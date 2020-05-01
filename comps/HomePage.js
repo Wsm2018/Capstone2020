@@ -5,7 +5,6 @@ import firebase from "firebase/app";
 import "firebase/auth";
 
 export default function HomePage() {
-
   const handleLogout = () => {
     firebase.auth().signOut();
   };
@@ -17,7 +16,7 @@ export default function HomePage() {
           handleLogout();
         }}
       >
-        <Text>Logout</Text>
+        <Text>Logout !</Text>
       </TouchableOpacity>
     </View>
   );
