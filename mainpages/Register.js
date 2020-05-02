@@ -13,6 +13,7 @@ import db from "../db";
 export default function Register(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName]  = useState("")
   const [phone, setPhone] = useState("");
   // the referral code that is entered
   const [referral, setReferral] = useState("");
@@ -71,6 +72,10 @@ export default function Register(props) {
       return alert("Enter your Phone Number!");
     }
 
+    if (displayName === "") {
+      return alert("Enter your Phone Number!");
+    }
+
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
     try {
@@ -81,8 +86,15 @@ export default function Register(props) {
       const response = await fetch(
         `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
           firebase.auth().currentUser.uid
-        }&phoneNumber=${phone}`
+        }&phoneNumber=${phone}&displayName=${displayName}`
       );
+      
+      //sending the user an email verification
+      await firebase.auth().currentUser.sendEmailVerification().then(() => {
+        console.log("Email Sent!")
+      }).catch((err) => {
+        console.log(err)
+      })
 
       // calling createUserInfo and waiting for it before moving the user to login page
       await createUserInfo();
@@ -107,7 +119,7 @@ export default function Register(props) {
       referralCode = Math.floor(Math.random() * 1000000) + "";
       result = await users.where("referralCode", "==", referralCode).get();
     }
-    const name = email.split("@");
+    // const name = email.split("@");
 
     // creating user document in the database with all the information
     db.collection("users")
@@ -117,7 +129,7 @@ export default function Register(props) {
         email,
         role: "user",
         qrCode: "",
-        name: name[0],
+        name: displayName,
         phone: `+974${phone}`,
         referralCode,
         loyaltyCode: "",
@@ -177,7 +189,15 @@ export default function Register(props) {
       </View>
       <View>
         <TextInput
+          onChangeText={setDisplayName}
+          placeholder="Display Name"
+          value={displayName}
+        />
+      </View>
+      <View>
+        <TextInput
           onChangeText={setPhone}
+          keyboardType="number-pad"
           placeholder="Phone No."
           value={phone}
         />
