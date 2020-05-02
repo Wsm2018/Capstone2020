@@ -159,7 +159,7 @@ export default function Register(props) {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View>
         <TextInput
           onChangeText={setEmail}
