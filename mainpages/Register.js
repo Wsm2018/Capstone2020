@@ -181,9 +181,12 @@ export default function Register(props) {
           placeholder="Phone No."
           value={phone}
         />
-      </View>
-      <View>
-        <TextInput />
+        <TextInput
+          onChangeText={setReferral}
+          selectionColor={"blue"}
+          placeholder="Referral Code"
+          value={referral}
+        />
         <TouchableOpacity
           style={{ flexDirection: "row", padding: 13 }}
           onPress={checkReferral}
