@@ -13,7 +13,8 @@ import db from "../db";
 export default function Register(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName]  = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   // the referral code that is entered
   const [referral, setReferral] = useState("");
@@ -76,6 +77,10 @@ export default function Register(props) {
       return alert("Enter your Phone Number!");
     }
 
+    if (password !== confirmPassword) {
+      return alert("Password and Confirm Password should be same !");
+    }
+
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
     try {
@@ -88,13 +93,17 @@ export default function Register(props) {
           firebase.auth().currentUser.uid
         }&phoneNumber=${phone}&displayName=${displayName}`
       );
-      
+
       //sending the user an email verification
-      await firebase.auth().currentUser.sendEmailVerification().then(() => {
-        console.log("Email Sent!")
-      }).catch((err) => {
-        console.log(err)
-      })
+      await firebase
+        .auth()
+        .currentUser.sendEmailVerification()
+        .then(() => {
+          console.log("Email Sent!");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       // calling createUserInfo and waiting for it before moving the user to login page
       await createUserInfo();
@@ -185,6 +194,14 @@ export default function Register(props) {
           placeholder="Password"
           secureTextEntry={true}
           value={password}
+        />
+      </View>
+      <View>
+        <TextInput
+          onChangeText={setConfirmPassword}
+          placeholder="Confirm Password"
+          secureTextEntry={true}
+          value={confirmPassword}
         />
       </View>
       <View>
