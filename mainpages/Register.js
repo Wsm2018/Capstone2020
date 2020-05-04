@@ -114,6 +114,7 @@ export default function Register(props) {
       .doc(firebase.auth().currentUser.uid)
       .set({
         outstandingBalance: 0,
+        balance: 0,
         email,
         role: "user",
         qrCode: "",
