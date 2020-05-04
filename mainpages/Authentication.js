@@ -10,10 +10,14 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../db";
 
-export default function Register(props) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+export default function Authentication(props) {
+  const [view, setView] = useState("Register");
+
+  // ***** Register useState *****
+
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   // the referral code that is entered
@@ -23,15 +27,24 @@ export default function Register(props) {
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
+  // ***** Login useState *****
+
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // ***** ForgotPass useState *****
+
+  const [forgotPassEmail, setForgotPassEmail] = useState("");
+
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
   useEffect(() => {
-    if (email !== "" && password !== "") {
+    if (registerEmail !== "" && registerPassword !== "") {
       setBtnStatus(false);
     } else {
       setBtnStatus(true);
     }
-  }, [email, password]);
+  }, [registerEmail, registerPassword]);
 
   // checkReferral will check if the referral exists and the code is available
   const checkReferral = async () => {
@@ -74,10 +87,10 @@ export default function Register(props) {
     }
 
     if (displayName === "") {
-      return alert("Enter your Phone Number!");
+      return alert("Enter your Display Name!");
     }
 
-    if (password !== confirmPassword) {
+    if (registerPassword !== confirmRegisterPassword) {
       return alert("Password and Confirm Password should be same !");
     }
 
@@ -85,7 +98,9 @@ export default function Register(props) {
     // email is not corrent or password is not strong
     try {
       // waiting for the user to be created in the authentication
-      await firebase.auth().createUserWithEmailAndPassword(email, password);
+      await firebase
+        .auth()
+        .createUserWithEmailAndPassword(registerEmail, registerPassword);
 
       // initiating user info in firebase funcations to add a display image and display name
       const response = await fetch(
@@ -136,7 +151,7 @@ export default function Register(props) {
       .set({
         outstandingBalance: 0,
         balance: 0,
-        email,
+        registerEmail,
         role: "user",
         qrCode: "",
         name: displayName,
@@ -180,29 +195,43 @@ export default function Register(props) {
     }
   };
 
-  return (
+  const handleLogin = async () => {
+    await firebase.auth().signInWithEmailAndPassword(loginEmail, loginPassword);
+  };
+
+  const handleSubmit = async () => {
+    firebase
+      .auth()
+      .sendPasswordResetEmail(forgotPassEmail)
+      .then(() => {
+        alert("Email Sent");
+      })
+      .catch((err) => alert(err.message));
+  };
+
+  return view === "Register" ? (
     <View style={styles.container}>
       <View>
         <TextInput
-          onChangeText={setEmail}
+          onChangeText={setRegisterEmail}
           placeholder="username@email.com"
-          value={email}
+          value={registerEmail}
         />
       </View>
       <View>
         <TextInput
-          onChangeText={setPassword}
+          onChangeText={setRegisterPassword}
           placeholder="Password"
           secureTextEntry={true}
-          value={password}
+          value={registerPassword}
         />
       </View>
       <View>
         <TextInput
-          onChangeText={setConfirmPassword}
+          onChangeText={setConfirmRegisterPassword}
           placeholder="Confirm Password"
           secureTextEntry={true}
-          value={confirmPassword}
+          value={confirmRegisterPassword}
         />
       </View>
       <View>
@@ -234,6 +263,55 @@ export default function Register(props) {
       </View>
       <TouchableOpacity onPress={handleRegister}>
         <Text>Sign Up!</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => setView("Login")}>
+        <Text>Already Have Account?</Text>
+      </TouchableOpacity>
+    </View>
+  ) : view === "Login" ? (
+    <View style={styles.container}>
+      <View>
+        <TextInput
+          onChangeText={setLoginEmail}
+          placeholder="username@email.com"
+          value={loginEmail}
+        />
+      </View>
+      <View>
+        <TextInput
+          onChangeText={setLoginPassword}
+          placeholder="Password"
+          secureTextEntry={true}
+          value={loginPassword}
+        />
+        <TouchableOpacity onPress={() => setView("ForgotPass")}>
+          <Text>Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity onPress={() => handleLogin()}>
+        <Text>Login</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => setView("Register")}>
+        <Text>Create New Account</Text>
+      </TouchableOpacity>
+    </View>
+  ) : (
+    <View>
+      <Text>Forgot Password</Text>
+      <TextInput
+        placeholder="Email"
+        value={forgotPassEmail}
+        onChangeText={setForgotPassEmail}
+      />
+      <TouchableOpacity onPress={handleSubmit}>
+        <Text>Submit</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => setView("Login")}>
+        <Text>Back to Login</Text>
       </TouchableOpacity>
     </View>
   );
