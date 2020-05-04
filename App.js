@@ -1,9 +1,7 @@
 //@refresh reset
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import Register from "./mainpages/Register";
-import Login from "./mainpages/Login";
-import ForgotPass from "./mainpages/ForgotPass"
+import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -25,9 +23,7 @@ export default function App() {
     <View style={styles.container}>
       {!loggedIn ? (
         <View style={styles.container}>
-          <Register />
-          <Login />
-          <ForgotPass />
+          <Authentication />
         </View>
       ) : (
         <View style={styles.container}>
