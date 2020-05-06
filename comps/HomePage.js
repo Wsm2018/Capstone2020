@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
+import { Icon } from "react-native-elements";
 
 export default function HomePage() {
   const handleLogout = () => {
@@ -30,3 +31,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+HomePage.navigationOptions = {
+  title: null,
+  tabBarIcon: () => {
+    <Icon name="home" type="font-awesome" size={24} />
+  },
+};
