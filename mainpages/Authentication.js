@@ -79,32 +79,32 @@ export default function Authentication(props) {
   }, [registerEmail, registerPassword]);
 
   // checkReferral will check if the referral exists and the code is available
-  const checkReferral = async () => {
-    // checking if the referral code is not empty
-    if (referral !== "") {
-      // checking if referral code is 6 digits
-      if (referral.length === 6) {
-        // defining the users collection from firestore
-        const users = db.collection("users");
-        // getting the referral document if the referralCode is equal to the provided code
-        // and using await because it will check all the documents
-        let result = await users.where("referralCode", "==", referral).get();
-        // it will check if there is only one document in the returned and
-        // the referral doc exists
-        if (result.size === 1) {
-          alert("Referral Code Added!");
-          setReferralStatus(true);
-        } else {
-          alert("Referral Code is Wrong!");
-          setReferral("");
-        }
-      } else {
-        alert("Referral Code is Not Available!");
-      }
-    } else {
-      alert("Enter a Code First!");
-    }
-  };
+  // const checkReferral = async () => {
+  //   // checking if the referral code is not empty
+  //   if (referral !== "") {
+  //     // checking if referral code is 6 digits
+  //     if (referral.length === 6) {
+  //       // defining the users collection from firestore
+  //       const users = db.collection("users");
+  //       // getting the referral document if the referralCode is equal to the provided code
+  //       // and using await because it will check all the documents
+  //       let result = await users.where("referralCode", "==", referral).get();
+  //       // it will check if there is only one document in the returned and
+  //       // the referral doc exists
+  //       if (result.size === 1) {
+  //         alert("Referral Code Added!");
+  //         setReferralStatus(true);
+  //       } else {
+  //         alert("Referral Code is Wrong!");
+  //         setReferral("");
+  //       }
+  //     } else {
+  //       alert("Referral Code is Not Available!");
+  //     }
+  //   } else {
+  //     alert("Enter a Code First!");
+  //   }
+  // };
 
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
@@ -161,7 +161,7 @@ export default function Authentication(props) {
             }&phoneNumber=${phone}&displayName=${displayName}`
           );
 
-          //sending the user a verification email 
+          //sending the user a verification email
           await firebase
             .auth()
             .currentUser.sendEmailVerification()
@@ -188,44 +188,6 @@ export default function Authentication(props) {
   // createUserInfo will complete all the data for the user to create a document in the
   // database
   const createUserInfo = async () => {
-    // generating a random 6 digit referralCode
-    let referralCode = Math.floor(Math.random() * 1000000) + "";
-
-    if (referralCode.length === 1) {
-      referralCode = "00000" + referralCode;
-    } else if (referralCode.length === 2) {
-      referralCode = "0000" + referralCode;
-    } else if (referralCode.length === 3) {
-      referralCode = "000" + referralCode;
-    } else if (referralCode.length === 4) {
-      referralCode = "00" + referralCode;
-    } else if (referralCode.length === 5) {
-      referralCode = "0" + referralCode;
-    }
-
-    const users = db.collection("users");
-    // checking if any other user has the generated referralCode and waiting because its
-    // checking all the users document
-    let result = await users.where("referralCode", "==", referralCode).get();
-    // while there is any user with that referralCode it will generate a new code and try
-    // again till it returns 0 documents
-    while (result.size > 0) {
-      referralCode = Math.floor(Math.random() * 1000000) + "";
-      if (referralCode.length === 1) {
-        referralCode = "00000" + referralCode;
-      } else if (referralCode.length === 2) {
-        referralCode = "0000" + referralCode;
-      } else if (referralCode.length === 3) {
-        referralCode = "000" + referralCode;
-      } else if (referralCode.length === 4) {
-        referralCode = "00" + referralCode;
-      } else if (referralCode.length === 5) {
-        referralCode = "0" + referralCode;
-      }
-      result = await users.where("referralCode", "==", referralCode).get();
-    }
-    // const name = email.split("@");
-
     // creating user document in the database with all the information
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -237,7 +199,6 @@ export default function Authentication(props) {
         qrCode: "",
         name: displayName,
         phone: `+974${phone}`,
-        referralCode,
         loyaltyCode: "",
         subscription: {
           name: null,
@@ -245,8 +206,6 @@ export default function Authentication(props) {
           endDate: null,
           point: null,
         },
-        // checking if the user used referral code and giving him a token if he did
-        tokens: referralStatus === true ? 1 : 0,
         location: null,
         privacy: {
           emailP: false,
@@ -254,7 +213,6 @@ export default function Authentication(props) {
           locationP: false,
           carsP: false,
         },
-        friends: [],
         favorite: [],
         reputation: 0,
         points: 0,
@@ -263,17 +221,17 @@ export default function Authentication(props) {
     // if the user used a referral code it will add document inside the referrer
     // subcollection and it will have the new user referral code and the status as false
     // the status will show if the user used the token or not
-    if (referralStatus === true) {
-      const referralDoc = await users
-        .where("referralCode", "==", referral)
-        .get();
-      referralDoc.forEach((doc) => {
-        db.collection("users").doc(doc.id).collection("referrer").doc().set({
-          referrerCode: referralCode,
-          status: false,
-        });
-      });
-    }
+    // if (referralStatus === true) {
+    //   const referralDoc = await users
+    //     .where("referralCode", "==", referral)
+    //     .get();
+    //   referralDoc.forEach((doc) => {
+    //     db.collection("users").doc(doc.id).collection("referrer").doc().set({
+    //       referrerCode: referralCode,
+    //       status: false,
+    //     });
+    //   });
+    // }
   };
 
   const handleLogin = async () => {
