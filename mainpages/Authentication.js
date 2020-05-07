@@ -100,6 +100,8 @@ export default function Authentication(props) {
           console.log(err);
         });
 
+      
+
       // calling createUserInfo and waiting for it before moving the user to login page
       await createUserInfo();
     } catch (error) {
@@ -191,7 +193,15 @@ export default function Authentication(props) {
   };
 
   const handleLogin = async () => {
-    await firebase.auth().signInWithEmailAndPassword(loginEmail, loginPassword);
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(loginEmail, loginPassword)
+      .then(() => {
+        console.log("successful login!")
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
   };
 
   const handleSubmit = async () => {
