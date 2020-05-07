@@ -86,7 +86,7 @@ export default function FriendsList(props) {
 
   return (
     <View style={styles.container}>
-      <Text>FriendsSearch</Text>
+      <Text>Friends Search</Text>
       {users &&
         friends &&
         users.map((user) => (
@@ -96,10 +96,7 @@ export default function FriendsList(props) {
           >
             <Text>{user.name}</Text>
             {user.friendStatus === "added" ? (
-              <TouchableOpacity
-                style={{ borderWidth: 1 }}
-                onPress={() => removeFriend(friend.id)}
-              >
+              <TouchableOpacity style={{ borderWidth: 1 }}>
                 <Text>Added</Text>
               </TouchableOpacity>
             ) : (

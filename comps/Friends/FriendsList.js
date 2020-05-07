@@ -27,7 +27,6 @@ export default function FriendsList(props) {
           setFriends([]);
         }
       });
-    setLoading(false);
   };
 
   const deleteAll = async () => {
@@ -74,7 +73,7 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Text>FriendsList</Text>
+      <Text>Friends List</Text>
       <Button title="Delete All" onPress={deleteAll} />
       {friends.length > 0 ? (
         friends.map((friend) => (
@@ -83,6 +82,16 @@ export default function FriendsList(props) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text>{friend.name}</Text>
+
+            <TouchableOpacity
+              style={{ borderWidth: 1 }}
+              onPress={() =>
+                props.navigation.navigate("FriendsChat", { friend })
+              }
+            >
+              <Text>Chat</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={{ borderWidth: 1 }}
               onPress={() => removeFriend(friend.id)}
