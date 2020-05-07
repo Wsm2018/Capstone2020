@@ -12,7 +12,6 @@ export default function FriendsList(props) {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
-      .orderBy("name")
       .onSnapshot((queryBySnapshot) => {
         console.log(queryBySnapshot.size);
         if (queryBySnapshot.size > 0) {
@@ -20,6 +19,11 @@ export default function FriendsList(props) {
           queryBySnapshot.forEach((doc) => {
             tempFriends.push({ id: doc.id, ...doc.data() });
           });
+          tempFriends = tempFriends.sort((a, b) =>
+            a.displayName
+              .toLowerCase()
+              .localeCompare(b.displayName.toLowerCase())
+          );
 
           // console.log(tempFriends);
           setFriends(tempFriends);
@@ -27,7 +31,6 @@ export default function FriendsList(props) {
           setFriends([]);
         }
       });
-    setLoading(false);
   };
 
   const deleteAll = async () => {
@@ -74,7 +77,7 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Text>FriendsList</Text>
+      <Text>Friends List</Text>
       <Button title="Delete All" onPress={deleteAll} />
       {friends.length > 0 ? (
         friends.map((friend) => (
@@ -82,7 +85,17 @@ export default function FriendsList(props) {
             key={friend.id}
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text>{friend.name}</Text>
+            <Text>{friend.displayName}</Text>
+
+            <TouchableOpacity
+              style={{ borderWidth: 1 }}
+              onPress={() =>
+                props.navigation.navigate("FriendsChat", { friend })
+              }
+            >
+              <Text>Chat</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={{ borderWidth: 1 }}
               onPress={() => removeFriend(friend.id)}
