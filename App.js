@@ -1,13 +1,20 @@
 //@refresh reset
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import Register from "./mainpages/Register";
-import Login from "./mainpages/Login";
+import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
 
-import HomePage from "./comps/HomePage";
+import { createAppContainer } from "react-navigation";
+import { createBottomTabNavigator } from "react-navigation-tabs";
+import HomeStack from "./navigation/HomeStack";
+
+const TabNavigator = createBottomTabNavigator({
+  Home: HomeStack,
+});
+
+const AppContainer = createAppContainer(TabNavigator);
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -16,24 +23,28 @@ export default function App() {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const handleLogout = () => {
-    firebase.auth().signOut();
-  };
+  if (!loggedIn) {
+    return (
+      <View style={styles.container}>
+        <Authentication />
+      </View>
+    );
+  } else {
+    return <AppContainer />;
+  }
 
-  return (
-    <View style={styles.container}>
-      {!loggedIn ? (
-        <View style={styles.container}>
-          <Register />
-          <Login />
-        </View>
-      ) : (
-        <View style={styles.container}>
-          <HomePage />
-        </View>
-      )}
-    </View>
-  );
+  // return (
+  //   // <View style={styles.container}>
+  //   //   {!loggedIn ? (
+
+  //   //   ) : (
+  //   //     // <View style={styles.container}>
+  //   //       <AppContainer />
+  //   //       {/* <HomePage /> */}
+  //   //     // </View>
+  //   //   )}
+  //   // </View>
+  // );
 }
 
 const styles = StyleSheet.create({
