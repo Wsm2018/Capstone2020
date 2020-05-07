@@ -172,6 +172,7 @@ export default function Authentication(props) {
         favorite: [],
         reputation: 0,
         points: 0,
+        photoURL: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
       });
 
     // if the user used a referral code it will add document inside the referrer
