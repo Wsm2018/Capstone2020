@@ -37,10 +37,7 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
-  // the referral code that is entered
-  const [referral, setReferral] = useState("");
-  // the referralStatus will show if a referral code is used
-  const [referralStatus, setReferralStatus] = useState(false);
+
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
@@ -194,6 +191,18 @@ export default function Authentication(props) {
     // generating a random 6 digit referralCode
     let referralCode = Math.floor(Math.random() * 1000000) + "";
 
+    if (referralCode.length === 1) {
+      referralCode = "00000" + referralCode;
+    } else if (referralCode.length === 2) {
+      referralCode = "0000" + referralCode;
+    } else if (referralCode.length === 3) {
+      referralCode = "000" + referralCode;
+    } else if (referralCode.length === 4) {
+      referralCode = "00" + referralCode;
+    } else if (referralCode.length === 5) {
+      referralCode = "0" + referralCode;
+    }
+
     const users = db.collection("users");
     // checking if any other user has the generated referralCode and waiting because its
     // checking all the users document
@@ -202,6 +211,17 @@ export default function Authentication(props) {
     // again till it returns 0 documents
     while (result.size > 0) {
       referralCode = Math.floor(Math.random() * 1000000) + "";
+      if (referralCode.length === 1) {
+        referralCode = "00000" + referralCode;
+      } else if (referralCode.length === 2) {
+        referralCode = "0000" + referralCode;
+      } else if (referralCode.length === 3) {
+        referralCode = "000" + referralCode;
+      } else if (referralCode.length === 4) {
+        referralCode = "00" + referralCode;
+      } else if (referralCode.length === 5) {
+        referralCode = "0" + referralCode;
+      }
       result = await users.where("referralCode", "==", referralCode).get();
     }
     // const name = email.split("@");
@@ -212,7 +232,7 @@ export default function Authentication(props) {
       .set({
         outstandingBalance: 0,
         balance: 0,
-        registerEmail,
+        email: registerEmail,
         role: "user",
         qrCode: "",
         name: displayName,
