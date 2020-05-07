@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
+import Home from "../mainpages/Admin/Home";
 
 export default function HomePage() {
   const handleLogout = () => {
@@ -18,6 +19,8 @@ export default function HomePage() {
       >
         <Text>Logout !</Text>
       </TouchableOpacity>
+
+      <Home />
     </View>
   );
 }

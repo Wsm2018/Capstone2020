@@ -20,10 +20,6 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
-  // the referral code that is entered
-  const [referral, setReferral] = useState("");
-  // the referralStatus will show if a referral code is used
-  const [referralStatus, setReferralStatus] = useState(false);
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
@@ -39,40 +35,24 @@ export default function Authentication(props) {
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
   useEffect(() => {
-    if (registerEmail !== "" && registerPassword !== "") {
+    if (
+      registerEmail !== "" &&
+      registerPassword !== "" &&
+      confirmRegisterPassword !== "" &&
+      displayName !== "" &&
+      phone !== ""
+    ) {
       setBtnStatus(false);
     } else {
       setBtnStatus(true);
     }
-  }, [registerEmail, registerPassword]);
-
-  // checkReferral will check if the referral exists and the code is available
-  const checkReferral = async () => {
-    // checking if the referral code is not empty
-    if (referral !== "") {
-      // checking if referral code is 6 digits
-      if (referral.length === 6) {
-        // defining the users collection from firestore
-        const users = db.collection("users");
-        // getting the referral document if the referralCode is equal to the provided code
-        // and using await because it will check all the documents
-        let result = await users.where("referralCode", "==", referral).get();
-        // it will check if there is only one document in the returned and
-        // the referral doc exists
-        if (result.size === 1) {
-          alert("Referral Code Added!");
-          setReferralStatus(true);
-        } else {
-          alert("Referral Code is Wrong!");
-          setReferral("");
-        }
-      } else {
-        alert("Referral Code is Not Available!");
-      }
-    } else {
-      alert("Enter a Code First!");
-    }
-  };
+  }, [
+    registerEmail,
+    registerPassword,
+    confirmRegisterPassword,
+    displayName,
+    phone,
+  ]);
 
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
@@ -177,18 +157,11 @@ export default function Authentication(props) {
         email: registerEmail,
         role: "user",
         qrCode: "",
-        name: displayName,
+        displayName,
         phone: `+974${phone}`,
         referralCode,
         loyaltyCode: "",
-        subscription: {
-          name: null,
-          startDate: null,
-          endDate: null,
-          point: null,
-        },
-        // checking if the user used referral code and giving him a token if he did
-        tokens: referralStatus === true ? 1 : 0,
+        tokens: 0,
         location: null,
         privacy: {
           emailP: false,
@@ -196,7 +169,6 @@ export default function Authentication(props) {
           locationP: false,
           carsP: false,
         },
-        friends: [],
         favorite: [],
         reputation: 0,
         points: 0,
@@ -284,7 +256,7 @@ export default function Authentication(props) {
           <Text>Use Code</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={handleRegister}>
+      <TouchableOpacity onPress={handleRegister} disabled={btnStatus}>
         <Text>Sign Up!</Text>
       </TouchableOpacity>
 
