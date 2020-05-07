@@ -5,7 +5,6 @@ import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
-import PhoneVerify from "./PhoneVerify";
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import HomeStack from "./navigation/HomeStack";

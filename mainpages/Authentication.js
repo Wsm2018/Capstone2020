@@ -342,18 +342,18 @@ export default function Authentication(props) {
             placeholder="Phone No."
             value={phone}
           />
-          <TextInput
+          {/* <TextInput
             onChangeText={setReferral}
             selectionColor={"blue"}
             placeholder="Referral Code"
             value={referral}
-          />
-          <TouchableOpacity
+          /> */}
+          {/* <TouchableOpacity
             style={{ flexDirection: "row", padding: 13 }}
             onPress={checkReferral}
           >
             <Text>Use Code</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <TouchableOpacity onPress={handleSendVerificationCode}>
           <Text>Sign Up!</Text>
