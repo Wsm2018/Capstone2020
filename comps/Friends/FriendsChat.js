@@ -17,19 +17,43 @@ import db from "../../db";
 export default function FriendsList(props) {
   const friend = props.navigation.getParam("friend");
 
+  const [from, setFrom] = useState(null);
+  const [to, setTo] = useState(null);
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
 
-  const handleChat = () => {
+  const handleFrom = () => {
     db.collection("chats")
-      .orderBy("date")
+      .where("from", "==", firebase.auth().currentUser.uid)
+      .where("to", "==", friend.id)
       .onSnapshot((queryBySnapshot) => {
-        let tempChats = [];
+        let tempFrom = [];
         queryBySnapshot.forEach((doc) => {
-          tempChats.push({ id: doc.id, ...doc.data() });
+          tempFrom.push({ id: doc.id, ...doc.data(), from: true });
         });
-        setChats(tempChats);
+        setFrom(tempFrom);
       });
+  };
+
+  const handleTo = () => {
+    db.collection("chats")
+      .where("from", "==", friend.id)
+      .where("to", "==", firebase.auth().currentUser.uid)
+      .onSnapshot((queryBySnapshot) => {
+        let tempFrom = [];
+        queryBySnapshot.forEach((doc) => {
+          tempFrom.push({ id: doc.id, ...doc.data(), from: false });
+        });
+        setTo(tempFrom);
+      });
+  };
+
+  const handleChat = () => {
+    let tempChat = from.concat(to);
+    tempChat = tempChat.sort(
+      (a, b) => a.dateTime.toDate() - b.dateTime.toDate()
+    );
+    setChats(tempChat);
   };
 
   const send = () => {
@@ -37,7 +61,7 @@ export default function FriendsList(props) {
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
-      date: new Date(),
+      dateTime: new Date(),
     });
   };
 
@@ -49,17 +73,35 @@ export default function FriendsList(props) {
   };
 
   useEffect(() => {
-    handleChat();
+    handleFrom();
+    handleTo();
   }, []);
 
+  useEffect(() => {
+    if (from && to) {
+      handleChat();
+    }
+  }, [from, to]);
+
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : null}
+      style={styles.container}
+    >
       <Text>Friends Chat</Text>
       <Button title="Delete All" onPress={deleteAll} />
 
-      <Text>To: {friend.name}</Text>
+      <Text>To: {friend.displayName}</Text>
       <ScrollView>
-        {chats && chats.map((chat) => <Text>{chat.text}</Text>)}
+        {chats &&
+          chats.map((chat) => (
+            <Text
+              style={chat.from ? { textAlign: "right" } : { textAlign: "left" }}
+              key={chat.id}
+            >
+              {chat.text}
+            </Text>
+          ))}
       </ScrollView>
 
       <TextInput

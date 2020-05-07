@@ -24,7 +24,6 @@ export default function FriendsList(props) {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
-      .orderBy("name")
       .onSnapshot((queryBySnapshot) => {
         if (queryBySnapshot.size > 0) {
           let tempFriends = [];
@@ -51,9 +50,13 @@ export default function FriendsList(props) {
     db.collection("users").onSnapshot((queryBySnapshot) => {
       let tempUsers = [];
       queryBySnapshot.forEach((doc) => {
-        tempUsers.push({ id: doc.id, ...doc.data() });
+        if (doc.id !== firebase.auth().currentUser.uid) {
+          tempUsers.push({ id: doc.id, ...doc.data() });
+        }
       });
-
+      tempUsers = tempUsers.sort((a, b) =>
+        a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase())
+      );
       setUsers(tempUsers);
     });
   };
@@ -63,13 +66,13 @@ export default function FriendsList(props) {
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .doc(user.id)
-      .set({ name: user.name, status: "added" });
+      .set({ displayName: user.displayName, status: "added" });
 
     db.collection("users")
       .doc(user.id)
       .collection("friends")
       .doc(firebase.auth().currentUser.uid)
-      .set({ name: currentUser.name, status: "added" });
+      .set({ displayName: currentUser.displayName, status: "added" });
   };
 
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function FriendsList(props) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
             key={user.id}
           >
-            <Text>{user.name}</Text>
+            <Text>{user.displayName}</Text>
             {user.friendStatus === "added" ? (
               <TouchableOpacity style={{ borderWidth: 1 }}>
                 <Text>Added</Text>
