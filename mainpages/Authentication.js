@@ -100,8 +100,6 @@ export default function Authentication(props) {
           console.log(err);
         });
 
-      
-
       // calling createUserInfo and waiting for it before moving the user to login page
       await createUserInfo();
     } catch (error) {
@@ -197,7 +195,7 @@ export default function Authentication(props) {
       .auth()
       .signInWithEmailAndPassword(loginEmail, loginPassword)
       .then(() => {
-        console.log("successful login!")
+        console.log("successful login!");
       })
       .catch((err) => {
         alert(err.message);
@@ -253,18 +251,6 @@ export default function Authentication(props) {
           placeholder="Phone No."
           value={phone}
         />
-        <TextInput
-          onChangeText={setReferral}
-          selectionColor={"blue"}
-          placeholder="Referral Code"
-          value={referral}
-        />
-        <TouchableOpacity
-          style={{ flexDirection: "row", padding: 13 }}
-          onPress={checkReferral}
-        >
-          <Text>Use Code</Text>
-        </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={handleRegister} disabled={btnStatus}>
         <Text>Sign Up!</Text>
