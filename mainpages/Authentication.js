@@ -20,7 +20,6 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
-
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
@@ -36,12 +35,24 @@ export default function Authentication(props) {
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
   useEffect(() => {
-    if (registerEmail !== "" && registerPassword !== "") {
+    if (
+      registerEmail !== "" &&
+      registerPassword !== "" &&
+      confirmRegisterPassword !== "" &&
+      displayName !== "" &&
+      phone !== ""
+    ) {
       setBtnStatus(false);
     } else {
       setBtnStatus(true);
     }
-  }, [registerEmail, registerPassword]);
+  }, [
+    registerEmail,
+    registerPassword,
+    confirmRegisterPassword,
+    displayName,
+    phone,
+  ]);
 
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
@@ -148,18 +159,11 @@ export default function Authentication(props) {
         email: registerEmail,
         role: "user",
         qrCode: "",
-        name: displayName,
+        displayName,
         phone: `+974${phone}`,
         referralCode,
         loyaltyCode: "",
-        subscription: {
-          name: null,
-          startDate: null,
-          endDate: null,
-          point: null,
-        },
-        // checking if the user used referral code and giving him a token if he did
-        tokens: referralStatus === true ? 1 : 0,
+        tokens: 0,
         location: null,
         privacy: {
           emailP: false,
@@ -167,7 +171,6 @@ export default function Authentication(props) {
           locationP: false,
           carsP: false,
         },
-        friends: [],
         favorite: [],
         reputation: 0,
         points: 0,
@@ -250,8 +253,20 @@ export default function Authentication(props) {
           placeholder="Phone No."
           value={phone}
         />
+        <TextInput
+          onChangeText={setReferral}
+          selectionColor={"blue"}
+          placeholder="Referral Code"
+          value={referral}
+        />
+        <TouchableOpacity
+          style={{ flexDirection: "row", padding: 13 }}
+          onPress={checkReferral}
+        >
+          <Text>Use Code</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={handleRegister}>
+      <TouchableOpacity onPress={handleRegister} disabled={btnStatus}>
         <Text>Sign Up!</Text>
       </TouchableOpacity>
 
