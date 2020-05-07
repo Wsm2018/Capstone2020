@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Button } from "react-native";
 
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -9,33 +9,98 @@ export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
 
   const handleFriends = async () => {
-    const getQuery = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
-      .get();
+      .orderBy("name")
+      .onSnapshot((queryBySnapshot) => {
+        console.log(queryBySnapshot.size);
+        if (queryBySnapshot.size > 0) {
+          let tempFriends = [];
+          queryBySnapshot.forEach((doc) => {
+            tempFriends.push({ id: doc.id, ...doc.data() });
+          });
 
-    if (getQuery.size > 0) {
-      console.log("no friends");
-    }
+          // console.log(tempFriends);
+          setFriends(tempFriends);
+        } else {
+          setFriends([]);
+        }
+      });
+    setLoading(false);
+  };
 
-    // const getQuery = await db
-    //   .collection("users")
-    //   .doc(firebase.auth().currentUser)
-    //   .collection("friends")
-    //   .limit(1)
-    //   .get();
+  const deleteAll = async () => {
+    const userQuery = await db.collection("users").get();
 
-    // console.log("Friends:", getQuery.size);
+    userQuery.forEach(async (user) => {
+      const friendQuery = await db
+        .collection("users")
+        .doc(user.id)
+        .collection("friends")
+        .get();
+
+      friendQuery.forEach((friend) => {
+        db.collection("users")
+          .doc(user.id)
+          .collection("friends")
+          .doc(friend.id)
+          .delete();
+      });
+    });
+  };
+
+  const removeFriend = (id) => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("friends")
+      .doc(id)
+      .delete();
+
+    db.collection("users")
+      .doc(id)
+      .collection("friends")
+      .doc(firebase.auth().currentUser.uid)
+      .delete();
   };
 
   useEffect(() => {
     handleFriends();
   }, []);
-  return (
+
+  return !friends ? (
+    <View>
+      <Text>LOADING...</Text>
+    </View>
+  ) : (
     <View style={styles.container}>
       <Text>FriendsList</Text>
-      {friends ? <View></View> : <View></View>}
+      <Button title="Delete All" onPress={deleteAll} />
+      {friends.length > 0 ? (
+        friends.map((friend) => (
+          <View
+            key={friend.id}
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text>{friend.name}</Text>
+            <TouchableOpacity
+              style={{ borderWidth: 1 }}
+              onPress={() => removeFriend(friend.id)}
+            >
+              <Text>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      ) : (
+        <Text>You have no friends</Text>
+      )}
+
+      <TouchableOpacity
+        style={{ borderWidth: 1 }}
+        onPress={() => props.navigation.navigate("FriendsSearch")}
+      >
+        <Text>Add A Friend</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -43,6 +108,5 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
   },
 });

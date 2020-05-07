@@ -5,11 +5,13 @@ import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
 
 import FriendsList from "./FriendsList";
+import FriendsSearch from "./FriendsSearch";
 
 const FriendsStack = createAppContainer(
   createStackNavigator(
     {
-      FriendsList: { screen: FriendsList },
+      FriendsList: FriendsList,
+      FriendsSearch: FriendsSearch,
     },
     {
       initialRouteName: "FriendsList",
