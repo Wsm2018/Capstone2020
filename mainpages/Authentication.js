@@ -20,10 +20,7 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
-  // the referral code that is entered
-  const [referral, setReferral] = useState("");
-  // the referralStatus will show if a referral code is used
-  const [referralStatus, setReferralStatus] = useState(false);
+
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
@@ -45,34 +42,6 @@ export default function Authentication(props) {
       setBtnStatus(true);
     }
   }, [registerEmail, registerPassword]);
-
-  // checkReferral will check if the referral exists and the code is available
-  const checkReferral = async () => {
-    // checking if the referral code is not empty
-    if (referral !== "") {
-      // checking if referral code is 6 digits
-      if (referral.length === 6) {
-        // defining the users collection from firestore
-        const users = db.collection("users");
-        // getting the referral document if the referralCode is equal to the provided code
-        // and using await because it will check all the documents
-        let result = await users.where("referralCode", "==", referral).get();
-        // it will check if there is only one document in the returned and
-        // the referral doc exists
-        if (result.size === 1) {
-          alert("Referral Code Added!");
-          setReferralStatus(true);
-        } else {
-          alert("Referral Code is Wrong!");
-          setReferral("");
-        }
-      } else {
-        alert("Referral Code is Not Available!");
-      }
-    } else {
-      alert("Enter a Code First!");
-    }
-  };
 
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
@@ -271,18 +240,6 @@ export default function Authentication(props) {
           placeholder="Phone No."
           value={phone}
         />
-        <TextInput
-          onChangeText={setReferral}
-          selectionColor={"blue"}
-          placeholder="Referral Code"
-          value={referral}
-        />
-        <TouchableOpacity
-          style={{ flexDirection: "row", padding: 13 }}
-          onPress={checkReferral}
-        >
-          <Text>Use Code</Text>
-        </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={handleRegister}>
         <Text>Sign Up!</Text>
