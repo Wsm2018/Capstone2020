@@ -9,9 +9,13 @@ import "firebase/auth";
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import HomeStack from "./navigation/HomeStack";
+import ServiceStack from "./navigation/ServiceStack";
+import NewsStack from "./navigation/NewsStack";
 
 const TabNavigator = createBottomTabNavigator({
   Home: HomeStack,
+  Service: ServiceStack,
+  News: NewsStack,
 });
 
 const AppContainer = createAppContainer(TabNavigator);
