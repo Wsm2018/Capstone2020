@@ -251,51 +251,141 @@ export default function Authentication(props) {
 
       {view === 1 ? (
         <View style={styles.containerRegister}>
-          <View>
-            <TextInput
-              onChangeText={setRegisterEmail}
-              placeholder="username@email.com"
-              value={registerEmail}
-            />
-          </View>
-          <View>
-            <TextInput
-              onChangeText={setRegisterPassword}
-              placeholder="Password"
-              secureTextEntry={true}
-              value={registerPassword}
-            />
-          </View>
-          <View>
-            <TextInput
-              onChangeText={setConfirmRegisterPassword}
-              placeholder="Confirm Password"
-              secureTextEntry={true}
-              value={confirmRegisterPassword}
-            />
-          </View>
-          <View>
-            <TextInput
-              onChangeText={setDisplayName}
-              placeholder="Display Name"
-              value={displayName}
-            />
-          </View>
-          <View>
-            <TextInput
-              onChangeText={setPhone}
-              keyboardType="number-pad"
-              placeholder="Phone No."
-              value={phone}
-            />
-          </View>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text>Sign Up!</Text>
-          </TouchableOpacity>
+          <View style={styles.form}>
+            <View style={{ flex: 6, width: "100%" }}>
+              <Input
+                inputContainerStyle={{ borderBottomWidth: 0 }}
+                leftIcon={
+                  <Icon name="email-outline" size={20} color="lightgray" />
+                }
+                containerStyle={styles.Inputs}
+                onChangeText={setRegisterEmail}
+                placeholder="username@email.com"
+                value={registerEmail}
+                // errorMessage="Error"
+                // errorStyle={{ color: "blue" }}
+                // renderErrorMessage
+              />
+              {/* <TextInput
+                onChangeText={setRegisterEmail}
+                placeholder="username@email.com"
+                value={registerEmail}
+              /> */}
+              <Input
+                inputContainerStyle={{ borderBottomWidth: 0 }}
+                leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                containerStyle={styles.Inputs}
+                onChangeText={setRegisterPassword}
+                placeholder="Password"
+                secureTextEntry={true}
+                value={registerPassword}
+                // errorMessage="Error"
+                // errorStyle={{ color: "blue" }}
+                // renderErrorMessage
+              />
+              {/* <TextInput
+                onChangeText={setRegisterPassword}
+                placeholder="Password"
+                secureTextEntry={true}
+                value={registerPassword}
+              /> */}
+              <Input
+                inputContainerStyle={{ borderBottomWidth: 0 }}
+                leftIcon={
+                  <Icon name="lock-outline" size={20} color="lightgray" />
+                }
+                containerStyle={styles.Inputs}
+                onChangeText={setConfirmRegisterPassword}
+                placeholder="Confirm Password"
+                secureTextEntry={true}
+                value={confirmRegisterPassword}
+                // errorMessage="Error"
+                // errorStyle={{ color: "blue" }}
+                // renderErrorMessage
+              />
+              {/* <TextInput
+                onChangeText={setConfirmRegisterPassword}
+                placeholder="Confirm Password"
+                secureTextEntry={true}
+                value={confirmRegisterPassword}
+              /> */}
+              <Input
+                inputContainerStyle={{ borderBottomWidth: 0 }}
+                leftIcon={
+                  <Icon
+                    name="account-card-details"
+                    size={20}
+                    color="lightgray"
+                  />
+                }
+                containerStyle={styles.Inputs}
+                onChangeText={setDisplayName}
+                placeholder="Display Name"
+                value={displayName}
+                // errorMessage="Error"
+                // errorStyle={{ color: "blue" }}
+                // renderErrorMessage
+              />
+              {/* <TextInput
+                onChangeText={setDisplayName}
+                placeholder="Display Name"
+                value={displayName}
+              /> */}
+              <Input
+                inputContainerStyle={{ borderBottomWidth: 0 }}
+                leftIcon={
+                  <Icon name="cellphone-android" size={20} color="lightgray" />
+                }
+                containerStyle={styles.Inputs}
+                onChangeText={setPhone}
+                keyboardType="number-pad"
+                placeholder="Phone No."
+                value={phone}
+                // errorMessage="Error"
+                // errorStyle={{ color: "blue" }}
+                // renderErrorMessage
+              />
+              {/* <TextInput
+                onChangeText={setPhone}
+                keyboardType="number-pad"
+                placeholder="Phone No."
+                value={phone}
+              /> */}
+            </View>
 
-          <TouchableOpacity onPress={() => setView("Login")}>
-            <Text>Already Have Account?</Text>
-          </TouchableOpacity>
+            <View
+              style={{
+                // flexDirection: "row",
+                // justifyContent: "center",
+                flex: 1,
+                // backgroundColor: "green",
+                width: "100%",
+              }}
+            >
+              <TouchableOpacity
+                onPress={handleRegister}
+                style={styles.loginButton}
+              >
+                <Text style={{ color: "white" }}>Sign Up!</Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                // flexDirection: "row",
+                // justifyContent: "center",
+                flex: 1,
+                // backgroundColor: "green",
+                width: "100%",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setView("Login")}
+                style={styles.loginButton}
+              >
+                <Text style={{ color: "white" }}>Already Have Account?</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       ) : view === 0 ? (
         <View style={styles.containerLogin}>
@@ -413,6 +503,12 @@ const styles = StyleSheet.create({
   containerRegister: {
     flex: 1,
     backgroundColor: "#0A5155",
+    width: "80%",
+    marginTop: -5,
+    marginBottom: "5%",
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: "gray",
     //alignItems: "center",
     //justifyContent: "center",
     // flexDirection: "column",
