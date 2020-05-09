@@ -80,28 +80,33 @@ exports.sendMail = functions.https.onRequest((request, response) => {
 
 
 exports.handleBooking = functions.https.onCall(async (data, context) => {
-  //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
+  //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  //console.log("add credit card", data.)
-  const booking = {
+  var booking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
     endDateTime: data.endDateTime,
   }
-  db.collection("assets").doc(data.asset.id).collection("assetBookings").add(booking);
-
+  var bId= ""
+  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(booking).then(docRef => 
+    bId = docRef.id
+  )
+  
+  booking.id = bId
+  
   db.collection("payments")
         .add({
           user: data.user,
           card:data.card,
           assetBooking:booking,
           serviceBooking: null,
-          totalAmount: 500,
+          totalAmount: data.totalAmount,
           dateTime: data.dateTime,
-          status: true,
+          status: data.status,
           promotionCode: null,
         });
+
   if( data.addCreditCard){
     db.collection("users").doc(data.uid).collection("cards").add(data.card)
   }
