@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Modal,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -13,11 +14,14 @@ import db from "../db";
 import LottieView from "lottie-react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Input } from "react-native-elements";
-
 import { ButtonGroup } from "react-native-elements";
 
 export default function Authentication(props) {
   const [view, setView] = useState(0);
+  const [registerView, setRegisterView] = useState(0);
+  const [modalViewLogin, setModalViewLogin] = useState(false);
+  const [accessFlag, setAccessFlag] = useState(false);
+  const [accessValid, setAccessValid] = useState(false);
   const buttons = ["Login", "Register"];
 
   // ***** Register useState *****
@@ -214,6 +218,7 @@ export default function Authentication(props) {
         alert("Email Sent");
       })
       .catch((err) => alert(err.message));
+    setModalViewLogin(false);
   };
 
   return (
@@ -226,7 +231,7 @@ export default function Authentication(props) {
           style={{ position: "relative", width: "50%" }}
         />
       </View>
-      <View style={{ alignItems: "center" }}>
+      <View style={styles.buttonGroup}>
         <ButtonGroup
           onPress={() => (view === 1 ? setView(0) : setView(1))}
           selectedIndex={view}
@@ -253,104 +258,148 @@ export default function Authentication(props) {
         <View style={styles.containerRegister}>
           <View style={styles.form}>
             <View style={{ flex: 6, width: "100%" }}>
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={
-                  <Icon name="email-outline" size={20} color="lightgray" />
-                }
-                containerStyle={styles.Inputs}
-                onChangeText={setRegisterEmail}
-                placeholder="username@email.com"
-                value={registerEmail}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              {/* <TextInput
-                onChangeText={setRegisterEmail}
-                placeholder="username@email.com"
-                value={registerEmail}
-              /> */}
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={<Icon name="key" size={20} color="lightgray" />}
-                containerStyle={styles.Inputs}
-                onChangeText={setRegisterPassword}
-                placeholder="Password"
-                secureTextEntry={true}
-                value={registerPassword}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              {/* <TextInput
-                onChangeText={setRegisterPassword}
-                placeholder="Password"
-                secureTextEntry={true}
-                value={registerPassword}
-              /> */}
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={
-                  <Icon name="lock-outline" size={20} color="lightgray" />
-                }
-                containerStyle={styles.Inputs}
-                onChangeText={setConfirmRegisterPassword}
-                placeholder="Confirm Password"
-                secureTextEntry={true}
-                value={confirmRegisterPassword}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              {/* <TextInput
-                onChangeText={setConfirmRegisterPassword}
-                placeholder="Confirm Password"
-                secureTextEntry={true}
-                value={confirmRegisterPassword}
-              /> */}
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={
-                  <Icon
-                    name="account-card-details"
-                    size={20}
-                    color="lightgray"
+              {registerView === 0 ? (
+                <View>
+                  <Input
+                    inputContainerStyle={{
+                      borderBottomWidth: 0,
+                      // color: "white",
+                    }}
+                    leftIcon={
+                      <Icon name="email-outline" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    onChangeText={setRegisterEmail}
+                    placeholder="E-mail"
+                    value={registerEmail}
+                    placeholderTextColor="white"
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
                   />
-                }
-                containerStyle={styles.Inputs}
-                onChangeText={setDisplayName}
-                placeholder="Display Name"
-                value={displayName}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              {/* <TextInput
-                onChangeText={setDisplayName}
-                placeholder="Display Name"
-                value={displayName}
+                  {/* <TextInput
+                onChangeText={setRegisterEmail}
+                placeholder="username@email.com"
+                value={registerEmail}
               /> */}
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={
-                  <Icon name="cellphone-android" size={20} color="lightgray" />
-                }
-                containerStyle={styles.Inputs}
-                onChangeText={setPhone}
-                keyboardType="number-pad"
-                placeholder="Phone No."
-                value={phone}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              {/* <TextInput
-                onChangeText={setPhone}
-                keyboardType="number-pad"
-                placeholder="Phone No."
-                value={phone}
+                  <Input
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                    containerStyle={styles.Inputs}
+                    onChangeText={setRegisterPassword}
+                    placeholder="Password"
+                    secureTextEntry={true}
+                    value={registerPassword}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    placeholderTextColor="white"
+                    // renderErrorMessage
+                  />
+                  {/* <TextInput
+                onChangeText={setRegisterPassword}
+                placeholder="Password"
+                secureTextEntry={true}
+                value={registerPassword}
               /> */}
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon name="lock-outline" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    onChangeText={setConfirmRegisterPassword}
+                    placeholder="Confirm Password"
+                    secureTextEntry={true}
+                    value={confirmRegisterPassword}
+                    placeholderTextColor="white"
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
+                  />
+                </View>
+              ) : (
+                <View>
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon
+                        name="account-card-details"
+                        size={20}
+                        color="lightgray"
+                      />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setDisplayName}
+                    placeholder="Display Name"
+                    value={displayName}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
+                  />
+
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon
+                        name="cellphone-android"
+                        size={20}
+                        color="lightgray"
+                      />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setPhone}
+                    keyboardType="number-pad"
+                    placeholder="Phone No."
+                    value={phone}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
+                  />
+
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon name="percent" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    // onChangeText={}
+                    keyboardType="number-pad"
+                    placeholder="Referral Code"
+                    value={phone}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
+                  />
+                </View>
+              )}
             </View>
 
             <View
@@ -362,88 +411,334 @@ export default function Authentication(props) {
                 width: "100%",
               }}
             >
-              <TouchableOpacity
-                onPress={handleRegister}
-                style={styles.loginButton}
-              >
-                <Text style={{ color: "white" }}>Sign Up!</Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                // flexDirection: "row",
-                // justifyContent: "center",
-                flex: 1,
-                // backgroundColor: "green",
-                width: "100%",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setView("Login")}
-                style={styles.loginButton}
-              >
-                <Text style={{ color: "white" }}>Already Have Account?</Text>
-              </TouchableOpacity>
+              {registerView === 0 ? (
+                <TouchableOpacity
+                  onPress={() => setRegisterView(1)}
+                  style={styles.loginButton}
+                >
+                  <Text style={{ color: "white" }}>Next</Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{ flexDirection: "row", justifyContent: "center" }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setRegisterView(0)}
+                    style={styles.backButton}
+                  >
+                    <Text style={{ color: "#3e875b", fontWeight: "bold" }}>
+                      Back
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleRegister}
+                    style={styles.registerButton}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      Sign Up!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
         </View>
       ) : view === 0 ? (
         <View style={styles.containerLogin}>
-          {/* <View style={styles.header}>
-            <Text style={styles.headerText}>Sign in</Text>
-          </View> */}
-          <View style={styles.form}>
-            {/* <LottieView
-              source={require("../assets/login.json")}
-              autoPlay
-              loop
-              style={{ position: "relative", width: "50%" }}
-            /> */}
-            <View style={{ flex: 6, width: "100%" }}>
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={
-                  <Icon name="email-outline" size={20} color="lightgray" />
-                }
-                containerStyle={styles.Inputs}
-                onChangeText={setLoginEmail}
-                placeholder="E-mail"
-                value={loginEmail}
-                // errorMessage="Error"
-                // errorStyle={{ color: "blue" }}
-                // renderErrorMessage
-              />
-              <Input
-                inputContainerStyle={{ borderBottomWidth: 0 }}
-                leftIcon={<Icon name="key" size={20} color="lightgray" />}
-                containerStyle={styles.Inputs}
-                onChangeText={setLoginPassword}
-                placeholder="Password"
-                secureTextEntry={true}
-                value={loginPassword}
-              />
-            </View>
+          {modalViewLogin === false && accessFlag == false ? (
+            <View style={styles.form}>
+              <View style={{ flex: 6, width: "100%" }}>
+                <Input
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="lightgray" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  // errorMessage="Error"
 
-            <View
-              style={{
-                // flexDirection: "row",
-                // justifyContent: "center",
-                flex: 1,
-                // backgroundColor: "green",
-                width: "100%",
-              }}
-            >
-              {/* <TouchableOpacity style={styles.Buttons}>
-                <Text>Access Code</Text>
-              </TouchableOpacity> */}
-              <TouchableOpacity
-                style={styles.loginButton}
-                onPress={() => handleLogin()}
+                  placeholderTextColor="white"
+                  // errorStyle={{ color: "blue" }}
+                  // renderErrorMessage
+                />
+                <Input
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginPassword}
+                  placeholder="Password"
+                  secureTextEntry={true}
+                  value={loginPassword}
+                  placeholderTextColor="white"
+                />
+              </View>
+
+              <View
+                style={{
+                  // flexDirection: "row",
+                  // justifyContent: "center",
+                  flex: 1,
+                  // backgroundColor: "green",
+                  width: "100%",
+                  justifyContent: "flex-end",
+                }}
               >
-                <Text style={{ color: "white" }}>Login</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => handleLogin()}
+                >
+                  <Text style={{ color: "white" }}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => setAccessFlag(true)}
+                >
+                  <Text style={{ color: "white" }}>Access Code</Text>
+                </TouchableOpacity>
+                <Text
+                  onPress={() => setModalViewLogin(true)}
+                  style={{ textAlign: "center", color: "white" }}
+                >
+                  Forgot Password?
+                </Text>
+              </View>
             </View>
-          </View>
+          ) : modalViewLogin === true && accessFlag == false ? (
+            <View style={styles.form}>
+              <View
+                style={{
+                  flex: 6,
+                  width: "100%",
+                  // paddingTop: "15%",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <Input
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="lightgray" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  // errorMessage="Error"
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  placeholderTextColor="white"
+                  // errorStyle={{ color: "blue" }}
+                  // renderErrorMessage
+                />
+                <View>
+                  <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={() => handleSubmit()}
+                  >
+                    <Text style={{ color: "white" }}>Submit</Text>
+                  </TouchableOpacity>
+                  <Text
+                    onPress={() => setModalViewLogin(false)}
+                    style={{ textAlign: "center", color: "white" }}
+                  >
+                    Back to Login
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            modalViewLogin === false &&
+            accessFlag == true && (
+              <View style={styles.form}>
+                {accessValid == false ? (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      // paddingTop: "15%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon name="account-key" size={20} color="lightgray" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setLoginEmail}
+                      placeholder="Access Code"
+                      value={loginEmail}
+                      // errorMessage="Error"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      // errorStyle={{ color: "blue" }}
+                      // renderErrorMessage
+                    />
+                    <View>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={() => setAccessValid(true)}
+                      >
+                        <Text style={{ color: "white" }}>Use Code</Text>
+                      </TouchableOpacity>
+                      <Text
+                        onPress={() => setAccessFlag(false)}
+                        style={{ textAlign: "center", color: "white" }}
+                      >
+                        Back to Login
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      // paddingTop: "15%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        //width: "80%",
+                      }}
+                    >
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={
+                          <Icon
+                            name="email-outline"
+                            size={20}
+                            color="lightgray"
+                          />
+                        }
+                        containerStyle={styles.AccessInputs}
+                        onChangeText={setLoginEmail}
+                        // placeholder="E-mail"
+                        value={"email@email.com"}
+                        // errorMessage="Error"
+                        inputStyle={{
+                          color: "white",
+                          fontSize: 16,
+                          textAlign: "center",
+                        }}
+                        placeholderTextColor="white"
+                        disabled={true}
+                        // errorStyle={{ color: "blue" }}
+                        // renderErrorMessage
+                      />
+
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="email-outline"
+                        //     size={20}
+                        //     color="lightgray"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "white",
+                          height: 50,
+                          width: "20%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                        }}
+                        // onChangeText={setLoginEmail}
+                        // placeholder="QR"
+                        //value={loginEmail}
+                        // errorMessage="Error"
+                        inputStyle={{
+                          color: "white",
+                          // fontSize: 16,
+                          textAlign: "center",
+                        }}
+                        placeholderTextColor="white"
+                        value="QR"
+                        disabled={true}
+                        // errorStyle={{ color: "blue" }}
+                        // renderErrorMessage
+                      />
+                    </View>
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setLoginEmail}
+                      placeholder="Display Name"
+                      value={loginEmail}
+                      // errorMessage="Error"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      // errorStyle={{ color: "blue" }}
+                      // renderErrorMessage
+                    />
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="cellphone-android"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setLoginEmail}
+                      placeholder="Phone No."
+                      value={loginEmail}
+                      // errorMessage="Error"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      // errorStyle={{ color: "blue" }}
+                      // renderErrorMessage
+                    />
+
+                    <View style={{ marginTop: "7%" }}>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={() => setAccessValid(false)}
+                      >
+                        <Text style={{ color: "white" }}>Next</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )
+          )}
 
           {/* <View style={styles.footer}>
             <Text style={{ color: "white" }}>Don't Have an Account? </Text>
@@ -454,7 +749,7 @@ export default function Authentication(props) {
         </View>
       ) : (
         <View>
-          <Text>Forgot Password</Text>
+          {/* <Text>Forgot Password</Text> */}
           <TextInput
             placeholder="Email"
             value={forgotPassEmail}
@@ -484,6 +779,9 @@ const styles = StyleSheet.create({
     width: Math.round(Dimensions.get("window").width),
     height: Math.round(Dimensions.get("window").height),
   },
+  buttonGroup: {
+    alignItems: "center",
+  },
   containerLogin: {
     flex: 1,
     backgroundColor: "#06575c",
@@ -502,7 +800,7 @@ const styles = StyleSheet.create({
   },
   containerRegister: {
     flex: 1,
-    backgroundColor: "#0A5155",
+    backgroundColor: "#06575c",
     width: "80%",
     marginTop: -5,
     marginBottom: "5%",
@@ -546,6 +844,20 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     paddingLeft: 12,
     marginTop: 20,
+    // color: "white",
+  },
+  AccessInputs: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "white",
+    height: 50,
+    width: "56%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 12,
+    marginTop: 20,
+    marginEnd: 10,
+    // color: "white",
   },
   Buttons: {
     borderRadius: 8,
@@ -561,17 +873,47 @@ const styles = StyleSheet.create({
     marginStart: "2%",
     marginEnd: "2%",
   },
-  loginButton: {
-    backgroundColor: "#3e875b",
-    height: "100%",
-    width: "100%",
+  backButton: {
+    backgroundColor: "lightgray",
+    height: 40,
+    width: "20%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 13,
+    // marginTop: 18,
     // marginRight:8,
     marginStart: "2%",
     marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  loginButton: {
+    backgroundColor: "#3e875b",
+    height: 40,
+    width: "80%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    // marginTop: 18,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  registerButton: {
+    backgroundColor: "#3e875b",
+    height: 40,
+    width: "55%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    // marginTop: 18,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
   },
   header: {
     justifyContent: "center",
