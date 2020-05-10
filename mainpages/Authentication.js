@@ -24,6 +24,9 @@ export default function Authentication(props) {
   const [accessValid, setAccessValid] = useState(false);
   const buttons = ["Login", "Register"];
 
+  //***** Access Code  */
+  const [AccessCode, setAccessCode] = useState("");
+  const [AccessAmount, setAccessAmount] = useState("");
   // ***** Register useState *****
 
   const [registerEmail, setRegisterEmail] = useState("");
@@ -31,6 +34,7 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [referralCode, setReferralCode] = useState("");
 
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
@@ -225,7 +229,7 @@ export default function Authentication(props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <LottieView
-          source={require("../assets/login.json")}
+          source={require("../assets/images/profileanimation.json")}
           autoPlay
           loop
           style={{ position: "relative", width: "50%" }}
@@ -390,10 +394,10 @@ export default function Authentication(props) {
                     }
                     containerStyle={styles.Inputs}
                     placeholderTextColor="white"
-                    // onChangeText={}
+                    onChangeText={setReferralCode}
                     keyboardType="number-pad"
                     placeholder="Referral Code"
-                    value={phone}
+                    value={referralCode}
                     // errorMessage="Error"
                     // errorStyle={{ color: "blue" }}
                     // renderErrorMessage
@@ -675,7 +679,8 @@ export default function Authentication(props) {
                           textAlign: "center",
                         }}
                         placeholderTextColor="white"
-                        value="QR"
+                        value={AccessAmount}
+                        // value="QR"
                         disabled={true}
                         // errorStyle={{ color: "blue" }}
                         // renderErrorMessage
@@ -691,9 +696,9 @@ export default function Authentication(props) {
                         />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setLoginEmail}
+                      onChangeText={setDisplayName}
                       placeholder="Display Name"
-                      value={loginEmail}
+                      value={displayName}
                       // errorMessage="Error"
                       inputStyle={{
                         color: "white",
@@ -713,9 +718,9 @@ export default function Authentication(props) {
                         />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setLoginEmail}
+                      onChangeText={setPhone}
                       placeholder="Phone No."
-                      value={loginEmail}
+                      value={phone}
                       // errorMessage="Error"
                       inputStyle={{
                         color: "white",
