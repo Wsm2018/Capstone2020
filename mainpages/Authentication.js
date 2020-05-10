@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Dimensions,
   Modal,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -26,7 +30,7 @@ export default function Authentication(props) {
 
   //***** Access Code  */
   const [AccessCode, setAccessCode] = useState("");
-  const [AccessAmount, setAccessAmount] = useState("");
+  const [AccessAmount, setAccessAmount] = useState("QR");
   // ***** Register useState *****
 
   const [registerEmail, setRegisterEmail] = useState("");
@@ -48,6 +52,31 @@ export default function Authentication(props) {
 
   const [forgotPassEmail, setForgotPassEmail] = useState("");
 
+  // Validation useStates for Form
+  //Login
+  const [loginEmailError, setLoginEmailError] = useState("transparent");
+  const [loginPasswordError, setLoginPasswordError] = useState("transparent");
+
+  //Reg
+  const [registerEmailError, setRegisterEmailError] = useState("transparent");
+  const [registerPasswordError, setRegisterPasswordError] = useState(
+    "transparent"
+  );
+  const [
+    confirmRegisterPasswordError,
+    setConfirmRegisterPasswordError,
+  ] = useState("transparent");
+  const [phoneError, setPhoneErr] = useState("transparent");
+  const [displayNameError, setDisplayErr] = useState("transparent");
+  const [refErr, setRefErr] = useState("transparent");
+
+  //Access
+
+  const [accessCodeError, setAccessCodeError] = useState("transparent");
+  const [displayErr2, setDisplayErr2] = useState("transparent");
+  const [phoneErr2, setPhoneErr2] = useState("transparent");
+  const [phoneAccess, setPhoneAccess] = useState("");
+
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
   useEffect(() => {
@@ -64,19 +93,29 @@ export default function Authentication(props) {
     if (phone !== "") {
       // checking if Phone No. is 8 digits
       if (phone.length !== 8) {
-        return alert("Phone Number is Not Available!");
+        setPhoneErr("red");
+        // return alert("Phone Number is Not Available!");
+      } else {
+        setPhoneErr("transparent");
       }
     } else {
-      return alert("Enter your Phone Number!");
+      setPhoneErr("red");
+      // return alert("Enter your Phone Number!");
     }
 
     if (displayName === "") {
-      return alert("Enter your Display Name!");
+      setDisplayErr("red");
+      // return alert("Enter your Display Name!");
+    } else {
+      setDisplayErr("transparent");
     }
 
-    if (registerPassword !== confirmRegisterPassword) {
-      return alert("Password and Confirm Password should be same !");
-    }
+    // if (registerPassword !== confirmRegisterPassword) {
+    //   // return alert("Password and Confirm Password should be same !");
+    //   setConfirmRegisterPasswordError("red");
+    // } else {
+    //   setConfirmRegisterPasswordError("transparent");
+    // }
 
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
@@ -207,29 +246,81 @@ export default function Authentication(props) {
       .auth()
       .signInWithEmailAndPassword(loginEmail, loginPassword)
       .then(() => {
+        setLoginEmailError("transparent");
+        setLoginPasswordError("transparent");
         console.log("successful login!");
       })
       .catch((err) => {
-        alert(err.message);
+        // setLoginEmailError("red");
+        setLoginPasswordError("red");
+        // alert(err);
       });
   };
 
   const handleSubmit = async () => {
+    // let count = 0;
     firebase
       .auth()
-      .sendPasswordResetEmail(forgotPassEmail)
+      .sendPasswordResetEmail(loginEmail)
       .then(() => {
         alert("Email Sent");
+        setLoginEmailError("transparent");
+        setModalViewLogin(false);
+        // count = 1;
       })
-      .catch((err) => alert(err.message));
-    setModalViewLogin(false);
+      .catch((err) => {
+        setLoginEmailError("red");
+        // count = 0;
+      });
+
+    // if (count === 1) {
+    //   setModalViewLogin(false);
+    // }
+  };
+
+  const registerNext = async () => {
+    let count = 0;
+    if (!registerEmail.includes("@")) {
+      setRegisterEmailError("red");
+    } else {
+      setRegisterEmailError("transparent");
+      count = count + 1;
+    }
+
+    if (registerPassword.length < 6) {
+      setRegisterPasswordError("red");
+    } else {
+      setRegisterPasswordError("transparent");
+      count = count + 1;
+    }
+
+    if (registerPassword !== confirmRegisterPassword) {
+      // return alert("Password and Confirm Password should be same !");
+      setConfirmRegisterPasswordError("red");
+    } else {
+      setConfirmRegisterPasswordError("transparent");
+      count = count + 1;
+    }
+
+    if (count === 3) {
+      setRegisterView(1);
+    }
+  };
+
+  const handleAccessCode = async () => {
+    if (AccessCode === "") {
+      setAccessCodeError("red");
+    } else {
+      setAccessCodeError("transparent");
+      setAccessValid(true);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <LottieView
-          source={require("../assets/images/profileanimation.json")}
+          source={require("../assets/login.json")}
           autoPlay
           loop
           style={{ position: "relative", width: "50%" }}
@@ -242,19 +333,22 @@ export default function Authentication(props) {
           buttons={buttons}
           containerStyle={{
             // height: 100,
-            backgroundColor: "transparent",
-            borderColor: "gray",
-            borderBottomColor: "gray",
+            backgroundColor: "#0f4573",
+            // color: "red",
+            //borderColor: "white",
+            // borderBottomColor: "white"
             marginTop: 50,
             width: "80%",
           }}
           selectedButtonStyle={{
-            backgroundColor: "#06575c",
-            borderBottomColor: "black",
+            backgroundColor: "#0f3a5e",
+            //borderBottomColor: "black",
           }}
-          innerBorderStyle={{
-            color: "gray",
-          }}
+          innerBorderStyle={
+            {
+              // color: "transparent",
+            }
+          }
         />
       </View>
 
@@ -281,9 +375,9 @@ export default function Authentication(props) {
                       color: "white",
                       fontSize: 16,
                     }}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
+                    errorMessage="* Invalid E-mail"
+                    errorStyle={{ color: registerEmailError }}
+                    renderErrorMessage
                   />
                   {/* <TextInput
                 onChangeText={setRegisterEmail}
@@ -298,22 +392,16 @@ export default function Authentication(props) {
                     placeholder="Password"
                     secureTextEntry={true}
                     value={registerPassword}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-
+                    errorMessage="* Password must be atleast 6 characters"
+                    errorStyle={{ color: registerPasswordError }}
                     inputStyle={{
                       color: "white",
                       fontSize: 16,
                     }}
                     placeholderTextColor="white"
-                    // renderErrorMessage
+                    renderErrorMessage
                   />
-                  {/* <TextInput
-                onChangeText={setRegisterPassword}
-                placeholder="Password"
-                secureTextEntry={true}
-                value={registerPassword}
-              /> */}
+
                   <Input
                     inputStyle={{
                       color: "white",
@@ -329,9 +417,9 @@ export default function Authentication(props) {
                     secureTextEntry={true}
                     value={confirmRegisterPassword}
                     placeholderTextColor="white"
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
+                    errorMessage="* Password doesn't match"
+                    errorStyle={{ color: confirmRegisterPasswordError }}
+                    renderErrorMessage
                   />
                 </View>
               ) : (
@@ -354,9 +442,9 @@ export default function Authentication(props) {
                     onChangeText={setDisplayName}
                     placeholder="Display Name"
                     value={displayName}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
+                    errorMessage="* Invalid name"
+                    errorStyle={{ color: displayNameError }}
+                    renderErrorMessage
                   />
 
                   <Input
@@ -378,9 +466,10 @@ export default function Authentication(props) {
                     keyboardType="number-pad"
                     placeholder="Phone No."
                     value={phone}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
+                    errorMessage="* Invalid Phone No."
+                    errorStyle={{ color: phoneError }}
+                    renderErrorMessage
+                    // maxLength={8}
                   />
 
                   <Input
@@ -417,7 +506,7 @@ export default function Authentication(props) {
             >
               {registerView === 0 ? (
                 <TouchableOpacity
-                  onPress={() => setRegisterView(1)}
+                  onPress={() => registerNext()}
                   style={styles.loginButton}
                 >
                   <Text style={{ color: "white" }}>Next</Text>
@@ -430,12 +519,12 @@ export default function Authentication(props) {
                     onPress={() => setRegisterView(0)}
                     style={styles.backButton}
                   >
-                    <Text style={{ color: "#3e875b", fontWeight: "bold" }}>
+                    <Text style={{ color: "#0f4573", fontWeight: "bold" }}>
                       Back
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => handleRegister}
+                    onPress={() => handleRegister()}
                     style={styles.registerButton}
                   >
                     <Text style={{ color: "white", fontWeight: "bold" }}>
@@ -465,11 +554,12 @@ export default function Authentication(props) {
                   onChangeText={setLoginEmail}
                   placeholder="E-mail"
                   value={loginEmail}
-                  // errorMessage="Error"
-
+                  errorMessage="* E-mail not valid"
                   placeholderTextColor="white"
-                  // errorStyle={{ color: "blue" }}
-                  // renderErrorMessage
+                  errorStyle={{
+                    color: loginEmailError,
+                  }}
+                  renderErrorMessage
                 />
                 <Input
                   inputStyle={{
@@ -484,6 +574,12 @@ export default function Authentication(props) {
                   secureTextEntry={true}
                   value={loginPassword}
                   placeholderTextColor="white"
+                  errorMessage="* Please check your email and password"
+                  errorStyle={{
+                    color: loginPasswordError,
+                    fontSize: 13,
+                  }}
+                  renderErrorMessage
                 />
               </View>
 
@@ -536,14 +632,14 @@ export default function Authentication(props) {
                   onChangeText={setLoginEmail}
                   placeholder="E-mail"
                   value={loginEmail}
-                  // errorMessage="Error"
                   inputStyle={{
                     color: "white",
                     fontSize: 16,
                   }}
                   placeholderTextColor="white"
-                  // errorStyle={{ color: "blue" }}
-                  // renderErrorMessage
+                  errorMessage="* Email not valid"
+                  errorStyle={{ color: loginEmailError }}
+                  renderErrorMessage
                 />
                 <View>
                   <TouchableOpacity
@@ -580,22 +676,22 @@ export default function Authentication(props) {
                         <Icon name="account-key" size={20} color="lightgray" />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setLoginEmail}
+                      onChangeText={setAccessCode}
                       placeholder="Access Code"
-                      value={loginEmail}
-                      // errorMessage="Error"
+                      value={AccessCode}
+                      errorMessage="* Code Invalid"
                       inputStyle={{
                         color: "white",
                         fontSize: 16,
                       }}
                       placeholderTextColor="white"
-                      // errorStyle={{ color: "blue" }}
-                      // renderErrorMessage
+                      errorStyle={{ color: accessCodeError }}
+                      renderErrorMessage
                     />
                     <View>
                       <TouchableOpacity
                         style={styles.loginButton}
-                        onPress={() => setAccessValid(true)}
+                        onPress={() => handleAccessCode()}
                       >
                         <Text style={{ color: "white" }}>Use Code</Text>
                       </TouchableOpacity>
@@ -718,9 +814,9 @@ export default function Authentication(props) {
                         />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setPhone}
+                      onChangeText={setPhoneAccess}
                       placeholder="Phone No."
-                      value={phone}
+                      value={phoneAccess}
                       // errorMessage="Error"
                       inputStyle={{
                         color: "white",
@@ -755,7 +851,7 @@ export default function Authentication(props) {
       ) : (
         <View>
           {/* <Text>Forgot Password</Text> */}
-          <TextInput
+          {/* <TextInput
             placeholder="Email"
             value={forgotPassEmail}
             onChangeText={setForgotPassEmail}
@@ -766,7 +862,7 @@ export default function Authentication(props) {
 
           <TouchableOpacity onPress={() => setView("Login")}>
             <Text>Back to Login</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
     </View>
@@ -776,7 +872,7 @@ export default function Authentication(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A5155",
+    backgroundColor: "#0f4573",
     alignItems: "center",
     //justifyContent: "center",
     // flexDirection: "column",
@@ -789,29 +885,29 @@ const styles = StyleSheet.create({
   },
   containerLogin: {
     flex: 1,
-    backgroundColor: "#06575c",
+    backgroundColor: "#0f3a5e",
     width: "80%",
     marginTop: -5,
     marginBottom: "5%",
     borderWidth: 1,
     borderTopWidth: 0,
-    borderColor: "gray",
+    borderColor: "white",
     // alignItems: "center",
     // justifyContent: "flex-start",
     // flexDirection: "column",
     // paddingHorizontal: 20,
     //width: Math.round(Dimensions.get("window").width),
-    //height: Math.round(Dimensions.get("window").height),
+    //height: Math.round(Dimensions.get("window").height),6586a6
   },
   containerRegister: {
     flex: 1,
-    backgroundColor: "#06575c",
+    backgroundColor: "#0f3a5e",
     width: "80%",
     marginTop: -5,
     marginBottom: "5%",
     borderWidth: 1,
     borderTopWidth: 0,
-    borderColor: "gray",
+    borderColor: "white",
     //alignItems: "center",
     //justifyContent: "center",
     // flexDirection: "column",
@@ -830,7 +926,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#0A5155",
+    backgroundColor: "#415598",
     flex: 1,
     flexDirection: "row",
   },
@@ -879,7 +975,7 @@ const styles = StyleSheet.create({
     marginEnd: "2%",
   },
   backButton: {
-    backgroundColor: "lightgray",
+    backgroundColor: "white",
     height: 40,
     width: "20%",
     alignSelf: "center",
@@ -893,7 +989,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButton: {
-    backgroundColor: "#3e875b",
+    backgroundColor: "#6586a6",
     height: 40,
     width: "80%",
     alignSelf: "center",
@@ -905,9 +1001,10 @@ const styles = StyleSheet.create({
     marginEnd: "2%",
     borderRadius: 10,
     marginBottom: 10,
+    // position: "relative",
   },
   registerButton: {
-    backgroundColor: "#3e875b",
+    backgroundColor: "#6586a6",
     height: 40,
     width: "55%",
     alignSelf: "center",
