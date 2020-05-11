@@ -80,12 +80,24 @@ export default function Authentication(props) {
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
   useEffect(() => {
-    if (registerEmail !== "" && registerPassword !== "") {
+    if (
+      registerEmail !== "" &&
+      registerPassword !== "" &&
+      confirmRegisterPassword !== "" &&
+      displayName !== "" &&
+      phone !== ""
+    ) {
       setBtnStatus(false);
     } else {
       setBtnStatus(true);
     }
-  }, [registerEmail, registerPassword]);
+  }, [
+    registerEmail,
+    registerPassword,
+    confirmRegisterPassword,
+    displayName,
+    phone,
+  ]);
 
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
@@ -200,7 +212,7 @@ export default function Authentication(props) {
         email: registerEmail,
         role: "user",
         qrCode: "",
-        name: displayName,
+        displayName,
         phone: `+974${phone}`,
         referralCode,
         loyaltyCode: "",
@@ -219,10 +231,11 @@ export default function Authentication(props) {
           locationP: false,
           carsP: false,
         },
-        friends: [],
         favorite: [],
         reputation: 0,
         points: 0,
+        photoURL:
+          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
       });
 
     // if the user used a referral code it will add document inside the referrer
