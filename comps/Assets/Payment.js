@@ -15,7 +15,7 @@ import {
 import firebase from "firebase/app";
 import "firebase/functions";
 import "firebase/auth";
-import db from "../db";
+import db from "../../db";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { AsyncStorage } from "react-native";

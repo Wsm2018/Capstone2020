@@ -15,7 +15,7 @@ import {
 import firebase from "firebase/app";
 import "firebase/functions";
 import "firebase/auth";
-import db from "../db";
+import db from "../../db";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { AsyncStorage } from "react-native";
@@ -25,20 +25,42 @@ import { CheckBox } from 'react-native-elements'
 
 export default function CheckOut(props) {
 
-    //const assetBooking = props.navigation.getParam("assetBooking", "some default value");
-    const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
+    const tName=props.navigation.getParam("tName",'failed')
+  const sName=props.navigation.getParam("sName",'failed')
+    const assetBooking = props.navigation.getParam("assetBooking", "some default value");
+    //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
 
     const [totalAmount, setTotalAmount] = useState(0)
 
     useEffect(() => {
 
         if (assetBooking) {
-            var s = new Date(assetBooking.startDateTime)
-            var e = new Date(assetBooking.endDateTime)
+            console.log("assset -----------------------",assetBooking.asset.price)
+            
+            
+            var split1 = assetBooking.startDateTime.split(" ")
+            var split2 = assetBooking.endDateTime.split(" ")
+
+            var start = split1.join('')
+            var end = split2.join('')
+
+            var s = new Date(start)
+            var e = new Date(end)
             var diff = (e.getTime() - s.getTime()) / 1000;
+            console.log("diff 40-----------------------",diff)
             diff /= (60 * 60);
-            setTotalAmount(diff * assetBooking.asset.price)
-        }
+            console.log("diff 42-----------------------",diff)
+            var totalAmount1= Math.round(diff * parseInt(assetBooking.asset.price) * 100) / 100
+            setTotalAmount(totalAmount1)
+
+//             const hours = Math.floor(
+//                 Math.abs(
+//                   new Date().getTime(assetBooking.endDateTime) -  new Date().getTime(assetBooking.startDateTime)
+//                 ) / 36e5
+//               );
+//               console.log("**********hours",  hours)
+// setTotalAmount(hours * parseInt(assetBooking.asset.price))
+  }
 
     }, [])
 
@@ -72,8 +94,13 @@ export default function CheckOut(props) {
         <View style={{ paddingTop: 10 }}>
 
             <Text>Checkout</Text>
+            <Text>Type name: {tName}</Text>
+            <Text>Section name: {sName}</Text>
 
             <Text>Amount: {totalAmount} QAR</Text>
+            <Text>Price: {assetBooking.asset.price} Per Hour</Text>
+      <Text>Start Date and Time: {assetBooking.startDateTime}</Text>
+      <Text>End Date and Time: {assetBooking.endDateTime}</Text>
 
 
             <View style={{ width: "30%", marginLeft: "auto", marginRight: "auto" }}>
