@@ -78,34 +78,6 @@ export default function Authentication(props) {
     }
   }, [registerEmail, registerPassword]);
 
-  // checkReferral will check if the referral exists and the code is available
-  // const checkReferral = async () => {
-  //   // checking if the referral code is not empty
-  //   if (referral !== "") {
-  //     // checking if referral code is 6 digits
-  //     if (referral.length === 6) {
-  //       // defining the users collection from firestore
-  //       const users = db.collection("users");
-  //       // getting the referral document if the referralCode is equal to the provided code
-  //       // and using await because it will check all the documents
-  //       let result = await users.where("referralCode", "==", referral).get();
-  //       // it will check if there is only one document in the returned and
-  //       // the referral doc exists
-  //       if (result.size === 1) {
-  //         alert("Referral Code Added!");
-  //         setReferralStatus(true);
-  //       } else {
-  //         alert("Referral Code is Wrong!");
-  //         setReferral("");
-  //       }
-  //     } else {
-  //       alert("Referral Code is Not Available!");
-  //     }
-  //   } else {
-  //     alert("Enter a Code First!");
-  //   }
-  // };
-
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
     if (phone !== "") {
@@ -217,21 +189,6 @@ export default function Authentication(props) {
         reputation: 0,
         points: 0,
       });
-
-    // if the user used a referral code it will add document inside the referrer
-    // subcollection and it will have the new user referral code and the status as false
-    // the status will show if the user used the token or not
-    // if (referralStatus === true) {
-    //   const referralDoc = await users
-    //     .where("referralCode", "==", referral)
-    //     .get();
-    //   referralDoc.forEach((doc) => {
-    //     db.collection("users").doc(doc.id).collection("referrer").doc().set({
-    //       referrerCode: referralCode,
-    //       status: false,
-    //     });
-    //   });
-    // }
   };
 
   const handleLogin = async () => {

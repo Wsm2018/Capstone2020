@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, Picker } from "react-native";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
@@ -12,6 +12,25 @@ export default function AddCard(props) {
   const [cardType, setCardType] = useState("");
   const [expiryDate, setExpiryDate] = useState(moment().format("MM/YY"));
   const [cvc, setCVC] = useState("");
+  const [cards, setCards] = useState([]);
+
+  useEffect(() => {
+    getCards();
+  }, []);
+
+  const getCards = () => {
+    db.collection("users")
+      .doc(user.id)
+      .collection("cards")
+      .onSnapshot((querySnapshot) => {
+        const cards = [];
+        querySnapshot.forEach((doc) => {
+          let data = doc.data();
+          cards.push(data.cardNumber);
+        });
+        setCards([...cards]);
+      });
+  };
 
   const validateForm = () => {
     let validate = true;
@@ -62,7 +81,6 @@ export default function AddCard(props) {
 
   const handleAddCard = async () => {
     if (validateForm()) {
-      alert("entered");
       const addCard = firebase.functions().httpsCallable("addCard");
       const response = await addCard({
         uid: firebase.auth().currentUser.uid,
