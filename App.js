@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import Authentication from "./mainpages/Authentication";
+import Assets from "./comps/Assets";
+
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -9,6 +11,9 @@ import "firebase/auth";
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import HomeStack from "./navigation/HomeStack";
+
+
+
 
 const TabNavigator = createBottomTabNavigator({
   Home: HomeStack,
@@ -26,11 +31,12 @@ export default function App() {
   if (!loggedIn) {
     return (
       <View style={styles.container}>
+        
         <Authentication />
       </View>
     );
   } else {
-    return <AppContainer />;
+    return <Assets />;
   }
 
   // return (
