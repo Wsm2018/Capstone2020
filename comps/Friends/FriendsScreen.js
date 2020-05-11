@@ -14,16 +14,17 @@ const FriendsStack = createAppContainer(
       FriendsSearch: FriendsSearch,
     },
     {
-      initialRouteName: "FriendsList",
+      // initialRouteName: "FriendsList",
 
       defaultNavigationOptions: {
-        headerStyle: {
-          backgroundColor: "#006cab",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "normal",
-        },
+        header: null,
+        // headerStyle: {
+        //   backgroundColor: "#006cab",
+        // },
+        //   headerTintColor: "#fff",
+        //   headerTitleStyle: {
+        //     fontWeight: "normal",
+        //   },
       },
     }
   )

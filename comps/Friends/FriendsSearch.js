@@ -94,7 +94,7 @@ export default function FriendsList(props) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
             key={user.id}
           >
-            <Text>{user.name}</Text>
+            <Text>{user.displayName}</Text>
             {user.friendStatus === "added" ? (
               <TouchableOpacity
                 style={{ borderWidth: 1 }}
