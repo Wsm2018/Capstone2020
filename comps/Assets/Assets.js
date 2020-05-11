@@ -14,92 +14,49 @@ import {
   View
 } from "react-native";
 
+import Types from './Types';
+import Sections from './Sections';
+import List from './List';
+import Details from './Details';
 
 import firebase from "firebase/app";
 import "firebase/auth";
-import db from "../db.js";
+import db from "../../db.js";
+import { createAppContainer } from "react-navigation";
 require("firebase/firestore");
 
 
-
-export default function List(props) {
-  const [assetList, setAssetList] = useState([]); 
-  const [finalAssets, setFinalAssets] = useState([]); 
-  const section =  props.navigation.getParam("section",'failed').id;
-  const startDateTime = props.navigation.getParam("startDate",'failed'); 
-  const endDateTime = props.navigation.getParam("endDate",'failed');
-    
-  useEffect(() => {
-    getList();
-    
-  }, [section]);
-
-  useEffect(() =>{
-    checkTime()
-  },[assetList.length > 0 && finalAssets.length == 0])
-
-  const getList =  () => {
-    const temp = [];
-    db.collection('assets').orderBy("code").where("assetSection","==",section).onSnapshot((snapshot) => {
-      snapshot.forEach(async doc => {
-        //console.log(section)
-          let bookingTemp = [];
-          let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
-          if(bookings){
-              bookings.forEach(b => {
-              bookingTemp.push(b.data())
-            })
-          }
-          temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
-          
-          if(temp.length === snapshot.docs.length){
-            //console.log('assets',temp)
-            setAssetList(temp)
-          }
-      });
+const AppNavigator = createStackNavigator(
+  {
+    Types:Types,
+    Sections:Sections,
+    List:List,
+    Details:Details
+  },
+  {
+    defaultNavigationOptions:{
+      headerStyle:{
+        backgroundColor:'pink'
+      },
+      headerTintColor:"#fff",
+      headerTitleStyle:{
+        fontWeight:"bold"
+      }
     }
-    )
-    
-  } 
-
-  const checkTime = () => {
-    console.log('hii');
-    let assetsToShow = assetList;
-
-    assetsToShow = assetsToShow.filter(
-      (asset) =>
-        asset.assetBookings.filter((assetBooking) => {
-          return !(
-            (startDateTime <= assetBooking.startDateTime &&
-              endDateTime <= assetBooking.startDateTime) ||
-            (startDateTime >= assetBooking.endDateTime &&
-              endDateTime >= assetBooking.endDateTime)
-          );
-        }).length === 0
-    );
-
-    console.log('after checking time',assetsToShow);
-    setFinalAssets(assetsToShow);
   }
+)
+
+const AppContainer = createAppContainer(AppNavigator);
+export default function Assets(props) {
+  
 
   return (
-    <View style={styles.container}>
-      {/* {console.log('inside return',assetList)} */}
-      {finalAssets.length > 0? finalAssets.map((l,i)=>(
-        <TouchableOpacity key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >{l.code}</Text>
-        </TouchableOpacity>
-    ))
-  :
-        <Text>Loading</Text>
-  }
-    
-    </View>
+    <AppContainer />
   );
 }
 
-List.navigationOptions = (props) => ({
-    title: "List",
+Assets.navigationOptions = (props) => ({
+    title: "Assets",
     headerStyle: { backgroundColor: "white" },
     headerTintColor: "black",
     headerTintStyle: { fontWeight: "bold" }
@@ -171,7 +128,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 50
   },
-  TypesFilename: {
+  AssetsFilename: {
     marginVertical: 7
   },
   codeHighlightText: {

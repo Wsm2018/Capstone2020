@@ -17,44 +17,72 @@ import {
 
 import firebase from "firebase/app";
 import "firebase/auth";
-import db from "../db.js";
-import { ceil } from "react-native-reanimated";
+import db from "../../db.js";
 require("firebase/firestore");
 
 
 
-export default function Types(props) {
-  const [assetTypes, setAssetTypes] = useState([]);  
+export default function Details(props) {
+  const asset = props.navigation.getParam("asset",'failed');
+  const startDateTime = props.navigation.getParam("startDateTime",'failed');
+  const endDateTime = props.navigation.getParam("endDateTime",'failed');
 
-  useEffect(() => {
-    getTypes();
-  }, []);
+    
+//   useEffect(() => {
+//     getList();
+//   }, [section]);
 
-  const getTypes = async () => {
-    const temp = [];
-    const types = await db.collection('assetTypes').get();
-    types.forEach(doc => {
-      
-      temp.push({id:doc.id, ...doc.data()})
-    });
-    setAssetTypes(temp);
-  } 
+
+//   const getList =  () => {
+//     const temp = [];
+//     db.collection('assets').orderBy("code").where("assetSection","==",section).onSnapshot((snapshot) => {
+//       snapshot.forEach(async doc => {
+//         //console.log(section)
+//           let bookingTemp = [];
+//           let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
+//           if(bookings){
+//               bookings.forEach(b => {
+//               bookingTemp.push(b.data())
+//             })
+//           }
+//           temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
+          
+//           if(temp.length === snapshot.docs.length){
+//             //console.log('assets',temp)
+//             setAssetList(temp)
+//           }
+//       });
+//     }
+//     )
+    
+//   } 
+
+
+
 
   return (
     <View style={styles.container}>
- 
-    {assetTypes.map((t,i)=>(
-        <TouchableOpacity onPress={() => props.navigation.navigate("Sections",{type:t})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >{t.name}</Text>
-        </TouchableOpacity>
-    ))}
-
+      {console.log('asset return',asset)}
+      {console.log('startD return',startDateTime)}
+      {console.log('endD return',endDateTime)}
+      {asset?
+        <View>
+          <Text >{asset.code}</Text>
+        <Text>{asset.price}</Text>
+      <Text>{startDateTime}</Text>
+      <Text>{endDateTime}</Text>
+        </View>
+   
+  :
+        <Text>Loading</Text>
+  }
+    
     </View>
-  );
+  )
 }
 
-Types.navigationOptions = (props) => ({
-    title: "Types",
+Details.navigationOptions = (props) => ({
+    title: "Details",
     headerStyle: { backgroundColor: "white" },
     headerTintColor: "black",
     headerTintStyle: { fontWeight: "bold" }
@@ -98,8 +126,7 @@ function handleHelpPress() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    
+    backgroundColor: "#fff"
   },
   developmentModeText: {
     marginBottom: 20,

@@ -14,132 +14,47 @@ import {
   View
 } from "react-native";
 
-import DatePicker from 'react-native-datepicker'
 
 import firebase from "firebase/app";
 import "firebase/auth";
-import db from "../db.js";
+import db from "../../db.js";
+import { ceil } from "react-native-reanimated";
 require("firebase/firestore");
 
 
 
-export default function Sections(props) {
-  const [assetSections, setAssetSections] = useState([]); 
-  const [startDate, setStartDate] = useState(''); 
-  const [endDate, setEndDate] = useState(''); 
-
-  const type =  props.navigation.getParam("type",'failed').id;
+export default function Types(props) {
+  const [assetTypes, setAssetTypes] = useState([]);  
 
   useEffect(() => {
-    getSections();
-  }, [type]);
+    getTypes();
+  }, []);
 
-  useEffect(() => {
-    console.log(startDate);
-  }, [startDate]);
-  useEffect(() => {
-    console.log(endDate);
-  }, [endDate]);
-
-  const getSections = async () => {
+  const getTypes = async () => {
     const temp = [];
-    
-    const sections = await db.collection('assetSections').where("assetType","==",type).get();
-    sections.forEach(doc => {
+    const types = await db.collection('assetTypes').get();
+    types.forEach(doc => {
       
-        temp.push({id:doc.id,...doc.data()})
+      temp.push({id:doc.id, ...doc.data()})
     });
-    console.log(temp)
-      setAssetSections(temp);
+    setAssetTypes(temp);
   } 
 
   return (
     <View style={styles.container}>
-
-      
-      {startDate?
-      <>
-      {
-        endDate?
-        <>
-        <Text>You are booking from {startDate} until {endDate} Now Choose a Section</Text>
-        {assetSections.map((s,i)=>(
-        <TouchableOpacity  onPress={() => props.navigation.navigate("List",{section:s,startDate:startDate,endDate:endDate})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >{s.name}</Text>
+ 
+    {assetTypes.map((t,i)=>(
+        <TouchableOpacity onPress={() => props.navigation.navigate("Sections",{type:t})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
+          <Text >{t.name}</Text>
         </TouchableOpacity>
-        ))}
-        </>
-        :
-        <>
+    ))}
 
-        <Text>
-          your start date and time is {startDate} now Choose an end date
-        </Text>
-         <DatePicker
-        style={{width: 200}}
-        date={endDate}
-        mode="datetime"
-        placeholder="select an end date"
-        format="YYYY-MM-DD T h:mm:ss"
-        minDate={startDate}
-        maxDate="2022-01-01"
-        confirmBtnText="Confirm"
-        cancelBtnText="Cancel"
-        customStyles={{
-          dateIcon: {
-            position: 'absolute',
-            left: 0,
-            top: 4,
-            marginLeft: 0
-          },
-          dateInput: {
-            marginLeft: 36
-          }
-          // ... You can check the source to find the other keys.
-        }}
-        onDateChange={setEndDate}
-      />
-        </>
-       
-      }
-    
-        </>
-        :
-        <>
-          <Text>Choose a start date and time</Text>
-          <DatePicker
-          style={{width: 200}}
-          date={startDate}
-          mode="datetime"
-          placeholder="select a Start date"
-          format="YYYY-MM-DD T h:mm:ss"
-          minDate="2020-05-07"
-          maxDate="2022-01-01"
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-          dateIcon: {
-            position: 'absolute',
-            left: 0,
-            top: 4,
-            marginLeft: 0
-          },
-          dateInput: {
-            marginLeft: 36
-          }
-          // ... You can check the source to find the other keys.
-        }}
-        onDateChange={setStartDate}
-      />
-        </>
-    }
-  
     </View>
   );
 }
 
-Sections.navigationOptions = (props) => ({
-    title: "Sections",
+Types.navigationOptions = (props) => ({
+    title: "Types",
     headerStyle: { backgroundColor: "white" },
     headerTintColor: "black",
     headerTintStyle: { fontWeight: "bold" }
@@ -183,7 +98,8 @@ function handleHelpPress() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
+    
   },
   developmentModeText: {
     marginBottom: 20,
