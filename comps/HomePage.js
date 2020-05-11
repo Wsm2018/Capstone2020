@@ -4,9 +4,6 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
-import Assets from "./Assets";
-import AddForm from "./AddForm";
-
 
 export default function HomePage() {
   const handleLogout = () => {
@@ -14,8 +11,15 @@ export default function HomePage() {
   };
 
   return (
-      <Assets />
-      //<AddForm />
+    <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          handleLogout();
+        }}
+      >
+        <Text>Logout !</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
