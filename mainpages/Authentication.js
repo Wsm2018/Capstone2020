@@ -165,45 +165,47 @@ export default function Authentication(props) {
   // createUserInfo will complete all the data for the user to create a document in the
   // database
   const createUserInfo = async () => {
+    alert("Hello Testing");
     // generating a random 6 digit referralCode
-    let referralCode = Math.floor(Math.random() * 1000000) + "";
+    // let referralCode = Math.floor(Math.random() * 1000000) + "";
 
-    if (referralCode.length === 1) {
-      referralCode = "00000" + referralCode;
-    } else if (referralCode.length === 2) {
-      referralCode = "0000" + referralCode;
-    } else if (referralCode.length === 3) {
-      referralCode = "000" + referralCode;
-    } else if (referralCode.length === 4) {
-      referralCode = "00" + referralCode;
-    } else if (referralCode.length === 5) {
-      referralCode = "0" + referralCode;
-    }
+    // if (referralCode.length === 1) {
+    //   referralCode = "00000" + referralCode;
+    // } else if (referralCode.length === 2) {
+    //   referralCode = "0000" + referralCode;
+    // } else if (referralCode.length === 3) {
+    //   referralCode = "000" + referralCode;
+    // } else if (referralCode.length === 4) {
+    //   referralCode = "00" + referralCode;
+    // } else if (referralCode.length === 5) {
+    //   referralCode = "0" + referralCode;
+    // }
 
-    const users = db.collection("users");
+    // const users = db.collection("users");
     // checking if any other user has the generated referralCode and waiting because its
     // checking all the users document
-    let result = await users.where("referralCode", "==", referralCode).get();
+    // let result = await users.where("referralCode", "==", referralCode).get();
     // while there is any user with that referralCode it will generate a new code and try
     // again till it returns 0 documents
-    while (result.size > 0) {
-      referralCode = Math.floor(Math.random() * 1000000) + "";
-      if (referralCode.length === 1) {
-        referralCode = "00000" + referralCode;
-      } else if (referralCode.length === 2) {
-        referralCode = "0000" + referralCode;
-      } else if (referralCode.length === 3) {
-        referralCode = "000" + referralCode;
-      } else if (referralCode.length === 4) {
-        referralCode = "00" + referralCode;
-      } else if (referralCode.length === 5) {
-        referralCode = "0" + referralCode;
-      }
-      result = await users.where("referralCode", "==", referralCode).get();
-    }
+    // while (result.size > 0) {
+    //   referralCode = Math.floor(Math.random() * 1000000) + "";
+    //   if (referralCode.length === 1) {
+    //     referralCode = "00000" + referralCode;
+    //   } else if (referralCode.length === 2) {
+    //     referralCode = "0000" + referralCode;
+    //   } else if (referralCode.length === 3) {
+    //     referralCode = "000" + referralCode;
+    //   } else if (referralCode.length === 4) {
+    //     referralCode = "00" + referralCode;
+    //   } else if (referralCode.length === 5) {
+    //     referralCode = "0" + referralCode;
+    //   }
+    //   result = await users.where("referralCode", "==", referralCode).get();
+    // }
     // const name = email.split("@");
 
     // creating user document in the database with all the information
+    console.log("user ", firebase.auth().currentUser.uid);
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .set({
@@ -214,7 +216,7 @@ export default function Authentication(props) {
         qrCode: "",
         displayName,
         phone: `+974${phone}`,
-        referralCode,
+        referralCode: 0,
         loyaltyCode: "",
         subscription: {
           name: null,
@@ -241,17 +243,17 @@ export default function Authentication(props) {
     // if the user used a referral code it will add document inside the referrer
     // subcollection and it will have the new user referral code and the status as false
     // the status will show if the user used the token or not
-    if (referralStatus === true) {
-      const referralDoc = await users
-        .where("referralCode", "==", referral)
-        .get();
-      referralDoc.forEach((doc) => {
-        db.collection("users").doc(doc.id).collection("referrer").doc().set({
-          referrerCode: referralCode,
-          status: false,
-        });
-      });
-    }
+    // if (referralStatus === true) {
+    //   const referralDoc = await users
+    //     .where("referralCode", "==", referral)
+    //     .get();
+    //   referralDoc.forEach((doc) => {
+    //     db.collection("users").doc(doc.id).collection("referrer").doc().set({
+    //       referrerCode: referralCode,
+    //       status: false,
+    //     });
+    //   });
+    // }
   };
 
   const handleLogin = async () => {
@@ -485,7 +487,7 @@ export default function Authentication(props) {
                     // maxLength={8}
                   />
 
-                  <Input
+                  {/* <Input
                     inputStyle={{
                       color: "white",
                       fontSize: 16,
@@ -503,7 +505,7 @@ export default function Authentication(props) {
                     // errorMessage="Error"
                     // errorStyle={{ color: "blue" }}
                     // renderErrorMessage
-                  />
+                  /> */}
                 </View>
               )}
             </View>

@@ -5,6 +5,14 @@ import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import { encode, decode } from "base-64";
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+if (!global.atob) {
+  global.atob = decode;
+}
 
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
