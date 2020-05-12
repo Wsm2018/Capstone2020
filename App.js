@@ -1,6 +1,14 @@
 //@refresh reset
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Image,
+} from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
@@ -16,16 +24,108 @@ if (!global.atob) {
 
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
+import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import HomeStack from "./navigation/HomeStack";
+import ProfileStack from "./navigation/ProfileStack";
+import FriendsStack from "./comps/Friends/FriendsScreen";
+import { Icon } from "react-native-elements";
+import { createStackNavigator } from "react-navigation-stack";
+import db from "./db";
 
-const TabNavigator = createBottomTabNavigator({
-  Home: HomeStack,
-});
-
-const AppContainer = createAppContainer(TabNavigator);
-
-export default function App() {
+export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  };
+
+  const DashboardTabNavigator = createBottomTabNavigator(
+    {
+      Home: HomeStack,
+      Profile: ProfileStack,
+    },
+    {
+      navigationOptions: ({ navigation }) => {
+        const { routeName } = navigation.state.routes[navigation.state.index];
+        return {
+          headerShown: true,
+          headerTitle: routeName,
+        };
+      },
+    }
+  );
+
+  const DashboardStackNavigator = createStackNavigator(
+    {
+      DashboardTabNavigator: DashboardTabNavigator,
+    },
+    {
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingLeft: 10 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      // },
+      headerMode: null,
+    }
+  );
+
+  const FriendsStk = createStackNavigator(
+    { Friends: FriendsStack },
+    {
+      defaultNavigationOptions: ({ navigation }) => {
+        return {
+          headerLeft: (
+            <Icon
+              style={{ paddingLeft: 10 }}
+              onPress={() => navigation.openDrawer()}
+              name="md-menu"
+              type="ionicon"
+              size={30}
+            />
+          ),
+        };
+      },
+    }
+  );
+
+  const AppDrawerNavigator = createDrawerNavigator({
+    Home: {
+      screen: DashboardStackNavigator,
+    },
+    Friends: {
+      screen: FriendsStk,
+    },
+  });
+
+  const AppContainer = createAppContainer(AppDrawerNavigator);
+
+  async function getUser() {
+    const userRef = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    const user = userRef.data();
+    setUser(user);
+  }
+
+  useEffect(() => {
+    if (!loggedIn) {
+      getUser();
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
