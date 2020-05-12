@@ -10,17 +10,17 @@ import CardsScreen from "../comps/Profile/CardsScreen";
 import { Icon } from "react-native-elements";
 const ProfileStack = createStackNavigator(
   {
-    ProfileScreen: ProfileScreen,
-    BalanceScreen: BalanceScreen,
-    ReferralScreen: ReferralScreen,
-    GiftScreen: GiftScreen,
+    Profile: ProfileScreen,
+    Balance: BalanceScreen,
+    Referral: ReferralScreen,
+    Gift: GiftScreen,
     AddCard: AddCard,
-    CardsScreen: CardsScreen,
+    Cards: CardsScreen,
   },
   {
     // headerMode: null,
     defaultNavigationOptions: ({ navigation }) => {
-      if (navigation.state.routeName === "ProfileScreen") {
+      if (navigation.state.routeName === "Profile") {
         return {
           headerLeft: () => (
             <Icon

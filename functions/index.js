@@ -69,14 +69,29 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
   response.send("All done ");
 });
 
-exports.addCard = functions.https.onCall(async (data, response) => {
-  db.collection("users").doc(data.uid).collection("cards").add(data.cardInfo);
+exports.addCard = functions.https.onCall(async (data, context) => {
+  const result = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cards")
+    .add(data.cardInfo);
+  return result;
 });
 
-exports.deleteUser = functions.https.onRequest(async (request, response) => {
+exports.deleteUser = functions.https.onRequest(async (request, context) => {
   await admin.auth().deleteUser(request.query.uid);
 
   response.send("All done");
+});
+
+exports.deleteCard = functions.https.onCall(async (data, context) => {
+  const result = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cards")
+    .doc(data.cardId)
+    .delete();
+  return result;
 });
 
 exports.sendMail = functions.https.onRequest((request, response) => {
