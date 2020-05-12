@@ -20,9 +20,9 @@ import "firebase/auth";
 import db from "../../db.js";
 require("firebase/firestore");
 
-
-
 export default function Details(props) {
+  const tName=props.navigation.getParam("tName",'failed')
+  const sName=props.navigation.getParam("sName",'failed')
   const asset = props.navigation.getParam("asset",'failed');
   const startDateTime = props.navigation.getParam("startDateTime",'failed');
   const endDateTime = props.navigation.getParam("endDateTime",'failed');
@@ -57,9 +57,6 @@ export default function Details(props) {
     
 //   } 
 
-
-
-
   return (
     <View style={styles.container}>
       {console.log('asset return',asset)}
@@ -71,6 +68,11 @@ export default function Details(props) {
         <Text>{asset.price}</Text>
       <Text>{startDateTime}</Text>
       <Text>{endDateTime}</Text>
+
+      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut",{tName:tName,sName:sName,assetBooking:{asset , startDateTime,endDateTime}})}style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
+          <Text >CheckOut</Text>
+        </TouchableOpacity>
+
         </View>
    
   :
@@ -87,41 +89,6 @@ Details.navigationOptions = (props) => ({
     headerTintColor: "black",
     headerTintStyle: { fontWeight: "bold" }
 })
-
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
-
-    return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use
-        useful development tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
-    );
-  }
-}
-
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync(
-    "https://docs.expo.io/versions/latest/workflow/development-mode/"
-  );
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    "https://docs.expo.io/versions/latest/workflow/up-and-running/#cant-see-your-changes"
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
