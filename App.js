@@ -18,11 +18,12 @@ import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import HomeStack from "./navigation/HomeStack";
 
-const TabNavigator = createBottomTabNavigator({
-  Home: HomeStack,
-});
+// const TabNavigator = createBottomTabNavigator({
+//   Home: HomeStack,
+//   // Profile:
+// });
 
-const AppContainer = createAppContainer(TabNavigator);
+const AppContainer = createAppContainer(HomeStack);
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
