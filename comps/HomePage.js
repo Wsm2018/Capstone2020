@@ -32,9 +32,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// HomePage.navigationOptions = {
-//   title: null,
-//   tabBarIcon: () => {
-//     <Icon name="home" type="font-awesome" size={24} />
-//   },
-// };
+HomePage.navigationOptions = {
+  header: null,
+};
