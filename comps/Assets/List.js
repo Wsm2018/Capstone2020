@@ -29,14 +29,40 @@ export default function List(props) {
   const startDateTime = props.navigation.getParam("startDate",'failed'); 
   const endDateTime = props.navigation.getParam("endDate",'failed');
     
-  useEffect(() => {
-    getList();
-    
-  }, [section]);
+  // useEffect(() => {
+  //   getList();
+  // }, [section]);
 
-  useEffect(() =>{
+  useEffect(() => {
+    props.navigation.getParam("section",'failed') === 'failed'?getAllList():getList();
+  },[section]);
+
+  useEffect(() => {
     checkTime()
   },[assetList.length > 0 && finalAssets.length == 0])
+
+  const getAllList =  () => {
+    const temp = [];
+    db.collection('assets').orderBy("assetSection").orderBy('code').onSnapshot((snapshot) => {
+      snapshot.forEach(async doc => {
+        //console.log(section)
+          let bookingTemp = [];
+          let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
+          if(bookings){
+              bookings.forEach(b => {
+              bookingTemp.push(b.data())
+            })
+          }
+          temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
+          
+          if(temp.length === snapshot.docs.length){
+            console.log('assets',temp)
+            setAssetList(temp)
+          }
+      });
+    }
+    )
+  } 
 
   const getList =  () => {
     const temp = [];
@@ -77,7 +103,6 @@ export default function List(props) {
           );
         }).length === 0
     );
-
     console.log('after checking time',assetsToShow);
     setFinalAssets(assetsToShow);
   }
@@ -86,14 +111,13 @@ export default function List(props) {
     <View style={styles.container}>
       {/* {console.log('inside return',assetList)} */}
       {finalAssets.length > 0? finalAssets.map((l,i)=>(
-        <TouchableOpacity onPress={() => props.navigation.navigate("Details",{asset:l,startDateTime:startDateTime,endDateTime:endDateTime})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >{l.code}</Text>
+        <TouchableOpacity onPress={() => props.navigation.navigate("Details",{asset:l,startDateTime:startDateTime,endDateTime:endDateTime})} key={i} style={{alignItems:"center",borderRadius:10,height:40,width:200,margin:5, backgroundColor:'pink'}}>
+          <Text >{l.description}</Text>
         </TouchableOpacity>
     ))
   :
         <Text>Loading</Text>
   }
-    
     </View>
   );
 }

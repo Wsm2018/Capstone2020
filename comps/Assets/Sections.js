@@ -55,7 +55,6 @@ export default function Sections(props) {
 
   return (
     <View style={styles.container}>
-
       
       {startDate?
       <>
@@ -63,6 +62,7 @@ export default function Sections(props) {
         endDate?
         <>
         <Text>You are booking from {startDate} until {endDate} Now Choose a Section</Text>
+        <TouchableOpacity onPress={() => props.navigation.navigate("List",{startDate:startDate,endDate:endDate})}><Text>Show All Assets</Text></TouchableOpacity>
         {assetSections.map((s,i)=>(
         <TouchableOpacity  onPress={() => props.navigation.navigate("List",{section:s,startDate:startDate,endDate:endDate})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
           <Text >{s.name}</Text>
