@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import db from "../../db";
+import firebase from "firebase";
+import "firebase/auth";
+import "firebase/functions";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user");
@@ -12,7 +15,7 @@ export default function CardsScreen(props) {
 
   const getCards = () => {
     db.collection("users")
-      .doc(user.id)
+      .doc(firebase.auth().currentUser.uid)
       .collection("cards")
       .onSnapshot((querySnapshot) => {
         const cards = [];

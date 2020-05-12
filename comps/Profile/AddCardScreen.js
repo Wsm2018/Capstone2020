@@ -5,6 +5,7 @@ import moment from "moment";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
+import db from "../../db";
 export default function AddCard(props) {
   const user = props.navigation.getParam("user");
   const [cardNumber, setCardNumber] = useState("");
@@ -20,7 +21,7 @@ export default function AddCard(props) {
 
   const getCards = () => {
     db.collection("users")
-      .doc(user.id)
+      .doc(firebase.auth().currentUser.uid)
       .collection("cards")
       .onSnapshot((querySnapshot) => {
         const cards = [];
@@ -33,50 +34,48 @@ export default function AddCard(props) {
   };
 
   const validateForm = () => {
-    let validate = true;
     if (cardNumber === "") {
       alert("Enter Card Number");
-      validate = false;
-      return validate;
+      return false;
     } else {
       if (cardNumber.length < 16) {
         alert("Enter a valid card number");
-        validate = false;
-        return validate;
+        return false;
       }
     }
 
     if (holderName === "") {
       alert("Enter Name");
-      validate = false;
-      return validate;
+      return false;
     }
 
     if (cardType === "") {
       alert("Select Card Type");
-      validate = false;
-      return validate;
+      return false;
     }
 
     if (expiryDate === moment().format("MM/YY")) {
       alert("Enter Card Expiry Date");
-      validate = false;
-      return validate;
+      return false;
     }
 
     if (cvc === "") {
       alert("Enter CVC Number");
       validate = false;
-      return validate;
+      return false;
     } else {
       if (cvc.length < 3) {
         alert("Enter a valid CVC number");
-        validate = false;
-        return validate;
+        return false;
       }
     }
 
-    return validate;
+    if (cards.includes(cardNumber)) {
+      alert("Card already exists");
+      return false;
+    }
+
+    return true;
   };
 
   const handleAddCard = async () => {

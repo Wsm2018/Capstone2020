@@ -34,6 +34,7 @@ try {
 }
 import LottieView from "lottie-react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Octicons } from "@expo/vector-icons";
 import { Input } from "react-native-elements";
 import { ButtonGroup } from "react-native-elements";
 
@@ -156,13 +157,6 @@ export default function Authentication(props) {
       setDisplayErr("transparent");
     }
 
-    // if (registerPassword !== confirmRegisterPassword) {
-    //   // return alert("Password and Confirm Password should be same !");
-    //   setConfirmRegisterPasswordError("red");
-    // } else {
-    //   setConfirmRegisterPasswordError("transparent");
-    // }
-
     try {
       const phoneProvider = new firebase.auth.PhoneAuthProvider();
       const verificationId = await phoneProvider.verifyPhoneNumber(
@@ -180,6 +174,14 @@ export default function Authentication(props) {
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
   const handleRegister = async () => {
+    if (
+      verificationCode === null ||
+      verificationCode === "" ||
+      verificationCode === undefined
+    ) {
+      alert("Enter Verification Code");
+      return;
+    }
     try {
       const credential = firebase.auth.PhoneAuthProvider.credential(
         verificationId,
@@ -226,45 +228,6 @@ export default function Authentication(props) {
   // createUserInfo will complete all the data for the user to create a document in the
   // database
   const createUserInfo = async () => {
-    alert("Hello Testing");
-    // generating a random 6 digit referralCode
-    // let referralCode = Math.floor(Math.random() * 1000000) + "";
-
-    // if (referralCode.length === 1) {
-    //   referralCode = "00000" + referralCode;
-    // } else if (referralCode.length === 2) {
-    //   referralCode = "0000" + referralCode;
-    // } else if (referralCode.length === 3) {
-    //   referralCode = "000" + referralCode;
-    // } else if (referralCode.length === 4) {
-    //   referralCode = "00" + referralCode;
-    // } else if (referralCode.length === 5) {
-    //   referralCode = "0" + referralCode;
-    // }
-
-    // const users = db.collection("users");
-    // checking if any other user has the generated referralCode and waiting because its
-    // checking all the users document
-    // let result = await users.where("referralCode", "==", referralCode).get();
-    // while there is any user with that referralCode it will generate a new code and try
-    // again till it returns 0 documents
-    // while (result.size > 0) {
-    //   referralCode = Math.floor(Math.random() * 1000000) + "";
-    //   if (referralCode.length === 1) {
-    //     referralCode = "00000" + referralCode;
-    //   } else if (referralCode.length === 2) {
-    //     referralCode = "0000" + referralCode;
-    //   } else if (referralCode.length === 3) {
-    //     referralCode = "000" + referralCode;
-    //   } else if (referralCode.length === 4) {
-    //     referralCode = "00" + referralCode;
-    //   } else if (referralCode.length === 5) {
-    //     referralCode = "0" + referralCode;
-    //   }
-    //   result = await users.where("referralCode", "==", referralCode).get();
-    // }
-    // const name = email.split("@");
-
     // creating user document in the database with all the information
     console.log("user ", firebase.auth().currentUser.uid);
     db.collection("users")
@@ -416,152 +379,168 @@ export default function Authentication(props) {
       {view === 1 ? (
         <View style={styles.containerRegister}>
           <View style={styles.form}>
+            <FirebaseRecaptchaVerifierModal
+              ref={recaptchaVerifier}
+              firebaseConfig={config}
+            />
             <View style={{ flex: 6, width: "100%" }}>
-              {registerView === 0 ? (
-                <View>
-                  <Input
-                    inputContainerStyle={{
-                      borderBottomWidth: 0,
-                      // color: "white",
-                    }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="lightgray" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setRegisterEmail}
-                    placeholder="E-mail"
-                    value={registerEmail}
-                    placeholderTextColor="white"
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    errorMessage="* Invalid E-mail"
-                    errorStyle={{ color: registerEmailError }}
-                    renderErrorMessage
-                  />
-                  {/* <TextInput
-                onChangeText={setRegisterEmail}
-                placeholder="username@email.com"
-                value={registerEmail}
-              /> */}
-                  <Input
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={<Icon name="key" size={20} color="lightgray" />}
-                    containerStyle={styles.Inputs}
-                    onChangeText={setRegisterPassword}
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    value={registerPassword}
-                    errorMessage="* Password must be atleast 6 characters"
-                    errorStyle={{ color: registerPasswordError }}
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    placeholderTextColor="white"
-                    renderErrorMessage
-                  />
+              {!registered ? (
+                registerView === 0 ? (
+                  <View>
+                    <Input
+                      inputContainerStyle={{
+                        borderBottomWidth: 0,
+                      }}
+                      leftIcon={
+                        <Icon
+                          name="email-outline"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setRegisterEmail}
+                      placeholder="E-mail"
+                      value={registerEmail}
+                      placeholderTextColor="white"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      errorMessage="* Invalid E-mail"
+                      errorStyle={{ color: registerEmailError }}
+                      renderErrorMessage
+                    />
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                      containerStyle={styles.Inputs}
+                      onChangeText={setRegisterPassword}
+                      placeholder="Password"
+                      secureTextEntry={true}
+                      value={registerPassword}
+                      errorMessage="* Password must be atleast 6 characters"
+                      errorStyle={{ color: registerPasswordError }}
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      renderErrorMessage
+                    />
 
-                  <Input
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="lock-outline" size={20} color="lightgray" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setConfirmRegisterPassword}
-                    placeholder="Confirm Password"
-                    secureTextEntry={true}
-                    value={confirmRegisterPassword}
-                    placeholderTextColor="white"
-                    errorMessage="* Password doesn't match"
-                    errorStyle={{ color: confirmRegisterPasswordError }}
-                    renderErrorMessage
-                  />
-                </View>
+                    <Input
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon name="lock-outline" size={20} color="lightgray" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setConfirmRegisterPassword}
+                      placeholder="Confirm Password"
+                      secureTextEntry={true}
+                      value={confirmRegisterPassword}
+                      placeholderTextColor="white"
+                      errorMessage="* Password doesn't match"
+                      errorStyle={{ color: confirmRegisterPasswordError }}
+                      renderErrorMessage
+                    />
+                  </View>
+                ) : (
+                  <View>
+                    <Input
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      placeholderTextColor="white"
+                      onChangeText={setDisplayName}
+                      placeholder="Display Name"
+                      value={displayName}
+                      errorMessage="* Invalid name"
+                      errorStyle={{ color: displayNameError }}
+                      renderErrorMessage
+                    />
+
+                    <Input
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="cellphone-android"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      placeholderTextColor="white"
+                      onChangeText={setPhone}
+                      keyboardType="number-pad"
+                      placeholder="Phone No."
+                      value={phone}
+                      errorMessage="* Invalid Phone No."
+                      errorStyle={{ color: phoneError }}
+                      renderErrorMessage
+                    />
+                  </View>
+                )
               ) : (
                 <View>
-                  <Input
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon
-                        name="account-card-details"
-                        size={20}
-                        color="lightgray"
-                      />
-                    }
-                    containerStyle={styles.Inputs}
-                    placeholderTextColor="white"
-                    onChangeText={setDisplayName}
-                    placeholder="Display Name"
-                    value={displayName}
-                    errorMessage="* Invalid name"
-                    errorStyle={{ color: displayNameError }}
-                    renderErrorMessage
-                  />
-
-                  <Input
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon
-                        name="cellphone-android"
-                        size={20}
-                        color="lightgray"
-                      />
-                    }
-                    containerStyle={styles.Inputs}
-                    placeholderTextColor="white"
-                    onChangeText={setPhone}
+                  <Text style={{ marginTop: 20 }}></Text>
+                  {/* <TextInput
+                    style={{ marginVertical: 10, fontSize: 17 }}
+                    editable={!!verificationId}
+                    placeholder="123456"
                     keyboardType="number-pad"
-                    placeholder="Phone No."
-                    value={phone}
-                    errorMessage="* Invalid Phone No."
-                    errorStyle={{ color: phoneError }}
-                    renderErrorMessage
-                    // maxLength={8}
-                  />
-
-                  {/* <Input
-                    inputStyle={{
-                      color: "white",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="percent" size={20} color="lightgray" />
-                    }
-                    containerStyle={styles.Inputs}
-                    placeholderTextColor="white"
-                    onChangeText={setReferralCode}
-                    keyboardType="number-pad"
-                    placeholder="Referral Code"
-                    value={referralCode}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
+                    onChangeText={setVerificationCode}
                   /> */}
+
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    editable={!!verificationId}
+                    inputContainerStyle={{ borderBottomWidth: 10 }}
+                    leftIcon={
+                      <Octicons name="verified" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setVerificationCode}
+                    placeholder="Verification Code"
+                  />
+                  <TouchableOpacity
+                    onPress={handleRegister}
+                    disabled={!verificationId}
+                    style={styles.registerButton}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      Confirm Verification Code
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
 
             <View
               style={{
-                // flexDirection: "row",
-                // justifyContent: "center",
                 flex: 1,
-                // backgroundColor: "green",
                 width: "100%",
               }}
             >
@@ -950,7 +929,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderTopWidth: 0,
     borderColor: "white",
-
   },
   containerRegister: {
     flex: 1,
@@ -961,7 +939,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderTopWidth: 0,
     borderColor: "white",
-
   },
   headerText: {
     alignItems: "center",
