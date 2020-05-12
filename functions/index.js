@@ -24,6 +24,28 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
+exports.updatePhoto = functions.https.onCall(async (data, context) => {
+  console.log("updatePhoto data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    photoURL: data.photoURL,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    photoURL: data.photoURL,
+  });
+});
+
+exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+  console.log("updateDisplayName data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
+  });
+});
+
 exports.initUser = functions.https.onRequest(async (request, response) => {
   console.log("request", request.query.uid);
   const email = (await admin.auth().getUser(request.query.uid)).email.split(
@@ -47,10 +69,29 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
   response.send("All done ");
 });
 
-exports.deleteUser = functions.https.onRequest(async (request, response) => {
+exports.addCard = functions.https.onCall(async (data, context) => {
+  const result = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cards")
+    .add(data.cardInfo);
+  return result;
+});
+
+exports.deleteUser = functions.https.onRequest(async (request, context) => {
   await admin.auth().deleteUser(request.query.uid);
 
   response.send("All done");
+});
+
+exports.deleteCard = functions.https.onCall(async (data, context) => {
+  const result = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cards")
+    .doc(data.cardId)
+    .delete();
+  return result;
 });
 
 exports.sendMail = functions.https.onRequest((request, response) => {
@@ -75,4 +116,39 @@ exports.sendMail = functions.https.onRequest((request, response) => {
       return response.send("Sent");
     });
   });
+});
+
+
+
+exports.handleBooking = functions.https.onCall(async (data, context) => {
+  //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
+  //create booking
+  var booking = {
+    user: data.user,
+    asset: data.asset,
+    startDateTime: data.startDateTime,
+    endDateTime: data.endDateTime,
+  }
+  var bId= ""
+  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(booking).then(docRef => 
+    bId = docRef.id
+  )
+  
+  booking.id = bId
+  
+  db.collection("payments")
+        .add({
+          user: data.user,
+          card:data.card,
+          assetBooking:booking,
+          serviceBooking: null,
+          totalAmount: data.totalAmount,
+          dateTime: data.dateTime,
+          status: data.status,
+          promotionCode: null,
+        });
+
+  if( data.addCreditCard){
+    db.collection("users").doc(data.uid).collection("cards").add(data.card)
+  }
 });
