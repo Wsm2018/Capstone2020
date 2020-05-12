@@ -17,7 +17,7 @@ export default function BalanceScreen({ user, navigation }) {
 
       <Button
         title="My Credit Cards"
-        onPress={() => navigation.navigate("CardsScreen", { user: user })}
+        onPress={() => navigation.navigate("Cards", { user: user })}
       />
     </View>
   );

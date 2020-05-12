@@ -18,6 +18,8 @@ import Types from './Types';
 import Sections from './Sections';
 import List from './List';
 import Details from './Details';
+import Payment from "./Payment"
+import CheckOut from "./CheckOut"
 
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -31,7 +33,9 @@ const AppNavigator = createStackNavigator(
     Types:Types,
     Sections:Sections,
     List:List,
-    Details:Details
+    Details:Details,
+    Payment: Payment,
+    CheckOut: CheckOut
   },
   {
     defaultNavigationOptions:{
