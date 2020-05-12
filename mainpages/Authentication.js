@@ -5,14 +5,32 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Dimensions,
+  Modal,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../db";
+import LottieView from "lottie-react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Input } from "react-native-elements";
+import { ButtonGroup } from "react-native-elements";
 
 export default function Authentication(props) {
-  const [view, setView] = useState("Register");
+  const [view, setView] = useState(0);
+  const [registerView, setRegisterView] = useState(0);
+  const [modalViewLogin, setModalViewLogin] = useState(false);
+  const [accessFlag, setAccessFlag] = useState(false);
+  const [accessValid, setAccessValid] = useState(false);
+  const buttons = ["Login", "Register"];
 
+  //***** Access Code  */
+  const [AccessCode, setAccessCode] = useState("");
+  const [AccessAmount, setAccessAmount] = useState("QR");
   // ***** Register useState *****
 
   const [registerEmail, setRegisterEmail] = useState("");
@@ -20,6 +38,8 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+
   // the register button status for validation
   const [btnStatus, setBtnStatus] = useState(true);
 
@@ -31,6 +51,31 @@ export default function Authentication(props) {
   // ***** ForgotPass useState *****
 
   const [forgotPassEmail, setForgotPassEmail] = useState("");
+
+  // Validation useStates for Form
+  //Login
+  const [loginEmailError, setLoginEmailError] = useState("transparent");
+  const [loginPasswordError, setLoginPasswordError] = useState("transparent");
+
+  //Reg
+  const [registerEmailError, setRegisterEmailError] = useState("transparent");
+  const [registerPasswordError, setRegisterPasswordError] = useState(
+    "transparent"
+  );
+  const [
+    confirmRegisterPasswordError,
+    setConfirmRegisterPasswordError,
+  ] = useState("transparent");
+  const [phoneError, setPhoneErr] = useState("transparent");
+  const [displayNameError, setDisplayErr] = useState("transparent");
+  const [refErr, setRefErr] = useState("transparent");
+
+  //Access
+
+  const [accessCodeError, setAccessCodeError] = useState("transparent");
+  const [displayErr2, setDisplayErr2] = useState("transparent");
+  const [phoneErr2, setPhoneErr2] = useState("transparent");
+  const [phoneAccess, setPhoneAccess] = useState("");
 
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
@@ -60,19 +105,29 @@ export default function Authentication(props) {
     if (phone !== "") {
       // checking if Phone No. is 8 digits
       if (phone.length !== 8) {
-        return alert("Phone Number is Not Available!");
+        setPhoneErr("red");
+        // return alert("Phone Number is Not Available!");
+      } else {
+        setPhoneErr("transparent");
       }
     } else {
-      return alert("Enter your Phone Number!");
+      setPhoneErr("red");
+      // return alert("Enter your Phone Number!");
     }
 
     if (displayName === "") {
-      return alert("Enter your Display Name!");
+      setDisplayErr("red");
+      // return alert("Enter your Display Name!");
+    } else {
+      setDisplayErr("transparent");
     }
 
-    if (registerPassword !== confirmRegisterPassword) {
-      return alert("Password and Confirm Password should be same !");
-    }
+    // if (registerPassword !== confirmRegisterPassword) {
+    //   // return alert("Password and Confirm Password should be same !");
+    //   setConfirmRegisterPasswordError("red");
+    // } else {
+    //   setConfirmRegisterPasswordError("transparent");
+    // }
 
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
@@ -110,45 +165,47 @@ export default function Authentication(props) {
   // createUserInfo will complete all the data for the user to create a document in the
   // database
   const createUserInfo = async () => {
+    alert("Hello Testing");
     // generating a random 6 digit referralCode
-    let referralCode = Math.floor(Math.random() * 1000000) + "";
+    // let referralCode = Math.floor(Math.random() * 1000000) + "";
 
-    if (referralCode.length === 1) {
-      referralCode = "00000" + referralCode;
-    } else if (referralCode.length === 2) {
-      referralCode = "0000" + referralCode;
-    } else if (referralCode.length === 3) {
-      referralCode = "000" + referralCode;
-    } else if (referralCode.length === 4) {
-      referralCode = "00" + referralCode;
-    } else if (referralCode.length === 5) {
-      referralCode = "0" + referralCode;
-    }
+    // if (referralCode.length === 1) {
+    //   referralCode = "00000" + referralCode;
+    // } else if (referralCode.length === 2) {
+    //   referralCode = "0000" + referralCode;
+    // } else if (referralCode.length === 3) {
+    //   referralCode = "000" + referralCode;
+    // } else if (referralCode.length === 4) {
+    //   referralCode = "00" + referralCode;
+    // } else if (referralCode.length === 5) {
+    //   referralCode = "0" + referralCode;
+    // }
 
-    const users = db.collection("users");
+    // const users = db.collection("users");
     // checking if any other user has the generated referralCode and waiting because its
     // checking all the users document
-    let result = await users.where("referralCode", "==", referralCode).get();
+    // let result = await users.where("referralCode", "==", referralCode).get();
     // while there is any user with that referralCode it will generate a new code and try
     // again till it returns 0 documents
-    while (result.size > 0) {
-      referralCode = Math.floor(Math.random() * 1000000) + "";
-      if (referralCode.length === 1) {
-        referralCode = "00000" + referralCode;
-      } else if (referralCode.length === 2) {
-        referralCode = "0000" + referralCode;
-      } else if (referralCode.length === 3) {
-        referralCode = "000" + referralCode;
-      } else if (referralCode.length === 4) {
-        referralCode = "00" + referralCode;
-      } else if (referralCode.length === 5) {
-        referralCode = "0" + referralCode;
-      }
-      result = await users.where("referralCode", "==", referralCode).get();
-    }
+    // while (result.size > 0) {
+    //   referralCode = Math.floor(Math.random() * 1000000) + "";
+    //   if (referralCode.length === 1) {
+    //     referralCode = "00000" + referralCode;
+    //   } else if (referralCode.length === 2) {
+    //     referralCode = "0000" + referralCode;
+    //   } else if (referralCode.length === 3) {
+    //     referralCode = "000" + referralCode;
+    //   } else if (referralCode.length === 4) {
+    //     referralCode = "00" + referralCode;
+    //   } else if (referralCode.length === 5) {
+    //     referralCode = "0" + referralCode;
+    //   }
+    //   result = await users.where("referralCode", "==", referralCode).get();
+    // }
     // const name = email.split("@");
 
     // creating user document in the database with all the information
+    console.log("user ", firebase.auth().currentUser.uid);
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .set({
@@ -159,8 +216,15 @@ export default function Authentication(props) {
         qrCode: "",
         displayName,
         phone: `+974${phone}`,
-        referralCode,
+        referralCode: 0,
         loyaltyCode: "",
+        subscription: {
+          name: null,
+          startDate: null,
+          endDate: null,
+          point: null,
+        },
+        // checking if the user used referral code and giving him a token if he did
         tokens: 0,
         location: null,
         privacy: {
@@ -172,22 +236,24 @@ export default function Authentication(props) {
         favorite: [],
         reputation: 0,
         points: 0,
+        photoURL:
+          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
       });
 
     // if the user used a referral code it will add document inside the referrer
     // subcollection and it will have the new user referral code and the status as false
     // the status will show if the user used the token or not
-    if (referralStatus === true) {
-      const referralDoc = await users
-        .where("referralCode", "==", referral)
-        .get();
-      referralDoc.forEach((doc) => {
-        db.collection("users").doc(doc.id).collection("referrer").doc().set({
-          referrerCode: referralCode,
-          status: false,
-        });
-      });
-    }
+    // if (referralStatus === true) {
+    //   const referralDoc = await users
+    //     .where("referralCode", "==", referral)
+    //     .get();
+    //   referralDoc.forEach((doc) => {
+    //     db.collection("users").doc(doc.id).collection("referrer").doc().set({
+    //       referrerCode: referralCode,
+    //       status: false,
+    //     });
+    //   });
+    // }
   };
 
   const handleLogin = async () => {
@@ -195,115 +261,625 @@ export default function Authentication(props) {
       .auth()
       .signInWithEmailAndPassword(loginEmail, loginPassword)
       .then(() => {
+        setLoginEmailError("transparent");
+        setLoginPasswordError("transparent");
         console.log("successful login!");
       })
       .catch((err) => {
-        alert(err.message);
+        // setLoginEmailError("red");
+        setLoginPasswordError("red");
+        // alert(err);
       });
   };
 
   const handleSubmit = async () => {
+    // let count = 0;
     firebase
       .auth()
-      .sendPasswordResetEmail(forgotPassEmail)
+      .sendPasswordResetEmail(loginEmail)
       .then(() => {
         alert("Email Sent");
+        setLoginEmailError("transparent");
+        setModalViewLogin(false);
+        // count = 1;
       })
-      .catch((err) => alert(err.message));
+      .catch((err) => {
+        setLoginEmailError("red");
+        // count = 0;
+      });
+
+    // if (count === 1) {
+    //   setModalViewLogin(false);
+    // }
   };
 
-  return view === "Register" ? (
+  const registerNext = async () => {
+    let count = 0;
+    if (!registerEmail.includes("@")) {
+      setRegisterEmailError("red");
+    } else {
+      setRegisterEmailError("transparent");
+      count = count + 1;
+    }
+
+    if (registerPassword.length < 6) {
+      setRegisterPasswordError("red");
+    } else {
+      setRegisterPasswordError("transparent");
+      count = count + 1;
+    }
+
+    if (registerPassword !== confirmRegisterPassword) {
+      // return alert("Password and Confirm Password should be same !");
+      setConfirmRegisterPasswordError("red");
+    } else {
+      setConfirmRegisterPasswordError("transparent");
+      count = count + 1;
+    }
+
+    if (count === 3) {
+      setRegisterView(1);
+    }
+  };
+
+  const handleAccessCode = async () => {
+    if (AccessCode === "") {
+      setAccessCodeError("red");
+    } else {
+      setAccessCodeError("transparent");
+      setAccessValid(true);
+    }
+  };
+
+  return (
     <View style={styles.container}>
-      <View>
-        <TextInput
-          onChangeText={setRegisterEmail}
-          placeholder="username@email.com"
-          value={registerEmail}
+      <View style={styles.header}>
+        <LottieView
+          source={require("../assets/login.json")}
+          autoPlay
+          loop
+          style={{ position: "relative", width: "50%" }}
         />
       </View>
-      <View>
-        <TextInput
-          onChangeText={setRegisterPassword}
-          placeholder="Password"
-          secureTextEntry={true}
-          value={registerPassword}
+      <View style={styles.buttonGroup}>
+        <ButtonGroup
+          onPress={() => (view === 1 ? setView(0) : setView(1))}
+          selectedIndex={view}
+          buttons={buttons}
+          containerStyle={{
+            // height: 100,
+            backgroundColor: "#0f4573",
+            // color: "red",
+            //borderColor: "white",
+            // borderBottomColor: "white"
+            marginTop: 50,
+            width: "80%",
+          }}
+          selectedButtonStyle={{
+            backgroundColor: "#0f3a5e",
+            //borderBottomColor: "black",
+          }}
+          innerBorderStyle={
+            {
+              // color: "transparent",
+            }
+          }
         />
-      </View>
-      <View>
-        <TextInput
-          onChangeText={setConfirmRegisterPassword}
-          placeholder="Confirm Password"
-          secureTextEntry={true}
-          value={confirmRegisterPassword}
-        />
-      </View>
-      <View>
-        <TextInput
-          onChangeText={setDisplayName}
-          placeholder="Display Name"
-          value={displayName}
-        />
-      </View>
-      <View>
-        <TextInput
-          onChangeText={setPhone}
-          keyboardType="number-pad"
-          placeholder="Phone No."
-          value={phone}
-        />
-      </View>
-      <TouchableOpacity onPress={handleRegister} disabled={btnStatus}>
-        <Text>Sign Up!</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => setView("Login")}>
-        <Text>Already Have Account?</Text>
-      </TouchableOpacity>
-    </View>
-  ) : view === "Login" ? (
-    <View style={styles.container}>
-      <View>
-        <TextInput
-          onChangeText={setLoginEmail}
-          placeholder="username@email.com"
-          value={loginEmail}
-        />
-      </View>
-      <View>
-        <TextInput
-          onChangeText={setLoginPassword}
-          placeholder="Password"
-          secureTextEntry={true}
-          value={loginPassword}
-        />
-        <TouchableOpacity onPress={() => setView("ForgotPass")}>
-          <Text>Forgot Password?</Text>
-        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => handleLogin()}>
-        <Text>Login</Text>
-      </TouchableOpacity>
+      {view === 1 ? (
+        <View style={styles.containerRegister}>
+          <View style={styles.form}>
+            <View style={{ flex: 6, width: "100%" }}>
+              {registerView === 0 ? (
+                <View>
+                  <Input
+                    inputContainerStyle={{
+                      borderBottomWidth: 0,
+                      // color: "white",
+                    }}
+                    leftIcon={
+                      <Icon name="email-outline" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    onChangeText={setRegisterEmail}
+                    placeholder="E-mail"
+                    value={registerEmail}
+                    placeholderTextColor="white"
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    errorMessage="* Invalid E-mail"
+                    errorStyle={{ color: registerEmailError }}
+                    renderErrorMessage
+                  />
+                  {/* <TextInput
+                onChangeText={setRegisterEmail}
+                placeholder="username@email.com"
+                value={registerEmail}
+              /> */}
+                  <Input
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                    containerStyle={styles.Inputs}
+                    onChangeText={setRegisterPassword}
+                    placeholder="Password"
+                    secureTextEntry={true}
+                    value={registerPassword}
+                    errorMessage="* Password must be atleast 6 characters"
+                    errorStyle={{ color: registerPasswordError }}
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    placeholderTextColor="white"
+                    renderErrorMessage
+                  />
 
-      <TouchableOpacity onPress={() => setView("Register")}>
-        <Text>Create New Account</Text>
-      </TouchableOpacity>
-    </View>
-  ) : (
-    <View>
-      <Text>Forgot Password</Text>
-      <TextInput
-        placeholder="Email"
-        value={forgotPassEmail}
-        onChangeText={setForgotPassEmail}
-      />
-      <TouchableOpacity onPress={handleSubmit}>
-        <Text>Submit</Text>
-      </TouchableOpacity>
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon name="lock-outline" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    onChangeText={setConfirmRegisterPassword}
+                    placeholder="Confirm Password"
+                    secureTextEntry={true}
+                    value={confirmRegisterPassword}
+                    placeholderTextColor="white"
+                    errorMessage="* Password doesn't match"
+                    errorStyle={{ color: confirmRegisterPasswordError }}
+                    renderErrorMessage
+                  />
+                </View>
+              ) : (
+                <View>
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon
+                        name="account-card-details"
+                        size={20}
+                        color="lightgray"
+                      />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setDisplayName}
+                    placeholder="Display Name"
+                    value={displayName}
+                    errorMessage="* Invalid name"
+                    errorStyle={{ color: displayNameError }}
+                    renderErrorMessage
+                  />
 
-      <TouchableOpacity onPress={() => setView("Login")}>
-        <Text>Back to Login</Text>
-      </TouchableOpacity>
+                  <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon
+                        name="cellphone-android"
+                        size={20}
+                        color="lightgray"
+                      />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setPhone}
+                    keyboardType="number-pad"
+                    placeholder="Phone No."
+                    value={phone}
+                    errorMessage="* Invalid Phone No."
+                    errorStyle={{ color: phoneError }}
+                    renderErrorMessage
+                    // maxLength={8}
+                  />
+
+                  {/* <Input
+                    inputStyle={{
+                      color: "white",
+                      fontSize: 16,
+                    }}
+                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    leftIcon={
+                      <Icon name="percent" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="white"
+                    onChangeText={setReferralCode}
+                    keyboardType="number-pad"
+                    placeholder="Referral Code"
+                    value={referralCode}
+                    // errorMessage="Error"
+                    // errorStyle={{ color: "blue" }}
+                    // renderErrorMessage
+                  /> */}
+                </View>
+              )}
+            </View>
+
+            <View
+              style={{
+                // flexDirection: "row",
+                // justifyContent: "center",
+                flex: 1,
+                // backgroundColor: "green",
+                width: "100%",
+              }}
+            >
+              {registerView === 0 ? (
+                <TouchableOpacity
+                  onPress={() => registerNext()}
+                  style={styles.loginButton}
+                >
+                  <Text style={{ color: "white" }}>Next</Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{ flexDirection: "row", justifyContent: "center" }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setRegisterView(0)}
+                    style={styles.backButton}
+                  >
+                    <Text style={{ color: "#0f4573", fontWeight: "bold" }}>
+                      Back
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleRegister()}
+                    style={styles.registerButton}
+                  >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      Sign Up!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      ) : view === 0 ? (
+        <View style={styles.containerLogin}>
+          {modalViewLogin === false && accessFlag == false ? (
+            <View style={styles.form}>
+              <View style={{ flex: 6, width: "100%" }}>
+                <Input
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="lightgray" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  errorMessage="* E-mail not valid"
+                  placeholderTextColor="white"
+                  errorStyle={{
+                    color: loginEmailError,
+                  }}
+                  renderErrorMessage
+                />
+                <Input
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={<Icon name="key" size={20} color="lightgray" />}
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginPassword}
+                  placeholder="Password"
+                  secureTextEntry={true}
+                  value={loginPassword}
+                  placeholderTextColor="white"
+                  errorMessage="* Please check your email and password"
+                  errorStyle={{
+                    color: loginPasswordError,
+                    fontSize: 13,
+                  }}
+                  renderErrorMessage
+                />
+              </View>
+
+              <View
+                style={{
+                  // flexDirection: "row",
+                  // justifyContent: "center",
+                  flex: 1,
+                  // backgroundColor: "green",
+                  width: "100%",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => handleLogin()}
+                >
+                  <Text style={{ color: "white" }}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => setAccessFlag(true)}
+                >
+                  <Text style={{ color: "white" }}>Access Code</Text>
+                </TouchableOpacity>
+                <Text
+                  onPress={() => setModalViewLogin(true)}
+                  style={{ textAlign: "center", color: "white" }}
+                >
+                  Forgot Password?
+                </Text>
+              </View>
+            </View>
+          ) : modalViewLogin === true && accessFlag == false ? (
+            <View style={styles.form}>
+              <View
+                style={{
+                  flex: 6,
+                  width: "100%",
+                  // paddingTop: "15%",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <Input
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="lightgray" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  inputStyle={{
+                    color: "white",
+                    fontSize: 16,
+                  }}
+                  placeholderTextColor="white"
+                  errorMessage="* Email not valid"
+                  errorStyle={{ color: loginEmailError }}
+                  renderErrorMessage
+                />
+                <View>
+                  <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={() => handleSubmit()}
+                  >
+                    <Text style={{ color: "white" }}>Submit</Text>
+                  </TouchableOpacity>
+                  <Text
+                    onPress={() => setModalViewLogin(false)}
+                    style={{ textAlign: "center", color: "white" }}
+                  >
+                    Back to Login
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            modalViewLogin === false &&
+            accessFlag == true && (
+              <View style={styles.form}>
+                {accessValid == false ? (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      // paddingTop: "15%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon name="account-key" size={20} color="lightgray" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setAccessCode}
+                      placeholder="Access Code"
+                      value={AccessCode}
+                      errorMessage="* Code Invalid"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      errorStyle={{ color: accessCodeError }}
+                      renderErrorMessage
+                    />
+                    <View>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={() => handleAccessCode()}
+                      >
+                        <Text style={{ color: "white" }}>Use Code</Text>
+                      </TouchableOpacity>
+                      <Text
+                        onPress={() => setAccessFlag(false)}
+                        style={{ textAlign: "center", color: "white" }}
+                      >
+                        Back to Login
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      // paddingTop: "15%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        //width: "80%",
+                      }}
+                    >
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={
+                          <Icon
+                            name="email-outline"
+                            size={20}
+                            color="lightgray"
+                          />
+                        }
+                        containerStyle={styles.AccessInputs}
+                        onChangeText={setLoginEmail}
+                        // placeholder="E-mail"
+                        value={"email@email.com"}
+                        // errorMessage="Error"
+                        inputStyle={{
+                          color: "white",
+                          fontSize: 16,
+                          textAlign: "center",
+                        }}
+                        placeholderTextColor="white"
+                        disabled={true}
+                        // errorStyle={{ color: "blue" }}
+                        // renderErrorMessage
+                      />
+
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="email-outline"
+                        //     size={20}
+                        //     color="lightgray"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "white",
+                          height: 50,
+                          width: "20%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                        }}
+                        // onChangeText={setLoginEmail}
+                        // placeholder="QR"
+                        //value={loginEmail}
+                        // errorMessage="Error"
+                        inputStyle={{
+                          color: "white",
+                          // fontSize: 16,
+                          textAlign: "center",
+                        }}
+                        placeholderTextColor="white"
+                        value={AccessAmount}
+                        // value="QR"
+                        disabled={true}
+                        // errorStyle={{ color: "blue" }}
+                        // renderErrorMessage
+                      />
+                    </View>
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setDisplayName}
+                      placeholder="Display Name"
+                      value={displayName}
+                      // errorMessage="Error"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      // errorStyle={{ color: "blue" }}
+                      // renderErrorMessage
+                    />
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="cellphone-android"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setPhoneAccess}
+                      placeholder="Phone No."
+                      value={phoneAccess}
+                      // errorMessage="Error"
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="white"
+                      // errorStyle={{ color: "blue" }}
+                      // renderErrorMessage
+                    />
+
+                    <View style={{ marginTop: "7%" }}>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={() => setAccessValid(false)}
+                      >
+                        <Text style={{ color: "white" }}>Next</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )
+          )}
+
+          {/* <View style={styles.footer}>
+            <Text style={{ color: "white" }}>Don't Have an Account? </Text>
+            <TouchableOpacity>
+              <Text style={{ color: "darkblue" }}>Register</Text>
+            </TouchableOpacity>
+          </View> */}
+        </View>
+      ) : (
+        <View>
+          {/* <Text>Forgot Password</Text> */}
+          {/* <TextInput
+            placeholder="Email"
+            value={forgotPassEmail}
+            onChangeText={setForgotPassEmail}
+          />
+          <TouchableOpacity onPress={handleSubmit}>
+            <Text>Submit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setView("Login")}>
+            <Text>Back to Login</Text>
+          </TouchableOpacity> */}
+        </View>
+      )}
     </View>
   );
 }
@@ -311,10 +887,156 @@ export default function Authentication(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#0f4573",
     alignItems: "center",
+    //justifyContent: "center",
+    // flexDirection: "column",
+    // paddingHorizontal: 20,
+    width: Math.round(Dimensions.get("window").width),
+    height: Math.round(Dimensions.get("window").height),
+  },
+  buttonGroup: {
+    alignItems: "center",
+  },
+  containerLogin: {
+    flex: 1,
+    backgroundColor: "#0f3a5e",
+    width: "80%",
+    marginTop: -5,
+    marginBottom: "5%",
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: "white",
+    // alignItems: "center",
+    // justifyContent: "flex-start",
+    // flexDirection: "column",
+    // paddingHorizontal: 20,
+    //width: Math.round(Dimensions.get("window").width),
+    //height: Math.round(Dimensions.get("window").height),6586a6
+  },
+  containerRegister: {
+    flex: 1,
+    backgroundColor: "#0f3a5e",
+    width: "80%",
+    marginTop: -5,
+    marginBottom: "5%",
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: "white",
+    //alignItems: "center",
+    //justifyContent: "center",
+    // flexDirection: "column",
+    // paddingHorizontal: 20,
+    //width: Math.round(Dimensions.get("window").width),
+    //height: Math.round(Dimensions.get("window").height),
+  },
+  headerText: {
+    alignItems: "center",
+    textAlign: "center",
+    color: "white",
+    fontSize: 34,
+    fontWeight: "bold",
+  },
+  footer: {
+    textAlign: "center",
     justifyContent: "center",
-    flexDirection: "column",
-    paddingHorizontal: 20,
+    alignItems: "center",
+    backgroundColor: "#415598",
+    flex: 1,
+    flexDirection: "row",
+  },
+  form: {
+    flex: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  Inputs: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "white",
+    height: 50,
+    width: "80%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 12,
+    marginTop: 20,
+    // color: "white",
+  },
+  AccessInputs: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "white",
+    height: 50,
+    width: "56%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 12,
+    marginTop: 20,
+    marginEnd: 10,
+    // color: "white",
+  },
+  Buttons: {
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: "white",
+    height: 35,
+    width: "30%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+  },
+  backButton: {
+    backgroundColor: "white",
+    height: 40,
+    width: "20%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    // marginTop: 18,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  loginButton: {
+    backgroundColor: "#6586a6",
+    height: 40,
+    width: "80%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    // marginTop: 18,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+    // position: "relative",
+  },
+  registerButton: {
+    backgroundColor: "#6586a6",
+    height: 40,
+    width: "55%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    // marginTop: 18,
+    // marginRight:8,
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "red",
+    flex: 1,
+    // paddingTop: 20,
   },
 });
