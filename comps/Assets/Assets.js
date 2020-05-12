@@ -25,7 +25,6 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
 import { createAppContainer } from "react-navigation";
-
 require("firebase/firestore");
 
 

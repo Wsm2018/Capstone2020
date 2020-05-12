@@ -19,6 +19,10 @@ const HomeStack = createStackNavigator({
   Payment: Payment,
   CheckOut: CheckOut
 
+},  {
+  navigationOptions: ({ navigation }) => {
+    header: null;
+  },
 });
 
 export default HomeStack;

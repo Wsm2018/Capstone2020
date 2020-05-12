@@ -24,6 +24,28 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
+exports.updatePhoto = functions.https.onCall(async (data, context) => {
+  console.log("updatePhoto data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    photoURL: data.photoURL,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    photoURL: data.photoURL,
+  });
+});
+
+exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+  console.log("updateDisplayName data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
+  });
+});
+
 exports.initUser = functions.https.onRequest(async (request, response) => {
   console.log("request", request.query.uid);
   const email = (await admin.auth().getUser(request.query.uid)).email.split(
@@ -45,6 +67,10 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
   });
 
   response.send("All done ");
+});
+
+exports.addCard = functions.https.onCall(async (data, response) => {
+  db.collection("users").doc(data.uid).collection("cards").add(data.cardInfo);
 });
 
 exports.deleteUser = functions.https.onRequest(async (request, response) => {

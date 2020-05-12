@@ -90,7 +90,6 @@ Details.navigationOptions = (props) => ({
     headerTintStyle: { fontWeight: "bold" }
 })
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
