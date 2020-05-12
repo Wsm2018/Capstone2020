@@ -11,6 +11,7 @@ export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
+  // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
     const doc = await db
       .collection("users")
@@ -20,6 +21,7 @@ export default function FriendsList(props) {
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
 
+  // ---------------------------------FRIENDS---------------------------------
   const handleFriends = async () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -46,6 +48,7 @@ export default function FriendsList(props) {
       });
   };
 
+  // ---------------------------------USERS---------------------------------
   const handleUsers = () => {
     db.collection("users").onSnapshot((queryBySnapshot) => {
       let tempUsers = [];
@@ -61,28 +64,30 @@ export default function FriendsList(props) {
     });
   };
 
+  // -------------------------------ADD-----------------------------------
   const addFriend = (user) => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .doc(user.id)
-      .set({ displayName: user.displayName, status: "added" });
+      .set({ displayName: user.displayName, status: "pending" });
 
     db.collection("users")
       .doc(user.id)
       .collection("friends")
       .doc(firebase.auth().currentUser.uid)
-      .set({ displayName: currentUser.displayName, status: "added" });
+      .set({ displayName: currentUser.displayName, status: "requested" });
   };
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     handleCurrentuser();
     handleUsers();
   }, []);
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     if (users) {
-      console.log("handleFriends is gunna run");
       handleFriends();
     }
   }, [users]);
@@ -98,8 +103,15 @@ export default function FriendsList(props) {
             key={user.id}
           >
             <Text>{user.displayName}</Text>
-            {user.friendStatus === "added" ? (
+            {user.friendStatus === "pending" ? (
               <TouchableOpacity style={{ borderWidth: 1 }}>
+                <Text>Pending</Text>
+              </TouchableOpacity>
+            ) : user.friendStatus === "accepted" ? (
+              <TouchableOpacity
+                style={{ borderWidth: 1 }}
+                onPress={() => addFriend(user)}
+              >
                 <Text>Added</Text>
               </TouchableOpacity>
             ) : (

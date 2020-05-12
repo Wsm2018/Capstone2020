@@ -14,11 +14,11 @@ export default function FriendsList(props) {
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .onSnapshot((queryBySnapshot) => {
-        console.log(queryBySnapshot.size, "friends");
+        console.log(queryBySnapshot.size);
         if (queryBySnapshot.size > 0) {
           let tempFriends = [];
           queryBySnapshot.forEach((doc) => {
-            if (doc.data().status === "accepted") {
+            if (doc.data().status === "requested") {
               tempFriends.push({ id: doc.id, ...doc.data() });
             }
           });
@@ -36,29 +36,23 @@ export default function FriendsList(props) {
       });
   };
 
-  // -------------------------------DELETE-----------------------------------
-  const deleteAll = async () => {
-    const userQuery = await db.collection("users").get();
+  // -------------------------------ACCEPT-----------------------------------
+  const accept = (user) => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("friends")
+      .doc(user.id)
+      .update({ status: "accepted" });
 
-    userQuery.forEach(async (user) => {
-      const friendQuery = await db
-        .collection("users")
-        .doc(user.id)
-        .collection("friends")
-        .get();
-
-      friendQuery.forEach((friend) => {
-        db.collection("users")
-          .doc(user.id)
-          .collection("friends")
-          .doc(friend.id)
-          .delete();
-      });
-    });
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ status: "accepted" });
   };
 
-  // -------------------------------REMOVE-----------------------------------
-  const removeFriend = (id) => {
+  // -------------------------------DECLINE-----------------------------------
+  const decline = (id) => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
@@ -83,8 +77,8 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Text>Friends List</Text>
-      <Button title="Delete All" onPress={deleteAll} />
+      <Text>Friends Request</Text>
+
       {friends.length > 0 ? (
         friends.map((friend) => (
           <View
@@ -95,37 +89,29 @@ export default function FriendsList(props) {
 
             <TouchableOpacity
               style={{ borderWidth: 1 }}
-              onPress={() =>
-                props.navigation.navigate("FriendsChat", { friend })
-              }
+              onPress={() => accept(friend)}
             >
-              <Text>Chat</Text>
+              <Text>Accept</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{ borderWidth: 1 }}
-              onPress={() => removeFriend(friend.id)}
+              onPress={() => decline(friend.id)}
             >
-              <Text>Delete</Text>
+              <Text>Decline</Text>
             </TouchableOpacity>
           </View>
         ))
       ) : (
-        <Text>You have no friends</Text>
+        <Text>You have no REQUESTS</Text>
       )}
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{ borderWidth: 1 }}
         onPress={() => props.navigation.navigate("FriendsSearch")}
       >
         <Text>Add A Friend</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ borderWidth: 1 }}
-        onPress={() => props.navigation.navigate("FriendsRequest")}
-      >
-        <Text>Friend Requests</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

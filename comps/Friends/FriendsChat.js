@@ -22,6 +22,7 @@ export default function FriendsList(props) {
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
 
+  // -------------------------------FROM-----------------------------------
   const handleFrom = () => {
     db.collection("chats")
       .where("from", "==", firebase.auth().currentUser.uid)
@@ -35,6 +36,7 @@ export default function FriendsList(props) {
       });
   };
 
+  // --------------------------------TO----------------------------------
   const handleTo = () => {
     db.collection("chats")
       .where("from", "==", friend.id)
@@ -48,6 +50,7 @@ export default function FriendsList(props) {
       });
   };
 
+  // -------------------------------CHAT-----------------------------------
   const handleChat = () => {
     let tempChat = from.concat(to);
     tempChat = tempChat.sort(
@@ -56,6 +59,7 @@ export default function FriendsList(props) {
     setChats(tempChat);
   };
 
+  // --------------------------------SEND----------------------------------
   const send = () => {
     db.collection("chats").add({
       to: friend.id,
@@ -65,6 +69,7 @@ export default function FriendsList(props) {
     });
   };
 
+  // --------------------------------DELETE ALL----------------------------------
   const deleteAll = async () => {
     const getQuery = await db.collection("chats").get();
     getQuery.forEach((doc) => {
@@ -72,11 +77,13 @@ export default function FriendsList(props) {
     });
   };
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     handleFrom();
     handleTo();
   }, []);
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     if (from && to) {
       handleChat();
@@ -85,7 +92,7 @@ export default function FriendsList(props) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : null}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <Text>Friends Chat</Text>
