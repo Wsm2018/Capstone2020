@@ -13,7 +13,6 @@
     "expo": "^37.0.8",
     "expo-firebase-recaptcha": "^1.1.0",
     "expo-image-picker": "^8.1.0",
-    "moment": "^2.25.3",
     "base-64": "^0.1.0",
     "expo-cli": "^3.20.1",
     "firebase": "7.9.0",
