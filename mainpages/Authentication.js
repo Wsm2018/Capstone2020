@@ -20,6 +20,22 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign, Ionicons } from "react-native-vector-icons";
 import { Input, Tooltip } from "react-native-elements";
 import { ButtonGroup, Image } from "react-native-elements";
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { Octicons } from "@expo/vector-icons";
+const config = {
+  apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
+  authDomain: "capstone2020-b64fd.firebaseapp.com",
+  databaseURL: "https://capstone2020-b64fd.firebaseio.com",
+  projectId: "capstone2020-b64fd",
+  storageBucket: "capstone2020-b64fd.appspot.com",
+  messagingSenderId: "930744827368",
+  appId: "1:930744827368:web:6f2a6287721546d272785d",
+};
+try {
+  firebase.initializeApp(config);
+} catch (err) {
+  console.log(err);
+}
 
 export default function Authentication(props) {
   const [view, setView] = useState(0);
@@ -48,6 +64,24 @@ export default function Authentication(props) {
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+
+  // ***** Phone Verification useState *****
+  // to know if the registration is completed, used for phone verification
+  const [registered, setRegistered] = useState(false);
+  const recaptchaVerifier = React.useRef(null);
+  const [verificationId, setVerificationId] = React.useState();
+  const [verificationCode, setVerificationCode] = React.useState();
+  const firebaseConfig = firebase.apps.length
+    ? firebase.app().options
+    : undefined;
+  const [message, showMessage] = React.useState(
+    !firebaseConfig || Platform.OS === "web"
+      ? {
+          text:
+            "To get started, provide a valid firebase config in App.js and open this snack on an iOS or Android device.",
+        }
+      : undefined
+  );
 
   // ***** ForgotPass useState *****
 
@@ -80,6 +114,7 @@ export default function Authentication(props) {
 
   // it check if the email and password is not empty to enable the register button
   // and it will keep checking whenever the user edits on the email or password fields
+
   useEffect(() => {
     if (
       registerEmail !== "" &&
@@ -100,9 +135,7 @@ export default function Authentication(props) {
     phone,
   ]);
 
-  // handleRegister will create a the user and create the document for the user in the
-  // database with all the needed information
-  const handleRegister = async () => {
+  const handleSendVerificationCode = async () => {
     if (phone !== "") {
       // checking if Phone No. is 8 digits
       if (phone.length !== 8) {
@@ -123,43 +156,67 @@ export default function Authentication(props) {
       setDisplayErr("transparent");
     }
 
-    // if (registerPassword !== confirmRegisterPassword) {
-    //   // return alert("Password and Confirm Password should be same !");
-    //   setConfirmRegisterPasswordError("red");
-    // } else {
-    //   setConfirmRegisterPasswordError("transparent");
-    // }
-
-    // trying creating user and if there is any error it will alert it for example:
-    // email is not corrent or password is not strong
     try {
-      // waiting for the user to be created in the authentication
-      await firebase
-        .auth()
-        .createUserWithEmailAndPassword(registerEmail, registerPassword);
-
-      // initiating user info in firebase funcations to add a display image and display name
-      const response = await fetch(
-        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
-          firebase.auth().currentUser.uid
-        }&phoneNumber=${phone}&displayName=${displayName}`
+      const phoneProvider = new firebase.auth.PhoneAuthProvider();
+      const verificationId = await phoneProvider.verifyPhoneNumber(
+        `+974${phone}`,
+        recaptchaVerifier.current
       );
+      setVerificationId(verificationId);
+      alert("Verification code has been sent to your phone.");
+      setRegistered(true);
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
 
-      //sending the user an email verification
-      await firebase
-        .auth()
-        .currentUser.sendEmailVerification()
-        .then(() => {
-          console.log("Email Sent!");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  const handleRegister = async () => {
+    if (
+      verificationCode === null ||
+      verificationCode === "" ||
+      verificationCode === undefined
+    ) {
+      alert("Enter Verification Code");
+      return;
+    }
+    try {
+      const credential = firebase.auth.PhoneAuthProvider.credential(
+        verificationId,
+        verificationCode
+      );
+      if (credential !== null) {
+        try {
+          // waiting for the user to be created in the authentication
+          await firebase
+            .auth()
+            .createUserWithEmailAndPassword(registerEmail, registerPassword);
 
-      // calling createUserInfo and waiting for it before moving the user to login page
-      await createUserInfo();
-    } catch (error) {
-      alert(error.message);
+          // initiating user info in firebase funcations to add a display image and display name
+          const response = await fetch(
+            `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
+              firebase.auth().currentUser.uid
+            }&phoneNumber=${phone}&displayName=${displayName}`
+          );
+
+          //sending the user a verification email
+          await firebase
+            .auth()
+            .currentUser.sendEmailVerification()
+            .then(() => {
+              console.log("Email Sent!");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+
+          // calling createUserInfo and waiting for it before moving the user to login page
+          await createUserInfo();
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     }
   };
 
@@ -206,7 +263,7 @@ export default function Authentication(props) {
     // const name = email.split("@");
 
     // creating user document in the database with all the information
-    console.log("user ", firebase.auth().currentUser.uid);
+    // console.log("user ", firebase.auth().currentUser.uid);
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .set({
@@ -267,14 +324,11 @@ export default function Authentication(props) {
         console.log("successful login!");
       })
       .catch((err) => {
-        // setLoginEmailError("red");
         setLoginPasswordError("red");
-        // alert(err);
       });
   };
 
   const handleSubmit = async () => {
-    // let count = 0;
     firebase
       .auth()
       .sendPasswordResetEmail(loginEmail)
@@ -282,16 +336,10 @@ export default function Authentication(props) {
         alert("Email Sent");
         setLoginEmailError("transparent");
         setModalViewLogin(false);
-        // count = 1;
       })
       .catch((err) => {
         setLoginEmailError("red");
-        // count = 0;
       });
-
-    // if (count === 1) {
-    //   setModalViewLogin(false);
-    // }
   };
 
   const registerNext = async () => {
@@ -311,7 +359,6 @@ export default function Authentication(props) {
     }
 
     if (registerPassword !== confirmRegisterPassword) {
-      // return alert("Password and Confirm Password should be same !");
       setConfirmRegisterPasswordError("red");
     } else {
       setConfirmRegisterPasswordError("transparent");
@@ -332,11 +379,16 @@ export default function Authentication(props) {
     }
   };
 
+  const handleSetRegisterView = () => {
+    setRegisterView(0);
+    setRegistered(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <LottieView
-          source={require("../assets/15593-profile-animation.json")}
+          source={require("../assets/login.json")}
           autoPlay
           loop
           style={{ position: "relative", width: "55%", paddingTop: "5%" }}
@@ -350,28 +402,17 @@ export default function Authentication(props) {
           textStyle={{ color: "white", fontSize: 21 }}
           buttons={buttons}
           containerStyle={{
-            // height: 100,
             backgroundColor: "#20365F",
-
             borderTopRightRadius: 30,
             borderTopLeftRadius: 30,
-            color: "#20365F",
-
-            //borderTopColor:'white',
-            // color: "red",
-            // borderColor: "white",
             borderWidth: 0,
             borderColor: "white",
-            // borderBottomColor: "white"#0f4573
             marginTop: 50,
             width: "87%",
           }}
-          //disabledSelectedTextStyle={{color:'#20365F'}}
           selectMultiple={false}
           selectedButtonStyle={{
             backgroundColor: "white",
-
-            //borderBottomColor: "black",
           }}
           innerBorderStyle={{
             color: "transparent",
@@ -382,145 +423,93 @@ export default function Authentication(props) {
       {view === 1 ? (
         <View style={styles.containerRegister}>
           <View style={styles.form}>
+            <FirebaseRecaptchaVerifierModal
+              ref={recaptchaVerifier}
+              firebaseConfig={config}
+            />
             <View style={{ flex: 6, width: "100%" }}>
-              {registerView === 0 ? (
-                <View>
-                  <Input
-                    inputContainerStyle={{
-                      borderBottomWidth: 0,
-                      // color: "white",
-                    }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setRegisterEmail}
-                    placeholder="E-mail"
-                    value={registerEmail}
-                    placeholderTextColor="#20365F"
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    errorMessage="* Invalid E-mail"
-                    errorStyle={{ color: registerEmailError }}
-                    renderErrorMessage
-                  />
-                  {/* <TextInput
-                onChangeText={setRegisterEmail}
-                placeholder="username@email.com"
-                value={registerEmail}
-              /> */}
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: 'center',
-                    }}
-                  >
+              {!registered ? (
+                registerView === 0 ? (
+                  <View>
                     <Input
-                      inputContainerStyle={{ borderBottomWidth: 0 }}
-                      leftIcon={<Icon name="key" size={20} color="#20365F" />}
-                      containerStyle={{
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: "#20365F",
-                        height: 50,
-                        width: "70%",
-                        alignSelf: "center",
-                        opacity: 0.8,
-                        // paddingLeft: 2,
-                        marginTop: 20,
-                        marginRight: 30,
+                      inputContainerStyle={{
+                        borderBottomWidth: 0,
+                        // color: "white",
                       }}
-                      onChangeText={setRegisterPassword}
-                      placeholder="Password"
-                      secureTextEntry={true}
-                      value={registerPassword}
-                      errorMessage="* Password must be atleast 6 characters"
-                      errorStyle={{ color: registerPasswordError }}
+                      leftIcon={
+                        <Icon name="email-outline" size={20} color="#20365F" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setRegisterEmail}
+                      placeholder="E-mail"
+                      value={registerEmail}
+                      placeholderTextColor="#20365F"
                       inputStyle={{
                         color: "#20365F",
                         fontSize: 16,
                       }}
-                      placeholderTextColor="#20365F"
+                      errorMessage="* Invalid E-mail"
+                      errorStyle={{ color: registerEmailError }}
                       renderErrorMessage
                     />
-                    <Tooltip popover={<Text>Info here</Text>}>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "white",
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={<Icon name="key" size={20} color="#20365F" />}
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
                           height: 50,
-                          width: "15%",
-                          justifyContent: "center",   
-                          alignSelf: 'auto',
-                          //opacity: 0.8,
-                          paddingLeft: 0,
+                          width: "70%",
+                          alignSelf: "center",
+                          opacity: 0.8,
                           marginTop: 20,
-                          marginLeft: 0,
-                          marginEnd: "20%",
-                          borderRadius: 30,
-                          marginBottom: 10,
+                          marginRight: 30,
                         }}
-                      >
-                        <AntDesign
-                          name="exclamationcircleo"
-                          size={25}
-                          color="#20365F"
-                        />
-                      </TouchableOpacity>
-                    </Tooltip>
-                  </View>
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="lock-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setConfirmRegisterPassword}
-                    placeholder="Confirm Password"
-                    secureTextEntry={true}
-                    value={confirmRegisterPassword}
-                    placeholderTextColor="#20365F"
-                    errorMessage="* Password doesn't match"
-                    errorStyle={{ color: confirmRegisterPasswordError }}
-                    renderErrorMessage
-                  />
-                </View>
-              ) : (
-                <View>
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon
-                        name="account-card-details"
-                        size={20}
-                        color="#20365F"
+                        onChangeText={setRegisterPassword}
+                        placeholder="Password"
+                        secureTextEntry={true}
+                        value={registerPassword}
+                        errorMessage="* Password must be atleast 6 characters"
+                        errorStyle={{ color: registerPasswordError }}
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        placeholderTextColor="#20365F"
+                        renderErrorMessage
                       />
-                    }
-                    containerStyle={styles.Inputs}
-                    placeholderTextColor="#20365F"
-                    onChangeText={setDisplayName}
-                    placeholder="Display Name"
-                    value={displayName}
-                    errorMessage="* Invalid name"
-                    errorStyle={{ color: displayNameError }}
-                    renderErrorMessage
-                  />
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      alignContent: "center",
-                    }}
-                  >
+                      <Tooltip popover={<Text>Info here</Text>}>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "white",
+                            height: 50,
+                            width: "15%",
+                            justifyContent: "center",
+                            alignSelf: "auto",
+                            paddingLeft: 0,
+                            marginTop: 20,
+                            marginLeft: 0,
+                            marginEnd: "20%",
+                            borderRadius: 30,
+                            marginBottom: 10,
+                          }}
+                        >
+                          <AntDesign
+                            name="exclamationcircleo"
+                            size={25}
+                            color="#20365F"
+                          />
+                        </TouchableOpacity>
+                      </Tooltip>
+                    </View>
                     <Input
                       inputStyle={{
                         color: "#20365F",
@@ -528,101 +517,144 @@ export default function Authentication(props) {
                       }}
                       inputContainerStyle={{ borderBottomWidth: 0 }}
                       leftIcon={
-                        <Image
-                          source={require("../assets/qatarFlag.png")}
-                          style={{ width: 20, height: 25 }}
-                        />
+                        <Icon name="lock-outline" size={20} color="#20365F" />
                       }
-                      containerStyle={{
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: "#20365F",
-                        height: 50,
-                        width: "25%",
-                        alignSelf: "center",
-                        opacity: 0.8,
-                        paddingLeft: 10,
-                        marginTop: 20,
-                        marginLeft: 20,
-                      }}
+                      containerStyle={styles.Inputs}
+                      onChangeText={setConfirmRegisterPassword}
+                      placeholder="Confirm Password"
+                      secureTextEntry={true}
+                      value={confirmRegisterPassword}
                       placeholderTextColor="#20365F"
-                      // onChangeText={setPhone}
-                      keyboardType="number-pad"
-                      placeholder="+974"
-                      // value={'+974'}
-                      errorMessage="* Invalid Phone No."
-                      errorStyle={{ color: phoneError }}
+                      errorMessage="* Password doesn't match"
+                      errorStyle={{ color: confirmRegisterPasswordError }}
                       renderErrorMessage
-                      disabled={true}
-                      // disabledInputStyle={{color:'#20365F'}}
-                      // maxLength={8}
                     />
+                  </View>
+                ) : (
+                  <View>
                     <Input
                       inputStyle={{
                         color: "#20365F",
                         fontSize: 16,
                       }}
                       inputContainerStyle={{ borderBottomWidth: 0 }}
-                      // leftIcon={
-                      //   <Icon
-                      //     name="cellphone-android"
-                      //     size={20}
-                      //     color="#20365F"
-                      //   />
-                      // }
-                      containerStyle={{
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: "#20365F",
-                        height: 50,
-                        width: "50%",
-                        alignSelf: "center",
-                        opacity: 0.8,
-                        paddingLeft: 12,
-                        marginTop: 20,
-                        marginRight: 25,
-                        paddingTop: "1%",
-                      }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="#20365F"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
                       placeholderTextColor="#20365F"
-                      onChangeText={setPhone}
-                      keyboardType="number-pad"
-                      placeholder="Phone No."
-                      value={phone}
-                      errorMessage="* Invalid Phone No."
-                      errorStyle={{ color: phoneError }}
+                      onChangeText={setDisplayName}
+                      placeholder="Display Name"
+                      value={displayName}
+                      errorMessage="* Invalid name"
+                      errorStyle={{ color: displayNameError }}
                       renderErrorMessage
-                      // maxLength={8}
                     />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-evenly",
+                        alignContent: "center",
+                      }}
+                    >
+                      <Input
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Image
+                        //     source={require("../assets/qatarFlag.png")}
+                        //     style={{ width: 20, height: 25 }}
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "25%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 10,
+                          marginTop: 20,
+                          marginLeft: 20,
+                        }}
+                        placeholderTextColor="#20365F"
+                        keyboardType="number-pad"
+                        placeholder="+974"
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneError }}
+                        renderErrorMessage
+                        disabled={true}
+                      />
+                      <Input
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="cellphone-android"
+                        //     size={20}
+                        //     color="#20365F"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "50%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                          marginRight: 25,
+                          paddingTop: "1%",
+                        }}
+                        placeholderTextColor="#20365F"
+                        onChangeText={setPhone}
+                        keyboardType="number-pad"
+                        placeholder="Phone No."
+                        value={phone}
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneError }}
+                        renderErrorMessage
+                      />
+                    </View>
                   </View>
-                  {/* <Input
+                )
+              ) : (
+                <View>
+                  <Input
                     inputStyle={{
-                      color: "#20365F",
+                      color: "white",
                       fontSize: 16,
                     }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
+                    editable={!!verificationId}
+                    // inputContainerStyle={{ borderBottomWidth: 10 }}
                     leftIcon={
-                      <Icon name="percent" size={20} color="#20365F" />
+                      <Octicons name="verified" size={20} color="lightgray" />
                     }
                     containerStyle={styles.Inputs}
-                    placeholderTextColor="#20365F"
-                    onChangeText={setReferralCode}
-                    keyboardType="number-pad"
-                    placeholder="Referral Code"
-                    value={referralCode}
-                    // errorMessage="Error"
-                    // errorStyle={{ color: "blue" }}
-                    // renderErrorMessage
-                  /> */}
+                    placeholderTextColor="gray"
+                    onChangeText={setVerificationCode}
+                    placeholder="Verification Code"
+                  />
                 </View>
               )}
             </View>
 
             <View
               style={{
-                // flexDirection: "row",
-                // justifyContent: "center",
                 flex: 1,
-                // backgroundColor: "green",
                 width: "100%",
               }}
             >
@@ -638,20 +670,31 @@ export default function Authentication(props) {
                   style={{ flexDirection: "row", justifyContent: "center" }}
                 >
                   <TouchableOpacity
-                    onPress={() => setRegisterView(0)}
+                    onPress={() => handleSetRegisterView()}
                     style={styles.backButton}
                   >
-                    {/* <AntDesign name="back" size={40} color="#20365F" /> */}
                     <Ionicons name="ios-arrow-back" size={30} color="#20365F" />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleRegister()}
-                    style={styles.registerButton}
-                  >
-                    <Text style={{ color: "white", fontWeight: "bold" }}>
-                      Sign Up!
-                    </Text>
-                  </TouchableOpacity>
+                  {!registered ? (
+                    <TouchableOpacity
+                      onPress={() => handleSendVerificationCode()}
+                      style={styles.registerButton}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Sign Up!
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={handleRegister}
+                      disabled={!verificationId}
+                      style={{ ...styles.registerButton }}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Confirm Verification Code
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
             </View>
@@ -706,10 +749,7 @@ export default function Authentication(props) {
 
               <View
                 style={{
-                  // flexDirection: "row",
-                  // justifyContent: "center",
                   flex: 1,
-                  // backgroundColor: "green",
                   width: "100%",
                   justifyContent: "flex-end",
                 }}
@@ -740,7 +780,6 @@ export default function Authentication(props) {
                 style={{
                   flex: 6,
                   width: "100%",
-                  // paddingTop: "15%",
                   justifyContent: "space-evenly",
                 }}
               >
@@ -754,7 +793,6 @@ export default function Authentication(props) {
                   placeholder="E-mail"
                   value={loginEmail}
                   inputStyle={{
-                    color: "#20365F",
                     fontSize: 16,
                   }}
                   placeholderTextColor="#20365F"
@@ -780,14 +818,13 @@ export default function Authentication(props) {
             </View>
           ) : (
             modalViewLogin === false &&
-            accessFlag == true && (
+            accessFlag === true && (
               <View style={styles.form}>
                 {accessValid == false ? (
                   <View
                     style={{
                       flex: 6,
                       width: "100%",
-                      // paddingTop: "15%",
                       justifyContent: "space-evenly",
                     }}
                   >
@@ -829,7 +866,6 @@ export default function Authentication(props) {
                     style={{
                       flex: 6,
                       width: "100%",
-                      // paddingTop: "15%",
                       justifyContent: "space-evenly",
                     }}
                   >
@@ -838,7 +874,6 @@ export default function Authentication(props) {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
-                        //width: "80%",
                       }}
                     >
                       <Input
@@ -852,9 +887,7 @@ export default function Authentication(props) {
                         }
                         containerStyle={styles.AccessInputs}
                         onChangeText={setLoginEmail}
-                        // placeholder="E-mail"
                         value={"email@email.com"}
-                        // errorMessage="Error"
                         inputStyle={{
                           color: "#20365F",
                           fontSize: 16,
@@ -862,8 +895,6 @@ export default function Authentication(props) {
                         }}
                         placeholderTextColor="#20365F"
                         disabled={true}
-                        // errorStyle={{ color: "blue" }}
-                        // renderErrorMessage
                       />
 
                       <Input
@@ -887,21 +918,13 @@ export default function Authentication(props) {
                           marginTop: 20,
                           paddingTop: "1%",
                         }}
-                        // onChangeText={setLoginEmail}
-                        // placeholder="QR"
-                        //value={loginEmail}
-                        // errorMessage="Error"
                         inputStyle={{
                           color: "#20365F",
-                          // fontSize: 16,
                           textAlign: "center",
                         }}
                         placeholderTextColor="#20365F"
                         value={AccessAmount}
-                        // value="QR"
                         disabled={true}
-                        // errorStyle={{ color: "blue" }}
-                        // renderErrorMessage
                       />
                     </View>
                     <Input
@@ -917,14 +940,10 @@ export default function Authentication(props) {
                       onChangeText={setDisplayName}
                       placeholder="Display Name"
                       value={displayName}
-                      // errorMessage="Error"
                       inputStyle={{
-                        color: "#20365F",
                         fontSize: 16,
                       }}
                       placeholderTextColor="#20365F"
-                      // errorStyle={{ color: "blue" }}
-                      // renderErrorMessage
                     />
                     <View
                       style={{
@@ -939,12 +958,12 @@ export default function Authentication(props) {
                           fontSize: 16,
                         }}
                         inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Image
-                            source={require("../assets/qatarFlag.png")}
-                            style={{ width: 20, height: 25 }}
-                          />
-                        }
+                        // leftIcon={
+                        //   <Image
+                        //     source={require("../assets/qatarFlag.png")}
+                        //     style={{ width: 20, height: 25 }}
+                        //   />
+                        // }
                         containerStyle={{
                           borderRadius: 8,
                           borderWidth: 1,
@@ -958,16 +977,12 @@ export default function Authentication(props) {
                           marginLeft: 20,
                         }}
                         placeholderTextColor="#20365F"
-                        // onChangeText={setPhone}
                         keyboardType="number-pad"
                         placeholder="+974"
-                        // value={'+974'}
                         errorMessage="* Invalid Phone No."
                         errorStyle={{ color: phoneError }}
                         renderErrorMessage
                         disabled={true}
-                        // disabledInputStyle={{color:'#20365F'}}
-                        // maxLength={8}
                       />
                       <Input
                         inputStyle={{
@@ -1003,31 +1018,8 @@ export default function Authentication(props) {
                         errorMessage="* Invalid Phone No."
                         errorStyle={{ color: phoneError }}
                         renderErrorMessage
-                        // maxLength={8}
                       />
                     </View>
-                    {/* <Input
-                      inputContainerStyle={{ borderBottomWidth: 0 }}
-                      leftIcon={
-                        <Icon
-                          name="cellphone-android"
-                          size={20}
-                          color="#20365F"
-                        />
-                      }
-                      containerStyle={styles.Inputs}
-                      onChangeText={setPhoneAccess}
-                      placeholder="Phone No."
-                      value={phoneAccess}
-                      // errorMessage="Error"
-                      inputStyle={{
-                        color: "#20365F",
-                        fontSize: 16,
-                      }}
-                      placeholderTextColor="#20365F"
-                      // errorStyle={{ color: "blue" }}
-                      // renderErrorMessage
-                    /> */}
 
                     <View style={{ marginTop: "7%" }}>
                       <TouchableOpacity
@@ -1042,29 +1034,22 @@ export default function Authentication(props) {
               </View>
             )
           )}
-
-          {/* <View style={styles.footer}>
-            <Text style={{ color: "white" }}>Don't Have an Account? </Text>
-            <TouchableOpacity>
-              <Text style={{ color: "darkblue" }}>Register</Text>
-            </TouchableOpacity>
-          </View> */}
         </View>
       ) : (
         <View>
           {/* <Text>Forgot Password</Text> */}
           {/* <TextInput
-            placeholder="Email"
-            value={forgotPassEmail}
-            onChangeText={setForgotPassEmail}
-          />
-          <TouchableOpacity onPress={handleSubmit}>
-            <Text>Submit</Text>
-          </TouchableOpacity>
+          placeholder="Email"
+          value={forgotPassEmail}
+          onChangeText={setForgotPassEmail}
+        />
+        <TouchableOpacity onPress={handleSubmit}>
+          <Text>Submit</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setView("Login")}>
-            <Text>Back to Login</Text>
-          </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => setView("Login")}>
+          <Text>Back to Login</Text>
+        </TouchableOpacity> */}
         </View>
       )}
     </View>
@@ -1076,9 +1061,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#20365F",
     alignItems: "center",
-    //justifyContent: "center",20365F
-    // flexDirection: "column",
-    // paddingHorizontal: 20,
     width: Math.round(Dimensions.get("window").width),
     height: Math.round(Dimensions.get("window").height),
   },
@@ -1096,12 +1078,6 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderBottomRightRadius: 30,
     borderBottomLeftRadius: 30,
-    // alignItems: "center",
-    // justifyContent: "flex-start",
-    // flexDirection: "column",
-    // paddingHorizontal: 20,
-    //width: Math.round(Dimensions.get("window").width),
-    //height: Math.round(Dimensions.get("window").height),6586a6
   },
   containerRegister: {
     flex: 1,
@@ -1114,12 +1090,6 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderBottomRightRadius: 30,
     borderBottomLeftRadius: 30,
-    //alignItems: "center",
-    //justifyContent: "center",
-    // flexDirection: "column",
-    // paddingHorizontal: 20,
-    //width: Math.round(Dimensions.get("window").width),
-    //height: Math.round(Dimensions.get("window").height),
   },
   headerText: {
     alignItems: "center",
@@ -1138,7 +1108,6 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 4,
-    // paddingBottom:'15%',
     paddingTop: "15%",
     justifyContent: "center",
     alignItems: "center",
@@ -1153,7 +1122,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     paddingLeft: 12,
     marginTop: 20,
-    // color: "white",
   },
   AccessInputs: {
     borderRadius: 8,
@@ -1166,7 +1134,6 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     marginTop: 20,
     marginEnd: 10,
-    // color: "white",
   },
   Buttons: {
     borderRadius: 8,
@@ -1178,7 +1145,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
-    // marginRight:8,
     marginStart: "2%",
     marginEnd: "2%",
   },
@@ -1189,9 +1155,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: 18,
-    // marginRight:8,
-    // marginStart: "2%",
     marginEnd: "2%",
     borderRadius: 30,
     marginBottom: 10,
@@ -1203,13 +1166,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: 18,
-    // marginRight:8,
     marginStart: "2%",
     marginEnd: "2%",
     borderRadius: 30,
     marginBottom: 10,
-    // position: "relative",
   },
   registerButton: {
     backgroundColor: "#20365F",
@@ -1218,8 +1178,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: 18,
-    // marginRight:8,
     marginStart: "2%",
     marginEnd: "2%",
     borderRadius: 30,
@@ -1228,7 +1186,6 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "red",
     flex: 0.7,
     paddingTop: "9%",
   },
