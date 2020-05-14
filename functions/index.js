@@ -215,6 +215,60 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.addFriend = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  db.collection("users")
+    .doc(data.user.id)
+    .collection("friends")
+    .doc(data.friend.id)
+    .set({ displayName: data.friend.displayName, status: "pending" });
+
+  db.collection("users")
+    .doc(data.friend.id)
+    .collection("friends")
+    .doc(data.user.id)
+    .set({ displayName: data.user.displayName, status: "requested" });
+});
+
+exports.acceptFriend = functions.https.onCall((data, context) => {
+  console.log("data", data);
+  db.collection("users")
+    .doc(data.user.id)
+    .collection("friends")
+    .doc(data.friend.id)
+    .update({ status: "accepted" });
+
+  db.collection("users")
+    .doc(data.friend.id)
+    .collection("friends")
+    .doc(data.user.id)
+    .update({ status: "accepted" });
+});
+
+exports.removeFriend = functions.https.onCall((data, context) => {
+  console.log("data", data);
+  db.collection("users")
+    .doc(data.user.id)
+    .collection("friends")
+    .doc(data.friend.id)
+    .delete();
+
+  db.collection("users")
+    .doc(data.friend.id)
+    .collection("friends")
+    .doc(data.user.id)
+    .delete();
+});
+
+exports.sendMessage = functions.https.onCall((data, context) => {
+  console.log("data", data);
+  console.log("new date", new Date());
+  db.collection("chats").add({
+    to: data.to,
+    from: data.from,
+    text: data.text,
+    dateTime: new Date(),
+  });
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
