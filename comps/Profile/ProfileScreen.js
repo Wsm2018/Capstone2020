@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, TextInput, Button } from "react-native";
+import { View, Text, TouchableOpacity, Button, Modal } from "react-native";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import * as ImagePicker from "expo-image-picker";
 
 import db from "../../db";
-import { Avatar, Icon } from "react-native-elements";
+import { Avatar, Icon, ButtonGroup, Input } from "react-native-elements";
 import { createMaterialTopTabNavigator } from "react-navigation-tabs";
 import { createStackNavigator } from "react-navigation-stack";
-import BalanceScreen from "./BalanceScreen";
+import BalanceScreen from "./Cards/BalanceScreen";
 import ReferralScreen from "./ReferralScreen";
 import GiftScreen from "./GiftScreen";
+import DetailsScreen from "./DetailsScreen";
 export default function ProfileScreen(props) {
   const [user, setUser] = useState(null);
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
+  const [photoURL, setPhotoURL] = useState("");
   const [edit, setEdit] = useState(false);
   const [displayName, setDisplayName] = useState();
-  const [view, setView] = useState("balance");
+  const buttons = ["Details", "Send Gift", "Referral Code"];
+  const [view, setView] = useState(0);
+
   const getUser = async () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .onSnapshot((doc) => {
         const user = doc.data();
+        setPhotoURL(user.photoURL);
         setDisplayName(user.displayName);
         setUser(user);
       });
@@ -51,12 +56,13 @@ export default function ProfileScreen(props) {
       .ref()
       .child(`users/${firebase.auth().currentUser.uid}`)
       .getDownloadURL();
-    const updatePhoto = firebase.functions().httpsCallable("updatePhoto");
-    const response2 = await updatePhoto({
-      uid: firebase.auth().currentUser.uid,
-      photoURL: url,
-    });
-    getUser();
+    setPhotoURL(url);
+    // const updatePhoto = firebase.functions().httpsCallable("updatePhoto");
+    // const response2 = await updatePhoto({
+    //   uid: firebase.auth().currentUser.uid,
+    //   photoURL: url,
+    // });
+    // getUser();
   };
 
   const handlePickImage = async () => {
@@ -75,14 +81,14 @@ export default function ProfileScreen(props) {
     }
   };
 
-  const handleEditName = async () => {
-    const updateDisplayName = firebase
-      .functions()
-      .httpsCallable("updateDisplayName");
-    const result = await updateDisplayName({
+  const handleSaveEdit = async () => {
+    const updateUserInfo = firebase.functions().httpsCallable("updateUserInfo");
+    const result = await updateUserInfo({
       uid: firebase.auth().currentUser.uid,
       displayName: displayName,
+      photoURL: photoURL,
     });
+    console.log(10, result);
     getUser();
     setEdit(false);
   };
@@ -91,83 +97,46 @@ export default function ProfileScreen(props) {
     user && (
       <View>
         <View>
-          <Avatar
-            rounded
-            source={{ uri: user.photoURL }}
-            showAccessory
-            onAccessoryPress={handlePickImage}
-            size="xlarge"
-          />
-
-          {edit ? (
-            <View>
-              <TextInput
-                value={displayName}
-                onChangeText={setDisplayName}
-                onSubmitEditing={handleEditName}
-              />
-              <TouchableOpacity onPress={handleEditName}>
-                <Text>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setEdit(false)}>
-                <Text>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View>
-              <Text>{displayName}</Text>
-              <TouchableOpacity onPress={() => setEdit(true)}>
-                <Icon name="edit" type="material" size={20} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-        <View
-          style={{
-            marginTop: 20,
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => setView("balance")}
-            style={
-              view === "balance"
-                ? { borderBottomWidth: 1, borderBottomColor: "blue" }
-                : null
-            }
-          >
-            <Text>Balance</Text>
+          <Avatar rounded source={{ uri: photoURL }} size="xlarge" />
+          <Text>{displayName}</Text>
+          <TouchableOpacity onPress={() => setEdit(true)}>
+            <Icon name="edit" type="material" size={20} />
           </TouchableOpacity>
 
-          <Text>|</Text>
-          <TouchableOpacity
-            onPress={() => setView("gift")}
-            style={
-              view === "gift"
-                ? { borderBottomWidth: 1, borderBottomColor: "blue" }
-                : null
-            }
-          >
-            <Text>Send Gift</Text>
-          </TouchableOpacity>
-
-          <Text>|</Text>
-          <TouchableOpacity
-            onPress={() => setView("referral")}
-            style={
-              view === "referral"
-                ? { borderBottomWidth: 1, borderBottomColor: "blue" }
-                : null
-            }
-          >
-            <Text>Referral Code</Text>
-          </TouchableOpacity>
+          <Modal visible={edit} animationType="fade">
+            <Avatar
+              rounded
+              source={{ uri: photoURL }}
+              showAccessory
+              onAccessoryPress={handlePickImage}
+              size="xlarge"
+            />
+            <Input
+              label="Display Name"
+              value={displayName}
+              onChangeText={setDisplayName}
+              onSubmitEditing={handleSaveEdit}
+            />
+            <TouchableOpacity onPress={handleSaveEdit}>
+              <Text>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setEdit(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
-        {view === "balance" ? (
-          <BalanceScreen user={user} navigation={props.navigation} />
-        ) : view === "gift" ? (
+        <ButtonGroup
+          onPress={(index) => setView(index)}
+          selectedIndex={view}
+          buttons={buttons}
+          // containerStyle={{ height: 100 }}
+          containerStyle={{}}
+          selectedButtonStyle={{}}
+        />
+        {view === 0 ? (
+          <DetailsScreen user={user} navigation={props.navigation} />
+        ) : view === 1 ? (
           <GiftScreen user={user} navigation={props.navigation} />
         ) : (
           <ReferralScreen user={user} navigation={props.navigation} />
