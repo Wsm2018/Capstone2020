@@ -83,9 +83,6 @@ exports.addCar = functions.https.onCall(async (data, context) => {
 
 exports.initUser = functions.https.onRequest(async (request, response) => {
   console.log("request", request.query.uid);
-  const email = (await admin.auth().getUser(request.query.uid)).email.split(
-    "@"
-  );
 
   const result = await admin.auth().updateUser(request.query.uid, {
     displayName: request.query.displayName,
@@ -95,11 +92,76 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
   });
   console.log("after set", result);
 
-  const listUsersResult = await admin.auth().listUsers(1000);
+  // generating a random 6 digit referralCode
+  let referralCode = String(Math.floor(Math.random() * 1000000));
 
-  listUsersResult.users.forEach((userRecord) => {
-    console.log("user", userRecord.toJSON());
+  while (referralCode.length < 6) {
+    referralCode = "0" + referralCode;
+  }
+
+  const users = db.collection("users");
+
+  const usersCollection = await users.get();
+  const usersDocs = [];
+  usersCollection.forEach((doc) => {
+    usersDocs.push(doc.data().referralCode);
   });
+
+  // checking if any other user has the generated referralCode and waiting because its
+  // checking all the users document
+  let refResult = usersDocs.includes(referralCode);
+  // while there is any user with that referralCode it will generate a new code and try
+  // again till it returns 0 documents
+
+  while (refResult) {
+    referralCode = String(Math.floor(Math.random() * 1000000));
+
+    while (referralCode.length < 6) {
+      referralCode = "0" + referralCode;
+    }
+
+    refResult = usersDocs.includes(referralCode);
+  }
+
+  await db
+    .collection("users")
+    .doc(request.query.uid)
+    .set({
+      outstandingBalance: 0,
+      balance: 0,
+      email: result.email,
+      role: "user",
+      qrCode: "",
+      displayName: request.query.displayName,
+      phone: `+974${request.query.phoneNumber}`,
+      referralCode,
+      loyaltyCode: "",
+      tokens: request.query.referralStatus === "true" ? 1 : 0,
+      location: null,
+      privacy: {
+        emailP: false,
+        nameP: false,
+        locationP: false,
+        carsP: false,
+      },
+      favorite: [],
+      reputation: 0,
+      points: 0,
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+    });
+
+  if (request.query.referralStatus === "true") {
+    const referralDoc = await users
+      .where("referralCode", "==", request.query.referral)
+      .get();
+    referralDoc.forEach((doc) => {
+      db.collection("users").doc(doc.id).collection("referrer").doc().set({
+        referrerCode: referralCode,
+        status: false,
+      });
+    });
+  }
 
   response.send("All done ");
 });
