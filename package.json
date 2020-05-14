@@ -16,7 +16,7 @@
     "expo-firebase-recaptcha": "^1.1.0",
     "expo-image-picker": "^8.1.0",
     "firebase": "7.9.0",
-    "lottie-react-native": "^3.3.2",
+    "lottie-react-native": "~2.6.1",
     "moment": "^2.25.3",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",

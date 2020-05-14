@@ -24,26 +24,61 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
-exports.updatePhoto = functions.https.onCall(async (data, context) => {
-  console.log("updatePhoto data", data);
+// Maybe gonna remove these two
+
+// exports.updatePhoto = functions.https.onCall(async (data, context) => {
+//   console.log("updatePhoto data", data);
+//   const result = await admin.auth().updateUser(data.uid, {
+//     photoURL: data.photoURL,
+//   });
+
+//   await db.collection("users").doc(data.uid).update({
+//     photoURL: data.photoURL,
+//   });
+// });
+
+// exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+//   console.log("updateDisplayName data", data);
+//   const result = await admin.auth().updateUser(data.uid, {
+//     displayName: data.displayName,
+//   });
+
+//   await db.collection("users").doc(data.uid).update({
+//     displayName: data.displayName,
+//   });
+// });
+
+exports.updateUserInfo = functions.https.onCall(async (data, context) => {
   const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
     photoURL: data.photoURL,
   });
 
   await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
     photoURL: data.photoURL,
   });
+  return result;
 });
 
-exports.updateDisplayName = functions.https.onCall(async (data, context) => {
-  console.log("updateDisplayName data", data);
-  const result = await admin.auth().updateUser(data.uid, {
-    displayName: data.displayName,
-  });
+exports.addCar = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
 
-  await db.collection("users").doc(data.uid).update({
-    displayName: data.displayName,
-  });
+  if (data.selectedCar === 0) {
+    await db.collection("users").doc(data.uid).collection("cars").add({
+      brand: data.brand,
+      plate: data.plate,
+      model: data.model,
+      isSelected: true,
+    });
+  } else {
+    await db.collection("users").doc(data.uid).collection("cars").add({
+      brand: data.brand,
+      plate: data.plate,
+      model: data.model,
+      isSelected: false,
+    });
+  }
 });
 
 exports.initUser = functions.https.onRequest(async (request, response) => {
@@ -118,8 +153,6 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
-
-
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
@@ -128,27 +161,29 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     asset: data.asset,
     startDateTime: data.startDateTime,
     endDateTime: data.endDateTime,
-  }
-  var bId= ""
-  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(booking).then(docRef => 
-    bId = docRef.id
-  )
-  
-  booking.id = bId
-  
-  db.collection("payments")
-        .add({
-          user: data.user,
-          card:data.card,
-          assetBooking:booking,
-          serviceBooking: null,
-          totalAmount: data.totalAmount,
-          dateTime: data.dateTime,
-          status: data.status,
-          promotionCode: null,
-        });
+  };
+  var bId = "";
+  var getId = await db
+    .collection("assets")
+    .doc(data.asset.id)
+    .collection("assetBookings")
+    .add(booking)
+    .then((docRef) => (bId = docRef.id));
 
-  if( data.addCreditCard){
-    db.collection("users").doc(data.uid).collection("cards").add(data.card)
+  booking.id = bId;
+
+  db.collection("payments").add({
+    user: data.user,
+    card: data.card,
+    assetBooking: booking,
+    serviceBooking: null,
+    totalAmount: data.totalAmount,
+    dateTime: data.dateTime,
+    status: data.status,
+    promotionCode: null,
+  });
+
+  if (data.addCreditCard) {
+    db.collection("users").doc(data.uid).collection("cards").add(data.card);
   }
 });
