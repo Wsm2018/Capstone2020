@@ -1,4 +1,9 @@
 import { createStackNavigator } from "react-navigation-stack";
+import { createBottomTabNavigator } from "react-navigation-tabs";
+import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
+// import TabBarIcon from "../components/TabBarIcon";
+import { Avatar, Icon } from "react-native-elements";
+
 import HomePage from "../comps/HomePage";
 import Payment from "../comps/Assets/Payment";
 import CheckOut from "../comps/Assets/CheckOut";

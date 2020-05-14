@@ -24,26 +24,61 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
-exports.updatePhoto = functions.https.onCall(async (data, context) => {
-  console.log("updatePhoto data", data);
+// Maybe gonna remove these two
+
+// exports.updatePhoto = functions.https.onCall(async (data, context) => {
+//   console.log("updatePhoto data", data);
+//   const result = await admin.auth().updateUser(data.uid, {
+//     photoURL: data.photoURL,
+//   });
+
+//   await db.collection("users").doc(data.uid).update({
+//     photoURL: data.photoURL,
+//   });
+// });
+
+// exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+//   console.log("updateDisplayName data", data);
+//   const result = await admin.auth().updateUser(data.uid, {
+//     displayName: data.displayName,
+//   });
+
+//   await db.collection("users").doc(data.uid).update({
+//     displayName: data.displayName,
+//   });
+// });
+
+exports.updateUserInfo = functions.https.onCall(async (data, context) => {
   const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
     photoURL: data.photoURL,
   });
 
   await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
     photoURL: data.photoURL,
   });
+  return result;
 });
 
-exports.updateDisplayName = functions.https.onCall(async (data, context) => {
-  console.log("updateDisplayName data", data);
-  const result = await admin.auth().updateUser(data.uid, {
-    displayName: data.displayName,
-  });
+exports.addCar = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
 
-  await db.collection("users").doc(data.uid).update({
-    displayName: data.displayName,
-  });
+  if (data.selectedCar === 0) {
+    await db.collection("users").doc(data.uid).collection("cars").add({
+      brand: data.brand,
+      plate: data.plate,
+      model: data.model,
+      isSelected: true,
+    });
+  } else {
+    await db.collection("users").doc(data.uid).collection("cars").add({
+      brand: data.brand,
+      plate: data.plate,
+      model: data.model,
+      isSelected: false,
+    });
+  }
 });
 
 exports.initUser = functions.https.onRequest(async (request, response) => {

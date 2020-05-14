@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList } from "react-native";
-import db from "../../db";
+import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";

@@ -5,7 +5,7 @@ import moment from "moment";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
-import db from "../../db";
+import db from "../../../db";
 export default function AddCard(props) {
   const user = props.navigation.getParam("user");
   const [cardNumber, setCardNumber] = useState("");
