@@ -56,10 +56,9 @@ export default function Authentication(props) {
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
-  const [referralCode, setReferralCode] = useState("");
-
-  // the register button status for validation
-  const [btnStatus, setBtnStatus] = useState(true);
+  const [referral, setReferral] = useState("");
+  // the referralStatus will show if a referral code is used
+  const [referralStatus, setReferralStatus] = useState("false");
 
   // ***** Login useState *****
 
@@ -83,10 +82,6 @@ export default function Authentication(props) {
         }
       : undefined
   );
-
-  // ***** ForgotPass useState *****
-
-  const [forgotPassEmail, setForgotPassEmail] = useState("");
 
   // Validation useStates for Form
   //Login
@@ -112,28 +107,6 @@ export default function Authentication(props) {
   const [displayErr2, setDisplayErr2] = useState("transparent");
   const [phoneErr2, setPhoneErr2] = useState("transparent");
   const [phoneAccess, setPhoneAccess] = useState("");
-
-  // it check if the email and password is not empty to enable the register button
-  // and it will keep checking whenever the user edits on the email or password fields
-  useEffect(() => {
-    if (
-      registerEmail !== "" &&
-      registerPassword !== "" &&
-      confirmRegisterPassword !== "" &&
-      displayName !== "" &&
-      phone !== ""
-    ) {
-      setBtnStatus(false);
-    } else {
-      setBtnStatus(true);
-    }
-  }, [
-    registerEmail,
-    registerPassword,
-    confirmRegisterPassword,
-    displayName,
-    phone,
-  ]);
 
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
@@ -171,6 +144,38 @@ export default function Authentication(props) {
     setRegistered(true);
   };
 
+  // checkReferral will check if the referral exists and the code is available
+  const checkReferral = async () => {
+    // checking if the referral code is not empty
+    if (referral !== "") {
+      // checking if referral code is 6 digits
+      if (referral.length === 6) {
+        // defining the users collection from firestore
+        const users = db.collection("users");
+        // getting the referral document if the referralCode is equal to the provided code
+        // and using await because it will check all the documents
+        let result = await users.where("referralCode", "==", referral).get();
+        // it will check if there is only one document in the returned and
+        // the referral doc exists
+        if (result.size === 1) {
+          alert("Referral Code Added!");
+          setRefErr("transparent");
+          setReferralStatus("true");
+        } else {
+          alert("Referral Code is Wrong!");
+          setRefErr("red");
+          setReferral("");
+        }
+      } else {
+        alert("Referral Code is Not Available!");
+        setRefErr("red");
+      }
+    } else {
+      alert("Enter a Code First!");
+      setRefErr("red");
+    }
+  };
+
   // handleRegister will create a the user and create the document for the user in the
   // database with all the needed information
   const handleRegister = async () => {
@@ -198,7 +203,7 @@ export default function Authentication(props) {
           const response = await fetch(
             `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
               firebase.auth().currentUser.uid
-            }&phoneNumber=${phone}&displayName=${displayName}`
+            }&phoneNumber=${phone}&displayName=${displayName}&referralStatus=${referralStatus}&referral=${referral}`
           );
 
           //sending the user a verification email
@@ -211,9 +216,6 @@ export default function Authentication(props) {
             .catch((err) => {
               console.log(err);
             });
-
-          // calling createUserInfo and waiting for it before moving the user to login page
-          await createUserInfo();
         } catch (error) {
           alert(error.message);
         }
@@ -223,46 +225,6 @@ export default function Authentication(props) {
     }
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
-  };
-
-  // createUserInfo will complete all the data for the user to create a document in the
-  // database
-  const createUserInfo = async () => {
-    // creating user document in the database with all the information
-    console.log("user ", firebase.auth().currentUser.uid);
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .set({
-        outstandingBalance: 0,
-        balance: 0,
-        email: registerEmail,
-        role: "user",
-        qrCode: "",
-        displayName,
-        phone: `+974${phone}`,
-        referralCode: 0,
-        loyaltyCode: "",
-        subscription: {
-          name: null,
-          startDate: null,
-          endDate: null,
-          point: null,
-        },
-        // checking if the user used referral code and giving him a token if he did
-        tokens: 0,
-        location: null,
-        privacy: {
-          emailP: false,
-          nameP: false,
-          locationP: false,
-          carsP: false,
-        },
-        favorite: [],
-        reputation: 0,
-        points: 0,
-        photoURL:
-          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
-      });
   };
 
   const handleLogin = async () => {
@@ -497,6 +459,38 @@ export default function Authentication(props) {
                       errorStyle={{ color: phoneError }}
                       renderErrorMessage
                     />
+
+                    <Input
+                      inputStyle={{
+                        color: "white",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="lightgray"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      placeholderTextColor="white"
+                      onChangeText={setReferral}
+                      placeholder="Referral Code"
+                      value={referral}
+                      errorMessage="* Invalid Code"
+                      errorStyle={{ color: refErr }}
+                      renderErrorMessage
+                    />
+
+                    <TouchableOpacity
+                      onPress={checkReferral}
+                      style={styles.registerButton}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Use Code
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 )
               ) : (
