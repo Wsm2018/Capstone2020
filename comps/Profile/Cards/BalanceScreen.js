@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button } from "react-native";
-import db from "../../db";
+import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 
-export default function BalanceScreen({ user, navigation }) {
+export default function BalanceScreen({ navigation }) {
+  const user = navigation.getParam("user", "No Params");
   return (
     <View>
       <Text>Current Balance</Text>
@@ -17,7 +18,7 @@ export default function BalanceScreen({ user, navigation }) {
 
       <Button
         title="My Credit Cards"
-        onPress={() => navigation.navigate("CardsScreen", { user: user })}
+        onPress={() => navigation.navigate("Cards", { user: user })}
       />
     </View>
   );
