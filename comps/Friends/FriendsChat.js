@@ -60,13 +60,17 @@ export default function FriendsList(props) {
   };
 
   // --------------------------------SEND----------------------------------
-  const send = () => {
-    db.collection("chats").add({
+  const send = async () => {
+    const message = firebase.functions().httpsCallable("sendMessage");
+    const response = await message({
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
       dateTime: new Date(),
     });
+    console.log("response", response);
+
+    setText("");
   };
 
   // --------------------------------DELETE ALL----------------------------------
@@ -115,6 +119,7 @@ export default function FriendsList(props) {
         style={{ borderWidth: 1 }}
         placeholder="Type here"
         onChangeText={setText}
+        value={text}
       />
       <TouchableOpacity style={{ borderWidth: 1, height: 30 }} onPress={send}>
         <Text>Send</Text>

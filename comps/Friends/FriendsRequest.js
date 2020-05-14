@@ -4,9 +4,21 @@ import { StyleSheet, View, Text, TouchableOpacity, Button } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
+import "firebase/functions";
 
 export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // ------------------------------CURRENT USER------------------------------------
+  const handleCurrentuser = async () => {
+    const doc = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+
+    setCurrentUser({ id: doc.id, ...doc.data() });
+  };
 
   // --------------------------------FRIENDS----------------------------------
   const handleFriends = async () => {
@@ -14,7 +26,7 @@ export default function FriendsList(props) {
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .onSnapshot((queryBySnapshot) => {
-        console.log(queryBySnapshot.size);
+        // console.log(queryBySnapshot.size);
         if (queryBySnapshot.size > 0) {
           let tempFriends = [];
           queryBySnapshot.forEach((doc) => {
@@ -37,37 +49,22 @@ export default function FriendsList(props) {
   };
 
   // -------------------------------ACCEPT-----------------------------------
-  const accept = (user) => {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("friends")
-      .doc(user.id)
-      .update({ status: "accepted" });
-
-    db.collection("users")
-      .doc(user.id)
-      .collection("friends")
-      .doc(firebase.auth().currentUser.uid)
-      .update({ status: "accepted" });
+  const accept = async (user) => {
+    const add = firebase.functions().httpsCallable("acceptFriend");
+    const response = await add({ user: currentUser, friend: user });
+    console.log("response", response);
   };
 
   // -------------------------------DECLINE-----------------------------------
-  const decline = (id) => {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("friends")
-      .doc(id)
-      .delete();
-
-    db.collection("users")
-      .doc(id)
-      .collection("friends")
-      .doc(firebase.auth().currentUser.uid)
-      .delete();
+  const decline = async (user) => {
+    const dec = firebase.functions().httpsCallable("removeFriend");
+    const response = await dec({ user: currentUser, friend: user });
+    console.log("response", response);
   };
 
   // ------------------------------------------------------------------
   useEffect(() => {
+    handleCurrentuser();
     handleFriends();
   }, []);
 
@@ -96,7 +93,7 @@ export default function FriendsList(props) {
 
             <TouchableOpacity
               style={{ borderWidth: 1 }}
-              onPress={() => decline(friend.id)}
+              onPress={() => decline(friend)}
             >
               <Text>Decline</Text>
             </TouchableOpacity>

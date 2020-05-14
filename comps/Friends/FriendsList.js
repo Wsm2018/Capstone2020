@@ -7,6 +7,17 @@ import db from "../../db";
 
 export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // ------------------------------CURRENT USER------------------------------------
+  const handleCurrentuser = async () => {
+    const doc = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+
+    setCurrentUser({ id: doc.id, ...doc.data() });
+  };
 
   // --------------------------------FRIENDS----------------------------------
   const handleFriends = async () => {
@@ -14,7 +25,7 @@ export default function FriendsList(props) {
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .onSnapshot((queryBySnapshot) => {
-        console.log(queryBySnapshot.size, "friends");
+        // console.log(queryBySnapshot.size, "friends - FriendsList");
         if (queryBySnapshot.size > 0) {
           let tempFriends = [];
           queryBySnapshot.forEach((doc) => {
@@ -58,22 +69,15 @@ export default function FriendsList(props) {
   };
 
   // -------------------------------REMOVE-----------------------------------
-  const removeFriend = (id) => {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("friends")
-      .doc(id)
-      .delete();
-
-    db.collection("users")
-      .doc(id)
-      .collection("friends")
-      .doc(firebase.auth().currentUser.uid)
-      .delete();
+  const removeFriend = async (user) => {
+    const dec = firebase.functions().httpsCallable("removeFriend");
+    const response = await dec({ user: currentUser, friend: user });
+    console.log("response", response);
   };
 
   // ------------------------------------------------------------------
   useEffect(() => {
+    handleCurrentuser();
     handleFriends();
   }, []);
 
@@ -84,7 +88,9 @@ export default function FriendsList(props) {
   ) : (
     <View style={styles.container}>
       <Text>Friends List</Text>
+      <Button title="TEST" onPress={() => props.navigation.navigate("Test")} />
       <Button title="Delete All" onPress={deleteAll} />
+
       {friends.length > 0 ? (
         friends.map((friend) => (
           <View
@@ -104,7 +110,7 @@ export default function FriendsList(props) {
 
             <TouchableOpacity
               style={{ borderWidth: 1 }}
-              onPress={() => removeFriend(friend.id)}
+              onPress={() => removeFriend(friend)}
             >
               <Text>Delete</Text>
             </TouchableOpacity>
