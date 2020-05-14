@@ -157,20 +157,20 @@ export default function Authentication(props) {
         // it will check if there is only one document in the returned and
         // the referral doc exists
         if (result.size === 1) {
-          alert("Referral Code Added!");
+          //alert("Referral Code Added!");
           setRefErr("transparent");
           setReferralStatus("true");
         } else {
-          alert("Referral Code is Wrong!");
+          //alert("Referral Code is Wrong!");
           setRefErr("red");
           setReferral("");
         }
       } else {
-        alert("Referral Code is Not Available!");
+        //alert("Referral Code is Not Available!");
         setRefErr("red");
       }
     } else {
-      alert("Enter a Code First!");
+      //alert("Enter a Code First!");
       setRefErr("red");
     }
   };
@@ -538,9 +538,9 @@ export default function Authentication(props) {
                         errorStyle={{ color: phoneError }}
                         renderErrorMessage
                       />
-                      <Input
+                    </View>
+                    <Input
                       inputStyle={{
-                        color: "white",
                         fontSize: 16,
                       }}
                       inputContainerStyle={{ borderBottomWidth: 0 }}
@@ -569,14 +569,13 @@ export default function Authentication(props) {
                         Use Code
                       </Text>
                     </TouchableOpacity>
-                    </View>
                   </View>
                 )
               ) : (
                 <View>
                   <Input
                     inputStyle={{
-                      color: "white",
+                      //color: "white",
                       fontSize: 16,
                     }}
                     editable={!!verificationId}
