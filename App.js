@@ -45,13 +45,20 @@ export default function App(props) {
       Home: HomeStack,
       Profile: ProfileStack,
     },
+    // {
+    //   navigationOptions: ({ navigation }) => {
+    //     const { routeName } = navigation.state.routes[navigation.state.index];
+    //     return {
+    //       headerShown: true,
+    //       headerTitle: routeName,
+    //     };
+    //   },
+    // },
     {
-      navigationOptions: ({ navigation }) => {
-        const { routeName } = navigation.state.routes[navigation.state.index];
-        return {
-          headerShown: true,
-          headerTitle: routeName,
-        };
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#20365F" },
       },
     }
   );
