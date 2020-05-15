@@ -125,6 +125,8 @@ export default function AddCard(props) {
       <ScrollView
         style={{
           flex: 3,
+          // backgroundColor: "red",
+          // width: "90%",
         }}
       >
         <CreditCardInput
