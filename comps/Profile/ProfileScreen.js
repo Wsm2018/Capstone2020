@@ -480,3 +480,8 @@ const styles = StyleSheet.create({
     // borderBottomLeftRadius: 40,
   },
 });
+
+ProfileScreen.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};

@@ -21,7 +21,7 @@ const ProfileStack = createStackNavigator(
     Referral: ReferralScreen,
     Gift: GiftScreen,
     AddCard: AddCard,
-    Cards: CardsScreen, 
+    Cards: CardsScreen,
     Car: CarDetail,
     AddCars: AddCars,
     AllCars: CarsScreen,
@@ -36,6 +36,7 @@ const ProfileStack = createStackNavigator(
               style={{ paddingLeft: 10 }}
               onPress={() => navigation.openDrawer()}
               name="md-menu"
+              color="white"
               type="ionicon"
               size={30}
             />
