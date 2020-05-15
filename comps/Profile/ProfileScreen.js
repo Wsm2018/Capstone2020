@@ -286,18 +286,18 @@ export default function ProfileScreen(props) {
               // containerStyle={{ height: 100 }}
               containerStyle={{
                 backgroundColor: "#0D2C6A",
-                borderWidth: 0,
+                // borderWidth: 1,
                 // borderBottomColor: "red",
                 // borderBottomWidth: 1,
-                borderTopLeftRadius: 15,
-                borderTopRightRadius: 15,
+                // borderTopLeftRadius: 15,
+                // borderTopRightRadius: 15,
                 // borderBottomLeftRadius: 40,
 
                 //borderColor: "grey",
                 // borderRightColor: "black",
               }}
               selectedButtonStyle={{
-                backgroundColor: "#E8ECF4",
+                backgroundColor: "white",
                 borderBottomWidth: 0,
                 // borderBottomColor: "red",
               }}
@@ -305,7 +305,7 @@ export default function ProfileScreen(props) {
                 color: "#0D2C6A",
                 fontWeight: "bold",
               }}
-              textStyle={{ color: "darkgray" }}
+              textStyle={{ color: "white", fontWeight: "bold" }}
             />
           </View>
           <View style={styles.containerLogin}>
@@ -325,8 +325,8 @@ export default function ProfileScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
-    backgroundColor: "#FFF",
+    //"#f5f0f0"
+    backgroundColor: "#e3e3e3",
     // alignItems: "center",
     // width: Math.round(Dimensions.get("window").width),
     // height: Math.round(Dimensions.get("window").height),
@@ -469,14 +469,14 @@ const styles = StyleSheet.create({
   containerLogin: {
     flex: 1,
     marginLeft: 10.5,
-    backgroundColor: "#E8ECF4",
+    // backgroundColor: "#E8ECF4",
     width: "95%",
     marginTop: -5,
     marginBottom: "5%",
     // borderWidth: 1,
-    borderTopWidth: 0,
+    // borderTopWidth: 0,
     // borderColor: "gray",
-    borderBottomRightRadius: 40,
-    borderBottomLeftRadius: 40,
+    // borderBottomRightRadius: 40,
+    // borderBottomLeftRadius: 40,
   },
 });

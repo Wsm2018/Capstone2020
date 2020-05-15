@@ -1,6 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
+import BalanceScreen from "./Cards/BalanceScreen";
 import { Icon } from "react-native-elements";
+import { Card } from "react-native-shadow-cards";
+
 import {
   FontAwesome5,
   Fontisto,
@@ -11,77 +14,75 @@ import {
 export default function DetailsScreen(props) {
   return (
     <View style={styles.container}>
-      <View
+      <View style={{ flex: 2 }}>
+        <Card
+          elevation={2}
+          style={{
+            width: "100%",
+            flex: 1,
+            // backgroundColor: "red",
+            // flexDirection: "column",
+            // justifyContent: "center",
+            // alignItems: "center",
+            borderWidth: 1,
+            borderTopWidth: 0,
+
+            borderColor: "darkgray",
+          }}
+        >
+          <BalanceScreen navigation={props.navigation} />
+        </Card>
+      </View>
+
+      <Card
+        elevation={2}
         style={{
           marginTop: "5%",
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          alignItems: "center",
+          width: "100%",
+          borderWidth: 1,
+          borderColor: "darkgray",
+          flex: 0.8,
         }}
       >
         <View
           style={{
-            flexDirection: "column",
-            justifyContent: "center",
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
             alignItems: "center",
           }}
         >
           <FontAwesome5
-            name="car-side"
+            name="heart"
             size={35}
             color="black"
             onPress={() =>
               props.navigation.navigate("Car", { user: props.user })
             }
           />
-          {/* <FontAwesome5 name="car-side" size={50} color="black" /> */}
-          <Text
-            style={{
-              color: "black",
-              fontWeight: "bold",
-              // textShadowColor: "rgba(0, 0, 0, 0.75)",
-              // // textShadowOffset: { width: -1, height: 1 },
-              // // textShadowRadius: 10,
-              fontSize: 16,
-            }}
-          >
-            Cars Details
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Fontisto
-            name="wallet"
-            color="black"
-            size={35}
+
+          <Image
+            source={require("../../assets/images/caricon4.png")}
+            style={{ height: 38, width: 85 }}
             onPress={() =>
-              props.navigation.navigate("Balance", { user: props.user })
+              props.navigation.navigate("Car", { user: props.user })
             }
           />
-          <Text
-            style={{
-              color: "black",
-              fontWeight: "bold",
-              // textShadowColor: "black",
-              // // textShadowOffset: { width: -1, height: 1 },
-              // // textShadowRadius: 10,
-              fontSize: 16,
-            }}
-          >
-            Balance Details
-          </Text>
+          <Image
+            source={require("../../assets/images/bookingicon.png")}
+            style={{ height: 48, width: 48 }}
+            onPress={() =>
+              props.navigation.navigate("Car", { user: props.user })
+            }
+          />
         </View>
-      </View>
+      </Card>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f5f0f0",
   },
 });

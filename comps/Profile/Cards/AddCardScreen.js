@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, Picker, Image } from "react-native";
+import { View, TextInput, Button, Picker, Image } from "react-native";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
-import db from "../../db";
+import db from "../../../db";
+import { Text } from "react-native-elements";
+import { Card } from "react-native-shadow-cards";
+
 import { CreditCardInput } from "react-native-credit-card-input";
 import { ScrollView } from "react-native-gesture-handler";
 export default function AddCard(props) {
@@ -121,7 +124,9 @@ export default function AddCard(props) {
 
   return (
     <View style={{ flex: 1, flexDirection: "column", flexWrap: "wrap" }}>
-      <Text>Add Credit Card</Text>
+      <Text h4 style={{ alignItems: "center" }}>
+        Add Credit Card
+      </Text>
       <ScrollView
         style={{
           flex: 3,
@@ -144,8 +149,8 @@ export default function AddCard(props) {
             marginTop: 20,
           }}
           labelStyle={{ color: "gray" }}
-          cardImageFront={require("../../assets/images/dark1.jpg")}
-          cardImageBack={require("../../assets/images/dark2.png")}
+          cardImageFront={require("../../../assets/images/dark1.jpg")}
+          cardImageBack={require("../../../assets/images/dark2.png")}
         />
       </ScrollView>
 

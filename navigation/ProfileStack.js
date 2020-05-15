@@ -21,7 +21,7 @@ const ProfileStack = createStackNavigator(
     Referral: ReferralScreen,
     Gift: GiftScreen,
     AddCard: AddCard,
-    Cards: CardsScreen,
+    Cards: CardsScreen, 
     Car: CarDetail,
     AddCars: AddCars,
     AllCars: CarsScreen,
