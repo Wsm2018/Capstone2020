@@ -5,7 +5,7 @@ import moment from "moment";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
-import db from "../../db";
+import db from "../../../db";
 import { CreditCardInput } from "react-native-credit-card-input";
 import { ScrollView } from "react-native-gesture-handler";
 export default function AddCard(props) {
@@ -144,8 +144,8 @@ export default function AddCard(props) {
             marginTop: 20,
           }}
           labelStyle={{ color: "gray" }}
-          cardImageFront={require("../../assets/images/dark1.jpg")}
-          cardImageBack={require("../../assets/images/dark2.png")}
+          cardImageFront={require("../../../assets/images/dark1.jpg")}
+          cardImageBack={require("../../../assets/images/dark2.png")}
         />
       </ScrollView>
 

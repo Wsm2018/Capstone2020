@@ -15,9 +15,9 @@ import Types from "../comps/Assets/Types";
 
 const HomeStack = createStackNavigator(
   {
-    Home: HomePage,
     Types: Types,
     Assets: Assets,
+    Home: HomePage,
     Sections: Sections,
     List: List,
     Details: Details,
