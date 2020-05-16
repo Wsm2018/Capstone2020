@@ -108,24 +108,48 @@ exports.sendMail = functions.https.onRequest((request, response) => {
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  var booking = {
+  console.log(" in functions")
+  var assetBooking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
     endDateTime: data.endDateTime,
   }
   var bId= ""
-  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(booking).then(docRef => 
+  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(assetBooking).then(docRef => 
     bId = docRef.id
   )
-  
-  booking.id = bId
-  
+  assetBooking.id = bId
+ console.log("booking added")
+  for( let i =0 ; i < data.serviceBooking.length ; i++){
+    console.log("add service")
+    var serviceBooking = {
+      service:data.serviceBooking[i].service,
+    assetBooking: assetBooking,
+    dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
+    worker:data.serviceBooking[i].worker,
+    completed: false
+    }
+    //add service booking
+    var sId= ""
+    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef => 
+      sId = docRef.id
+    )
+    serviceBooking.id = sId
+    //update worker schedule
+    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
+      serviceBooking,
+      dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
+      worker:data.serviceBooking[i].worker,
+      completed: false
+    })
+  }
+console.log("payment")
   db.collection("payments")
         .add({
           user: data.user,
           card:data.card,
-          assetBooking:booking,
+          assetBooking:assetBooking,
           serviceBooking: null,
           totalAmount: data.totalAmount,
           dateTime: data.dateTime,

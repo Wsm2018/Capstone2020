@@ -31,7 +31,7 @@ export default function Details(props) {
   const [serviceBooking, setServiceBooking] = useState([])
   const [selectedService, setSelectedService] = useState()
   const assetTypeId = props.navigation.getParam("assetTypeId", '2pioF3LLXnx2Btr4OJPn');
-  const startDateTime = props.navigation.getParam("startDateTime", '2020-05-13 T 5:00:00');
+  const startDateTime = props.navigation.getParam("startDateTime", '2020-05-13 T 1:00:00');
   const endDateTime = props.navigation.getParam("endDateTime", '2020-05-14 T 7:00:00');
   const [workers, setWorkers] = useState([])
   const [allWorkers, setAllWorkers] = useState([])
@@ -64,6 +64,8 @@ export default function Details(props) {
     { book: false, time: "22:00:00" },
     { book: false, time: "23:00:00" },
   ])
+
+  const [week, setWeek] = useState(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
   const [updateAvailableTimings, setUpdateAvailableTimings] = useState([])
 
 
@@ -75,14 +77,39 @@ export default function Details(props) {
 
   useEffect(() => {
     if (schedules) {
-      //console.log("here")
       filterTimings()
       getAvailableTimings()
     }
   }, [schedules])
 
-  const getServices = async () => {
 
+  useEffect(() => {
+    setUpdate(!update)
+  }, [userDays])
+
+  useEffect(() => {
+
+    setUpdate(!update)
+    if (services.length > 0) {
+
+      var temp = services
+      for (let i = 0; i < services.length; i++) {
+        console.log("here")
+        db.collection('services').doc(services[i].id).collection("workingDays").onSnapshot((snapshot) => {
+          const weekDays = [];
+          snapshot.forEach(async (doc) => {
+            weekDays.push({ day: doc.id, ...doc.data() })
+          })
+          temp[i].weekDays = weekDays
+          setServices(temp)
+        });
+      }
+    }
+
+  }, [services])
+
+  const getServices = async () => {
+    //const service = [];
     db.collection('services').where("assetType", "==", assetTypeId).onSnapshot((snapshot) => {
       const services = [];
       snapshot.forEach((doc) => {
@@ -91,14 +118,10 @@ export default function Details(props) {
       setServices(services)
     });
 
-    //getAllWorkers
     db.collection("users").where("role", "==", "worker").onSnapshot((snapshot) => {
-
       var worker = ""
-
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }
-
         var workerId = doc.id
         db.collection("users").doc(doc.id).collection("schedules").onSnapshot((snapshot) => {
           const schedules = [];
@@ -108,21 +131,18 @@ export default function Details(props) {
           var temp = allWorkers
           temp.push({ worker, schedules })
           setAllWorkers(temp)
-
         })
-
       });
     });
-
-
   }
 
-  const getWorkers = (id) => {
-
+  const manageTimings = async (service) => {
     setSchedules([])
     setWorkers([])
-    setSelectedService(id)
-    //get workers and schedule timings
+    setSelectedService(service)
+    filterTimings()
+    getAvailableTimings()
+
     db.collection("users").where("role", "==", "worker").onSnapshot((snapshot) => {
       const schedules = [];
       const workers = []
@@ -132,7 +152,7 @@ export default function Details(props) {
         workers.push({ ...doc.data(), id: doc.id })
 
         temp = doc.data()
-        temp = temp.services.filter(t => t == id)
+        temp = temp.services.filter(t => t == service.id)
 
         if (temp.length > 0) {
           setWorkers(workers)
@@ -159,15 +179,13 @@ export default function Details(props) {
     var diffDays = Math.ceil((new Date(split2[0]) - new Date(split1[0])) / (1000 * 60 * 60 * 24))
     var firstDayHours = []
     var lastDayHours = []
-
+    var days = []
+    //if more than one day
     if (diffDays > 0) {
-
       var startHour = startDateTime.split(" ")[2]
       var endHour = endDateTime.split(" ")[2]
-
       //remove hours before start hour
       for (let i = 0; i < timesList.length; i++) {
-
         if ((timesList[i].time + "") === startHour) {
           for (let k = i; k < timesList.length; k++) {
             firstDayHours.push(timesList[k])
@@ -184,15 +202,18 @@ export default function Details(props) {
         }
       }
       var currentDate = split1[0]
-      var days = []
+
       for (let i = 1; i <= diffDays + 1; i++) {
         days.push({ day: currentDate, timesList, oneBooking: false })
         currentDate = moment(currentDate).add(1, "day").format("YYYY-MM-DD")
       }
       days[0].timesList = firstDayHours
       days[days.length - 1].timesList = lastDayHours
-      setUserDays(days)
+
+      //console.log("after", days)
+
     }
+    //if one day
     else {
       var startHour = startDateTime.split(" ")[2]
       for (let i = 0; i < timesList.length; i++) {
@@ -203,13 +224,35 @@ export default function Details(props) {
         }
       }
 
-      var days = []
       days.push({ day: split1[0], timesList: firstDayHours, oneBooking: false })
-      setUserDays(days)
 
     }
 
-    setUpdate(!update)
+
+    if (selectedService) {
+      for (let i = 0; i < days.length; i++) {
+        var temp = []
+        var findDay = week[new Date(days[i].day).getDay()]
+        //var result = findDay]
+        //console.log("resultaaa,", findDay)
+        //filter based on the day
+        var serviceWorkingDay = selectedService.weekDays.filter(h => h.day == findDay)[0]
+        if (serviceWorkingDay && serviceWorkingDay.hours) {
+          for (let k = 0; k < days[i].timesList.length; k++) {
+
+            var findHour = serviceWorkingDay.hours.filter(h => h === days[i].timesList[k].time)[0]
+
+            if (findHour) {
+              temp.push(days[i].timesList[k])
+            }
+
+          }
+        }
+
+        days[i].timesList = temp
+      }
+    }
+    setUserDays(days)
   }
 
   const getAvailableTimings = () => {
@@ -222,7 +265,7 @@ export default function Details(props) {
         var counter = 0
         for (let j = 0; j < allWorkers.length; j++) {
 
-          var check = allWorkers[j].worker.services.filter(s => s == selectedService)
+          var check = allWorkers[j].worker.services.filter(s => s == selectedService.id)
           if (check.length > 0) {
             totalWorkers = totalWorkers.filter(t => t == allWorkers[j].id)
             if (totalWorkers.length == 0) {
@@ -237,8 +280,7 @@ export default function Details(props) {
             }
           }
         }
-        //check counter if == to workers of the service length
-        //console.log(" totals", totalWorkers , counter)
+
         if (totalWorkers.length === counter) {
           // console.log("to update")
           toUpdate.push({ day: i, time: k })
@@ -253,16 +295,13 @@ export default function Details(props) {
   const book = (day, time) => {
 
     var temp = serviceBooking
-    var check = temp.filter(t => t.service == selectedService && t.day == userDays[day].day && t.time == userDays[day].timesList[time])
+    var check = temp.filter(t => t.service == selectedService.id && t.day == userDays[day].day && t.time == userDays[day].timesList[time])
     if (check.length == 0) {
-      //update in Worker schedule
 
-      //1 choose a worker and add the worker id in the service booking
-      //2 update the worker schedule
       var selectedWorker = ""
       for (let j = 0; j < allWorkers.length; j++) {
 
-        var findWorker = allWorkers[j].worker.services.filter(s => s == selectedService)
+        var findWorker = allWorkers[j].worker.services.filter(s => s == selectedService.id)
 
         if (findWorker.length > 0) {
           var checkSchedule = allWorkers[j].schedules.filter(s => s.dateTime == userDays[day].day + "T" + userDays[day].timesList[time])
@@ -281,7 +320,6 @@ export default function Details(props) {
       setUserDays(ud)
       setUpdate(!update)
       setServiceBooking(temp)
-      //console.log("time",serviceBooking)
 
     }
     setUpdate(!update)
@@ -293,19 +331,16 @@ export default function Details(props) {
   const deleteBooking = (index) => {
 
     var updateWorkers = allWorkers
-
-
     for (let i = 0; i < updateWorkers.length; i++) {
       if (updateWorkers[i].worker.id == serviceBooking[index].worker) {
-        console.log(" timaaaaaaa,", serviceBooking[index].day + "T" + serviceBooking[index].time, "//////", updateWorkers[i].schedules)
+        // console.log(" timaaaaaaa,", serviceBooking[index].day + "T" + serviceBooking[index].time, "//////", updateWorkers[i].schedules)
         var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != serviceBooking[index].day + "T" + serviceBooking[index].time)
-        console.log(" should delete", newSchedule)
+        //console.log(" should delete", newSchedule)
         updateWorkers[i].schedules = newSchedule
         setAllWorkers(updateWorkers)
         break;
       }
     }
-    //console.log("delete schedule !!!!!!", allWorkers)
 
     var temp = []
     for (let i = 0; i < serviceBooking.length; i++) {
@@ -318,64 +353,43 @@ export default function Details(props) {
 
   }
 
-  useEffect(() => {
-    setUpdate(!update)
-  }, [userDays])
 
-  // useEffect(() => {
-  //   setUpdate(!update)
-  // }, [serviceBooking])
-
-  // useEffect(() => {
-  //   setUpdate(!update)
-  // }, [allWorkers])
-
-  const check = (time, day) => {
-
-    if (updateAvailableTimings.filter(a => a.day === day && a.time === time).length == 1) {
-      return false
-    }
-    else {
-      return true
-    }
+const checkHour = ( time , day)=>{
+  //not booked
+  if (serviceBooking.filter(t => t.service == selectedService && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time).length > 0) {
+    return "green"
   }
-
-  const bookedByUser = (day, time) => {
-
-    if (serviceBooking.filter(t => t.service == selectedService && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time).length > 0) {
-      return true
-    }
-    else {
-      return false
-    }
+  else if (!updateAvailableTimings.filter(a => a.day === day && a.time === time).length == 1) {
+    return "white"
   }
+  else{
+    return "red"
+  }
+}
 
   return (
     <View style={styles.container}>
 
-      {/* {asset ?
+      {asset ?
         <View>
           <Text >{asset.code}</Text>
           <Text>{asset.price}</Text>
           <Text>{startDateTime}</Text>
           <Text>{endDateTime}</Text>
 
-          <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime, endDateTime } })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
-            <Text >CheckOut</Text>
-          </TouchableOpacity>
-
+          
         </View>
 
         :
         <Text>Loading</Text>
-      } */}
+      }
       {
         services ?
 
           services.map(s =>
             <View>
 
-              <TouchableOpacity onPress={() => getWorkers(s.id)}>
+              <TouchableOpacity onPress={() => manageTimings(s)}>
                 <Text >{s.name}</Text>
 
               </TouchableOpacity>
@@ -384,38 +398,56 @@ export default function Details(props) {
           :
           <Text>No Available Services</Text>
       }
+
+
       {
-        selectedService && userDays ?
-          userDays.map((d, dayindex) =>
-            <View>
+        selectedService ?
+          <View>
+            <Text>Service: {selectedService.name}</Text>
+            {/* <Text>bookings per day: {selectedService.maxBookings}</Text> */}
 
-              <Text>{d.day}</Text>
-              <View style={{ flexDirection: "row" }}>
-                {d.timesList.map((t, timeindex) =>
 
-                  bookedByUser(dayindex, timeindex) ?
-                    <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "green" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
-                    : check(timeindex, dayindex) ?
-                      <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
-                      : bookedByUser(dayindex, timeindex) ?
-                        <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "green" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
-                        :
-                        <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
-
-                )}
-              </View>
-            </View>
-
-          )
+          </View>
           :
           null
       }
+
+
+      {
+        selectedService && userDays ?
+          <View>
+            <Text>Working Hours</Text>
+            {
+              userDays.map((d, dayindex) =>
+                <View>
+
+                  <Text>{d.day}</Text>
+                  <View style={{ flexDirection: "row" }}>
+                    {d.timesList.map((t, timeindex) =>
+
+                      checkHour(timeindex, dayindex) == "green" ?
+                        <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "green" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
+                        : checkHour(timeindex, dayindex) == "white" ?
+                          <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
+                          :
+                              <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
+
+                    )}
+                  </View>
+                </View>
+
+              )}
+          </View>
+          :
+          null
+      }
+
 
       {
         serviceBooking ?
           serviceBooking.map((s, index) =>
             <View>
-              <Text>Service: {s.service}</Text>
+              <Text>Service: {s.service.name}</Text>
               <Text>Time: {s.time}</Text>
               <Text>Day: {s.day}</Text>
               <Button title="X" onPress={() => deleteBooking(index)} />
@@ -425,6 +457,9 @@ export default function Details(props) {
           null
       }
 
+      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime, endDateTime } , serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
+        <Text >CheckOut</Text>
+      </TouchableOpacity>
 
     </View>
   )

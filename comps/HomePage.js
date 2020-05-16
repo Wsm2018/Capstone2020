@@ -20,12 +20,7 @@ export default function HomePage(props) {
         <Text>Logout !</Text>
 
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() =>props.navigation.navigate("CheckOut")}
-      >
-        <Text>Checkout</Text>
-        
-      </TouchableOpacity>
+      
     </View>
   );
 }
