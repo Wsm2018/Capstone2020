@@ -10,37 +10,62 @@ export default function AddCars(props) {
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
   const [brand, setBrand] = useState("");
-  const [selectedCar, setSelectedCar] = useState([]);
+  const [cars, setCars] = useState([]);
+  const [selectedCar, setSelectedCar] = useState(0);
 
-  const getSelectedCar = () => {
+  const getCars = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("cars")
-      .where("isSelected", "==", true)
       .onSnapshot((query) => {
-        let cars = [];
+        let car = [];
         query.forEach((doc) => {
-          cars.push({ id: doc.id, ...doc.data() });
+          car.push({ id: doc.id, ...doc.data() });
         });
-        setSelectedCar([...cars]);
+        setCars([...car]);
       });
   };
 
+  const getSelectedCar = async () => {
+    const carRef = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("cars")
+      .where("isSelected", "==", true)
+      .get();
+    const carSelected = carRef.docs.length;
+    setSelectedCar(carSelected);
+  };
+
+  useEffect(() => {
+    getCars();
+    getSelectedCar();
+  }, []);
+
   const validateForm = () => {
+    if (brand === "") {
+      alert("Enter Car Brand");
+      return false;
+    }
+    if (model === "") {
+      alert("Enter Car Model");
+      return false;
+    }
     if (plate === "") {
       alert("Enter Plate Number");
       return false;
     }
 
-    if (model === "") {
-      alert("Enter Car Model");
-      return false;
-    }
-
-    if (brand === "") {
-      alert("Enter Car Brand");
-      return false;
-    }
+    cars.map((item) => {
+      if (
+        item.plate === plate &&
+        item.brand === brand &&
+        item.model === model
+      ) {
+        alert("Car already exists");
+        return false;
+      }
+    });
 
     return true;
   };
@@ -53,8 +78,14 @@ export default function AddCars(props) {
         plate: plate,
         model: model,
         brand: brand,
-        selectedCar: selectedCar.length,
+        selectedCar: selectedCar,
       });
+      if (response) {
+        alert("Successfully Added");
+        props.navigation.goBack();
+      }
+    } else {
+      alert("Fix the fields");
     }
   };
 
