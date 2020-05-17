@@ -30,6 +30,7 @@ import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
+import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 
 export default function App(props) {
@@ -43,6 +44,7 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
+      News: NewsStack,
       Profile: ProfileStack,
     },
     // {
