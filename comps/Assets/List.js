@@ -1,7 +1,11 @@
 //@refresh reset
+<<<<<<< HEAD
 import {Button,Rating} from "react-native-elements"
+=======
+import { Button } from "react-native-elements";
+>>>>>>> master
 import React, { useState, useEffect } from "react";
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator } from "react-navigation-stack";
 
 import {
   Image,
@@ -11,18 +15,16 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
-
 
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
 require("firebase/firestore");
 
-
-
 export default function List(props) {
+<<<<<<< HEAD
   const [assetList, setAssetList] = useState([]); 
   const [finalAssets, setFinalAssets] = useState([]); 
   const section =  props.navigation.getParam("section",'failed').id;
@@ -86,30 +88,59 @@ export default function List(props) {
   } 
 
   const getList =  () => {
+=======
+  const [assetList, setAssetList] = useState([]);
+  const [finalAssets, setFinalAssets] = useState([]);
+  const section = props.navigation.getParam("section", "failed").id;
+  const assetTypeId = props.navigation.getParam("assetTypeId", "failed");
+  const tName = props.navigation.getParam("tName", "failed");
+  const sName = props.navigation.getParam("section", "failed").name;
+  const startDateTime = props.navigation.getParam("startDate", "failed");
+  const endDateTime = props.navigation.getParam("endDate", "failed");
+
+  useEffect(() => {
+    getList();
+  }, [section]);
+
+  useEffect(() => {
+    checkTime();
+  }, [assetList.length > 0 && finalAssets.length == 0]);
+
+  const getList = () => {
+>>>>>>> master
     const temp = [];
-    db.collection('assets').orderBy("code").where("assetSection","==",section).onSnapshot((snapshot) => {
-      snapshot.forEach(async doc => {
-        //console.log(section)
+    db.collection("assets")
+      .orderBy("code")
+      .where("assetSection", "==", section)
+      .onSnapshot((snapshot) => {
+        snapshot.forEach(async (doc) => {
+          //console.log(section)
           let bookingTemp = [];
-          let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
-          if(bookings){
-              bookings.forEach(b => {
-              bookingTemp.push(b.data())
-            })
+          let bookings = await db
+            .collection("assets")
+            .doc(doc.id)
+            .collection("assetBookings")
+            .get();
+          if (bookings) {
+            bookings.forEach((b) => {
+              bookingTemp.push(b.data());
+            });
           }
-          temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
-          
-          if(temp.length === snapshot.docs.length){
+          temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
+
+          if (temp.length === snapshot.docs.length) {
             //console.log('assets',temp)
-            setAssetList(temp)
+            setAssetList(temp);
           }
+        });
       });
-    }
-    )
-    
-  } 
+  };
 
   const checkTime = () => {
+<<<<<<< HEAD
+=======
+    console.log("hii");
+>>>>>>> master
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -123,11 +154,17 @@ export default function List(props) {
           );
         }).length === 0
     );
+<<<<<<< HEAD
     // console.log('after checking time',assetsToShow);
+=======
+
+    console.log("after checking time", assetsToShow);
+>>>>>>> master
     setFinalAssets(assetsToShow);
-  }
+  };
 
   return (
+<<<<<<< HEAD
     <ScrollView>
       <View style={styles.container}>
         {/* {console.log('inside return',assetList)} */}
@@ -149,15 +186,49 @@ export default function List(props) {
       </View>
     </ScrollView>
     
+=======
+    <View style={styles.container}>
+      {/* {console.log('inside return',assetList)} */}
+      {finalAssets.length > 0 ? (
+        finalAssets.map((l, i) => (
+          <TouchableOpacity
+            onPress={() =>
+              props.navigation.navigate("Details", {
+                sName: sName,
+                tName: tName,
+                asset: l,
+                startDateTime: startDateTime,
+                endDateTime: endDateTime,
+                assetTypeId,
+              })
+            }
+            key={i}
+            style={{
+              alignItems: "center",
+              borderRadius: 50,
+              height: 20,
+              width: 200,
+              margin: 5,
+              backgroundColor: "pink",
+            }}
+          >
+            <Text>{l.code}</Text>
+          </TouchableOpacity>
+        ))
+      ) : (
+        <Text>Loading</Text>
+      )}
+    </View>
+>>>>>>> master
   );
 }
 
 List.navigationOptions = (props) => ({
-    title: "List",
-    headerStyle: { backgroundColor: "white" },
-    headerTintColor: "black",
-    headerTintStyle: { fontWeight: "bold" }
-})
+  title: "List",
+  headerStyle: { backgroundColor: "white" },
+  headerTintColor: "black",
+  headerTintStyle: { fontWeight: "bold" },
+});
 
 function DevelopmentModeNotice() {
   if (__DEV__) {
@@ -197,50 +268,50 @@ function handleHelpPress() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   developmentModeText: {
     marginBottom: 20,
     color: "rgba(0,0,0,0.4)",
     fontSize: 14,
     lineHeight: 19,
-    textAlign: "center"
+    textAlign: "center",
   },
   contentContainer: {
-    paddingTop: 30
+    paddingTop: 30,
   },
   welcomeContainer: {
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 20
+    marginBottom: 20,
   },
   welcomeImage: {
     width: 100,
     height: 80,
     resizeMode: "contain",
     marginTop: 3,
-    marginLeft: -10
+    marginLeft: -10,
   },
   getStartedContainer: {
     alignItems: "center",
-    marginHorizontal: 50
+    marginHorizontal: 50,
   },
   TypesFilename: {
-    marginVertical: 7
+    marginVertical: 7,
   },
   codeHighlightText: {
-    color: "rgba(96,100,109, 0.8)"
+    color: "rgba(96,100,109, 0.8)",
   },
   codeHighlightContainer: {
     backgroundColor: "rgba(0,0,0,0.05)",
     borderRadius: 3,
-    paddingHorizontal: 4
+    paddingHorizontal: 4,
   },
   getStartedText: {
     fontSize: 24,
     color: "rgba(96,100,109, 1)",
     lineHeight: 24,
-    textAlign: "center"
+    textAlign: "center",
   },
   tabBarInfoContainer: {
     position: "absolute",
@@ -252,33 +323,33 @@ const styles = StyleSheet.create({
         shadowColor: "black",
         shadowOffset: { width: 0, height: -3 },
         shadowOpacity: 0.1,
-        shadowRadius: 3
+        shadowRadius: 3,
       },
       android: {
-        elevation: 20
-      }
+        elevation: 20,
+      },
     }),
     alignItems: "center",
     backgroundColor: "#fbfbfb",
-    paddingVertical: 20
+    paddingVertical: 20,
   },
   tabBarInfoText: {
     fontSize: 17,
     color: "rgba(96,100,109, 1)",
-    textAlign: "center"
+    textAlign: "center",
   },
   navigationFilename: {
-    marginTop: 5
+    marginTop: 5,
   },
   helpContainer: {
     marginTop: 15,
-    alignItems: "center"
+    alignItems: "center",
   },
   helpLink: {
-    paddingVertical: 15
+    paddingVertical: 15,
   },
   helpLinkText: {
     fontSize: 14,
-    color: "#2e78b7"
-  }
+    color: "#2e78b7",
+  },
 });

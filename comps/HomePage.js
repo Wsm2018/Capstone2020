@@ -4,17 +4,40 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
+<<<<<<< HEAD
 import Assets from "./Assets/Assets";
 
+=======
+import AdminHome from "../comps/Admin/HomeScreen";
+>>>>>>> master
 
-export default function HomePage() {
+export default function HomePage(props) {
   const handleLogout = () => {
     firebase.auth().signOut();
   };
 
   return (
+<<<<<<< HEAD
       <Assets />
       //<AddForm />
+=======
+    <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          handleLogout();
+        }}
+      >
+        <Text>Logout !</Text>
+
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>props.navigation.navigate("CheckOut")}
+      >
+        <Text>Checkout</Text>
+        
+      </TouchableOpacity>
+    </View>
+>>>>>>> master
   );
 }
 
