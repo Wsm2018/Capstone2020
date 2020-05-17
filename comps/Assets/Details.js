@@ -1,7 +1,8 @@
 //@refresh reset
-import {Button} from "react-native-elements"
+import {Button, Input, Rating} from "react-native-elements"
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from 'react-navigation-stack';
+
 
 import {
   Image,
@@ -11,10 +12,13 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  KeyboardAvoidingView,
+  
 } from "react-native";
+import Textarea from 'react-native-textarea';
 
-
+import 'firebase/functions'
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -26,57 +30,132 @@ export default function Details(props) {
   const asset = props.navigation.getParam("asset",'failed');
   const startDateTime = props.navigation.getParam("startDateTime",'failed');
   const endDateTime = props.navigation.getParam("endDateTime",'failed');
+  const [reviews, setReviews] = useState([]); 
+  const [newReview, setNewReview] = useState(''); 
+  const [rating, setRating] = useState(0); 
+  const [user,setUser] = useState(null);
 
     
-//   useEffect(() => {
-//     getList();
-//   }, [section]);
+  useEffect(() => {
+    getReviews();
+  }, [asset]);
 
+  useEffect(() => {
+    console.log(rating)
+  }, [rating]);
 
-//   const getList =  () => {
-//     const temp = [];
-//     db.collection('assets').orderBy("code").where("assetSection","==",section).onSnapshot((snapshot) => {
-//       snapshot.forEach(async doc => {
-//         //console.log(section)
-//           let bookingTemp = [];
-//           let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
-//           if(bookings){
-//               bookings.forEach(b => {
-//               bookingTemp.push(b.data())
-//             })
-//           }
-//           temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
-          
-//           if(temp.length === snapshot.docs.length){
-//             //console.log('assets',temp)
-//             setAssetList(temp)
-//           }
-//       });
-//     }
-//     )
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    const user = await db.collection('users').doc(firebase.auth().currentUser.uid).get();
+    // console.log('user: ',user.data())
+    setUser(user.data());
+  } 
+
+  const getReviews = async () => {
+    const temp = [];
     
-//   } 
+    db.collection('assets').doc(asset.id).collection('reviews').onSnapshot((snapshot) => {
+      snapshot.forEach(doc => {
+        temp.push({id:doc.id,...doc.data()})
+      })
+    
+    // console.log(temp)
+    setReviews(temp);
+    })
+}
+
+  const handleAddReview = async () => {
+    console.log('before')
+    const addReview = firebase
+      .functions()
+      .httpsCallable("addReview");
+    const result = await addReview({
+      comment: newReview,
+      displayName: user.displayName,
+      uid:firebase.auth().currentUser.uid,
+      aid:asset.id,
+      rating:rating
+    });
+    console.log('after')
+
+  };
 
 
 
 
   return (
     <View style={styles.container}>
-      {console.log('asset return',asset)}
-      {console.log('startD return',startDateTime)}
-      {console.log('endD return',endDateTime)}
-      {asset?
+      <ScrollView>
+      {/* {console.log('asset return',asset)} */}
+      {/* {console.log('startD return',startDateTime)} */}
+      {/* {console.log('endD return',endDateTime)} */}
+      <KeyboardAvoidingView>
+        {asset?
         <View>
-          <Text >{asset.code}</Text>
-        <Text>{asset.price}</Text>
-      <Text>{startDateTime}</Text>
-      <Text>{endDateTime}</Text>
+          <Text > {asset.description}</Text>
+        <Text> Price Per Hour {asset.price}</Text>
+        {
+          startDateTime === '0000-00-00'? null:
+          <>
+          <Text>{startDateTime}</Text>
+          <Text>{endDateTime}</Text>
+          </>
+        }
+        <Text style={{textAlign:'center'}}>Reviews</Text>
+        <View>
+        <Textarea
+          containerStyle={styles.textareaContainer}
+          style={styles.textarea}
+          maxLength={80}
+          onChangeText={setNewReview}
+          defaultValue={newReview}
+          placeholder={'Write Your Review Here'}
+          placeholderTextColor={'#c7c7c7'}
+          underlineColorAndroid={'transparent'}
+        />
+        <Text style={{textAlign:"center"}}>Slide to add rating</Text>
+        <Rating
+          type='star'
+          ratingCount={5}
+          imageSize={30}
+          startingValue={rating}
+          onFinishRating={setRating}
+        />
+        
+        <Button 
+          title={'Add Review'} 
+          onPress={handleAddReview}
+        />
+
+        </View>
+        
+          {reviews.map((r,i) =>(
+            <View style={{marginTop:50}}>
+              <Text>From: {r.displayName}</Text>
+              <Text>Comment: {r.comment}</Text>
+              <Rating
+                
+                type='star'
+                ratingCount={5}
+                startingValue={r.rating}
+                imageSize={20}
+                readonly
+                onFinishRating={setRating}
+              />
+            </View>
+          ))}
+        
         </View>
    
   :
         <Text>Loading</Text>
   }
     
+      </KeyboardAvoidingView>
+      </ScrollView>
     </View>
   )
 }
@@ -124,6 +203,17 @@ function handleHelpPress() {
 }
 
 const styles = StyleSheet.create({
+  textareaContainer: {
+    height: 180,
+    padding: 5,
+    backgroundColor: '#F5FCFF',
+  },
+  textarea: {
+    textAlignVertical: 'top',  // hack android
+    height: 170,
+    fontSize: 14,
+    color: '#333',
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff"

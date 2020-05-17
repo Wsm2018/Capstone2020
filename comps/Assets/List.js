@@ -1,5 +1,5 @@
 //@refresh reset
-import {Button} from "react-native-elements"
+import {Button,Rating} from "react-native-elements"
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from 'react-navigation-stack';
 
@@ -53,10 +53,31 @@ export default function List(props) {
               bookingTemp.push(b.data())
             })
           }
-          temp.push({id:doc.id,assetBookings:bookingTemp,...doc.data()})
-          
+
+          let ratingTemp = 0;
+          let ratingAvg = 0;
+          let rating = await db.collection('assets').doc(doc.id).collection('reviews').get()
+          if(rating){
+            let count = 0;
+            rating.forEach(r => {
+              ratingTemp+=r.data().rating;
+              //console.log('sum',ratingTemp)
+              count++;
+              console.log(count)
+            })
+            ratingAvg = parseFloat(ratingTemp)/parseFloat(count);
+            if(!isNaN(ratingAvg)){
+              console.log('avg',ratingAvg)
+            }else{
+              ratingAvg = 0;
+            }
+            //console.log(ratingAvg);
+          }
+
+          temp.push({id:doc.id, rating:rating,assetBookings:bookingTemp,...doc.data()})
+
           if(temp.length === snapshot.docs.length){
-            console.log('assets',temp)
+            //console.log('assets',temp)
             setAssetList(temp)
           }
       });
@@ -89,7 +110,6 @@ export default function List(props) {
   } 
 
   const checkTime = () => {
-    console.log('hii');
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -103,22 +123,32 @@ export default function List(props) {
           );
         }).length === 0
     );
-    console.log('after checking time',assetsToShow);
+    // console.log('after checking time',assetsToShow);
     setFinalAssets(assetsToShow);
   }
 
   return (
-    <View style={styles.container}>
-      {/* {console.log('inside return',assetList)} */}
-      {finalAssets.length > 0? finalAssets.map((l,i)=>(
-        <TouchableOpacity onPress={() => props.navigation.navigate("Details",{asset:l,startDateTime:startDateTime,endDateTime:endDateTime})} key={i} style={{alignItems:"center",borderRadius:10,height:40,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >{l.description}</Text>
-        </TouchableOpacity>
-    ))
-  :
-        <Text>Loading</Text>
-  }
-    </View>
+    <ScrollView>
+      <View style={styles.container}>
+        {/* {console.log('inside return',assetList)} */}
+        {finalAssets.length > 0? finalAssets.map((l,i)=>(
+          <TouchableOpacity onPress={() => props.navigation.navigate("Details",{asset:l,startDateTime:startDateTime,endDateTime:endDateTime})} key={i} style={{alignItems:"center",borderRadius:10,height:40,width:200,margin:5, backgroundColor:'pink'}}>
+            <Text >{l.description}</Text>
+            <Rating
+              type='star'
+              ratingCount={5}
+              startingValue={l.rating}
+              imageSize={20}
+              readonly
+            />
+          </TouchableOpacity>
+        ))
+        :
+              <Text>Loading</Text>
+        }
+      </View>
+    </ScrollView>
+    
   );
 }
 

@@ -24,6 +24,16 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
+exports.addReview = functions.https.onCall(async (data, context) => {
+  console.log("addReview data", data);
+  await db.collection("assets").doc(data.aid).collection('reviews').add({
+    comment: data.comment,
+    displayName: data.displayName,
+    uid:data.uid,
+    rating:data.rating
+  });
+});
+
 exports.updatePhoto = functions.https.onCall(async (data, context) => {
   console.log("updatePhoto data", data);
   const result = await admin.auth().updateUser(data.uid, {
