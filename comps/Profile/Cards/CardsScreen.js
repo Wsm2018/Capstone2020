@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import { View, FlatList, TouchableOpacity, Image } from "react-native";
 import db from "../../../db";
+import { Text } from "react-native-elements";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
@@ -27,10 +28,16 @@ export default function CardsScreen(props) {
         setCards([...cards]);
       });
   };
+  // 5190767138616175
 
   return (
     <View style={{ flex: 1 }}>
-      <Text>My Credit Cards</Text>
+      <View
+        style={{ alignItems: "center", justifyContent: "center", flex: 0.3 }}
+      >
+        <Text h4>My Credit Cards</Text>
+      </View>
+
       {cards.length === 0 ? (
         <Text>No Cards</Text>
       ) : (
@@ -40,7 +47,6 @@ export default function CardsScreen(props) {
           keyExtractor={(item) => item.id}
         />
       )}
-
       <View
         style={{
           flex: 1,

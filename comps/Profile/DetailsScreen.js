@@ -1,17 +1,30 @@
-import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Modal,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import BalanceScreen from "./Cards/BalanceScreen";
 import { Icon } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
-
+import CarsScreen from "./Cars/CarsScreen";
 import {
   FontAwesome5,
   Fontisto,
   MaterialCommunityIcons,
   Ionicons,
 } from "@expo/vector-icons";
+import db from "../../db";
+import firebase from "firebase";
+import "firebase/auth";
 
 export default function DetailsScreen(props) {
+  const [carsModal, setCarsModal] = useState(false);
+
   return (
     <View style={styles.container}>
       <View style={{ flex: 2 }}>
@@ -20,13 +33,8 @@ export default function DetailsScreen(props) {
           style={{
             width: "100%",
             flex: 1,
-            // backgroundColor: "red",
-            // flexDirection: "column",
-            // justifyContent: "center",
-            // alignItems: "center",
             borderWidth: 1,
             borderTopWidth: 0,
-
             borderColor: "darkgray",
           }}
         >
@@ -60,14 +68,12 @@ export default function DetailsScreen(props) {
               props.navigation.navigate("Car", { user: props.user })
             }
           />
-
-          <Image
-            source={require("../../assets/images/caricon4.png")}
-            style={{ height: 38, width: 85 }}
-            onPress={() =>
-              props.navigation.navigate("Car", { user: props.user })
-            }
-          />
+          <TouchableOpacity onPress={() => setCarsModal(true)}>
+            <Image
+              source={require("../../assets/images/caricon4.png")}
+              style={{ height: 38, width: 85 }}
+            />
+          </TouchableOpacity>
           <Image
             source={require("../../assets/images/bookingicon.png")}
             style={{ height: 48, width: 48 }}
@@ -77,6 +83,11 @@ export default function DetailsScreen(props) {
           />
         </View>
       </Card>
+      <CarsScreen
+        carsModal={carsModal}
+        setCarsModal={setCarsModal}
+        navigation={props.navigation}
+      />
     </View>
   );
 }
