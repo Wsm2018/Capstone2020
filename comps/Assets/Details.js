@@ -295,7 +295,7 @@ export default function Details(props) {
   const book = (day, time) => {
     //chick if service is booked more that service.maxBookings
     if (parseInt(selectedService.maxBookings) == userDays[day].bookings ) {
-      alert("Sorry, Only "+ selectedService.maxBookings+" "+ selectedService.name+ "Booking/s Allowed Per Day")
+      alert("Sorry, Only "+ selectedService.maxBookings+" "+ selectedService.name+ " Booking/s Allowed Per Day")
     }
     else {
       var temp = serviceBooking
