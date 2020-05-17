@@ -28,81 +28,6 @@ require("firebase/firestore");
 
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
-  const [assetList, setAssetList] = useState([]);
-  const [finalAssets, setFinalAssets] = useState([]);
-  const [selectedSection, setSelectedSection] = useState(null);
-  // const tName = props.navigation.getParam("tName", "failed");
-  // const sName = props.navigation.getParam("section", "failed").name;
-  // const startDateTime = props.navigation.getParam("startDate", "failed");
-  // const endDateTime = props.navigation.getParam("endDate", "failed");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-
-  useEffect(() => {
-    //console.log(selectedSection);
-    if (selectedSection !== null) {
-      getList();
-    }
-  }, [selectedSection]);
-
-  useEffect(() => {
-    console.log("asset list is :", assetList.length);
-    console.log("finalAssets is :", finalAssets.length);
-
-    if (assetList.length > 0 && finalAssets.length == 0) {
-      checkTime();
-    }
-  }, [assetList]);
-
-  const getList = () => {
-    console.log("section rn", selectedSection);
-    const temp = [];
-
-    db.collection("assets")
-      .orderBy("code")
-      .where("assetSection", "==", selectedSection.id)
-      .onSnapshot((snapshot) => {
-        snapshot.forEach(async (doc) => {
-          //console.log(section)
-          let bookingTemp = [];
-          let bookings = await db
-            .collection("assets")
-            .doc(doc.id)
-            .collection("assetBookings")
-            .get();
-          if (bookings) {
-            bookings.forEach((b) => {
-              bookingTemp.push(b.data());
-            });
-          }
-          temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
-          if (temp.length === snapshot.docs.length) {
-            //console.log("assets", temp);
-            setAssetList(temp);
-          }
-        });
-      });
-  };
-
-  const checkTime = () => {
-    console.log("hii");
-    let assetsToShow = assetList;
-
-    assetsToShow = assetsToShow.filter(
-      (asset) =>
-        asset.assetBookings.filter((assetBooking) => {
-          return !(
-            (startDate <= assetBooking.startDateTime &&
-              endDate <= assetBooking.startDateTime) ||
-            (startDate >= assetBooking.endDateTime &&
-              endDate >= assetBooking.endDateTime)
-          );
-        }).length === 0
-    );
-
-    //console.log("after checking time", assetsToShow);
-    setFinalAssets(assetsToShow);
-  };
 
   //design testing variable
   const [assetSections2, setAssetSections2] = useState([
@@ -136,6 +61,8 @@ export default function Sections(props) {
   const [listView, setListView] = useState(false);
   ///////////////////////////////////////////////////////////////////
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showSections, setShowSections] = useState(false);
   const [visibale, setVisible] = useState(false);
 
@@ -145,12 +72,6 @@ export default function Sections(props) {
   useEffect(() => {
     getSections();
   }, [type]);
-
-  useEffect(() => {
-    if (finalAssets.length > 0) {
-      setListView(true);
-    }
-  }, [finalAssets]);
 
   useEffect(() => {
     console.log(startDate);
@@ -176,6 +97,25 @@ export default function Sections(props) {
   };
 
   return (
+<<<<<<< HEAD
+    <View style={styles.container}>
+      <TouchableOpacity style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}} onPress={() => props.navigation.navigate("List",{startDate:'0000-00-00',endDate:'0000-00-00'})}><Text>Show All Assets</Text></TouchableOpacity>
+
+      {startDate?
+      <>
+      {
+        endDate?
+        <>
+        <Text>You are booking from {startDate} until {endDate} Now Choose a Section</Text>
+        {assetSections.map((s,i)=>(
+        <TouchableOpacity  onPress={() => props.navigation.navigate("List",{section:s,startDate:startDate,endDate:endDate})} key={i} style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
+          <Text >{s.name}</Text>
+        </TouchableOpacity>
+        ))}
+        </>
+        :
+        <>
+=======
     <ScrollView contentContainerStyle={{ backgroundColor: "#e3e3e3" }}>
       <View style={styles.container}>
         <View style={styles.header}>
@@ -283,7 +223,7 @@ export default function Sections(props) {
                 <TouchableOpacity
                   onPress={
                     // (
-                    () => setSelectedSection(s)
+                    () => setListView(true)
                     //,
                     // () =>
                     //   props.navigation.navigate("List", {
@@ -335,12 +275,13 @@ export default function Sections(props) {
             <Text>Please choose a date to continue</Text>
           )}
         </View>
+>>>>>>> master
 
         <View style={styles.three}>
           <Text style={styles.cardTitle}>List</Text>
           {listView === true ? (
-            finalAssets.length > 0 ? (
-              finalAssets.map((l, i) => (
+            finalAssets2.length > 0 ? (
+              finalAssets2.map((l, i) => (
                 <View style={{ width: "20%", alignItems: "center" }}>
                   <TouchableOpacity
                     // onPress={() =>
