@@ -22,6 +22,7 @@ export default function FriendsList(props) {
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
 
+  // -------------------------------FROM-----------------------------------
   const handleFrom = () => {
     db.collection("chats")
       .where("from", "==", firebase.auth().currentUser.uid)
@@ -35,6 +36,7 @@ export default function FriendsList(props) {
       });
   };
 
+  // --------------------------------TO----------------------------------
   const handleTo = () => {
     db.collection("chats")
       .where("from", "==", friend.id)
@@ -48,6 +50,7 @@ export default function FriendsList(props) {
       });
   };
 
+  // -------------------------------CHAT-----------------------------------
   const handleChat = () => {
     let tempChat = from.concat(to);
     tempChat = tempChat.sort(
@@ -56,15 +59,21 @@ export default function FriendsList(props) {
     setChats(tempChat);
   };
 
-  const send = () => {
-    db.collection("chats").add({
+  // --------------------------------SEND----------------------------------
+  const send = async () => {
+    const message = firebase.functions().httpsCallable("sendMessage");
+    const response = await message({
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
       dateTime: new Date(),
     });
+    console.log("response", response);
+
+    setText("");
   };
 
+  // --------------------------------DELETE ALL----------------------------------
   const deleteAll = async () => {
     const getQuery = await db.collection("chats").get();
     getQuery.forEach((doc) => {
@@ -72,11 +81,13 @@ export default function FriendsList(props) {
     });
   };
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     handleFrom();
     handleTo();
   }, []);
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     if (from && to) {
       handleChat();
@@ -85,7 +96,7 @@ export default function FriendsList(props) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : null}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <Text>Friends Chat</Text>
@@ -108,6 +119,7 @@ export default function FriendsList(props) {
         style={{ borderWidth: 1 }}
         placeholder="Type here"
         onChangeText={setText}
+        value={text}
       />
       <TouchableOpacity style={{ borderWidth: 1, height: 30 }} onPress={send}>
         <Text>Send</Text>

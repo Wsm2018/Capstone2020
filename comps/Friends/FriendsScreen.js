@@ -7,6 +7,7 @@ import { createAppContainer } from "react-navigation";
 import FriendsList from "./FriendsList";
 import FriendsSearch from "./FriendsSearch";
 import FriendsChat from "./FriendsChat";
+import FriendsRequest from "./FriendsRequest";
 
 const FriendsStack = createAppContainer(
   createStackNavigator(
@@ -14,18 +15,20 @@ const FriendsStack = createAppContainer(
       FriendsList: FriendsList,
       FriendsSearch: FriendsSearch,
       FriendsChat: FriendsChat,
+      FriendsRequest: FriendsRequest,
     },
     {
-      initialRouteName: "FriendsList",
+      // initialRouteName: "FriendsList",
 
       defaultNavigationOptions: {
-        headerStyle: {
-          backgroundColor: "#006cab",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "normal",
-        },
+        header: null,
+        // headerStyle: {
+        //   backgroundColor: "#006cab",
+        // },
+        //   headerTintColor: "#fff",
+        //   headerTitleStyle: {
+        //     fontWeight: "normal",
+        //   },
       },
     }
   )
