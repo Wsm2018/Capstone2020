@@ -35,9 +35,10 @@ export default function ProfileScreen(props) {
   const [user, setUser] = useState(null);
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [photoURL, setPhotoURL] = useState("");
+  const [profileBackground, setProfileBackground] = useState("");
   const [edit, setEdit] = useState(false);
   const [displayName, setDisplayName] = useState();
-  const buttons = ["Details", "Send Gift", "Referral Code"];
+  const buttons = ["Balance", "Send Gift", "Referral Code"];
   const [view, setView] = useState(0);
 
   const getUser = async () => {
@@ -47,6 +48,7 @@ export default function ProfileScreen(props) {
         const user = doc.data();
         setPhotoURL(user.photoURL);
         setDisplayName(user.displayName);
+        setProfileBackground(user.profileBackground);
         setUser(user);
       });
   };
@@ -61,20 +63,41 @@ export default function ProfileScreen(props) {
     askPermission();
   }, []);
 
-  const handleSave = async (uri) => {
+  const handleSave = async (uri, type) => {
     const response = await fetch(uri);
     const blob = await response.blob();
-    const putResult = await firebase
-      .storage()
-      .ref()
-      .child(`users/${firebase.auth().currentUser.uid}`)
-      .put(blob);
-    const url = await firebase
-      .storage()
-      .ref()
-      .child(`users/${firebase.auth().currentUser.uid}`)
-      .getDownloadURL();
-    setPhotoURL(url);
+    if (type === "profile") {
+      const putResult = await firebase
+        .storage()
+        .ref()
+        .child(`users/${firebase.auth().currentUser.uid}`)
+        .put(blob);
+      const url = await firebase
+        .storage()
+        .ref()
+        .child(`users/${firebase.auth().currentUser.uid}`)
+        .getDownloadURL();
+      setPhotoURL(url);
+    } else {
+      const putResult = await firebase
+        .storage()
+        .ref()
+        .child(`background/${firebase.auth().currentUser.uid}`)
+        .put(blob);
+      const url = await firebase
+        .storage()
+        .ref()
+        .child(`background/${firebase.auth().currentUser.uid}`)
+        .getDownloadURL();
+      const updatePhoto = firebase.functions().httpsCallable("updatePhoto");
+      const response2 = await updatePhoto({
+        uid: firebase.auth().currentUser.uid,
+        profileBackground: url,
+      });
+      getUser();
+      // setPhotoURL(url);
+    }
+
     // const updatePhoto = firebase.functions().httpsCallable("updatePhoto");
     // const response2 = await updatePhoto({
     //   uid: firebase.auth().currentUser.uid,
@@ -94,7 +117,21 @@ export default function ProfileScreen(props) {
 
     if (!result.cancelled) {
       console.log("not cancelled", result.uri);
-      handleSave(result.uri);
+      handleSave(result.uri, "profile");
+      //setPhotoURL(result.uri);
+    }
+  };
+
+  const handlePickBackgroundImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      console.log("not cancelled", result.uri);
+      handleSave(result.uri, "background");
       //setPhotoURL(result.uri);
     }
   };
@@ -106,7 +143,6 @@ export default function ProfileScreen(props) {
       displayName: displayName,
       photoURL: photoURL,
     });
-    console.log(10, result);
     getUser();
     setEdit(false);
   };
@@ -114,36 +150,38 @@ export default function ProfileScreen(props) {
   return (
     user && (
       <View style={styles.container}>
-        <View>
-          <View>
-            <View style={styles.headerContainer}>
-              <View style={styles.coverContainer}>
-                <ImageBackground
-                  source={{
-                    uri:
-                      "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
-                  }}
-                  style={styles.coverImage}
-                >
-                  <View style={styles.coverTitleContainer}>
-                    <Ionicons name="md-images" size={40} color="white" />
-                  </View>
-                </ImageBackground>
-              </View>
-              <View style={styles.profileImageContainer}>
-                <Avatar
-                  rounded
-                  source={{ uri: photoURL }}
-                  size="xlarge"
-                  style={styles.profileImage}
+        <View style={styles.headerContainer}>
+          <View style={styles.coverContainer}>
+            <ImageBackground
+              source={{
+                uri: profileBackground,
+              }}
+              style={styles.coverImage}
+            >
+              <View style={styles.coverTitleContainer}>
+                <Ionicons
+                  name="md-images"
+                  size={40}
+                  color="white"
+                  onPress={handlePickBackgroundImage}
                 />
               </View>
-            </View>
-            {/* <View style={{ alignItems: "center" }}>
+            </ImageBackground>
+          </View>
+          <View style={styles.profileImageContainer}>
+            <Avatar
+              rounded
+              source={{ uri: user.photoURL }}
+              size="xlarge"
+              style={styles.profileImage}
+            />
+          </View>
+        </View>
+        {/* <View style={{ alignItems: "center" }}>
               <Avatar rounded source={{ uri: photoURL }} size="xlarge" />
             </View> */}
-            {/* <View style={{ backgroundColor: "blue", height: 80 }}></View> */}
-            {/* <Divider
+        {/* <View style={{ backgroundColor: "blue", height: 80 }}></View> */}
+        {/* <Divider
               style={{
                 backgroundColor: "black",
                 //marginTop: -60,
@@ -154,129 +192,121 @@ export default function ProfileScreen(props) {
               }}
             /> */}
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 18, paddingRight: 5 }}>
-                {displayName}
-              </Text>
-              <TouchableOpacity onPress={() => setEdit(true)}>
-                <FontAwesome5
-                  name="edit"
-                  size={20}
-                  style={{ color: "#20365F" }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+          <TouchableOpacity onPress={() => setEdit(true)}>
+            <FontAwesome5 name="edit" size={20} style={{ color: "#20365F" }} />
+          </TouchableOpacity>
+        </View>
 
-          <Modal visible={edit} animationType="fade" transparent={true}>
-            <View style={styles.centeredView}>
-              <View elevation={5} style={styles.modalView}>
-                <KeyboardAvoidingView
-                  behavior={Platform.OS === "ios" ? "height" : "padding"}
-                  style={{ flex: 1 }}
+        <Modal visible={edit} animationType="fade" transparent={true}>
+          <View style={styles.centeredView}>
+            <View elevation={5} style={styles.modalView}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "height" : "padding"}
+                style={{ flex: 1 }}
+              >
+                <View
+                  style={{
+                    justifyContent: "space-around",
+                    flex: 1,
+                    alignItems: "center",
+                  }}
+                >
+                  <Avatar
+                    rounded
+                    source={{ uri: photoURL }}
+                    showAccessory
+                    onAccessoryPress={() => handlePickImage()}
+                    size="xlarge"
+                  />
+
+                  <Input
+                    inputContainerStyle={{
+                      width: "100%",
+                      borderColor: "black",
+                    }}
+                    label="Display Name"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={() => handleSaveEdit()}
+                  />
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    // backgroundColor: "red",
+                    marginTop: 20,
+                    width: "100%",
+                    // marginEnd: 50,
+                    // flex: 1,
+                  }}
                 >
                   <View
                     style={{
-                      justifyContent: "space-around",
-                      flex: 1,
+                      backgroundColor: "#20365F",
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
                       alignItems: "center",
+                      //marginStart: "2%",
+                      //marginEnd: "2%",
+                      borderRadius: 30,
+                      //marginBottom: 10,
                     }}
                   >
-                    <Avatar
-                      rounded
-                      source={{ uri: photoURL }}
-                      showAccessory
-                      onAccessoryPress={handlePickImage}
-                      size="xlarge"
-                    />
-
-                    <Input
-                      inputContainerStyle={{
-                        width: "100%",
-                        borderColor: "black",
-                      }}
-                      label="Display Name"
-                      value={displayName}
-                      onChangeText={setDisplayName}
-                      onSubmitEditing={handleSaveEdit}
-                    />
+                    <TouchableOpacity onPress={() => handleSaveEdit()}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+                        }}
+                      >
+                        Save
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-
                   <View
                     style={{
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      // backgroundColor: "red",
-                      marginTop: 20,
-                      width: "100%",
-                      // marginEnd: 50,
-                      // flex: 1,
+                      backgroundColor: "#20365F",
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      // marginStart: "2%",
+                      // marginEnd: "2%",
+                      borderRadius: 30,
+                      //marginBottom: 10,
                     }}
                   >
-                    <View
-                      style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        //marginStart: "2%",
-                        //marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
-                      }}
-                    >
-                      <TouchableOpacity onPress={handleSaveEdit}>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
-                          }}
-                        >
-                          Save
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        // marginStart: "2%",
-                        // marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
-                      }}
-                    >
-                      <TouchableOpacity onPress={() => setEdit(false)}>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
-                          }}
-                        >
-                          Cancel
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => setEdit(false)}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+                        }}
+                      >
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                </KeyboardAvoidingView>
-              </View>
+                </View>
+              </KeyboardAvoidingView>
             </View>
-          </Modal>
-        </View>
+          </View>
+        </Modal>
         <View style={{ flex: 1 }}>
           <View>
             <ButtonGroup
@@ -387,8 +417,8 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     borderRadius: 70,
     borderWidth: 4,
-    height: 140,
-    width: 140,
+    height: 130,
+    width: 130,
   },
   profileImageContainer: {
     bottom: 0,
