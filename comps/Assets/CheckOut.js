@@ -174,7 +174,7 @@ export default function CheckOut(props) {
 
                 <Button
                     title="Pay Now"
-                    onPress={() => props.navigation.navigate("Payment",{ assetBooking: assetBooking})}
+                    onPress={() => props.navigation.navigate("Payment",{ assetBooking: assetBooking , serviceBooking , totalAmount})}
                 />
 
             </View>

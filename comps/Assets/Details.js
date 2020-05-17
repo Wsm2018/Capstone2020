@@ -204,7 +204,7 @@ export default function Details(props) {
       var currentDate = split1[0]
 
       for (let i = 1; i <= diffDays + 1; i++) {
-        days.push({ day: currentDate, timesList, oneBooking: false })
+        days.push({ day: currentDate, timesList, bookings: 0 })
         currentDate = moment(currentDate).add(1, "day").format("YYYY-MM-DD")
       }
       days[0].timesList = firstDayHours
@@ -224,7 +224,7 @@ export default function Details(props) {
         }
       }
 
-      days.push({ day: split1[0], timesList: firstDayHours, oneBooking: false })
+      days.push({ day: split1[0], timesList: firstDayHours, bookings: 0 })
 
     }
 
@@ -293,38 +293,77 @@ export default function Details(props) {
 
 
   const book = (day, time) => {
+    //chick if service is booked more that service.maxBookings
+    if (parseInt(selectedService.maxBookings) == userDays[day].bookings ) {
+      alert("Sorry, Only "+ selectedService.maxBookings+" "+ selectedService.name+ "Booking/s Allowed Per Day")
+    }
+    else {
+      var temp = serviceBooking
+      var check = temp.filter(t => t.service.id == selectedService.id && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time)
+      //console.log("check", check)
+      if (check.length == 0) {
 
-    var temp = serviceBooking
-    var check = temp.filter(t => t.service == selectedService.id && t.day == userDays[day].day && t.time == userDays[day].timesList[time])
-    if (check.length == 0) {
+        var selectedWorker = ""
+        for (let j = 0; j < allWorkers.length; j++) {
 
-      var selectedWorker = ""
-      for (let j = 0; j < allWorkers.length; j++) {
+          var findWorker = allWorkers[j].worker.services.filter(s => s == selectedService.id)
 
-        var findWorker = allWorkers[j].worker.services.filter(s => s == selectedService.id)
+          if (findWorker.length > 0) {
+            var checkSchedule = allWorkers[j].schedules.filter(s => s.dateTime == userDays[day].day + "T" + userDays[day].timesList[time])
+            if (checkSchedule.length == 0) {
+              var updateSchedule = allWorkers
+              updateSchedule[j].schedules.push({ dateTime: userDays[day].day + "T" + userDays[day].timesList[time].time })
+              setAllWorkers(updateSchedule)
+              selectedWorker = allWorkers[j]
 
-        if (findWorker.length > 0) {
-          var checkSchedule = allWorkers[j].schedules.filter(s => s.dateTime == userDays[day].day + "T" + userDays[day].timesList[time])
-          if (checkSchedule.length == 0) {
-            var updateSchedule = allWorkers
-            updateSchedule[j].schedules.push({ dateTime: userDays[day].day + "T" + userDays[day].timesList[time].time })
-            setAllWorkers(updateSchedule)
-            selectedWorker = allWorkers[j]
-
+            }
           }
         }
-      }
-      temp.push({ service: selectedService, day: userDays[day].day, time: userDays[day].timesList[time].time, worker: selectedWorker.worker.id })
-      var ud = userDays
-      ud[day].timesList[time].book = true
-      setUserDays(ud)
-      setUpdate(!update)
-      setServiceBooking(temp)
+        temp.push({ service: selectedService, day: userDays[day].day, time: userDays[day].timesList[time].time, worker: selectedWorker.worker.id })
+        var ud = userDays
+        ud[day].timesList[time].book = true
+        ud[day].bookings = ud[day].bookings + 1
+        setUserDays(ud)
+        setUpdate(!update)
+        setServiceBooking(temp)
 
+      }
+      else {
+        var index = serviceBooking.findIndex( i => i.day == userDays[day].day && i.time == userDays[day].timesList[time].time)
+        var updateWorkers = allWorkers
+        for (let i = 0; i < updateWorkers.length; i++) {
+          if (updateWorkers[i].worker.id == serviceBooking[index].worker) {
+            // console.log(" timaaaaaaa,", serviceBooking[index].day + "T" + serviceBooking[index].time, "//////", updateWorkers[i].schedules)
+            var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != serviceBooking[index].day + "T" + serviceBooking[index].time)
+            //console.log(" should delete", newSchedule)
+            updateWorkers[i].schedules = newSchedule
+            var ud = userDays
+            //ud[serviceBooking[index]].bookings = ud[day].bookings -1
+            for (let k = 0; k < userDays.length; k++) {
+              if (userDays[k].day == serviceBooking[index].day) {
+                ud[k].bookings = userDays[k].bookings - 1
+                setUserDays(ud)
+              }
+            }
+
+            setAllWorkers(updateWorkers)
+            break;
+          }
+        }
+
+        var temp = []
+        for (let i = 0; i < serviceBooking.length; i++) {
+          if (i !== index) {
+            temp.push(serviceBooking[i])
+          }
+        }
+        setServiceBooking(temp)
+      }
+      setUpdate(!update)
+      var forceUpdate = userDays
+      setUserDays(forceUpdate)
     }
-    setUpdate(!update)
-    var forceUpdate = userDays
-    setUserDays(forceUpdate)
+
 
   }
 
@@ -337,6 +376,15 @@ export default function Details(props) {
         var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != serviceBooking[index].day + "T" + serviceBooking[index].time)
         //console.log(" should delete", newSchedule)
         updateWorkers[i].schedules = newSchedule
+        var ud = userDays
+        //ud[serviceBooking[index]].bookings = ud[day].bookings -1
+        for (let k = 0; k < userDays.length; k++) {
+          if (userDays[k].day == serviceBooking[index].day) {
+            ud[k].bookings = userDays[k].bookings - 1
+            setUserDays(ud)
+          }
+        }
+
         setAllWorkers(updateWorkers)
         break;
       }
@@ -354,18 +402,18 @@ export default function Details(props) {
   }
 
 
-const checkHour = ( time , day)=>{
-  //not booked
-  if (serviceBooking.filter(t => t.service == selectedService && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time).length > 0) {
-    return "green"
+  const checkHour = (time, day) => {
+    //not booked
+    if (serviceBooking.filter(t => t.service == selectedService && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time).length > 0) {
+      return "green"
+    }
+    else if (!updateAvailableTimings.filter(a => a.day === day && a.time === time).length == 1) {
+      return "white"
+    }
+    else {
+      return "red"
+    }
   }
-  else if (!updateAvailableTimings.filter(a => a.day === day && a.time === time).length == 1) {
-    return "white"
-  }
-  else{
-    return "red"
-  }
-}
 
   return (
     <View style={styles.container}>
@@ -377,7 +425,7 @@ const checkHour = ( time , day)=>{
           <Text>{startDateTime}</Text>
           <Text>{endDateTime}</Text>
 
-          
+
         </View>
 
         :
@@ -430,7 +478,7 @@ const checkHour = ( time , day)=>{
                         : checkHour(timeindex, dayindex) == "white" ?
                           <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
                           :
-                              <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
+                          <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
 
                     )}
                   </View>
@@ -457,7 +505,7 @@ const checkHour = ( time , day)=>{
           null
       }
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime, endDateTime } , serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
+      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime, endDateTime }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
         <Text >CheckOut</Text>
       </TouchableOpacity>
 

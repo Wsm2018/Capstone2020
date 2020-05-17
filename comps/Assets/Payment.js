@@ -25,8 +25,10 @@ import { CheckBox } from 'react-native-elements'
 
 export default function Payment(props) {
   // use 24 time format or 12 !!!!!!
-  //const assetBooking = props.navigation.getParam("assetBooking", "some default value");
-  const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
+  const assetBooking = props.navigation.getParam("assetBooking", "some default value");
+  const serviceBooking = props.navigation.getParam("serviceBooking", "some default value");
+  const totalAmount = props.navigation.getParam("totalAmount", "some default value");
+  //const [serviceBooking, setServiceBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
 
   const [cardNumber, setCardNumber] = useState();
   const [year, setYear] = useState();
@@ -36,17 +38,17 @@ export default function Payment(props) {
   const [yearsList, setYearsList] = useState();
   const [monthList, setMonthList] = useState(["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"])
   const [addCreditCard, setAddCreditCard] = useState(true)
-  const [totalAmount , setTotalAmount] = useState(0)
+ // const [totalAmount , setTotalAmount] = useState(0)
   
   useEffect(() => {
 
-    if(assetBooking){
-      var s = new Date(assetBooking.startDateTime)
-      var e = new Date(assetBooking.endDateTime)
-      var diff = (e.getTime() - s.getTime()) / 1000;
-      diff /= (60 * 60);
-      setTotalAmount(diff * assetBooking.asset.price)
-    }
+    // if(assetBooking){
+    //   var s = new Date(assetBooking.startDateTime)
+    //   var e = new Date(assetBooking.endDateTime)
+    //   var diff = (e.getTime() - s.getTime()) / 1000;
+    //   diff /= (60 * 60);
+    //   setTotalAmount(diff * assetBooking.asset.price)
+    // }
     
     var years = [ ]
     for (let i = 0; i <= 10; i++) {
@@ -75,7 +77,8 @@ export default function Payment(props) {
       addCreditCard: addCreditCard,
       uid: firebase.auth().currentUser.uid,
       totalAmount: totalAmount,
-      status: true
+      status: true,
+      serviceBooking
     });
 
     props.navigation.navigate("Home")
