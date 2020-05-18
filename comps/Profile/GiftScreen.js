@@ -50,7 +50,11 @@ export default function GiftScreen(props) {
           >
             <Picker.Item value="" label="Select Amount" />
             {amounts.labels.map((item, index) => (
-              <Picker.Item value={amounts.values[index]} label={item} />
+              <Picker.Item
+                key={index}
+                value={amounts.values[index]}
+                label={item}
+              />
             ))}
           </Picker>
         ) : (
