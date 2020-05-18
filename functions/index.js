@@ -26,16 +26,12 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
 
 // Maybe gonna remove these two
 
-// exports.updatePhoto = functions.https.onCall(async (data, context) => {
-//   console.log("updatePhoto data", data);
-//   const result = await admin.auth().updateUser(data.uid, {
-//     photoURL: data.photoURL,
-//   });
-
-//   await db.collection("users").doc(data.uid).update({
-//     photoURL: data.photoURL,
-//   });
-// });
+exports.updatePhoto = functions.https.onCall(async (data, context) => {
+  console.log("updatePhoto data", data);
+  await db.collection("users").doc(data.uid).update({
+    profileBackground: data.profileBackground,
+  });
+});
 
 // exports.updateDisplayName = functions.https.onCall(async (data, context) => {
 //   console.log("updateDisplayName data", data);
@@ -62,7 +58,7 @@ exports.updateUserInfo = functions.https.onCall(async (data, context) => {
 });
 
 exports.addCar = functions.https.onCall(async (data, context) => {
-  console.log("data", data);
+  console.log("addCar data", data);
 
   if (data.selectedCar === 0) {
     await db.collection("users").doc(data.uid).collection("cars").add({
@@ -149,6 +145,8 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       points: 0,
       photoURL:
         "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
     });
 
   if (request.query.referralStatus === "true") {
@@ -269,6 +267,8 @@ exports.sendMessage = functions.https.onCall((data, context) => {
     text: data.text,
     dateTime: new Date(),
   });
+});
+
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking

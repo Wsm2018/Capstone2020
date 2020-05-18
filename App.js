@@ -30,6 +30,7 @@ import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
+import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 
 export default function App(props) {
@@ -43,15 +44,23 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
+      News: NewsStack,
       Profile: ProfileStack,
     },
+    // {
+    //   navigationOptions: ({ navigation }) => {
+    //     const { routeName } = navigation.state.routes[navigation.state.index];
+    //     return {
+    //       headerShown: true,
+    //       headerTitle: routeName,
+    //     };
+    //   },
+    // },
     {
-      navigationOptions: ({ navigation }) => {
-        const { routeName } = navigation.state.routes[navigation.state.index];
-        return {
-          headerShown: true,
-          headerTitle: routeName,
-        };
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#20365F" },
       },
     }
   );
@@ -97,14 +106,60 @@ export default function App(props) {
     }
   );
 
-  const AppDrawerNavigator = createDrawerNavigator({
-    Home: {
-      screen: DashboardStackNavigator,
+  const AppDrawerNavigator = createDrawerNavigator(
+    {
+      Home: {
+        screen: DashboardStackNavigator,
+      },
+      Friends: {
+        screen: FriendsStk,
+      },
     },
-    Friends: {
-      screen: FriendsStk,
-    },
-  });
+    {
+      drawerBackgroundColor: "#F0F8FF",
+      contentOptions: {
+        activeTintColor: "black",
+        inactiveTintColor: "black",
+      },
+      contentComponent: (props) => (
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              height: 200,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SafeAreaView style={{ marginTop: "19%" }}>
+              <View style={{ flexDirection: "row" }}>
+                <Image
+                  source={require("./assets/qrcodetest.png")}
+                  style={{ width: 50, height: 50 }}
+                />
+                <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
+              </View>
+            </SafeAreaView>
+          </View>
+          <View>
+            <Text>{user && user.email}</Text>
+            <Text>{user && user.phone}</Text>
+            {/* since its 0, added the titles to know which is which */}
+            <Text>reputation: {user && user.reputation}</Text>
+            <Text>points: {user && user.points}</Text>
+          </View>
+
+          <ScrollView>
+            <DrawerItems {...props} />
+          </ScrollView>
+          <View>
+            <TouchableOpacity onPress={handleLogout}>
+              <Text>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      ),
+    }
+  );
 
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
@@ -118,7 +173,7 @@ export default function App(props) {
   }
 
   useEffect(() => {
-    if (!loggedIn) {
+    if (loggedIn) {
       getUser();
     }
   }, []);
