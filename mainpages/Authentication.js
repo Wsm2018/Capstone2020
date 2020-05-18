@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
-import db from "../db";
+import db, { config } from "../db";
 import LottieView from "lottie-react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign, Ionicons } from "react-native-vector-icons";
@@ -22,20 +22,21 @@ import { Input, Tooltip } from "react-native-elements";
 import { ButtonGroup, Image } from "react-native-elements";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { Octicons } from "@expo/vector-icons";
-const config = {
-  apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
-  authDomain: "capstone2020-b64fd.firebaseapp.com",
-  databaseURL: "https://capstone2020-b64fd.firebaseio.com",
-  projectId: "capstone2020-b64fd",
-  storageBucket: "capstone2020-b64fd.appspot.com",
-  messagingSenderId: "930744827368",
-  appId: "1:930744827368:web:6f2a6287721546d272785d",
-};
-try {
-  firebase.initializeApp(config);
-} catch (err) {
-  console.log(err);
-}
+const validator = require("email-validator");
+// const config = {
+//   apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
+//   authDomain: "capstone2020-b64fd.firebaseapp.com",
+//   databaseURL: "https://capstone2020-b64fd.firebaseio.com",
+//   projectId: "capstone2020-b64fd",
+//   storageBucket: "capstone2020-b64fd.appspot.com",
+//   messagingSenderId: "930744827368",
+//   appId: "1:930744827368:web:6f2a6287721546d272785d",
+// };
+// try {
+//   firebase.initializeApp(config);
+// } catch (err) {
+//   console.log(err);
+// }
 
 export default function Authentication(props) {
   const [view, setView] = useState(0);
@@ -58,6 +59,7 @@ export default function Authentication(props) {
   const [referral, setReferral] = useState("");
   // the referralStatus will show if a referral code is used
   const [referralStatus, setReferralStatus] = useState("false");
+  const [allUsers, setAllUsers] = useState([]);
 
   // ***** Login useState *****
 
@@ -106,6 +108,20 @@ export default function Authentication(props) {
   const [displayErr2, setDisplayErr2] = useState("transparent");
   const [phoneErr2, setPhoneErr2] = useState("transparent");
   const [phoneAccess, setPhoneAccess] = useState("");
+
+  const getAllUsers = () => {
+    db.collection("users").onSnapshot((querySnapshot) => {
+      let users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      setAllUsers([...users]);
+    });
+  };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
 
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
@@ -252,31 +268,64 @@ export default function Authentication(props) {
       });
   };
 
+  const emailValidity = () => {
+    if (validator.validate(registerEmail)) {
+      const emailParts = registerEmail.split("@");
+      const providers = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"];
+      const providerParts = emailParts[1].split(".");
+      const provider = providerParts[0];
+      return providers.includes(provider);
+    } else {
+      alert("Not a valid email");
+    }
+  };
+
+  const passwordStrength = () => {
+    const strongRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+    );
+    console.log("pass", strongRegex.test(registerPassword));
+    return strongRegex.test(registerPassword);
+  };
+
   const registerNext = async () => {
-    let count = 0;
-    if (!registerEmail.includes("@")) {
-      setRegisterEmailError("red");
-    } else {
-      setRegisterEmailError("transparent");
-      count = count + 1;
-    }
+    const result = true;
+    allUsers.map((item) => {
+      if (item.email === registerEmail) {
+        alert("Email already exists");
+        result = false;
+      }
+    });
 
-    if (registerPassword.length < 6) {
-      setRegisterPasswordError("red");
-    } else {
-      setRegisterPasswordError("transparent");
-      count = count + 1;
-    }
+    if (emailValidity()) {
+      let count = 0;
 
-    if (registerPassword !== confirmRegisterPassword) {
-      setConfirmRegisterPasswordError("red");
-    } else {
-      setConfirmRegisterPasswordError("transparent");
-      count = count + 1;
-    }
+      if (!registerEmail.includes("@")) {
+        setRegisterEmailError("red");
+      } else {
+        setRegisterEmailError("transparent");
+        count = count + 1;
+      }
 
-    if (count === 3) {
-      setRegisterView(1);
+      if (!passwordStrength()) {
+        setRegisterPasswordError("red");
+      } else {
+        setRegisterPasswordError("transparent");
+        count = count + 1;
+      }
+
+      if (registerPassword !== confirmRegisterPassword) {
+        setConfirmRegisterPasswordError("red");
+      } else {
+        setConfirmRegisterPasswordError("transparent");
+        count = count + 1;
+      }
+
+      if (count === 3 && result) {
+        setRegisterView(1);
+      }
+    } else {
+      alert("Enter a real email address");
     }
   };
 
@@ -387,7 +436,7 @@ export default function Authentication(props) {
                         placeholder="Password"
                         secureTextEntry={true}
                         value={registerPassword}
-                        errorMessage="* Password must be atleast 6 characters"
+                        errorMessage="* Enter a strong password"
                         errorStyle={{ color: registerPasswordError }}
                         inputStyle={{
                           color: "#20365F",
@@ -396,7 +445,7 @@ export default function Authentication(props) {
                         placeholderTextColor="#20365F"
                         renderErrorMessage
                       />
-                      <Tooltip popover={<Text>Info here</Text>}>
+                      {/* <Tooltip popover={<Text>Info here</Text>}>
                         <TouchableOpacity
                           style={{
                             backgroundColor: "white",
@@ -418,7 +467,7 @@ export default function Authentication(props) {
                             color="#20365F"
                           />
                         </TouchableOpacity>
-                      </Tooltip>
+                      </Tooltip> */}
                     </View>
                     <Input
                       inputStyle={{

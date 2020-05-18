@@ -184,21 +184,36 @@ export default function ProfileScreen(props) {
                   style={styles.profileImage}
                 />
               </View>
+
+              <View style={styles.profileImageContainer}>
+                <Avatar
+                  rounded
+                  source={{ uri: user.photoURL }}
+                  size="xlarge"
+                  style={styles.profileImage}
+                />
+              </View>
             </View>
-            {/* <View style={{ alignItems: "center" }}>
-              <Avatar rounded source={{ uri: photoURL }} size="xlarge" />
-            </View> */}
-            {/* <View style={{ backgroundColor: "blue", height: 80 }}></View> */}
-            {/* <Divider
-              style={{
-                backgroundColor: "black",
-                //marginTop: -60,
-                // height: 5,
-                position: "relative",
-                height: Dimensions.get("window").width * (3 / 4),
-                width: Dimensions.get("window").width,
-              }}
-            /> */}
+            {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
+            <View style={styles.tabRowLeft}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  width: "100%",
+                }}
+              >
+                <View>
+                  <Text>Reputation</Text>
+                  <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
+                </View>
+                <View>
+                  <Text>Points</Text>
+                  <Text style={styles.tabLabelNumber}>{user.points}</Text>
+                </View>
+              </View>
+            </View>
+            {/* </View> */}
 
             <View
               style={{
@@ -498,7 +513,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 30,
     fontWeight: "bold",
-    // paddingStart: "90%",
     flex: 1,
     alignItems: "center",
   },
@@ -509,13 +523,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   coverTitleContainer: {
-    // backgroundColor: "transparent",
     flex: 1,
     alignItems: "flex-end",
   },
   headerContainer: {
     alignItems: "center",
-    //backgroundColor: "#DDDDEC",
   },
   indicatorTab: {
     backgroundColor: "transparent",
@@ -537,8 +549,6 @@ const styles = StyleSheet.create({
   },
   profileImageContainer: {
     bottom: 0,
-    //left: 10,
-
     position: "absolute",
   },
   modalView: {
@@ -546,18 +556,12 @@ const styles = StyleSheet.create({
     height: height / 1.8,
     width: width / 1.4,
     backgroundColor: "#fff",
-    // borderWidth: 2,
-    // borderColor: "gray",
-    //padding: 20,
-    //backgroundColor: "white",
-    //shadowColor: "red",
     shadowOpacity: 1,
     shadowRadius: 2,
     shadowOffset: {
       height: 1,
       width: 1,
     },
-    //opacity: 0.8,
     borderRadius: 20,
     padding: 35,
     justifyContent: "center",
@@ -593,12 +597,18 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 10,
   },
-  tabRow: {
+  tabRowLeft: {
+    // flexDirection: "row",
+    // backgroundColor: "red",
     flexWrap: "wrap",
-    flexDirection: "column",
-    justifyContent: "flex-start",
+    justifyContent: "flex-end",
     alignItems: "flex-start",
-    flex: 1,
+    flex: 0.1,
+  },
+  tabRowRight: {
+    // backgroundColor: "red",
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
   },
   tabLabelNumber: {
     color: "black",
