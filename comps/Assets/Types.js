@@ -27,6 +27,7 @@ require("firebase/firestore");
 export default function Types(props) {
   const [assetTypes, setAssetTypes] = useState([]);
 
+  //////////////////////  design ////////////////////////////////
   const [assetTypes2, setAssetTypes2] = useState([
     { id: "1", name: "Parking" },
     { id: "2", name: "Parking" },
@@ -45,6 +46,8 @@ export default function Types(props) {
     "https://image.flaticon.com/icons/png/512/1845/1845213.png",
     "https://cdn4.iconfinder.com/data/icons/office-workplace-2/50/82-512.png",
   ]);
+
+  ////////////////////////////////////////////////////////////////////////
 
   const [images] = useState(["../../assets/images/parking.png"]);
   useEffect(() => {
@@ -68,16 +71,16 @@ export default function Types(props) {
         style={{ width: "100%", height: "100%" }}
       >
         <View style={styles.headerView}>
-          <Image
-            style={{
-              width: "80%",
-              height: "30%",
-              marginLeft: 15,
+          <TouchableOpacity
+            onPress={() => {
+              firebase.auth().signOut();
             }}
-            source={require("../../assets/images/title.png")}
-          />
+          >
+            <Text>Logout !</Text>
+          </TouchableOpacity>
         </View>
-        <ScrollView>
+
+        <ScrollView style={{}}>
           <View
             style={{
               flexDirection: "row",
@@ -87,7 +90,7 @@ export default function Types(props) {
               // margin: 5,
               flexWrap: "wrap",
               // backgroundColor: "gray",
-              // height: "100%",
+              height: "100%",
               // flex: 2,
             }}
           >
@@ -141,8 +144,8 @@ export default function Types(props) {
                   key={i}
                   style={{
                     backgroundColor: "#20365F",
-                    width: 190,
-                    height: 190,
+                    width: "90%",
+                    height: "100%",
                     margin: 5,
                     // justifyContent: "center",
                     alignItems: "center",
@@ -207,6 +210,7 @@ export default function Types(props) {
               </View>
             ))}
           </View>
+          {/* <View style={{ }}></View> */}
         </ScrollView>
       </ImageBackground>
     </View>

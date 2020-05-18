@@ -28,6 +28,7 @@ import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import HomeStack from "./navigation/HomeStack";
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
+import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import db from "./db";
@@ -191,6 +192,7 @@ export default function App(props) {
       </View>
     );
   } else {
+    // return <Guide />;
     return <AppContainer />;
   }
 
