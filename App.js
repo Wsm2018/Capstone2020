@@ -171,7 +171,7 @@ export default function App(props) {
   }
 
   useEffect(() => {
-    if (!loggedIn) {
+    if (loggedIn) {
       getUser();
     }
   }, []);
