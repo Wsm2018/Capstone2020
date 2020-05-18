@@ -26,6 +26,9 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
 
+import Details from "./Details";
+import { set } from "react-native-reanimated";
+
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
@@ -39,23 +42,36 @@ export default function Sections(props) {
   const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
-    //console.log(selectedSection);
+    console.log(
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
+      selectedSection
+    );
     if (selectedSection !== null) {
+      var temp = [];
+      setAssetList(temp);
+      // console.log("-----------------", assetList);
       getList();
+      for (let i = 0; i < assetList.length; i++) {
+        console.log(" ppppppppppppppppp", assetList[i].code);
+      }
     }
   }, [selectedSection]);
 
   useEffect(() => {
-    console.log("asset list is :", assetList.length);
-    console.log("finalAssets is :", finalAssets.length);
+    //console.log("asset list is :", assetList.length);
+    //console.log("finalAssets is :", finalAssets.length);
 
-    if (assetList.length > 0 && finalAssets.length == 0) {
+    // console.log(
+    //   " it should work heeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    //   assetList
+    // );
+    if (assetList.length > 0) {
       checkTime();
     }
   }, [assetList]);
 
   const getList = () => {
-    console.log("section rn", selectedSection);
+    //console.log("section rn", selectedSection);
     const temp = [];
 
     db.collection("assets")
@@ -72,6 +88,9 @@ export default function Sections(props) {
             .get();
           if (bookings) {
             bookings.forEach((b) => {
+              // console.log(
+              //   " here the push!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              // );
               bookingTemp.push(b.data());
             });
           }
@@ -85,7 +104,7 @@ export default function Sections(props) {
   };
 
   const checkTime = () => {
-    console.log("hii");
+    //console.log("hii");
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -134,6 +153,15 @@ export default function Sections(props) {
 
   //design view new variables
   const [listView, setListView] = useState(false);
+  const [detailsView, setDetailsView] = useState(false);
+  const [selectedList, setSelectedList] = useState("");
+
+  // const getDetails = async (l) => {
+  //   setSelectedList(l);
+  //   setDetailsView(true);
+  //   //setSelectedList(l) || setDetailsView(true)
+  // };
+
   ///////////////////////////////////////////////////////////////////
 
   const [showSections, setShowSections] = useState(false);
@@ -143,6 +171,7 @@ export default function Sections(props) {
   const tName = props.navigation.getParam("type", "failed").name;
 
   useEffect(() => {
+    //console.log("++++++++++++++++++++++", type);
     getSections();
   }, [type]);
 
@@ -176,14 +205,15 @@ export default function Sections(props) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ backgroundColor: "#e3e3e3" }}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView>
         <View style={styles.header}>
           <Image
             style={{
               // width: "100%",
-              height: "100%",
+              // height: "100%",
               // position: "relative",
+              flex: 1,
             }}
             source={require("../../assets/images/test.jpg")}
           />
@@ -345,14 +375,15 @@ export default function Sections(props) {
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {
-                    //     sName: sName,
+                    //     sName: selectedSection.name,
                     //     tName: tName,
                     //     asset: l,
-                    //     startDateTime: startDateTime,
-                    //     endDateTime: endDateTime,
-                    //     assetTypeId,
+                    //     startDateTime: startDate,
+                    //     endDateTime: endDate,
+                    //     type,
                     //   })
                     // }
+                    onPress={() => setSelectedList(l) || setDetailsView(true)}
                     key={i}
                     style={{
                       backgroundColor: "#C6CBD0",
@@ -398,12 +429,39 @@ export default function Sections(props) {
           )}
         </View>
         <View style={styles.four}>
-          <Text style={styles.cardTitle}>Checkout</Text>
-          <Text>Please fill in all the information for checkout</Text>
+          <Text style={styles.cardTitle}>Services</Text>
+
+          {detailsView === true ? (
+            <View>
+              {/* <TouchableOpacity>
+                <Text>click2</Text>
+              </TouchableOpacity> */}
+              {selectedSection === null ? null : (
+                <Details
+                  sName={selectedSection.name}
+                  tName={tName}
+                  asset={selectedList}
+                  startDateTime={startDate}
+                  endDateTime={endDate}
+                  type={type}
+                />
+              )}
+              {/* <TouchableOpacity>
+                <Text>click</Text>
+              </TouchableOpacity> */}
+            </View>
+          ) : (
+            <View>
+              <Text>Please choose a list to continue</Text>
+              {/* <TouchableOpacity>
+                <Text>click</Text>
+              </TouchableOpacity> */}
+            </View>
+          )}
         </View>
-      </View>
-      <View style={{ minHeight: 200 }}></View>
-    </ScrollView>
+        <View style={{ height: 15 }}></View>
+      </ScrollView>
+    </View>
   );
 }
 Sections.navigationOptions = (props) => ({
@@ -414,18 +472,18 @@ Sections.navigationOptions = (props) => ({
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    flex: 1,
     backgroundColor: "#e3e3e3",
     width: Math.round(Dimensions.get("window").width),
-    height: Math.round(Dimensions.get("window").height),
+    // height: Math.round(Dimensions.get("window").height),
   },
   header: {
-    // flex: 1,
+    flex: 1,
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
     backgroundColor: "white",
-    height: "25%",
+    // height: "25%",
   },
   one: {
     backgroundColor: "white",

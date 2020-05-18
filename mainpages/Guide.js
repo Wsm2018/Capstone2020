@@ -1,10 +1,11 @@
 //@refresh reset
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
 import AdminHome from "../comps/Admin/HomeScreen";
+import LottieView from "lottie-react-native";
 
 function Guide(props) {
   return (
@@ -33,13 +34,20 @@ function Guide(props) {
           <View
             style={{
               height: "100%",
-              justifyContent: "center",
+              justifyContent: "flex-end",
               alignItems: "center",
               width: "60%",
-              //   backgroundColor: "red",
+              // backgroundColor: "red",
             }}
           >
-            <Text>Guide 1</Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+              }}
+            >
+              Book a Parking
+            </Text>
           </View>
           <View
             style={{
@@ -57,23 +65,46 @@ function Guide(props) {
       <View style={styles.bodyView}>
         <View
           style={{
+            marginLeft: "10%",
             height: "70%",
             justifyContent: "center",
             alignItems: "center",
-            borderWidth: 1,
+            // alignSelf: "center",
+            alignContent: "center",
+            // borderWidth: 1,
+            // backgroundColor: "#CCDBEA",
           }}
         >
-          <Text>Image</Text>
+          <Image
+            style={{
+              width: "100%",
+              height: "80%",
+              // backgroundColor: "#CCDBEA",
+            }}
+            source={require("../assets/trialimages/parking4.png")}
+          />
         </View>
         <View
           style={{
             height: "30%",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             alignItems: "center",
-            borderWidth: 1,
+            //borderWidth: 1,
           }}
         >
-          <Text>Desc</Text>
+          <Text
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              alignContent: "center",
+              width: "85%",
+              color: "gray",
+            }}
+          >
+            Book Prepay for your spot and get a parking pass instantly via text,
+            email, or the app Book Prepay for your spot and get a parking pass
+            instantly via text
+          </Text>
         </View>
       </View>
       <View style={styles.footerView}>
@@ -94,10 +125,10 @@ function Guide(props) {
               height: "100%",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "gray",
+              backgroundColor: "#3574E1",
             }}
           >
-            <Text>Next</Text>
+            <Text style={{ color: "white" }}>Next</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -110,24 +141,24 @@ export default Guide;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e3e3e3",
+    backgroundColor: "#ffffff",
 
     // alignItems: "center",
     // justifyContent: "center",
   },
   headerView: {
     flex: 1,
-    // backgroundColor: "red",
-    borderWidth: 1,
+    //backgroundColor: "#CCDBEA",
+    //borderWidth: 1,
   },
   bodyView: {
     flex: 6,
-    // backgroundColor: "yellow",
-    borderWidth: 1,
+    //backgroundColor: "#CCDBEA",
+    //borderWidth: 1,
   },
   footerView: {
     flex: 1,
-    // backgroundColor: "red",
-    borderWidth: 1,
+    //backgroundColor: "red",
+    //borderWidth: 1,
   },
 });

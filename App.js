@@ -192,8 +192,8 @@ export default function App(props) {
       </View>
     );
   } else {
-    // return <Guide />;
-    return <AppContainer />;
+    return <Guide />;
+    // return <AppContainer />;
   }
 
   // return (

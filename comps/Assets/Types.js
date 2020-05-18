@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
   ImageBackground,
+  Dimensions,
 } from "react-native";
 import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
@@ -21,6 +22,8 @@ import db from "../../db.js";
 import { ceil } from "react-native-reanimated";
 import LottieView from "lottie-react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import TimedSlideshow from "react-native-timed-slideshow";
+import { Surface } from "react-native-paper";
 
 require("firebase/firestore");
 
@@ -46,7 +49,27 @@ export default function Types(props) {
     "https://image.flaticon.com/icons/png/512/1845/1845213.png",
     "https://cdn4.iconfinder.com/data/icons/office-workplace-2/50/82-512.png",
   ]);
-
+  const [items] = useState([
+    {
+      uri:
+        "http://www.lovethemountains.co.uk/wp-content/uploads/2017/05/New-Outdoor-Sports-and-Music-Festival-For-Wales-4.jpg",
+      title: "Michael Malik",
+      text: "Minnesota, USA",
+    },
+    {
+      uri:
+        "http://blog.adrenaline-hunter.com/wp-content/uploads/2018/05/bungee-jumping-barcelona-1680x980.jpg",
+      title: "Victor Fallon",
+      text: "Val di Sole, Italy",
+      duration: 3000,
+    },
+    {
+      uri: "https://greatist.com/sites/default/files/Running_Mountain.jpg",
+      title: "Mary Gomes",
+      text: "Alps",
+      fullWidth: true,
+    },
+  ]);
   ////////////////////////////////////////////////////////////////////////
 
   const [images] = useState(["../../assets/images/parking.png"]);
@@ -65,315 +88,108 @@ export default function Types(props) {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/bg.jpg")}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <View style={styles.headerView}>
-          <TouchableOpacity
-            onPress={() => {
-              firebase.auth().signOut();
-            }}
-          >
-            <Text>Logout !</Text>
-          </TouchableOpacity>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.advertisement}>
+          <TimedSlideshow items={items} progressBarDirection="fromLeft" />
         </View>
-
-        <ScrollView style={{}}>
-          <View
-            style={{
-              flexDirection: "row",
-              // alignItems: "center",
-              // justifyContent: "center",
-              // marginLeft: "3%",
-              // margin: 5,
-              flexWrap: "wrap",
-              // backgroundColor: "gray",
-              height: "100%",
-              // flex: 2,
-            }}
-          >
-            {assetTypes.map((t, i) => (
-              <View
+        <View style={styles.logo}>
+          <Text style={styles.logoText}>QuickbookinQ</Text>
+        </View>
+        <View style={styles.assets}>
+          {assetTypes.map((t, i) => (
+            <View style={styles.surface}>
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate("Sections", { type: t })
+                }
+                key={i}
                 style={{
-                  width: "50%",
-                  // backgroundColor: "red",
+                  backgroundColor: "#7893b3",
+                  width: "90%",
+                  height: "45%",
+                  margin: 5,
+                  justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: "5%",
+                  elevation: 20,
+                  shadowOpacity: 0.6,
+                  // shadowRadius: 3,
+                  shadowOffset: {
+                    // height: 2,
+                    // width: 2,
+                  },
+                  borderWidth: 2,
+                  borderColor: "black",
                 }}
               >
-                {/* <Card
-                title={titles[i]}
-                style={{
-                  height: "10%",
-                  width: "95%",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() =>
-                    props.navigation.navigate("Sections", { type: t })
-                  }
-                  key={i}
-                  style={styles.buttonStyle}
-                >
-                  <Text style={styles.textStyle}>Book</Text>
-                </TouchableOpacity>
-              </Card> */}
-                {/* ------------ */}
-                {/* <Card
-            title={titles[i]}
-            style={{
-              height: "10%",
-              width: "95%",
-            }}
-          >
-            
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate("Sections", { type: t })}
-              key={i}
-              style={styles.buttonStyle}
-            >
-              <Text style={styles.textStyle}>Book</Text>
-            </TouchableOpacity>
-          </Card> */}
-                <TouchableOpacity
-                  onPress={() =>
-                    props.navigation.navigate("Sections", { type: t })
-                  }
-                  key={i}
+                <Image
                   style={{
-                    backgroundColor: "#20365F",
-                    width: "90%",
-                    height: "100%",
-                    margin: 5,
-                    // justifyContent: "center",
-                    alignItems: "center",
-                    borderWidth: 2,
-                    // borderRadius: 5,
-                    borderColor: "#20365F",
-                    // borderTopRightRadius: 10,
-                    // borderTopLeftRadius: 10,
+                    width: "92%",
+                    height: "90%",
                   }}
+                  source={{
+                    uri: bookImage[i],
+                  }}
+                />
+                <Text
+                  style={{ fontSize: 20, color: "white", marginBottom: "5%" }}
                 >
-                  {/* <Text style={{ textAlign: "center", color: "white" }}>
-                {titles[i]}
-              </Text> */}
-                  <View
-                    style={{
-                      height: "80%",
-                      // backgroundColor: "red",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {/* <MaterialCommunityIcons
-                    name="google-classroom"
-                    size={80}
-                    color="white"
-                  /> */}
-
-                    <Image
-                      style={{
-                        width: 125,
-                        height: 125,
-                        // marginLeft: 15,
-                      }}
-                      // source={require("../../assets/trialimages/" +
-                      //   "parking" +
-                      //   ".png")}
-                      source={{ uri: bookImage[i] }}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      height: "20%",
-                      // width:"100%",
-                      // backgroundColor: "yellow",
-                      backgroundColor: "#e3e3e3",
-                      width: "100%",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        color: "#266394",
-                        fontSize: 15,
-                        // fontSize: 18,
-                      }}
-                    >
-                      {titles[i]}
-                      {/* Classroom */}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          {/* <View style={{ }}></View> */}
-        </ScrollView>
-      </ImageBackground>
-    </View>
+                  {titles[i]}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+        <View style={styles.footer}></View>
+      </View>
+    </ScrollView>
   );
 }
 
 Types.navigationOptions = (props) => ({
   title: "Assets Types",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#3771b3" },
   headerTintColor: "white",
-  // headerTintStyle: { textAlign: "center" },
 });
-
-// function DevelopmentModeNotice() {
-//   if (__DEV__) {
-//     const learnMoreButton = (
-//       <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-//         Learn more
-//       </Text>
-//     );
-
-//     return (
-//       <Text style={styles.developmentModeText}>
-//         Development mode is enabled: your app will be slower but you can use
-//         useful development tools. {learnMoreButton}
-//       </Text>
-//     );
-//   } else {
-//     return (
-//       <Text style={styles.developmentModeText}>
-//         You are not in development mode: your app will run at full speed.
-//       </Text>
-//     );
-//   }
-// }
-
-// function handleLearnMorePress() {
-//   WebBrowser.openBrowserAsync(
-//     "https://docs.expo.io/versions/latest/workflow/development-mode/"
-//   );
-// }
-
-// function handleHelpPress() {
-//   WebBrowser.openBrowserAsync(
-//     "https://docs.expo.io/versions/latest/workflow/up-and-running/#cant-see-your-changes"
-//   );
-// }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
+    width: Math.round(Dimensions.get("window").width),
+    height: Math.round(Dimensions.get("window").height),
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: "rgba(0,0,0,0.4)",
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: "center",
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  textStyle: {
-    color: "white",
-  },
-  header: {
-    textAlign: "center",
-    fontSize: 20,
-  },
-  headerView: {
-    flex: 1,
-    justifyContent: "center",
-    textAlign: "center",
-    marginLeft: 50,
+  advertisement: {
+    flex: 0.5,
     //backgroundColor: "red",
   },
-  welcomeContainer: {
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  buttonStyle: {
-    backgroundColor: "#0066AB",
-    height: 40,
-    width: "60%",
-    alignSelf: "center",
+  logo: {
+    flex: 0.1,
+    //backgroundColor: "yellow",
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: 18,
-    // marginRight:8,
-    // marginStart: "2%",
-    // marginEnd: "2%",
-    borderRadius: 10,
-    // marginBottom: 10,
-    color: "white",
-    // position: "relative",
   },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: "contain",
-    marginTop: 3,
-    marginLeft: -10,
+  logoText: {
+    fontSize: 30,
   },
-  getStartedContainer: {
-    alignItems: "center",
-    marginHorizontal: 50,
+  assets: {
+    flex: 1,
+    //backgroundColor: "blue",
+    flexDirection: "row",
+    // justifyContent: "space-between",
+    // alignItems: "flex-start",
+    // alignContent: "flex-start",
   },
-  TypesFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: "rgba(96,100,109, 0.8)",
-  },
-  codeHighlightContainer: {
-    backgroundColor: "rgba(0,0,0,0.05)",
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 24,
-    color: "rgba(96,100,109, 1)",
-    lineHeight: 24,
-    textAlign: "center",
-  },
-  tabBarInfoContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: "center",
-    backgroundColor: "#fbfbfb",
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: "rgba(96,100,109, 1)",
-    textAlign: "center",
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
+  surface: {
+    width: "50%",
+    height: "100%",
+    // alignSelf: "center",
+    // elevation: 20,
+    // backgroundColor: "white",
     alignItems: "center",
   },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: "#2e78b7",
+  footer: {
+    flex: 0.2,
+    backgroundColor: "purple",
   },
 });
