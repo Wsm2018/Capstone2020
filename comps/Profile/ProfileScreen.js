@@ -156,188 +156,182 @@ export default function ProfileScreen(props) {
   return (
     user && (
       <View style={styles.container}>
-        <View>
-          <View>
-            <View style={styles.headerContainer}>
-              <View style={styles.coverContainer}>
-                <ImageBackground
-                  source={{
-                    uri: profileBackground,
-                  }}
-                  style={styles.coverImage}
-                >
-                  <View style={styles.coverTitleContainer}>
-                    <Ionicons
-                      name="md-images"
-                      size={40}
-                      color="white"
-                      onPress={handlePickBackgroundImage}
-                    />
-                  </View>
-                </ImageBackground>
-              </View>
-              <View style={styles.profileImageContainer}>
-                <Avatar
-                  rounded
-                  source={{ uri: photoURL }}
-                  size="xlarge"
-                  style={styles.profileImage}
-                />
-              </View>
-
-              <View style={styles.profileImageContainer}>
-                <Avatar
-                  rounded
-                  source={{ uri: user.photoURL }}
-                  size="xlarge"
-                  style={styles.profileImage}
-                />
-              </View>
-            </View>
-            {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
-            <View style={styles.tabRowLeft}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  width: "100%",
-                }}
-              >
-                <View>
-                  <Text>Reputation</Text>
-                  <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
-                </View>
-                <View>
-                  <Text>Points</Text>
-                  <Text style={styles.tabLabelNumber}>{user.points}</Text>
-                </View>
-              </View>
-            </View>
-            {/* </View> */}
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
+        <View style={styles.headerContainer}>
+          <View style={styles.coverContainer}>
+            <ImageBackground
+              source={{
+                uri: profileBackground,
               }}
+              style={styles.coverImage}
             >
-              <Text style={{ fontSize: 18, paddingRight: 5 }}>
-                {displayName}
-              </Text>
-              <TouchableOpacity onPress={() => setEdit(true)}>
-                <FontAwesome5
-                  name="edit"
-                  size={20}
-                  style={{ color: "#224229" }}
+              <View style={styles.coverTitleContainer}>
+                <Ionicons
+                  name="md-images"
+                  size={40}
+                  color="white"
+                  onPress={handlePickBackgroundImage}
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </ImageBackground>
+          </View>
+          <View style={styles.profileImageContainer}>
+            <Avatar
+              rounded
+              source={{ uri: photoURL }}
+              size="xlarge"
+              style={styles.profileImage}
+            />
           </View>
 
-          <Modal visible={edit} animationType="fade" transparent={true}>
-            <View style={styles.centeredView}>
-              <View elevation={5} style={styles.modalView}>
-                <KeyboardAvoidingView
-                  behavior={Platform.OS === "ios" ? "height" : "padding"}
-                  style={{ flex: 1 }}
+          <View style={styles.profileImageContainer}>
+            <Avatar
+              rounded
+              source={{ uri: user.photoURL }}
+              size="xlarge"
+              style={styles.profileImage}
+            />
+          </View>
+        </View>
+        {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
+        <View style={styles.tabRowLeft}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              // alignItems: "center",
+              // width: "100%",
+              marginTop: "-12%",
+              // backgroundColor: "red",
+              flex: 2,
+            }}
+          >
+            <View style={{ marginStart: "-6%" }}>
+              <Text>Reputation</Text>
+              <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
+            </View>
+            <View>
+              <Text>Points</Text>
+              <Text style={styles.tabLabelNumber}>{user.points}</Text>
+            </View>
+          </View>
+        </View>
+        {/* </View> */}
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+          <TouchableOpacity onPress={() => setEdit(true)}>
+            <FontAwesome5 name="edit" size={20} style={{ color: "#224229" }} />
+          </TouchableOpacity>
+        </View>
+
+        <Modal visible={edit} animationType="fade" transparent={true}>
+          <View style={styles.centeredView}>
+            <View elevation={5} style={styles.modalView}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "height" : "padding"}
+                style={{ flex: 1 }}
+              >
+                <View
+                  style={{
+                    justifyContent: "space-around",
+                    flex: 1,
+                    alignItems: "center",
+                  }}
+                >
+                  <Avatar
+                    rounded
+                    source={{ uri: photoURL }}
+                    showAccessory
+                    onAccessoryPress={handlePickImage}
+                    size="xlarge"
+                  />
+
+                  <Input
+                    inputContainerStyle={{
+                      width: "100%",
+                      borderColor: "black",
+                    }}
+                    label="Display Name"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={handleSaveEdit}
+                  />
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    // backgroundColor: "red",
+                    marginTop: 20,
+                    width: "100%",
+                    // marginEnd: 50,
+                    // flex: 1,
+                  }}
                 >
                   <View
                     style={{
-                      justifyContent: "space-around",
-                      flex: 1,
+                      backgroundColor: "#20365F",
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
                       alignItems: "center",
+                      //marginStart: "2%",
+                      //marginEnd: "2%",
+                      borderRadius: 30,
+                      //marginBottom: 10,
                     }}
                   >
-                    <Avatar
-                      rounded
-                      source={{ uri: photoURL }}
-                      showAccessory
-                      onAccessoryPress={handlePickImage}
-                      size="xlarge"
-                    />
-
-                    <Input
-                      inputContainerStyle={{
-                        width: "100%",
-                        borderColor: "black",
-                      }}
-                      label="Display Name"
-                      value={displayName}
-                      onChangeText={setDisplayName}
-                      onSubmitEditing={handleSaveEdit}
-                    />
+                    <TouchableOpacity onPress={handleSaveEdit}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+                        }}
+                      >
+                        Save
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-
                   <View
                     style={{
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      // backgroundColor: "red",
-                      marginTop: 20,
-                      width: "100%",
-                      // marginEnd: 50,
-                      // flex: 1,
+                      backgroundColor: "#20365F",
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      // marginStart: "2%",
+                      // marginEnd: "2%",
+                      borderRadius: 30,
+                      //marginBottom: 10,
                     }}
                   >
-                    <View
-                      style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        //marginStart: "2%",
-                        //marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
-                      }}
-                    >
-                      <TouchableOpacity onPress={handleSaveEdit}>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
-                          }}
-                        >
-                          Save
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        // marginStart: "2%",
-                        // marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
-                      }}
-                    >
-                      <TouchableOpacity onPress={() => setEdit(false)}>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
-                          }}
-                        >
-                          Cancel
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => setEdit(false)}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+                        }}
+                      >
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                </KeyboardAvoidingView>
-              </View>
+                </View>
+              </KeyboardAvoidingView>
             </View>
-          </Modal>
-        </View>
+          </View>
+        </Modal>
         <View style={{ flex: 1 }}>
           <View>
             <ButtonGroup
@@ -501,7 +495,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   coverImage: {
-    height: Dimensions.get("window").width * (3 / 8),
+    height: Dimensions.get("window").width * (2.5 / 8),
     width: Dimensions.get("window").width,
   },
   coverMetaContainer: {
@@ -598,12 +592,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   tabRowLeft: {
+    // position: "relative",
     // flexDirection: "row",
-    // backgroundColor: "red",
+    // backgroundColor: "blue",
     flexWrap: "wrap",
-    justifyContent: "flex-end",
-    alignItems: "flex-start",
-    flex: 0.1,
+    justifyContent: "flex-start",
+    // alignItems: "flex-start",
+    flex: 0.05,
   },
   tabRowRight: {
     // backgroundColor: "red",

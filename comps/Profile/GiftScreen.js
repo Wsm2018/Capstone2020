@@ -257,7 +257,7 @@ export default function GiftScreen(props) {
           )}
           <View
             style={{
-              flex: 2,
+              flex: 4,
               // backgroundColor: "red",
               justifyContent: "space-evenly",
               alignItems: "center",
