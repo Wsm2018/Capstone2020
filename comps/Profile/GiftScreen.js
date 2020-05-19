@@ -12,12 +12,14 @@ import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
 
 import { Input, Button } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
+const validator = require("email-validator");
 
 import ReactNativePickerModule from "react-native-picker-module";
 export default function GiftScreen(props) {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [flag, setFlag] = useState(false);
+  const [view, setView] = useState("first");
   const amounts = {
     labels: ["100", "50", "10", "Other Amount"],
     values: ["100", "50", "10", "other"],
@@ -37,6 +39,7 @@ export default function GiftScreen(props) {
   };
 
   const handleSend = async () => {
+    alert("sending...");
     //const response = await fetch(`https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${email}?sub=Gift$body${}`)
     // const message = `You got a gift code worth ${amount}QR from ${firebase.auth().currentUser.email}. \n Your code is`
   };
@@ -44,6 +47,41 @@ export default function GiftScreen(props) {
   const handleFlag = () => {
     setAmount("");
     setFlag(false);
+  };
+
+  const handleClear = () => {
+    setEmail("");
+  };
+
+  const emailValidity = () => {
+    if (validator.validate(email)) {
+      const emailParts = email.split("@");
+      const providers = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"];
+      const providerParts = emailParts[1].split(".");
+      const provider = providerParts[0];
+      return providers.includes(provider);
+    } else {
+      alert("Not a valid email");
+    }
+  };
+
+  const handleNext = () => {
+    if (email !== "") {
+      if (emailValidity()) {
+        setView("second");
+      } else {
+        alert("Not a valid email address");
+      }
+    } else {
+      alert("Enter Email");
+      return;
+    }
+  };
+
+  const hanldeGoback = () => {
+    setAmount("");
+    setFlag(false);
+    setView("first");
   };
 
   return (
@@ -59,40 +97,42 @@ export default function GiftScreen(props) {
             borderColor: "darkgray",
           }}
         >
-          <View
-            style={{
-              // justifyContent: "space-around",
-              alignItems: "center",
-              // backgroundColor: "red",
-              flex: 1.5,
-              marginTop: "2%",
-            }}
-          >
+          {view === "first" ? (
             <View
               style={{
-                // backgroundColor: "white",
+                // justifyContent: "space-around",
                 alignItems: "center",
-                // marginTop: 5,
-
-                flexDirection: "row",
-                paddingLeft: 6,
-                width: "60%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 10,
-                marginBottom: 10,
+                // backgroundColor: "red",
+                flex: 1.5,
+                marginTop: "2%",
               }}
+              onPress={handleCancel}
             >
-              <MaterialCommunityIcons name="email" size={20} color="gray" />
-              <TextInput
-                style={{ height: 40, width: "80%", paddingLeft: 6 }}
-                placeholder="receiver@email.com"
-                value={email}
-                onChangeText={setEmail}
-              />
+              <View
+                style={{
+                  // backgroundColor: "white",
+                  alignItems: "center",
+                  // marginTop: 5,
+
+                  flexDirection: "row",
+                  paddingLeft: 6,
+                  width: "60%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <MaterialCommunityIcons name="email" size={20} color="gray" />
+                <TextInput
+                  style={{ height: 40, width: "80%", paddingLeft: 6 }}
+                  placeholder="receiver@email.com"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
             </View>
-          </View>
-          {!flag ? (
+          ) : !flag ? (
             Platform.OS !== "ios" ? (
               <View
                 style={{
@@ -110,7 +150,11 @@ export default function GiftScreen(props) {
                 >
                   <Picker.Item value="" label="Select Amount" />
                   {amounts.labels.map((item, index) => (
-                    <Picker.Item value={amounts.values[index]} label={item} />
+                    <Picker.Item
+                      key={index}
+                      value={amounts.values[index]}
+                      label={item}
+                    />
                   ))}
                 </Picker>
               </View>
@@ -255,71 +299,140 @@ export default function GiftScreen(props) {
               </TouchableOpacity>
             </View>
           )}
-          <View
-            style={{
-              flex: 4,
-              // backgroundColor: "red",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              flexDirection: "row-reverse",
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#20365F",
-                // borderWidth: 4,
-                height: 40,
-                width: "30%",
-                // alignSelf: "center",
-                justifyContent: "center",
-                alignItems: "center",
-                //marginStart: "2%",
-                //marginEnd: "2%",
-                borderRadius: 15,
-                //marginBottom: 10,
-              }}
-              onPress={handleCancel}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 16,
-                  color: "white",
-                  // fontWeight: "bold",
-                }}
-              >
-                Cancel It!
-              </Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
+          {view === "first" ? (
+            <View
               style={{
-                backgroundColor: "#20365F",
-                height: 40,
-                width: "30%",
-                // borderWidth: 4,
-                // alignSelf: "center",
-                justifyContent: "center",
+                flex: 4,
+                // backgroundColor: "red",
+                justifyContent: "space-evenly",
                 alignItems: "center",
-                //marginStart: "2%",
-                //marginEnd: "2%",
-                borderRadius: 15,
-                //marginBottom: 10,
+                flexDirection: "row-reverse",
               }}
-              onPress={handleSend}
             >
-              <Text
+              <TouchableOpacity
                 style={{
-                  textAlign: "center",
-                  fontSize: 16,
-                  color: "white",
-                  // fontWeight: "bold",
+                  backgroundColor: "#20365F",
+                  // borderWidth: 4,
+                  height: 40,
+                  width: "30%",
+                  // alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
                 }}
+                onPress={handleNext}
               >
-                Send Gift!
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Next
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#20365F",
+                  height: 40,
+                  width: "30%",
+                  // borderWidth: 4,
+                  // alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
+                }}
+                onPress={handleClear}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Clear
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View
+              style={{
+                flex: 4,
+                // backgroundColor: "red",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                flexDirection: "row-reverse",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#20365F",
+                  // borderWidth: 4,
+                  height: 40,
+                  width: "30%",
+                  // alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
+                }}
+                onPress={handleSend}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Send
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#20365F",
+                  height: 40,
+                  width: "30%",
+                  // borderWidth: 4,
+                  // alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
+                }}
+                onPress={hanldeGoback}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Go Back
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </Card>
       </View>
     </View>
