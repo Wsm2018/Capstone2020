@@ -485,7 +485,7 @@ export default function Details(props) {
 
   return (
     <View style={styles.container}>
-      {asset ? (
+      {/* {asset ? (
         <View>
           <Text>{asset.code}</Text>
           <Text>{asset.price}</Text>
@@ -494,17 +494,19 @@ export default function Details(props) {
         </View>
       ) : (
         <Text>Loading</Text>
-      )}
+      )} */}
       {services ? (
-        services.map((s) => (
-          <View>
-            <TouchableOpacity onPress={() => manageTimings(s)}>
-              <Text>{s.name}</Text>
-            </TouchableOpacity>
-          </View>
-        ))
+        <View style={{ borderWidth: 1 }}>
+          {services.map((s) => (
+            <View style={{}}>
+              <TouchableOpacity onPress={() => manageTimings(s)}>
+                <Text>{s.name}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
       ) : (
-        <Text>No Available Services</Text>
+        <Text>No Services Available During These Hours</Text>
       )}
 
       {selectedService ? (
@@ -575,25 +577,18 @@ export default function Details(props) {
 
       <TouchableOpacity
         onPress={
-          // () =>
-          //   props.navigation.navigate("CheckOut", {
-          //     tName: tName,
-          //     sName: sName,
-          //     assetBooking: { asset, startDateTime, endDateTime },
-          //     serviceBooking,
-          //   })
-          () => console.log("OOHAAAAAAA")
+          () =>
+            props.navigation.navigate("CheckOut", {
+              tName: tName,
+              sName: sName,
+              assetBooking: { asset, startDateTime, endDateTime },
+              serviceBooking: serviceBooking,
+            })
+          // () => console.log("OOHAAAAAAA")
         }
-        style={{
-          alignItems: "center",
-          borderRadius: 50,
-          height: 100,
-          width: 200,
-          margin: 5,
-          backgroundColor: "lightblue",
-        }}
+        style={styles.registerButton}
       >
-        <Text>CheckOut</Text>
+        <Text style={{ color: "white", fontWeight: "bold" }}>CheckOut</Text>
       </TouchableOpacity>
     </View>
   );
@@ -611,6 +606,18 @@ const styles = StyleSheet.create({
     // flex: 1,
     // backgroundColor: "green",
     // height: 500,
+  },
+  registerButton: {
+    backgroundColor: "#20365F",
+    height: 50,
+    width: "55%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 30,
+    marginBottom: 10,
   },
   developmentModeText: {
     marginBottom: 20,

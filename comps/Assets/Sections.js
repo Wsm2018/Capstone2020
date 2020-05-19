@@ -1,4 +1,3 @@
-//@refresh reset
 import { Button } from "react-native-elements";
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "react-navigation-stack";
@@ -419,6 +418,7 @@ export default function Sections(props) {
                       </Text>
                     </View>
                   </TouchableOpacity>
+                  <Text>Add price </Text>
                 </View>
               ))
             ) : (
@@ -428,37 +428,42 @@ export default function Sections(props) {
             <Text>Please choose a section to continue</Text>
           )}
         </View>
-        <View style={styles.four}>
-          <Text style={styles.cardTitle}>Services</Text>
-
-          {detailsView === true ? (
-            <View>
-              {/* <TouchableOpacity>
+        {selectedList ? (
+          <View style={styles.four}>
+            <Text style={styles.cardTitle}>Services</Text>
+            {/* <Text>Price {selectedList.price}</Text>
+            <Text>add what ever u want</Text> */}
+            {detailsView === true ? (
+              <View>
+                {/* <TouchableOpacity>
                 <Text>click2</Text>
               </TouchableOpacity> */}
-              {selectedSection === null ? null : (
-                <Details
-                  sName={selectedSection.name}
-                  tName={tName}
-                  asset={selectedList}
-                  startDateTime={startDate}
-                  endDateTime={endDate}
-                  type={type}
-                />
-              )}
-              {/* <TouchableOpacity>
+                {selectedSection === null ? null : (
+                  <Details
+                    sName={selectedSection.name}
+                    tName={tName}
+                    asset={selectedList}
+                    startDateTime={startDate}
+                    endDateTime={endDate}
+                    type={type}
+                    navigation={props.navigation}
+                  />
+                )}
+                {/* <TouchableOpacity>
                 <Text>click</Text>
               </TouchableOpacity> */}
-            </View>
-          ) : (
-            <View>
-              <Text>Please choose a list to continue</Text>
-              {/* <TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <Text>Please choose a list to continue</Text>
+                {/* <TouchableOpacity>
                 <Text>click</Text>
               </TouchableOpacity> */}
-            </View>
-          )}
-        </View>
+              </View>
+            )}
+          </View>
+        ) : null}
+
         <View style={{ height: 15 }}></View>
       </ScrollView>
     </View>

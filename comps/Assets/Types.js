@@ -39,7 +39,7 @@ export default function Types(props) {
   ]);
   const [titles] = useState([
     "Book a Parking",
-    "Book a Classroom",
+    "Book a Parking",
     "Book a Classroom",
     "Book a Classroom",
   ]);
@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     //backgroundColor: "blue",
     flexDirection: "row",
+    // flexWrap: "wrap",
     // justifyContent: "space-between",
     // alignItems: "flex-start",
     // alignContent: "flex-start",
