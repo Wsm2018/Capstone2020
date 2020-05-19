@@ -124,7 +124,7 @@ export default function AddCard(props) {
 
   return (
     <View style={{ flex: 1, flexDirection: "column", flexWrap: "wrap" }}>
-      <Text h4 style={{ alignItems: "center" }}>
+      <Text h4 style={{ alignItems: "center", justifyContent: "center" }}>
         Add Credit Card
       </Text>
       <ScrollView
