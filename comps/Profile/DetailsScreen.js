@@ -23,8 +23,6 @@ import firebase from "firebase";
 import "firebase/auth";
 
 export default function DetailsScreen(props) {
-  const [carsModal, setCarsModal] = useState(false);
-
   return (
     <View style={styles.container}>
       <View style={{ flex: 2 }}>
@@ -42,7 +40,7 @@ export default function DetailsScreen(props) {
         </Card>
       </View>
 
-      <Card
+      {/* <Card
         elevation={2}
         style={{
           marginTop: "5%",
@@ -87,7 +85,7 @@ export default function DetailsScreen(props) {
         carsModal={carsModal}
         setCarsModal={setCarsModal}
         navigation={props.navigation}
-      />
+      /> */}
     </View>
   );
 }

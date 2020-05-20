@@ -1,4 +1,3 @@
-//@refresh reset
 import { Button } from "react-native-elements";
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "react-navigation-stack";
@@ -26,8 +25,102 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
 
+import Details from "./Details";
+import { set } from "react-native-reanimated";
+
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
+  const [assetList, setAssetList] = useState([]);
+  const [finalAssets, setFinalAssets] = useState([]);
+  const [selectedSection, setSelectedSection] = useState(null);
+  // const tName = props.navigation.getParam("tName", "failed");
+  // const sName = props.navigation.getParam("section", "failed").name;
+  // const startDateTime = props.navigation.getParam("startDate", "failed");
+  // const endDateTime = props.navigation.getParam("endDate", "failed");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  useEffect(() => {
+    console.log(
+      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
+      selectedSection
+    );
+    if (selectedSection !== null) {
+      var temp = [];
+      setAssetList(temp);
+      // console.log("-----------------", assetList);
+      getList();
+      for (let i = 0; i < assetList.length; i++) {
+        console.log(" ppppppppppppppppp", assetList[i].code);
+      }
+    }
+  }, [selectedSection]);
+
+  useEffect(() => {
+    //console.log("asset list is :", assetList.length);
+    //console.log("finalAssets is :", finalAssets.length);
+
+    // console.log(
+    //   " it should work heeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    //   assetList
+    // );
+    if (assetList.length > 0) {
+      checkTime();
+    }
+  }, [assetList]);
+
+  const getList = () => {
+    //console.log("section rn", selectedSection);
+    const temp = [];
+
+    db.collection("assets")
+      .orderBy("code")
+      .where("assetSection", "==", selectedSection.id)
+      .onSnapshot((snapshot) => {
+        snapshot.forEach(async (doc) => {
+          //console.log(section)
+          let bookingTemp = [];
+          let bookings = await db
+            .collection("assets")
+            .doc(doc.id)
+            .collection("assetBookings")
+            .get();
+          if (bookings) {
+            bookings.forEach((b) => {
+              // console.log(
+              //   " here the push!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              // );
+              bookingTemp.push(b.data());
+            });
+          }
+          temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
+          if (temp.length === snapshot.docs.length) {
+            //console.log("assets", temp);
+            setAssetList(temp);
+          }
+        });
+      });
+  };
+
+  const checkTime = () => {
+    //console.log("hii");
+    let assetsToShow = assetList;
+
+    assetsToShow = assetsToShow.filter(
+      (asset) =>
+        asset.assetBookings.filter((assetBooking) => {
+          return !(
+            (startDate <= assetBooking.startDateTime &&
+              endDate <= assetBooking.startDateTime) ||
+            (startDate >= assetBooking.endDateTime &&
+              endDate >= assetBooking.endDateTime)
+          );
+        }).length === 0
+    );
+
+    //console.log("after checking time", assetsToShow);
+    setFinalAssets(assetsToShow);
+  };
 
   //design testing variable
   const [assetSections2, setAssetSections2] = useState([
@@ -59,19 +152,33 @@ export default function Sections(props) {
 
   //design view new variables
   const [listView, setListView] = useState(false);
+  const [detailsView, setDetailsView] = useState(false);
+  const [selectedList, setSelectedList] = useState("");
+
+  // const getDetails = async (l) => {
+  //   setSelectedList(l);
+  //   setDetailsView(true);
+  //   //setSelectedList(l) || setDetailsView(true)
+  // };
+
   ///////////////////////////////////////////////////////////////////
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [showSections, setShowSections] = useState(false);
-  const [visibale, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const type = props.navigation.getParam("type", "failed").id;
   const tName = props.navigation.getParam("type", "failed").name;
 
   useEffect(() => {
+    //console.log("++++++++++++++++++++++", type);
     getSections();
   }, [type]);
+
+  useEffect(() => {
+    if (finalAssets.length > 0) {
+      setListView(true);
+    }
+  }, [finalAssets]);
 
   useEffect(() => {
     console.log(startDate);
@@ -97,14 +204,15 @@ export default function Sections(props) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ backgroundColor: "#e3e3e3" }}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView>
         <View style={styles.header}>
           <Image
             style={{
               // width: "100%",
-              height: "100%",
+              // height: "100%",
               // position: "relative",
+              flex: 1,
             }}
             source={require("../../assets/images/test.jpg")}
           />
@@ -204,7 +312,7 @@ export default function Sections(props) {
                 <TouchableOpacity
                   onPress={
                     // (
-                    () => setListView(true)
+                    () => setSelectedSection(s)
                     //,
                     // () =>
                     //   props.navigation.navigate("List", {
@@ -217,7 +325,7 @@ export default function Sections(props) {
                   }
                   key={i}
                   style={{
-                    backgroundColor: "#C6CBD0",
+                    backgroundColor: selectedSection === s ? "gray" : "#C6CBD0",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -260,23 +368,24 @@ export default function Sections(props) {
         <View style={styles.three}>
           <Text style={styles.cardTitle}>List</Text>
           {listView === true ? (
-            finalAssets2.length > 0 ? (
-              finalAssets2.map((l, i) => (
+            finalAssets.length > 0 ? (
+              finalAssets.map((l, i) => (
                 <View style={{ width: "20%", alignItems: "center" }}>
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {
-                    //     sName: sName,
+                    //     sName: selectedSection.name,
                     //     tName: tName,
                     //     asset: l,
-                    //     startDateTime: startDateTime,
-                    //     endDateTime: endDateTime,
-                    //     assetTypeId,
+                    //     startDateTime: startDate,
+                    //     endDateTime: endDate,
+                    //     type,
                     //   })
                     // }
+                    onPress={() => setSelectedList(l) || setDetailsView(true)}
                     key={i}
                     style={{
-                      backgroundColor: "#C6CBD0",
+                      backgroundColor: selectedList === l ? "gray" : "#C6CBD0",
                       width: 60,
                       height: 60,
                       margin: 5,
@@ -309,6 +418,7 @@ export default function Sections(props) {
                       </Text>
                     </View>
                   </TouchableOpacity>
+                  <Text>Add price </Text>
                 </View>
               ))
             ) : (
@@ -318,13 +428,45 @@ export default function Sections(props) {
             <Text>Please choose a section to continue</Text>
           )}
         </View>
-        <View style={styles.four}>
-          <Text style={styles.cardTitle}>Checkout</Text>
-          <Text>Please fill in all the information for checkout</Text>
-        </View>
-      </View>
-      <View style={{ minHeight: 200 }}></View>
-    </ScrollView>
+        {selectedList ? (
+          <View style={styles.four}>
+            <Text style={styles.cardTitle}>Services</Text>
+            {/* <Text>Price {selectedList.price}</Text>
+            <Text>add what ever u want</Text> */}
+            {detailsView === true ? (
+              <View>
+                {/* <TouchableOpacity>
+                <Text>click2</Text>
+              </TouchableOpacity> */}
+                {selectedSection === null ? null : (
+                  <Details
+                    sName={selectedSection.name}
+                    tName={tName}
+                    asset={selectedList}
+                    startDateTime={startDate}
+                    endDateTime={endDate}
+                    type={type}
+                    navigation={props.navigation}
+                  />
+                )}
+                {/* <TouchableOpacity>
+                <Text>click</Text>
+              </TouchableOpacity> */}
+              </View>
+            ) : (
+              <View>
+                <Text>Please choose a list to continue</Text>
+                {/* <TouchableOpacity>
+                <Text>click</Text>
+              </TouchableOpacity> */}
+              </View>
+            )}
+          </View>
+        ) : null}
+
+        <View style={{ height: 15 }}></View>
+      </ScrollView>
+    </View>
   );
 }
 Sections.navigationOptions = (props) => ({
@@ -335,18 +477,18 @@ Sections.navigationOptions = (props) => ({
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    flex: 1,
     backgroundColor: "#e3e3e3",
     width: Math.round(Dimensions.get("window").width),
-    height: Math.round(Dimensions.get("window").height),
+    // height: Math.round(Dimensions.get("window").height),
   },
   header: {
-    // flex: 1,
+    flex: 1,
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
     backgroundColor: "white",
-    height: "25%",
+    // height: "25%",
   },
   one: {
     backgroundColor: "white",

@@ -3,18 +3,28 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Button,
+  Image,
   Modal,
   StyleSheet,
   Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
 } from "react-native";
+const LottieView = require("lottie-react-native");
+import { Card } from "react-native-shadow-cards";
+
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import * as ImagePicker from "expo-image-picker";
-import { Feather, AntDesign, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import {
+  Feather,
+  AntDesign,
+  Fontisto,
+  MaterialCommunityIcons,
+  FontAwesome5,
+  Ionicons,
+} from "@expo/vector-icons";
 import db from "../../db";
 import {
   Avatar,
@@ -29,17 +39,20 @@ import BalanceScreen from "./Cards/BalanceScreen";
 import ReferralScreen from "./ReferralScreen";
 import GiftScreen from "./GiftScreen";
 import DetailsScreen from "./DetailsScreen";
+import CarsScreen from "./Cars/CarsScreen";
+
 const { width, height } = Dimensions.get("screen");
 
 export default function ProfileScreen(props) {
   const [user, setUser] = useState(null);
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [photoURL, setPhotoURL] = useState("");
-  const [profileBackground, setProfileBackground] = useState("");
   const [edit, setEdit] = useState(false);
+  const [profileBackground, setProfileBackground] = useState("");
   const [displayName, setDisplayName] = useState();
   const buttons = ["Balance", "Send Gift", "Referral Code"];
   const [view, setView] = useState(0);
+  const [carsModal, setCarsModal] = useState(false);
 
   const getUser = async () => {
     db.collection("users")
@@ -97,24 +110,15 @@ export default function ProfileScreen(props) {
       getUser();
       // setPhotoURL(url);
     }
-
-    // const updatePhoto = firebase.functions().httpsCallable("updatePhoto");
-    // const response2 = await updatePhoto({
-    //   uid: firebase.auth().currentUser.uid,
-    //   photoURL: url,
-    // });
-    // getUser();
   };
 
   const handlePickImage = async () => {
-    // show camera roll, allow user to select
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
     if (!result.cancelled) {
       console.log("not cancelled", result.uri);
       handleSave(result.uri, "profile");
@@ -132,6 +136,7 @@ export default function ProfileScreen(props) {
     if (!result.cancelled) {
       console.log("not cancelled", result.uri);
       handleSave(result.uri, "background");
+      handleSave(result.uri);
       //setPhotoURL(result.uri);
     }
   };
@@ -143,6 +148,7 @@ export default function ProfileScreen(props) {
       displayName: displayName,
       photoURL: photoURL,
     });
+    console.log(10, result);
     getUser();
     setEdit(false);
   };
@@ -168,6 +174,14 @@ export default function ProfileScreen(props) {
               </View>
             </ImageBackground>
           </View>
+          <View style={styles.profileImageContainer}>
+            <Avatar
+              rounded
+              source={{ uri: photoURL }}
+              size="xlarge"
+              style={styles.profileImage}
+            />
+          </View>
 
           <View style={styles.profileImageContainer}>
             <Avatar
@@ -183,16 +197,40 @@ export default function ProfileScreen(props) {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-around",
-              width: "100%",
+              justifyContent: "space-between",
+              // alignItems: "center",
+              // width: "100%",
+              marginTop: "-13%",
+              // backgroundColor: "red",
+              flex: 2,
             }}
           >
-            <View>
-              <Text>Reputation</Text>
+            <View
+              style={{
+                // backgroundColor: "red",
+                width: "35%",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
+              >
+                Reputation
+              </Text>
               <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
             </View>
-            <View>
-              <Text>Points</Text>
+            <View
+              style={{
+                // backgroundColor: "red",
+                width: "35%",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+              >
+                Points
+              </Text>
               <Text style={styles.tabLabelNumber}>{user.points}</Text>
             </View>
           </View>
@@ -208,7 +246,7 @@ export default function ProfileScreen(props) {
         >
           <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
           <TouchableOpacity onPress={() => setEdit(true)}>
-            <FontAwesome5 name="edit" size={20} style={{ color: "#20365F" }} />
+            <FontAwesome5 name="edit" size={20} style={{ color: "#224229" }} />
           </TouchableOpacity>
         </View>
 
@@ -230,7 +268,7 @@ export default function ProfileScreen(props) {
                     rounded
                     source={{ uri: photoURL }}
                     showAccessory
-                    onAccessoryPress={() => handlePickImage()}
+                    onAccessoryPress={handlePickImage}
                     size="xlarge"
                   />
 
@@ -242,7 +280,7 @@ export default function ProfileScreen(props) {
                     label="Display Name"
                     value={displayName}
                     onChangeText={setDisplayName}
-                    onSubmitEditing={() => handleSaveEdit()}
+                    onSubmitEditing={handleSaveEdit}
                   />
                 </View>
 
@@ -271,7 +309,7 @@ export default function ProfileScreen(props) {
                       //marginBottom: 10,
                     }}
                   >
-                    <TouchableOpacity onPress={() => handleSaveEdit()}>
+                    <TouchableOpacity onPress={handleSaveEdit}>
                       <Text
                         style={{
                           textAlign: "center",
@@ -322,15 +360,15 @@ export default function ProfileScreen(props) {
               buttons={buttons}
               // containerStyle={{ height: 100 }}
               containerStyle={{
-                backgroundColor: "#0D2C6A",
-                // borderWidth: 1,
+                backgroundColor: "#D2D4DA",
+                borderWidth: 1,
                 // borderBottomColor: "red",
-                // borderBottomWidth: 1,
-                // borderTopLeftRadius: 15,
-                // borderTopRightRadius: 15,
+                // borderBottomWidth: 0,
+                // borderTopLeftRadius: 6,
+                // borderTopRightRadius: 6,
                 // borderBottomLeftRadius: 40,
 
-                //borderColor: "grey",
+                borderColor: "darkgrey",
                 // borderRightColor: "black",
               }}
               selectedButtonStyle={{
@@ -339,10 +377,10 @@ export default function ProfileScreen(props) {
                 // borderBottomColor: "red",
               }}
               selectedTextStyle={{
-                color: "#0D2C6A",
+                color: "black",
                 fontWeight: "bold",
               }}
-              textStyle={{ color: "white", fontWeight: "bold" }}
+              textStyle={{ color: "#535150", fontWeight: "bold" }}
             />
           </View>
           <View style={styles.containerLogin}>
@@ -354,6 +392,105 @@ export default function ProfileScreen(props) {
               <ReferralScreen user={user} navigation={props.navigation} />
             )}
           </View>
+          <View
+            style={{
+              // marginTop: "5%",
+              // width: "90%",
+              // borderWidth: 1,
+              // borderColor: "darkgray",
+              alignItems: "center",
+              flex: 0.8,
+            }}
+          >
+            <Card
+              elevation={2}
+              style={{
+                // marginTop: "5%",
+                width: "95%",
+                borderWidth: 1,
+                borderColor: "darkgray",
+                flex: 0.95,
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                {/* <FontAwesome5
+                name="heart"
+                size={35}
+                color="black"
+                onPress={() =>
+                  props.navigation.navigate("Car", { user: props.user })
+                }
+              /> */}
+                <LottieView
+                  source={require("../../assets/lf30_editor_6YHFU0.json")}
+                  autoPlay
+                  // loop
+                  style={{
+                    width: "22%",
+                    // height: "90%",
+                    // backgroundColor: "red",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                  }}
+                />
+                <Image
+                  source={require("../../assets/car5.gif")}
+                  autoPlay
+                  // loop
+                  style={{
+                    // position: "relative",
+                    width: "18%",
+                    height: "65%",
+                    // backgroundColor: "blue",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // paddingTop: "5%",
+                  }}
+                />
+
+                {/* <TouchableOpacity onPress={() => setCarsModal(true)}>
+                <Image
+                  source={require("../../assets/images/caricon4.png")}
+                  style={{ height: 38, width: 85 }}
+                />
+              </TouchableOpacity> */}
+                {/* <Image
+                source={require("../../assets/images/bookingicon.png")}
+                style={{ height: 48, width: 48 }}
+                onPress={() =>
+                  props.navigation.navigate("Car", { user: props.user })
+                }
+              /> */}
+                <Image
+                  source={require("../../assets/booking.gif")}
+                  autoPlay
+                  loop
+                  style={{
+                    // position: "relative",
+                    width: "22%",
+                    height: "70%",
+                    // backgroundColor: "red",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // paddingTop: "5%",
+                  }}
+                />
+              </View>
+            </Card>
+          </View>
+
+          <CarsScreen
+            carsModal={carsModal}
+            setCarsModal={setCarsModal}
+            navigation={props.navigation}
+          />
         </View>
       </View>
     )
@@ -362,7 +499,11 @@ export default function ProfileScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e3e3e3",
+    //"#f5f0f0"
+    backgroundColor: "#f5f0f0",
+    // alignItems: "center",
+    // width: Math.round(Dimensions.get("window").width),
+    // height: Math.round(Dimensions.get("window").height),
   },
   coverBio: {
     color: "#FFF",
@@ -417,8 +558,8 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     borderRadius: 70,
     borderWidth: 4,
-    height: 130,
-    width: 130,
+    height: 140,
+    width: 140,
   },
   profileImageContainer: {
     bottom: 0,
@@ -471,12 +612,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   tabRowLeft: {
+    // position: "relative",
     // flexDirection: "row",
-    // backgroundColor: "red",
+    // backgroundColor: "blue",
     flexWrap: "wrap",
-    justifyContent: "flex-end",
-    alignItems: "flex-start",
-    flex: 0.1,
+    justifyContent: "flex-start",
+    // alignItems: "flex-start",
+    flex: 0.07,
   },
   tabRowRight: {
     // backgroundColor: "red",
@@ -484,8 +626,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   tabLabelNumber: {
-    color: "black",
-    fontSize: 22,
+    fontWeight: "bold",
+    color: "#229277",
+    fontSize: 16,
     textAlign: "center",
     marginBottom: 2,
   },
@@ -495,17 +638,12 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   containerLogin: {
-    flex: 1,
+    flex: 1.5,
     marginLeft: 10.5,
     // backgroundColor: "#E8ECF4",
     width: "95%",
     marginTop: -5,
-    marginBottom: "5%",
-    // borderWidth: 1,
-    // borderTopWidth: 0,
-    // borderColor: "gray",
-    // borderBottomRightRadius: 40,
-    // borderBottomLeftRadius: 40,
+    marginBottom: "4%",
   },
 });
 
