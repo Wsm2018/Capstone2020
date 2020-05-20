@@ -197,20 +197,40 @@ export default function ProfileScreen(props) {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-around",
+              justifyContent: "space-between",
               // alignItems: "center",
               // width: "100%",
-              marginTop: "-12%",
+              marginTop: "-13%",
               // backgroundColor: "red",
               flex: 2,
             }}
           >
-            <View style={{ marginStart: "-6%" }}>
-              <Text>Reputation</Text>
+            <View
+              style={{
+                // backgroundColor: "red",
+                width: "35%",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
+              >
+                Reputation
+              </Text>
               <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
             </View>
-            <View>
-              <Text>Points</Text>
+            <View
+              style={{
+                // backgroundColor: "red",
+                width: "35%",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+              >
+                Points
+              </Text>
               <Text style={styles.tabLabelNumber}>{user.points}</Text>
             </View>
           </View>
@@ -389,7 +409,7 @@ export default function ProfileScreen(props) {
                 width: "95%",
                 borderWidth: 1,
                 borderColor: "darkgray",
-                flex: 0.9,
+                flex: 0.95,
               }}
             >
               <View
@@ -426,8 +446,8 @@ export default function ProfileScreen(props) {
                   // loop
                   style={{
                     // position: "relative",
-                    width: "20%",
-                    height: "70%",
+                    width: "18%",
+                    height: "65%",
                     // backgroundColor: "blue",
                     justifyContent: "center",
                     alignItems: "center",
@@ -454,8 +474,8 @@ export default function ProfileScreen(props) {
                   loop
                   style={{
                     // position: "relative",
-                    width: "20%",
-                    height: "75%",
+                    width: "22%",
+                    height: "70%",
                     // backgroundColor: "red",
                     justifyContent: "center",
                     alignItems: "center",
@@ -495,7 +515,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   coverImage: {
-    height: Dimensions.get("window").width * (2.5 / 8),
+    height: Dimensions.get("window").width * (3 / 7),
     width: Dimensions.get("window").width,
   },
   coverMetaContainer: {
@@ -598,7 +618,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-start",
     // alignItems: "flex-start",
-    flex: 0.05,
+    flex: 0.07,
   },
   tabRowRight: {
     // backgroundColor: "red",
@@ -606,8 +626,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   tabLabelNumber: {
-    color: "black",
-    fontSize: 22,
+    fontWeight: "bold",
+    color: "#229277",
+    fontSize: 16,
     textAlign: "center",
     marginBottom: 2,
   },

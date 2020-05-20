@@ -60,8 +60,6 @@ export default function GiftScreen(props) {
       const providerParts = emailParts[1].split(".");
       const provider = providerParts[0];
       return providers.includes(provider);
-    } else {
-      alert("Not a valid email");
     }
   };
 
@@ -104,7 +102,7 @@ export default function GiftScreen(props) {
                 alignItems: "center",
                 // backgroundColor: "red",
                 flex: 1.5,
-                marginTop: "2%",
+                marginTop: "10%",
               }}
               onPress={handleCancel}
             >
@@ -112,7 +110,6 @@ export default function GiftScreen(props) {
                 style={{
                   // backgroundColor: "white",
                   alignItems: "center",
-                  // marginTop: 5,
 
                   flexDirection: "row",
                   paddingLeft: 6,
@@ -143,6 +140,7 @@ export default function GiftScreen(props) {
                 <Picker
                   style={{
                     width: "50%",
+                    marginTop: "10%",
                     // backgroundColor: "blue",
                   }}
                   selectedValue={amount}
@@ -196,7 +194,11 @@ export default function GiftScreen(props) {
                         flexDirection: "row",
                       }}
                     >
-                      <Text style={{ fontWeight: "bold" }}>Select Amount</Text>
+                      <Text style={{ fontWeight: "bold" }}>
+                        {amount === ""
+                          ? "Select Amount"
+                          : `Selected amount: ${amount}`}
+                      </Text>
                       <AntDesign
                         style={{ marginRight: "5%" }}
                         name="caretdown"
@@ -236,6 +238,7 @@ export default function GiftScreen(props) {
               <View
                 style={{
                   flex: 0.4,
+                  marginTop: "10%",
                   // backgroundColor: "green",
                   // justifyContent: "flex-end",
                   alignItems: "center",
@@ -248,7 +251,7 @@ export default function GiftScreen(props) {
                     alignItems: "center",
                     flexDirection: "row",
                     // paddingLeft: 6,
-                    // marginTop: 5,
+
                     // width: "60%",
                     borderColor: "black",
                     borderBottomWidth: 2,
@@ -277,7 +280,7 @@ export default function GiftScreen(props) {
                   // marginEnd: "2%",
                   // borderRadius: 30,
 
-                  marginTop: 15,
+                  marginTop: "8%",
                   // flexDirection: "row",
 
                   flex: 0.2,
@@ -442,18 +445,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // backgroundColor: "#f5f0f0",
-  },
-  containerLogin: {
-    flex: 2,
-    // marginLeft: -15,
-    // backgroundColor: "#E8ECF4",
-    // width: "107%",
-    // marginTop: -15,
-    // marginBottom: "5%",
-    // borderWidth: 1,
-    // borderTopWidth: 0,
-    // borderColor: "gray",
-    // borderBottomRightRadius: 40,
-    // borderBottomLeftRadius: 40,
   },
 });

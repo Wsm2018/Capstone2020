@@ -119,7 +119,7 @@ export default function BalanceScreen({ navigation }) {
             >
               <Image
                 source={require("../../../assets/images/listcards2.png")}
-                style={{ height: 70, width: 70 }}
+                style={{ height: 60, width: 60 }}
               />
               <Text
                 style={{
