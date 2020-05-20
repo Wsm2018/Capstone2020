@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  AsyncStorage,
 } from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
@@ -37,6 +38,8 @@ import db from "./db";
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState(null);
+  const [guideView, setGuideView] = useState(true);
 
   const handleLogout = () => {
     firebase.auth().signOut();
@@ -173,6 +176,23 @@ export default function App(props) {
     setUser(user);
   }
 
+  async function getFirstLaunch() {
+    const value = await AsyncStorage.getItem("alreadyLaunched");
+    console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      AsyncStorage.setItem("alreadyLaunched", true);
+      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(true);
+    } else {
+      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(false);
+    }
+  }
+
+  useEffect(() => {
+    getFirstLaunch();
+  }, []);
+
   useEffect(() => {
     if (loggedIn) {
       getUser();
@@ -187,6 +207,11 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
+  const guideSkip = () => {
+    console.log("Skipppped");
+    setGuideView(false);
+  };
+
   if (!loggedIn) {
     return (
       <View style={styles.container}>
@@ -194,8 +219,11 @@ export default function App(props) {
       </View>
     );
   } else {
-    // return <Guide />;
-    return <AppContainer />;
+    if (firstLaunch && guideView) {
+      return <Guide guideSkip={guideSkip} />;
+    } else {
+      return <AppContainer />;
+    }
   }
 
   // return (

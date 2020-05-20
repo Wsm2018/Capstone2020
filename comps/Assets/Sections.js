@@ -164,7 +164,7 @@ export default function Sections(props) {
   ///////////////////////////////////////////////////////////////////
 
   const [showSections, setShowSections] = useState(false);
-  const [visibale, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const type = props.navigation.getParam("type", "failed").id;
   const tName = props.navigation.getParam("type", "failed").name;
@@ -325,7 +325,7 @@ export default function Sections(props) {
                   }
                   key={i}
                   style={{
-                    backgroundColor: "#C6CBD0",
+                    backgroundColor: selectedSection === s ? "gray" : "#C6CBD0",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -385,7 +385,7 @@ export default function Sections(props) {
                     onPress={() => setSelectedList(l) || setDetailsView(true)}
                     key={i}
                     style={{
-                      backgroundColor: "#C6CBD0",
+                      backgroundColor: selectedList === l ? "gray" : "#C6CBD0",
                       width: 60,
                       height: 60,
                       margin: 5,

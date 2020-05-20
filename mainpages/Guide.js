@@ -58,7 +58,7 @@ function Guide(props) {
               //   backgroundColor: "blue",
             }}
           >
-            <Text>Skip</Text>
+            <Text onPress={() => props.guideSkip()}>Skip</Text>
           </View>
         </View>
       </View>
