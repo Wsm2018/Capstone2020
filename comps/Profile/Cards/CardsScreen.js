@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 import db from "../../../db";
 import { Text } from "react-native-elements";
 import firebase from "firebase";
@@ -31,51 +37,71 @@ export default function CardsScreen(props) {
   // 5190767138616175
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{ alignItems: "center", justifyContent: "center", flex: 0.3 }}
-      >
-        <Text h4>My Credit Cards</Text>
-      </View>
-
-      {cards.length === 0 ? (
-        <Text>No Cards</Text>
-      ) : (
-        <FlatList
-          data={cards}
-          renderItem={({ item }) => <Card card={item} />}
-          keyExtractor={(item) => item.id}
-        />
-      )}
+    <View style={{ flex: 1, backgroundColor: "#f5f0f0" }}>
       <View
         style={{
-          flex: 1,
-          // backgroundColor: "#20365F",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "red",
+          flex: 0.1,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+          }}
+        >
+          My Cards
+        </Text>
+      </View>
+      <ScrollView style={{ flex: 5 }}>
+        {cards.length === 0 ? (
+          <Text>No Cards</Text>
+        ) : (
+          <FlatList
+            data={cards}
+            renderItem={({ item }) => <Card card={item} />}
+            keyExtractor={(item) => item.id}
+          />
+        )}
+      </ScrollView>
+      <View
+        style={{
+          flex: 0.2,
+          // backgroundColor: "red",
           // height: 50,
           justifyContent: "flex-end",
           alignItems: "center",
         }}
       >
         <TouchableOpacity
-          style={{ alignItems: "center" }}
+          // style={{ alignItems: "center", justifyContent: "center" }}
           onPress={() => props.navigation.navigate("AddCard", { user: user })}
         >
-          <Image
+          {/* <Image
             source={require("../../../assets/images/addcard.png")}
             style={{ height: 60, width: 60 }}
-          />
+          /> */}
           <Text
             style={{
+              height: 60,
+              // backgroundColor: "red",
+              width: "60%",
               textAlign: "center",
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: "bold",
-              color: "#20365F",
+              color: "gray",
             }}
           >
-            Add Credit Card
+            + Add a New Card
           </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+CardsScreen.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};

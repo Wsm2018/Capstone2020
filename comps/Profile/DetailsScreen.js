@@ -31,8 +31,8 @@ export default function DetailsScreen(props) {
           style={{
             width: "100%",
             flex: 1,
-            borderWidth: 0.3,
-            // borderTopWidth: 0,
+            borderWidth: 1,
+            borderTopWidth: 0,
             borderColor: "darkgray",
           }}
         >

@@ -499,9 +499,13 @@ export default function Details(props) {
       {services ? (
         <View style={{ marginBottom: 5 }}>
           {services.map((s, i) => (
-            <View style={{ padding: 5, paddingTop: 0 }}>
+            <View style={{ padding: 5, paddingTop: 0, marginBottom: 5 }}>
               <TouchableOpacity
-                onPress={() => manageTimings(s)}
+                onPress={
+                  selectedService === s
+                    ? () => setSelectedService([])
+                    : () => manageTimings(s)
+                }
                 style={{
                   // borderWidth: 1,
                   // borderBottomWidth: 1,
@@ -512,8 +516,19 @@ export default function Details(props) {
                   borderRadius: 5,
                 }}
               >
-                <View style={{ width: "80%" }}>
-                  <Text>{s.name}</Text>
+                <View
+                  style={{
+                    width: "80%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons
+                    name="local-gas-station"
+                    size={25}
+                    color="#20365F"
+                  />
+                  <Text> {s.name}</Text>
                 </View>
                 <View style={{ width: "20%", alignItems: "flex-end" }}>
                   <Text style={{}}>
@@ -547,45 +562,64 @@ export default function Details(props) {
                 >
                   {selectedService && userDays ? (
                     <View>
-                      <Text>Working Hours</Text>
+                      {/* <Text>Working Hours</Text> */}
                       {userDays.map((d, dayindex) => (
-                        <View>
+                        <View style={{ margin: 5 }}>
                           <Text>{d.day}</Text>
-                          <View style={{ flexDirection: "row" }}>
-                            {d.timesList.map((t, timeindex) =>
-                              checkHour(timeindex, dayindex) == "green" ? (
-                                <TouchableOpacity
-                                  style={{
-                                    borderWidth: 1,
-                                    borderColor: "black",
-                                    backgroundColor: "green",
-                                  }}
-                                  onPress={() => book(dayindex, timeindex)}
-                                >
-                                  <Text>{t.time.split(":")[0]}</Text>
-                                </TouchableOpacity>
-                              ) : checkHour(timeindex, dayindex) == "white" ? (
-                                <TouchableOpacity
-                                  style={{
-                                    borderWidth: 1,
-                                    borderColor: "black",
-                                    backgroundColor: "white",
-                                  }}
-                                  onPress={() => book(dayindex, timeindex)}
-                                >
-                                  <Text>{t.time.split(":")[0]}</Text>
-                                </TouchableOpacity>
-                              ) : (
-                                <View
-                                  style={{
-                                    borderWidth: 1,
-                                    borderColor: "black",
-                                    backgroundColor: "red",
-                                  }}
-                                >
-                                  <Text>{t.time.split(":")[0]}</Text>
-                                </View>
+                          <View
+                            style={{ flexDirection: "row", flexWrap: "wrap" }}
+                          >
+                            {d.timesList.length > 0 ? (
+                              d.timesList.map((t, timeindex) =>
+                                checkHour(timeindex, dayindex) == "green" ? (
+                                  <TouchableOpacity
+                                    style={{
+                                      borderWidth: 1,
+                                      borderColor: "black",
+                                      backgroundColor: "green",
+                                      width: 35,
+                                      height: 35,
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                    onPress={() => book(dayindex, timeindex)}
+                                  >
+                                    <Text>{t.time.split(":")[0]}</Text>
+                                  </TouchableOpacity>
+                                ) : checkHour(timeindex, dayindex) ==
+                                  "white" ? (
+                                  <TouchableOpacity
+                                    style={{
+                                      borderWidth: 1,
+                                      borderColor: "black",
+                                      backgroundColor: "white",
+                                      width: 35,
+                                      height: 35,
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                    onPress={() => book(dayindex, timeindex)}
+                                  >
+                                    <Text>{t.time.split(":")[0]}</Text>
+                                  </TouchableOpacity>
+                                ) : (
+                                  <View
+                                    style={{
+                                      borderWidth: 1,
+                                      borderColor: "black",
+                                      backgroundColor: "red",
+                                      width: 35,
+                                      height: 35,
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    <Text>{t.time.split(":")[0]}</Text>
+                                  </View>
+                                )
                               )
+                            ) : (
+                              <Text>No services available for this day</Text>
                             )}
                           </View>
                         </View>
@@ -608,18 +642,58 @@ export default function Details(props) {
             </Text>
           </View>
         )}
-
-        {serviceBooking
-          ? serviceBooking.map((s, index) => (
-              <View style={{ backgroundColor: "#f5f5f5" }}>
-                <Text>Service: {s.service.name}</Text>
-                <Text>Time: {s.time}</Text>
-                <Text>Day: {s.day}</Text>
-                <Button title="X" onPress={() => deleteBooking(index)} />
-              </View>
-            ))
-          : null}
-
+        {/* {serviceBooking.length > 0 &&
+          console.log(
+            "-----------------------------------------------------",
+            serviceBooking
+          )} */}
+        <View>
+          {serviceBooking.length > 0
+            ? serviceBooking.map((s, index) => (
+                // <View style={{ backgroundColor: "#f5f5f5", margin: 5 }}>
+                //   <Text>Service: </Text>
+                //   <Text>Time:</Text>
+                //   <Text>Day: </Text>
+                //   <Button title="X" onPress={() => deleteBooking(index)} />
+                // </View>
+                <View
+                  style={{
+                    backgroundColor: "#f5f5f5",
+                    margin: 5,
+                    borderRadius: 5,
+                    // padding: 5,
+                    flexDirection: "row",
+                  }}
+                >
+                  <View style={{ width: "80%", padding: 10 }}>
+                    <Text style={{ fontSize: 12 }}>{s.day}</Text>
+                    <Text style={{ fontSize: 12 }}>{s.time}</Text>
+                    <Text style={{ fontSize: 20 }}>{s.service.name}</Text>
+                  </View>
+                  <View
+                    style={{
+                      width: "20%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => deleteBooking(index)}
+                      style={{
+                        // backgroundColor: "red",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            : null}
+        </View>
+      </View>
+      <View style={{ marginTop: 20 }}>
         <TouchableOpacity
           onPress={
             () =>
