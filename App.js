@@ -208,7 +208,7 @@ export default function App(props) {
   }, []);
 
   const guideSkip = () => {
-    console.log("Skipppped");
+    // console.log("Skipppped");
     setGuideView(false);
   };
 
@@ -220,7 +220,13 @@ export default function App(props) {
     );
   } else {
     if (firstLaunch && guideView) {
-      return <Guide guideSkip={guideSkip} />;
+      return (
+        <Guide
+          guideSkip={guideSkip}
+          // setFirstLaunch={setFirstLaunch}
+          // setGuideView={setGuideView}
+        />
+      );
     } else {
       return <AppContainer />;
     }
