@@ -40,6 +40,7 @@ import ReferralScreen from "./ReferralScreen";
 import GiftScreen from "./GiftScreen";
 import DetailsScreen from "./DetailsScreen";
 import CarsScreen from "./Cars/CarsScreen";
+import Favorites from "./Favorites";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -53,6 +54,7 @@ export default function ProfileScreen(props) {
   const buttons = ["Balance", "Send Gift", "Referral Code"];
   const [view, setView] = useState(0);
   const [carsModal, setCarsModal] = useState(false);
+  const [favoritesModal, setFavoritesModal] = useState(false);
 
   const getUser = async () => {
     db.collection("users")
@@ -428,32 +430,47 @@ export default function ProfileScreen(props) {
                   props.navigation.navigate("Car", { user: props.user })
                 }
               /> */}
-                <LottieView
-                  source={require("../../assets/lf30_editor_6YHFU0.json")}
-                  autoPlay
-                  // loop
-                  style={{
-                    width: "22%",
-                    // height: "90%",
-                    // backgroundColor: "red",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                  }}
-                />
-                <Image
-                  source={require("../../assets/car5.gif")}
-                  autoPlay
-                  // loop
+                <TouchableOpacity onPress={() => setFavoritesModal(true)}>
+                  <LottieView
+                    source={require("../../assets/lf30_editor_6YHFU0.json")}
+                    autoPlay
+                    // loop
+                    style={{
+                      width: "22%",
+                      height: "100%",
+                      // backgroundColor: "red",
+                      justifyContent: "space-evenly",
+                      alignItems: "center",
+                    }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setCarsModal(true)}
                   style={{
                     // position: "relative",
-                    width: "18%",
-                    height: "65%",
+                    width: "50%",
+                    height: "100%",
                     // backgroundColor: "blue",
                     justifyContent: "center",
                     alignItems: "center",
-                    // paddingTop: "5%",
                   }}
-                />
+                >
+                  <Image
+                    source={require("../../assets/car5.gif")}
+                    autoPlay
+                    onPress={() => setCarsModal(true)}
+                    // loop
+                    style={{
+                      // position: "relative",
+                      width: "35%",
+                      height: "65%",
+                      // backgroundColor: "blue",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      // paddingTop: "5%",
+                    }}
+                  />
+                </TouchableOpacity>
 
                 {/* <TouchableOpacity onPress={() => setCarsModal(true)}>
                 <Image
@@ -490,6 +507,12 @@ export default function ProfileScreen(props) {
             carsModal={carsModal}
             setCarsModal={setCarsModal}
             navigation={props.navigation}
+          />
+          <Favorites
+            favoritesModal={favoritesModal}
+            setFavoritesModal={setFavoritesModal}
+            navigation={props.navigation}
+            user={user}
           />
         </View>
       </View>

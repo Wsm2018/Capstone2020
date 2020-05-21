@@ -303,3 +303,14 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
   }
 });
+
+exports.deleteFavorite = functions.https.onCall(async (data, context) => {
+  console.log("deleteFavorite   ", data);
+  const res = await db
+    .collection("users")
+    .doc(data.uid)
+    .update({
+      favorite: admin.firestore.FieldValue.arrayRemove(data.assetId),
+    });
+  return res;
+});
