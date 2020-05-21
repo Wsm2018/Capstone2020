@@ -6,6 +6,7 @@ import {
   Modal,
   StyleSheet,
   Image,
+  Alert,
 } from "react-native";
 import firebase from "firebase";
 import "firebase/auth";
@@ -22,6 +23,25 @@ export default function Card(props) {
       uid: firebase.auth().currentUser.uid,
       cardId: cardInfo.id,
     });
+    if (response.data !== null) {
+      alert("Card removed");
+    }
+  };
+
+  const handleDeleteAlert = () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete ?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => handleDelete() },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -53,7 +73,7 @@ export default function Card(props) {
       >
         <Text style={styles.notes}>abcd</Text>
 
-        <TouchableOpacity onPress={() => handleDelete()}>
+        <TouchableOpacity onPress={() => handleDeleteAlert()}>
           {/* <Text style={styles.notes}>X</Text> */}
           <Octicons name="trashcan" size={27} color="#ede9eb" />
         </TouchableOpacity>

@@ -147,9 +147,6 @@ export default function App(props) {
           <View>
             <Text>{user && user.email}</Text>
             <Text>{user && user.phone}</Text>
-            {/* since its 0, added the titles to know which is which */}
-            <Text>reputation: {user && user.reputation}</Text>
-            <Text>points: {user && user.points}</Text>
           </View>
 
           <ScrollView>
@@ -197,7 +194,7 @@ export default function App(props) {
     if (loggedIn) {
       getUser();
     }
-  }, []);
+  }, [loggedIn]);
 
   useEffect(() => {
     console.log("user", user);
