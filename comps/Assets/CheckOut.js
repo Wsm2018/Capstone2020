@@ -24,7 +24,7 @@ import { CheckBox } from 'react-native-elements'
 
 
 export default function CheckOut(props) {
-
+    const [disable , setDisable] = useState(false)
     const tName = props.navigation.getParam("tName", 'failed')
     const sName = props.navigation.getParam("sName", 'failed')
     const assetBooking = props.navigation.getParam("assetBooking", "some default value");
@@ -102,10 +102,10 @@ export default function CheckOut(props) {
             for (let k = 0; k < bookedhours.length; k++) {
                 hours.push(bookedhours[k].day + " " + bookedhours[k].show)
                 if (bookedhours[k].time.split(":")[0].split("").length == 1) {
-                    whatever.push(bookedhours[k].day + "T0" + bookedhours[k].time)
+                    whatever.push({ hr24:bookedhours[k].day + "T0" + bookedhours[k].time , hr12:bookedhours[k].day + "T0" + bookedhours[k].show  })
                 }
                 else {
-                    whatever.push(bookedhours[k].day + "T" + bookedhours[k].time)
+                    whatever.push({ hr24:bookedhours[k].day + "T" + bookedhours[k].time , hr12:bookedhours[k].day + "T" + bookedhours[k].show  })
                 }
 
             }
@@ -120,16 +120,16 @@ export default function CheckOut(props) {
             if (use.length > 0) {
                 var counter = use.length
                 while (counter > 0) {
-                    var min = use[0]
+                    var min = use[0].hr24
                     var index = 0
                     for (let k = 0; k < use.length; k++) {
       
-                        if (new Date(min).getTime() > new Date(use[k]).getTime()) {
+                        if (new Date(min).getTime() > new Date(use[k].hr24).getTime()) {
                             min = newServiceArr[i].whatever[k]
                             index = k
                         }
                     }
-                    arranged.push(use[index])
+                    arranged.push(use[index].hr12)
                     use = use.filter( (t , i ) => i != index)
                     counter = counter - 1
                 }
@@ -217,6 +217,7 @@ export default function CheckOut(props) {
                 <Button
                     title="Pay Now"
                     onPress={() => props.navigation.navigate("Payment", { assetBooking: assetBooking, serviceBooking, totalAmount })}
+                    disable= {disable}
                 />
 
             </View>
@@ -224,7 +225,8 @@ export default function CheckOut(props) {
 
                 <Button
                     title="Pay Later"
-                    onPress={() => payLater()}
+                    onPress={() => setDisable(true) ||payLater()}
+                    disable= {disable}
                 />
 
             </View>
