@@ -11,11 +11,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Picker
 } from "react-native";
 
 import DatePicker from 'react-native-datepicker'
-
+import moment from "moment"
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -28,7 +29,8 @@ export default function Sections(props) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showSections , setShowSections] = useState(false)
-
+  const [tempstartDate, settempStartDate] = useState('');
+  const [tempendDate, settempEndDate] = useState('');
   const type = props.navigation.getParam("type", 'failed').id;
   const tName = props.navigation.getParam("type", 'failed').name
 
@@ -36,12 +38,22 @@ export default function Sections(props) {
     getSections();
   }, [type]);
 
+  useEffect(() => { 
+    if(tempstartDate){
+      var dateTime = tempstartDate.split(" ")
+      var update = dateTime[0]+" "+dateTime[1]+" "+dateTime[2].split(":")[0]+":00 "+dateTime[3]
+      setStartDate(update)
+    } 
+  }, [tempstartDate]);
+
   useEffect(() => {
-    console.log(startDate);
-  }, [startDate]);
-  useEffect(() => {
-    console.log(endDate);
-  }, [endDate]);
+    if(tempendDate){
+      var dateTime = tempendDate.split(" ")
+      var update = dateTime[0]+" "+dateTime[1]+" "+dateTime[2].split(":")[0]+":00 "+dateTime[3]
+      setEndDate(update)
+    }
+    
+  }, [tempendDate]);
 
   const getSections = async () => {
     const temp = [];
@@ -57,20 +69,19 @@ export default function Sections(props) {
 
   return (
     <View style={styles.container}>
-
-
       {
         !showSections ?
           <View>
             <Text>Choose a start date and time</Text>
             <DatePicker
               style={{ width: 200 }}
+              //is24Hour
               date={startDate}
               mode="datetime"
               placeholder="select a Start date"
-              format="YYYY-MM-DD T h:mm:ss"
-              minDate="2020-05-07"
-              maxDate="2022-01-01"
+              format="YYYY-MM-DD T h:mm A"
+              minDate={moment()}
+              maxDate={moment().add(3,"month")}
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
               customStyles={{
@@ -85,8 +96,9 @@ export default function Sections(props) {
                 }
                 // ... You can check the source to find the other keys.
               }}
-              onDateChange={setStartDate}
+              onDateChange={settempStartDate}
             />
+            
             {
               startDate ?
                 <Text>
@@ -101,9 +113,9 @@ export default function Sections(props) {
               date={endDate}
               mode="datetime"
               placeholder="select an end date"
-              format="YYYY-MM-DD T h:mm:ss"
+              format="YYYY-MM-DD T h:mm A"
               minDate={startDate}
-              maxDate="2022-01-01"
+              //maxDate={moment(startDate).add(2,"day")}
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
               customStyles={{
@@ -118,7 +130,7 @@ export default function Sections(props) {
                 }
                 // ... You can check the source to find the other keys.
               }}
-              onDateChange={setEndDate}
+              onDateChange={settempEndDate}
               disabled={!startDate}
             />
 

@@ -33,6 +33,8 @@ export default function Details(props) {
   const assetTypeId = props.navigation.getParam("assetTypeId", 'no');
   const startDateTime = props.navigation.getParam("startDateTime", 'no');
   const endDateTime = props.navigation.getParam("endDateTime", 'no');
+  const start = useRef()
+  const end = useRef()
   const [workers, setWorkers] = useState([])
   const [allWorkers, setAllWorkers] = useState([])
   const [update, setUpdate] = useState(true)
@@ -40,29 +42,30 @@ export default function Details(props) {
   const [schedules, setSchedules] = useState([])
   const [userDays, setUserDays] = useState([])
   const [timesList, setTimesList] = useState([
-    { book: false, time: "1:00:00" },
-    { book: false, time: "2:00:00" },
-    { book: false, time: "3:00:00" },
-    { book: false, time: "4:00:00" },
-    { book: false, time: "5:00:00" },
-    { book: false, time: "6:00:00" },
-    { book: false, time: "7:00:00" },
-    { book: false, time: "8:00:00" },
-    { book: false, time: "9:00:00" },
-    { book: false, time: "10:00:00" },
-    { book: false, time: "11:00:00" },
-    { book: false, time: "12:00:00" },
-    { book: false, time: "13:00:00" },
-    { book: false, time: "14:00:00" },
-    { book: false, time: "15:00:00" },
-    { book: false, time: "16:00:00" },
-    { book: false, time: "17:00:00" },
-    { book: false, time: "18:00:00" },
-    { book: false, time: "19:00:00" },
-    { book: false, time: "20:00:00" },
-    { book: false, time: "21:00:00" },
-    { book: false, time: "22:00:00" },
-    { book: false, time: "23:00:00" },
+    { book: false, show: "12:00 AM", time: "00:00:00"},
+    { book: false, show: "1:00 AM" , time: "1:00:00" },
+    { book: false, show: "2:00 AM" , time: "2:00:00" },
+    { book: false, show: "3:00 AM" , time: "3:00:00"},
+    { book: false, show: "4:00 AM" , time: "4:00:00" },
+    { book: false, show: "5:00 AM" , time: "5:00:00"},
+    { book: false, show: "6:00 AM" , time: "6:00:00"},
+    { book: false, show: "7:00 AM" , time: "7:00:00"},
+    { book: false, show: "8:00 AM" , time: "8:00:00"},
+    { book: false, show: "9:00 AM" , time: "9:00:00"},
+    { book: false, show: "10:00 AM" , time: "10:00:00"},
+    { book: false, show: "11:00 AM" , time: "11:00:00"},
+    { book: false, show: "12:00 PM" , time: "12:00:00"},
+    { book: false, show: "1:00 PM" , time: "13:00:00"},
+    { book: false, show: "2:00 PM" , time: "14:00:00"},
+    { book: false, show: "3:00 PM" , time: "15:00:00"},
+    { book: false, show: "4:00 PM" , time: "16:00:00"},
+    { book: false, show: "5:00 PM" , time: "17:00:00"},
+    { book: false, show: "6:00 PM" , time: "18:00:00"},
+    { book: false, show: "7:00 PM" , time: "19:00:00"},
+    { book: false, show: "8:00 PM" , time: "20:00:00"},
+    { book: false, show: "9:00 PM" , time: "21:00:00"},
+    { book: false, show: "10:00 PM" , time: "22:00:00"},
+    { book: false, show: "11:00 PM" , time: "23:00:00"},
   ])
   const [showTimings, setShowTimings] = useState(false)
   const [week, setWeek] = useState(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
@@ -70,12 +73,17 @@ export default function Details(props) {
 
 
   useEffect(() => {
+    //var start = startDateTime
+    console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!!",startDateTime.split(" "))
+    //var end = endDateTime
+      
     getServices()
   }, []);
 
   useEffect(() => {
 
     if (services.length > 0) {
+      
 
       var temp = services
       for (let i = 0; i < services.length; i++) {
@@ -95,6 +103,22 @@ export default function Details(props) {
 
   useEffect(() => {
     if (schedules) {
+      if( startDateTime.split(" ")[3] == "PM"){
+        start.current = startDateTime.split(" ")[0]+" T "+(parseInt(startDateTime.split(" ")[2].split(":")[0]) + 12)+":00:00"
+        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! start",start.current)
+      }
+      else{
+        start.current = startDateTime.split(" ")[0]+" T "+startDateTime.split(" ")[2]+":00"
+        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! start",start.current)
+      }
+      if(endDateTime.split(" ")[3] == "PM"){
+        end.current = endDateTime.split(" ")[0]+" T "+(parseInt(endDateTime.split(" ")[2].split(":")[0]) + 12)+":00:00"
+        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! end", end.current)
+      }
+      else{
+        end.current = endDateTime.split(" ")[0]+" T "+endDateTime.split(" ")[2]+":00"
+        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!!  end",end.current)
+      }
       filterTimings()
       getAvailableTimings()
     }
@@ -140,18 +164,19 @@ export default function Details(props) {
 
 
   const filterTimings = () => {
-
-    var split1 = startDateTime.split(" ")
-    var split2 = endDateTime.split(" ")
-
+    console.log(" whyyy", start.current)
+    var split1 = start.current.split(" ")
+    var split2 = end.current.split(" ")
+console.log(" 168")
     var diffDays = Math.ceil((new Date(split2[0]) - new Date(split1[0])) / (1000 * 60 * 60 * 24))
     var firstDayHours = []
     var lastDayHours = []
     var days = []
     //if more than one day
     if (diffDays > 0) {
-      var startHour = startDateTime.split(" ")[2]
-      var endHour = endDateTime.split(" ")[2]
+      var startHour = start.current.split(" ")[2]
+      console.log(" 176")
+      var endHour = end.current.split(" ")[2]
       //remove hours before start hour
       for (let i = 0; i < timesList.length; i++) {
         if ((timesList[i].time + "") === startHour) {
@@ -179,7 +204,8 @@ export default function Details(props) {
       days[days.length - 1].timesList = lastDayHours
     }
     else {
-      var startHour = startDateTime.split(" ")[2]
+      var startHour = start.current.split(" ")[2]
+      console.log(" 208")
       for (let i = 0; i < timesList.length; i++) {
         if ((timesList[i].time) === startHour) {
           for (let k = i; k < timesList.length; k++) {
@@ -367,6 +393,8 @@ export default function Details(props) {
           <Text>{asset.price}</Text>
           <Text>{startDateTime}</Text>
           <Text>{endDateTime}</Text>
+          <Text>{start.current}</Text>
+          <Text>{end.current}</Text>
 
         </View>
 
@@ -413,9 +441,9 @@ export default function Details(props) {
                     {d.timesList.map((t, timeindex) =>
 
                       checkHour(timeindex, dayindex) == "green" ?
-                        <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "green" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
+                        <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "green" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.show}</Text></TouchableOpacity>
                         : checkHour(timeindex, dayindex) == "white" ?
-                          <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.time.split(":")[0]}</Text></TouchableOpacity>
+                          <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.show}</Text></TouchableOpacity>
                           :
                           <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
 
@@ -435,7 +463,7 @@ export default function Details(props) {
           serviceBooking.map((s, index) =>
             <View>
               <Text>Service: {s.service.name}</Text>
-              <Text>Time: {s.time}</Text>
+              <Text>Time: {s.show}</Text>
               <Text>Day: {s.day}</Text>
               <Button title="X" onPress={() => deleteBooking(index)} />
             </View>
@@ -444,7 +472,7 @@ export default function Details(props) {
           null
       }
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime, endDateTime }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
+      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime: start.current, endDateTime: end.current }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
         <Text >CheckOut</Text>
       </TouchableOpacity>
 
