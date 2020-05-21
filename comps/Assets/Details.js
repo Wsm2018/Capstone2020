@@ -28,6 +28,8 @@ export default function Details(props) {
   const tName = props.navigation.getParam("tName", 'failed')
   const sName = props.navigation.getParam("sName", 'failed')
   const asset = props.navigation.getParam("asset", 'failed');
+  const [displayServices, setDisplayServices] = useState([])
+
   const [serviceBooking, setServiceBooking] = useState([])
   const [selectedService, setSelectedService] = useState()
   const assetTypeId = props.navigation.getParam("assetTypeId", 'no');
@@ -42,30 +44,30 @@ export default function Details(props) {
   const [schedules, setSchedules] = useState([])
   const [userDays, setUserDays] = useState([])
   const [timesList, setTimesList] = useState([
-    { book: false, show: "12:00 AM", time: "00:00:00"},
-    { book: false, show: "1:00 AM" , time: "1:00:00" },
-    { book: false, show: "2:00 AM" , time: "2:00:00" },
-    { book: false, show: "3:00 AM" , time: "3:00:00"},
-    { book: false, show: "4:00 AM" , time: "4:00:00" },
-    { book: false, show: "5:00 AM" , time: "5:00:00"},
-    { book: false, show: "6:00 AM" , time: "6:00:00"},
-    { book: false, show: "7:00 AM" , time: "7:00:00"},
-    { book: false, show: "8:00 AM" , time: "8:00:00"},
-    { book: false, show: "9:00 AM" , time: "9:00:00"},
-    { book: false, show: "10:00 AM" , time: "10:00:00"},
-    { book: false, show: "11:00 AM" , time: "11:00:00"},
-    { book: false, show: "12:00 PM" , time: "12:00:00"},
-    { book: false, show: "1:00 PM" , time: "13:00:00"},
-    { book: false, show: "2:00 PM" , time: "14:00:00"},
-    { book: false, show: "3:00 PM" , time: "15:00:00"},
-    { book: false, show: "4:00 PM" , time: "16:00:00"},
-    { book: false, show: "5:00 PM" , time: "17:00:00"},
-    { book: false, show: "6:00 PM" , time: "18:00:00"},
-    { book: false, show: "7:00 PM" , time: "19:00:00"},
-    { book: false, show: "8:00 PM" , time: "20:00:00"},
-    { book: false, show: "9:00 PM" , time: "21:00:00"},
-    { book: false, show: "10:00 PM" , time: "22:00:00"},
-    { book: false, show: "11:00 PM" , time: "23:00:00"},
+    { book: false, show: "12:00 AM", time: "00:00:00" },
+    { book: false, show: "1:00 AM", time: "1:00:00" },
+    { book: false, show: "2:00 AM", time: "2:00:00" },
+    { book: false, show: "3:00 AM", time: "3:00:00" },
+    { book: false, show: "4:00 AM", time: "4:00:00" },
+    { book: false, show: "5:00 AM", time: "5:00:00" },
+    { book: false, show: "6:00 AM", time: "6:00:00" },
+    { book: false, show: "7:00 AM", time: "7:00:00" },
+    { book: false, show: "8:00 AM", time: "8:00:00" },
+    { book: false, show: "9:00 AM", time: "9:00:00" },
+    { book: false, show: "10:00 AM", time: "10:00:00" },
+    { book: false, show: "11:00 AM", time: "11:00:00" },
+    { book: false, show: "12:00 PM", time: "12:00:00" },
+    { book: false, show: "1:00 PM", time: "13:00:00" },
+    { book: false, show: "2:00 PM", time: "14:00:00" },
+    { book: false, show: "3:00 PM", time: "15:00:00" },
+    { book: false, show: "4:00 PM", time: "16:00:00" },
+    { book: false, show: "5:00 PM", time: "17:00:00" },
+    { book: false, show: "6:00 PM", time: "18:00:00" },
+    { book: false, show: "7:00 PM", time: "19:00:00" },
+    { book: false, show: "8:00 PM", time: "20:00:00" },
+    { book: false, show: "9:00 PM", time: "21:00:00" },
+    { book: false, show: "10:00 PM", time: "22:00:00" },
+    { book: false, show: "11:00 PM", time: "23:00:00" },
   ])
   const [showTimings, setShowTimings] = useState(false)
   const [week, setWeek] = useState(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
@@ -74,17 +76,15 @@ export default function Details(props) {
 
   useEffect(() => {
     //var start = startDateTime
-    console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!!",startDateTime.split(" "))
+    //console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!!",startDateTime.split(" "))
     //var end = endDateTime
-      
+
     getServices()
   }, []);
 
   useEffect(() => {
 
     if (services.length > 0) {
-      
-
       var temp = services
       for (let i = 0; i < services.length; i++) {
         db.collection('services').doc(services[i].id).collection("workingDays").onSnapshot((snapshot) => {
@@ -97,27 +97,24 @@ export default function Details(props) {
         });
       }
     }
-
   }, [services])
 
 
   useEffect(() => {
     if (schedules) {
-      if( startDateTime.split(" ")[3] == "PM"){
-        start.current = startDateTime.split(" ")[0]+" T "+(parseInt(startDateTime.split(" ")[2].split(":")[0]) + 12)+":00:00"
-        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! start",start.current)
+      if (startDateTime.split(" ")[3] == "PM" && startDateTime.split(" ")[2].split(":")[0] !== "12") {
+        start.current = startDateTime.split(" ")[0] + " T " + (parseInt(startDateTime.split(" ")[2].split(":")[0]) + 12) + ":00:00"
       }
-      else{
-        start.current = startDateTime.split(" ")[0]+" T "+startDateTime.split(" ")[2]+":00"
-        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! start",start.current)
+      else {
+        start.current = startDateTime.split(" ")[0] + " T " + startDateTime.split(" ")[2] + ":00"
       }
-      if(endDateTime.split(" ")[3] == "PM"){
-        end.current = endDateTime.split(" ")[0]+" T "+(parseInt(endDateTime.split(" ")[2].split(":")[0]) + 12)+":00:00"
-        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!! end", end.current)
+      if (endDateTime.split(" ")[3] == "PM" && endDateTime.split(" ")[2].split(":")[0] !== "12") {
+        end.current = endDateTime.split(" ")[0] + " T " + (parseInt(endDateTime.split(" ")[2].split(":")[0]) + 12) + ":00:00"
       }
-      else{
-        end.current = endDateTime.split(" ")[0]+" T "+endDateTime.split(" ")[2]+":00"
-        console.log("OOOOOOOOOHHHHHHHHHHAAAAAAAAAAA!!!!!!  end",end.current)
+      else {
+
+        end.current = endDateTime.split(" ")[0] + " T " + endDateTime.split(" ")[2] + ":00"
+        console.log("OOOOOHAAAAAAA!", startDateTime.split(" ")[2].split(":")[0])
       }
       filterTimings()
       getAvailableTimings()
@@ -167,7 +164,7 @@ export default function Details(props) {
     console.log(" whyyy", start.current)
     var split1 = start.current.split(" ")
     var split2 = end.current.split(" ")
-console.log(" 168")
+    console.log(" 168")
     var diffDays = Math.ceil((new Date(split2[0]) - new Date(split1[0])) / (1000 * 60 * 60 * 24))
     var firstDayHours = []
     var lastDayHours = []
@@ -275,7 +272,7 @@ console.log(" 168")
   const book = (day, time) => {
     var check = serviceBooking.filter(t => t.service.id == selectedService.id && t.day == userDays[day].day && t.time == userDays[day].timesList[time].time)
 
-    if (parseInt(selectedService.maxBookings)  == userDays[day].bookings  && check.length == 0) {
+    if (parseInt(selectedService.maxBookings) == userDays[day].bookings && check.length == 0) {
       alert("Sorry, Only " + selectedService.maxBookings + " " + selectedService.name + " Booking/s Allowed Per Day")
     }
     else if (check == 0) {
@@ -300,7 +297,7 @@ console.log(" 168")
             }
           }
         }
-        temp.push({ service: selectedService, day: userDays[day].day, time: userDays[day].timesList[time].time, worker: selectedWorker.worker.id })
+        temp.push({ service: selectedService, day: userDays[day].day, time: userDays[day].timesList[time].time, show: userDays[day].timesList[time].show, worker: selectedWorker.worker.id })
         var ud = userDays
         ud[day].timesList[time].book = true
         ud[day].bookings = ud[day].bookings + 1
@@ -335,39 +332,43 @@ console.log(" 168")
       }
       setServiceBooking(temp)
     }
+    orderList()
     setUpdate(!update)
     var forceUpdate = userDays
     setUserDays(forceUpdate)
-  }
-
-  const deleteBooking = (index) => {
-
-    var updateWorkers = allWorkers
-    for (let i = 0; i < updateWorkers.length; i++) {
-      if (updateWorkers[i].worker.id == serviceBooking[index].worker) {
-        var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != serviceBooking[index].day + "T" + serviceBooking[index].time)
-        updateWorkers[i].schedules = newSchedule
-        var ud = userDays
-        for (let k = 0; k < userDays.length; k++) {
-          if (userDays[k].day == serviceBooking[index].day) {
-            ud[k].bookings = userDays[k].bookings - 1
-            setUserDays(ud)
-          }
-        }
-        setAllWorkers(updateWorkers)
-        break;
-      }
-    }
-
-    var temp = []
-    for (let i = 0; i < serviceBooking.length; i++) {
-      if (i !== index) {
-        temp.push(serviceBooking[i])
-      }
-    }
-    setServiceBooking(temp)
     getAvailableTimings()
+
   }
+
+  // const deleteBooking = (index) => {
+
+  //   var updateWorkers = allWorkers
+  //   for (let i = 0; i < updateWorkers.length; i++) {
+  //     if (updateWorkers[i].worker.id == serviceBooking[index].worker) {
+  //       var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != serviceBooking[index].day + "T" + serviceBooking[index].time)
+  //       updateWorkers[i].schedules = newSchedule
+  //       var ud = userDays
+  //       for (let k = 0; k < userDays.length; k++) {
+  //         if (userDays[k].day == serviceBooking[index].day) {
+  //           ud[k].bookings = userDays[k].bookings - 1
+  //           setUserDays(ud)
+  //         }
+  //       }
+  //       setAllWorkers(updateWorkers)
+  //       break;
+  //     }
+  //   }
+
+  //   var temp = []
+  //   for (let i = 0; i < serviceBooking.length; i++) {
+  //     if (i !== index) {
+  //       temp.push(serviceBooking[i])
+  //     }
+  //   }
+  //   setServiceBooking(temp)
+  //   getAvailableTimings()
+  //   orderList()
+  // }
 
 
   const checkHour = (time, day) => {
@@ -384,9 +385,62 @@ console.log(" 168")
     }
   }
 
+  const orderList = () => {
+    var newServiceArr = []
+    for (let i = 0; i < serviceBooking.length; i++) {
+      newServiceArr = newServiceArr.filter(s => s.service !== serviceBooking[i].service)
+      var bookedhours = serviceBooking.filter(s => s.service == serviceBooking[i].service)
+      var hours = []
+      var whatever = []
+      for (let k = 0; k < bookedhours.length; k++) {
+        hours.push(bookedhours[k].day + " " + bookedhours[k].show)
+        if (bookedhours[k].time.split(":")[0].split("").length == 1) {
+          whatever.push(bookedhours[k].day + "T0" + bookedhours[k].time)
+        }
+        else {
+          whatever.push(bookedhours[k].day + "T" + bookedhours[k].time)
+        }
+
+      }
+      newServiceArr.push({ service: serviceBooking[i].service, hours, whatever })
+
+    }
+
+    //order timings 
+    for (let i = 0; i < newServiceArr.length; i++) {
+      var arranged = []
+      var use = newServiceArr[i].whatever
+      if (use.length > 0) {
+        var counter = use.length
+        while (counter > 0) {
+          var min = use[0]
+          var index = 0
+          for (let k = 0; k < use.length; k++) {
+
+            if (new Date(min).getTime() > new Date(use[k]).getTime()) {
+              min = newServiceArr[i].whatever[k]
+              index = k
+            }
+          }
+          arranged.push(use[index])
+          use = use.filter((t, i) => i != index)
+          counter = counter - 1
+        }
+      }
+      newServiceArr[i].hours = arranged
+
+
+    }
+    setDisplayServices(newServiceArr)
+    console.log(" result -----------------", displayServices)
+  }
+
+
   return (
     <View style={styles.container}>
-
+      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime: start.current, endDateTime: end.current }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
+        <Text >CheckOut</Text>
+      </TouchableOpacity>
       {asset ?
         <View>
           <Text >{asset.code}</Text>
@@ -445,7 +499,7 @@ console.log(" 168")
                         : checkHour(timeindex, dayindex) == "white" ?
                           <TouchableOpacity style={{ borderWidth: 1, borderColor: "black", backgroundColor: "white" }} onPress={() => book(dayindex, timeindex)} ><Text>{t.show}</Text></TouchableOpacity>
                           :
-                          <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.time.split(":")[0]}</Text></View>
+                          <View style={{ borderWidth: 1, borderColor: "black", backgroundColor: "red" }} ><Text>{t.show}</Text></View>
 
                     )}
                   </View>
@@ -460,21 +514,27 @@ console.log(" 168")
 
       {
         serviceBooking ?
-          serviceBooking.map((s, index) =>
+          displayServices.map((s, index) =>
             <View>
               <Text>Service: {s.service.name}</Text>
-              <Text>Time: {s.show}</Text>
-              <Text>Day: {s.day}</Text>
-              <Button title="X" onPress={() => deleteBooking(index)} />
+              <Text>Timing/s: </Text>
+              {
+                s.hours.map(
+                  h =>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text>{h}</Text>
+                      {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
+                    </View>
+                )
+              }
+
             </View>
           )
           :
           null
       }
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime: start.current, endDateTime: end.current }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
-        <Text >CheckOut</Text>
-      </TouchableOpacity>
+
 
     </View>
   )
