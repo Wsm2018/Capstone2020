@@ -7,6 +7,7 @@ import {
   Platform,
   StyleSheet,
   TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
 
@@ -83,7 +84,7 @@ export default function GiftScreen(props) {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
       <View style={{ flex: 1 }}>
         <Card
           elevation={2}
@@ -133,6 +134,7 @@ export default function GiftScreen(props) {
             Platform.OS !== "ios" ? (
               <View
                 style={{
+                  width: "100%",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -438,7 +440,7 @@ export default function GiftScreen(props) {
           )}
         </Card>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 const styles = StyleSheet.create({
