@@ -203,6 +203,20 @@ export default function Sections(props) {
     setAssetSections(temp);
   };
 
+  const handleAddFavorite = async (item) => {
+    const addFavorite = firebase.functions().httpsCallable("addFavorite");
+    const response = await addFavorite({
+      uid: firebase.auth().currentUser.uid,
+      assetId: item.id,
+    });
+    console.log(response);
+    if (response.data !== "Exists") {
+      alert("Asset Added");
+    } else {
+      alert("Asset added before");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -234,7 +248,7 @@ export default function Sections(props) {
                 mode="datetime"
                 placeholder="Start Date"
                 format="YYYY-MM-DD T h:mm:ss"
-                minDate="2020-05-07"
+                minDate={new Date()}
                 maxDate="2022-01-01"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
@@ -419,6 +433,9 @@ export default function Sections(props) {
                     </View>
                   </TouchableOpacity>
                   <Text>Add price </Text>
+                  <TouchableOpacity onPress={() => handleAddFavorite(l)}>
+                    <Text>Add to Favorite</Text>
+                  </TouchableOpacity>
                 </View>
               ))
             ) : (
