@@ -314,3 +314,15 @@ exports.deleteFavorite = functions.https.onCall(async (data, context) => {
     });
   return res;
 });
+
+exports.addFavorite = functions.https.onCall(async (data, context) => {
+  const user = (await db.collection("users").doc(data.uid).get()).data();
+  const userFavorite = user.favorite;
+  if (userFavorite.includes(data.assetId)) return "Exists";
+
+  userFavorite.push(data.assetId);
+  const response = await db.collection("users").doc(data.uid).update({
+    favorite: userFavorite,
+  });
+  return response;
+});
