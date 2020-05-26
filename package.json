@@ -13,6 +13,7 @@
     "base-64": "^0.1.0",
     "email-validator": "^2.0.4",
     "expo": "^37.0.8",
+    "expo-barcode-scanner": "~8.1.0",
     "expo-cli": "^3.20.1",
     "expo-firebase-recaptcha": "^1.1.0",
     "expo-image-picker": "^8.1.0",

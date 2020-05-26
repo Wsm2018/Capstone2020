@@ -179,16 +179,9 @@ export default function ProfileScreen(props) {
           <View style={styles.profileImageContainer}>
             <Avatar
               rounded
+              // avatarStyle={{ maxHeight: "100%", maxWidth: "100%" }}
+              // overlayContainerStyle={{ backgroundColor: "red",  }}
               source={{ uri: photoURL }}
-              size="xlarge"
-              style={styles.profileImage}
-            />
-          </View>
-
-          <View style={styles.profileImageContainer}>
-            <Avatar
-              rounded
-              source={{ uri: user.photoURL }}
               size="xlarge"
               style={styles.profileImage}
             />
@@ -422,14 +415,6 @@ export default function ProfileScreen(props) {
                   alignItems: "center",
                 }}
               >
-                {/* <FontAwesome5
-                name="heart"
-                size={35}
-                color="black"
-                onPress={() =>
-                  props.navigation.navigate("Car", { user: props.user })
-                }
-              /> */}
                 <TouchableOpacity onPress={() => setFavoritesModal(true)}>
                   <LottieView
                     source={require("../../assets/lf30_editor_6YHFU0.json")}
@@ -458,7 +443,7 @@ export default function ProfileScreen(props) {
                   <Image
                     source={require("../../assets/car5.gif")}
                     autoPlay
-                    onPress={() => setCarsModal(true)}
+                    // onPress={() => setCarsModal(true)}
                     // loop
                     style={{
                       // position: "relative",
@@ -472,19 +457,6 @@ export default function ProfileScreen(props) {
                   />
                 </TouchableOpacity>
 
-                {/* <TouchableOpacity onPress={() => setCarsModal(true)}>
-                <Image
-                  source={require("../../assets/images/caricon4.png")}
-                  style={{ height: 38, width: 85 }}
-                />
-              </TouchableOpacity> */}
-                {/* <Image
-                source={require("../../assets/images/bookingicon.png")}
-                style={{ height: 48, width: 48 }}
-                onPress={() =>
-                  props.navigation.navigate("Car", { user: props.user })
-                }
-              /> */}
                 <Image
                   source={require("../../assets/booking.gif")}
                   autoPlay

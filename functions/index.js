@@ -127,7 +127,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       balance: 0,
       email: result.email,
       role: "user",
-      qrCode: "",
+      qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
       referralCode,

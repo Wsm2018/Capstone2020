@@ -34,6 +34,7 @@ import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
+import HomePage from "./comps/HomePage";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -48,7 +49,7 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      News: NewsStack,
+      // News: NewsStack,
       Profile: ProfileStack,
     },
     // {
@@ -94,19 +95,20 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      defaultNavigationOptions: ({ navigation }) => {
-        return {
-          headerLeft: (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              type="ionicon"
-              size={30}
-            />
-          ),
-        };
-      },
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingLeft: 10 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      // },
+      headerMode: null,
     }
   );
 
@@ -136,10 +138,12 @@ export default function App(props) {
           >
             <SafeAreaView style={{ marginTop: "19%" }}>
               <View style={{ flexDirection: "row" }}>
-                <Image
-                  source={require("./assets/qrcodetest.png")}
-                  style={{ width: 50, height: 50 }}
-                />
+                {user && (
+                  <Image
+                    source={{ uri: user.qrCode }}
+                    style={{ width: 150, height: 150 }}
+                  />
+                )}
                 <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
               </View>
             </SafeAreaView>
@@ -176,7 +180,7 @@ export default function App(props) {
   async function getFirstLaunch() {
     const value = await AsyncStorage.getItem("alreadyLaunched");
     console.log("valueeeeeeeeeeeee", value);
-    if (value === null) {
+    if (!value) {
       AsyncStorage.setItem("alreadyLaunched", true);
       console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(true);
@@ -186,11 +190,12 @@ export default function App(props) {
     }
   }
 
-  useEffect(() => {
-    getFirstLaunch();
-  }, []);
+  // useEffect(() => {
+  //   getFirstLaunch();
+  // }, []);
 
   useEffect(() => {
+    console.log(loggedIn);
     if (loggedIn) {
       getUser();
     }
@@ -216,11 +221,11 @@ export default function App(props) {
       </View>
     );
   } else {
-    if (firstLaunch && guideView) {
-      return <Guide guideSkip={guideSkip} />;
-    } else {
-      return <AppContainer />;
-    }
+    // if (firstLaunch && guideView) {
+    //   return <Guide guideSkip={guideSkip} />;
+    // } else {
+    return <AppContainer />;
+    // }
   }
 
   // return (

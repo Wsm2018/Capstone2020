@@ -3,6 +3,7 @@ import "firebase/auth";
 
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
+import { Icon } from "react-native-elements";
 
 import FriendsList from "./FriendsList";
 import FriendsSearch from "./FriendsSearch";
@@ -18,17 +19,22 @@ const FriendsStack = createAppContainer(
       FriendsRequest: FriendsRequest,
     },
     {
-      // initialRouteName: "FriendsList",
-
-      defaultNavigationOptions: {
-        header: null,
-        // headerStyle: {
-        //   backgroundColor: "#006cab",
-        // },
-        //   headerTintColor: "#fff",
-        //   headerTitleStyle: {
-        //     fontWeight: "normal",
-        //   },
+      // headerMode: null,
+      defaultNavigationOptions: ({ navigation }) => {
+        if (navigation.state.routeName === "FriendsList") {
+          return {
+            headerLeft: () => (
+              <Icon
+                style={{ paddingLeft: 10 }}
+                onPress={() => navigation.openDrawer()}
+                name="md-menu"
+                color="black"
+                type="ionicon"
+                size={30}
+              />
+            ),
+          };
+        }
       },
     }
   )

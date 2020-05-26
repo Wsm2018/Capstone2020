@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -65,7 +72,7 @@ export default function Favorites({
 
   return (
     <Modal visible={favoritesModal} transparent={false}>
-      <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity onPress={() => setFavoritesModal(false)}>
             <Text>X</Text>
@@ -81,7 +88,7 @@ export default function Favorites({
             </View>
           ))}
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }
