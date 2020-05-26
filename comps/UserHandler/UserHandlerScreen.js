@@ -6,14 +6,12 @@ import { createAppContainer } from "react-navigation";
 
 import EmployeesCreate from "./EmployeesCreate";
 import EmployeesCreateSuccess from "./EmployeesCreateSuccess";
-import test from "./test";
 
 const EmployeeHandlerStack = createAppContainer(
   createStackNavigator(
     {
       EmployeesCreate: EmployeesCreate,
       EmployeesCreateSuccess: EmployeesCreateSuccess,
-      test: test,
     },
     {
       // initialRouteName: "FriendsList",
