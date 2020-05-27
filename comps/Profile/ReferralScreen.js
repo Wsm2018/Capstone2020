@@ -1,6 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-shadow-cards";
+import {
+  FontAwesome,
+  Fontisto,
+  MaterialCommunityIcons,
+  Ionicons,
+} from "@expo/vector-icons";
 
 export default function ReferralScreen(props) {
   const user = props.user;
@@ -21,44 +27,116 @@ export default function ReferralScreen(props) {
           <View
             style={{
               flex: 4,
+              marginTop: -10,
               // backgroundColor: "red",
               alignItems: "center",
               justifyContent: "space-evenly",
             }}
           >
-            <Text
+            <Card
+              // elevation={2}
               style={{
-                textAlign: "center",
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "#20365F",
+                width: "42%",
+                // backgroundColor: "#6b9c74",
+                // backgroundColor: "rgb(26,148,149)",
+                backgroundColor: "#e3e1e1",
+
+                // height: "50%",
+                flex: 0.4,
+                borderWidth: 1,
+                // borderTopWidth: 0,
+                borderColor: "darkgray",
               }}
             >
-              My Referral Code: {user.referralCode}
-            </Text>
-            {/* <Text>{user.referralCode}</Text> */}
-            <Text
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    // flexDirection: "row",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      // textAlign: "right",
+                      // marginStart: 10,
+                      fontSize: 29,
+                      fontWeight: "bold",
+                      color: "black",
+                    }}
+                  >
+                    {user.referralCode}
+                  </Text>
+                  <Text
+                    style={{
+                      // marginStart: 10,
+                      textAlign: "center",
+                      fontSize: 16,
+                      // fontWeight: "bold",
+                      // borderBottomWidth: 1,
+                      color: "black",
+                    }}
+                  >
+                    My Referral Code
+                  </Text>
+                </View>
+
+                {/* <Fontisto name="share" size={23} color="black" /> */}
+              </View>
+            </Card>
+            <View
               style={{
-                textAlign: "center",
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "#20365F",
+                flexDirection: "row",
+                // flex: 1,
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Tokens: {user.tokens}
-            </Text>
-            {/* <Text>{user.tokens}</Text> */}
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "#20365F",
-              }}
-            >
-              Discounts: 0 (hard coded)
-            </Text>
-            {/* <Text>0 (hard coded) </Text> */}
+              <View
+                style={{
+                  justifyContent: "flex-start",
+                  // backgroundColor: "red",
+                  flex: 0.5,
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 20,
+                    fontWeight: "bold",
+                    color: "black",
+
+                    // color: "#20365F",
+                  }}
+                >
+                  Tokens: {user.tokens}
+                </Text>
+              </View>
+
+              {/* <View
+                style={{
+                  justifyContent: "flex-start",
+                  // backgroundColor: "red",
+                  flex: 0.5,
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 20,
+                    fontWeight: "bold",
+                    color: "black",
+                  }}
+                >
+                  Discount: 0
+                </Text>
+              </View> */}
+            </View>
           </View>
         </Card>
       </View>
