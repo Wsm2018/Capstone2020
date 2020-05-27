@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
+const { width, height } = Dimensions.get("screen");
+
 export default function Favorites({
   favoritesModal,
   setFavoritesModal,
@@ -64,24 +74,60 @@ export default function Favorites({
   }, []);
 
   return (
-    <Modal visible={favoritesModal} transparent={false}>
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
+    <Modal visible={favoritesModal} transparent={true}>
+      {/* <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, alignItems: "flex-end" }}> */}
+      <View style={styles.centeredView}>
+        <View elevation={5} style={styles.modalView}>
           <TouchableOpacity onPress={() => setFavoritesModal(false)}>
             <Text>X</Text>
           </TouchableOpacity>
-        </View>
-        <View style={{ flex: 10 }}>
-          {favoriteAssets.map((item) => (
-            <View>
-              <Text>{item.name}</Text>
-              <TouchableOpacity onPress={() => handleDeleteAlert(item.id)}>
-                <Text>X</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+
+          <View>
+            {favoriteAssets.map((item) => (
+              <View>
+                <Text>{item.name}</Text>
+                <TouchableOpacity onPress={() => handleDeleteAlert(item.id)}>
+                  <Text>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </Modal>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  modalView: {
+    margin: 20,
+    height: height / 1.5,
+    width: width / 1.3,
+    backgroundColor: "#fff",
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
+    borderRadius: 20,
+    padding: 35,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+});

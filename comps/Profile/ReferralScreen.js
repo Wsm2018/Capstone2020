@@ -18,12 +18,48 @@ export default function ReferralScreen(props) {
             borderColor: "darkgray",
           }}
         >
-          <Text>My Referral Code</Text>
-          <Text>{user.referralCode}</Text>
-          <Text>Token</Text>
-          <Text>{user.tokens}</Text>
-          <Text>Discounts</Text>
-          <Text>0 (hard coded) </Text>
+          <View
+            style={{
+              flex: 4,
+              // backgroundColor: "red",
+              alignItems: "center",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#20365F",
+              }}
+            >
+              My Referral Code: {user.referralCode}
+            </Text>
+            {/* <Text>{user.referralCode}</Text> */}
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#20365F",
+              }}
+            >
+              Tokens: {user.tokens}
+            </Text>
+            {/* <Text>{user.tokens}</Text> */}
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#20365F",
+              }}
+            >
+              Discounts: 0 (hard coded)
+            </Text>
+            {/* <Text>0 (hard coded) </Text> */}
+          </View>
         </Card>
       </View>
     </View>
