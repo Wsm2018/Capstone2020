@@ -92,7 +92,6 @@ export default function Details(props) {
       <KeyboardAvoidingView>
         {asset?
         <View>
-<<<<<<< HEAD
           <Text > {asset.description}</Text>
         <Text> Price Per Hour {asset.price}</Text>
         {
@@ -146,17 +145,6 @@ export default function Details(props) {
             </View>
           ))}
         
-=======
-          <Text >{asset.code}</Text>
-        <Text>{asset.price}</Text>
-      <Text>{startDateTime}</Text>
-      <Text>{endDateTime}</Text>
-
-      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut",{tName:tName,sName:sName,assetBooking:{asset , startDateTime,endDateTime}})}style={{alignItems:"center",borderRadius:50,height:20,width:200,margin:5, backgroundColor:'pink'}}>
-          <Text >CheckOut</Text>
-        </TouchableOpacity>
-
->>>>>>> master
         </View>
    
   :
