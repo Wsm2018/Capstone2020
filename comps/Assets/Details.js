@@ -25,8 +25,6 @@ import db from "../../db.js";
 require("firebase/firestore");
 
 export default function Details(props) {
-  const tName=props.navigation.getParam("tName",'failed')
-  const sName=props.navigation.getParam("sName",'failed')
   const asset = props.navigation.getParam("asset",'failed');
   const startDateTime = props.navigation.getParam("startDateTime",'failed');
   const endDateTime = props.navigation.getParam("endDateTime",'failed');

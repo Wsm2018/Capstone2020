@@ -15,13 +15,8 @@
     "expo-cli": "^3.20.1",
     "expo-firebase-recaptcha": "^1.1.0",
     "expo-image-picker": "^8.1.0",
-<<<<<<< HEAD
-    "firebase": "^7.9.0",
-    "lottie-react-native": "^3.3.2",
-=======
     "firebase": "7.9.0",
     "lottie-react-native": "~2.6.1",
->>>>>>> master
     "moment": "^2.25.3",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
@@ -31,14 +26,8 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^2.0.0",
     "react-native-gesture-handler": "~1.6.0",
-<<<<<<< HEAD
-    "react-native-paper": "^3.9.0",
     "react-native-ratings": "^7.2.0",
-    "react-native-reanimated": "~1.7.0",
-    "react-native-safe-area-context": "0.7.3",
-    "react-native-screens": "~2.2.0",
     "react-native-textarea": "^1.0.4",
-=======
     "react-native-gradient-buttons": "^2.0.1",
     "react-native-paper": "^3.10.1",
     "react-native-picker-module": "^1.3.1",
@@ -46,7 +35,6 @@
     "react-native-safe-area-context": "0.7.3",
     "react-native-screens": "~2.2.0",
     "react-native-shadow-cards": "^1.0.2",
->>>>>>> master
     "react-native-web": "~0.11.7",
     "react-native-webview": "8.1.1",
     "react-navigation": "^4.3.9",

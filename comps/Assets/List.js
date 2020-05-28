@@ -1,9 +1,5 @@
 //@refresh reset
-<<<<<<< HEAD
 import {Button,Rating} from "react-native-elements"
-=======
-import { Button } from "react-native-elements";
->>>>>>> master
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "react-navigation-stack";
 
@@ -24,7 +20,6 @@ import db from "../../db.js";
 require("firebase/firestore");
 
 export default function List(props) {
-<<<<<<< HEAD
   const [assetList, setAssetList] = useState([]); 
   const [finalAssets, setFinalAssets] = useState([]); 
   const section =  props.navigation.getParam("section",'failed').id;
@@ -88,26 +83,6 @@ export default function List(props) {
   } 
 
   const getList =  () => {
-=======
-  const [assetList, setAssetList] = useState([]);
-  const [finalAssets, setFinalAssets] = useState([]);
-  const section = props.navigation.getParam("section", "failed").id;
-  const assetTypeId = props.navigation.getParam("assetTypeId", "failed");
-  const tName = props.navigation.getParam("tName", "failed");
-  const sName = props.navigation.getParam("section", "failed").name;
-  const startDateTime = props.navigation.getParam("startDate", "failed");
-  const endDateTime = props.navigation.getParam("endDate", "failed");
-
-  useEffect(() => {
-    getList();
-  }, [section]);
-
-  useEffect(() => {
-    checkTime();
-  }, [assetList.length > 0 && finalAssets.length == 0]);
-
-  const getList = () => {
->>>>>>> master
     const temp = [];
     db.collection("assets")
       .orderBy("code")
@@ -137,10 +112,6 @@ export default function List(props) {
   };
 
   const checkTime = () => {
-<<<<<<< HEAD
-=======
-    console.log("hii");
->>>>>>> master
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -154,17 +125,11 @@ export default function List(props) {
           );
         }).length === 0
     );
-<<<<<<< HEAD
     // console.log('after checking time',assetsToShow);
-=======
-
-    console.log("after checking time", assetsToShow);
->>>>>>> master
     setFinalAssets(assetsToShow);
   };
 
   return (
-<<<<<<< HEAD
     <ScrollView>
       <View style={styles.container}>
         {/* {console.log('inside return',assetList)} */}
@@ -186,40 +151,6 @@ export default function List(props) {
       </View>
     </ScrollView>
     
-=======
-    <View style={styles.container}>
-      {/* {console.log('inside return',assetList)} */}
-      {finalAssets.length > 0 ? (
-        finalAssets.map((l, i) => (
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Details", {
-                sName: sName,
-                tName: tName,
-                asset: l,
-                startDateTime: startDateTime,
-                endDateTime: endDateTime,
-                assetTypeId,
-              })
-            }
-            key={i}
-            style={{
-              alignItems: "center",
-              borderRadius: 50,
-              height: 20,
-              width: 200,
-              margin: 5,
-              backgroundColor: "pink",
-            }}
-          >
-            <Text>{l.code}</Text>
-          </TouchableOpacity>
-        ))
-      ) : (
-        <Text>Loading</Text>
-      )}
-    </View>
->>>>>>> master
   );
 }
 

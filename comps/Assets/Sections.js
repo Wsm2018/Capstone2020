@@ -1,5 +1,5 @@
 //@refresh reset
-import { Button } from "react-native-elements";
+import { Button,Rating } from "react-native-elements";
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "react-navigation-stack";
 
@@ -46,16 +46,67 @@ export default function Sections(props) {
   }, [selectedSection]);
 
   useEffect(() => {
-    console.log("asset list is :", assetList.length);
-    console.log("finalAssets is :", finalAssets.length);
+    // console.log("asset list is :", assetList.length);
+    // console.log("finalAssets is :", finalAssets.length);
 
     if (assetList.length > 0 && finalAssets.length == 0) {
       checkTime();
     }
   }, [assetList]);
 
+  const getAllList =  () => {
+    setEndDate('00-00-0000')
+    setStartDate('00-00-0000')
+
+    const temp = [];
+    db.collection('assets').orderBy("assetSection").orderBy('code').onSnapshot((snapshot) => {
+      snapshot.forEach(async doc => {
+        //console.log(section)
+          let bookingTemp = [];
+          let bookings = await db.collection('assets').doc(doc.id).collection('assetBookings').get()
+          if(bookings){
+              bookings.forEach(b => {
+              bookingTemp.push(b.data())
+            })
+          }
+
+          let ratingTemp = 0;
+          let ratingAvg = 0;
+          let rating = await db.collection('assets').doc(doc.id).collection('reviews').get()
+          if(rating){
+            
+            let count = 0;
+            rating.forEach(r => {
+              ratingTemp+=r.data().rating;
+              //console.log('sum',ratingTemp)
+              count++;
+              // console.log(count)
+            })
+            ratingAvg = parseFloat(ratingTemp)/parseFloat(count);
+
+            if(!isNaN(ratingAvg)){
+              //console.log('avg is a number',ratingAvg)
+            }else{
+              ratingAvg = 0;
+              //console.log('avg is not a number',ratingAvg);
+            }
+            
+          }
+
+          temp.push({id:doc.id, rr:ratingAvg,assetBookings:bookingTemp,...doc.data()})
+
+          if(temp.length === snapshot.docs.length){
+            //console.log('assets',temp)
+            setAssetList(temp)
+          }
+      });
+    }
+    )
+  } 
+
   const getList = () => {
-    console.log("section rn", selectedSection);
+    
+    // console.log("section rn", selectedSection);
     const temp = [];
 
     db.collection("assets")
@@ -85,7 +136,7 @@ export default function Sections(props) {
   };
 
   const checkTime = () => {
-    console.log("hii");
+    // console.log("hii");
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -104,34 +155,7 @@ export default function Sections(props) {
     setFinalAssets(assetsToShow);
   };
 
-  //design testing variable
-  const [assetSections2, setAssetSections2] = useState([
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-  ]);
-  const [finalAssets2, setFinalAssets2] = useState([
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-  ]);
-
+ 
   //design view new variables
   const [listView, setListView] = useState(false);
   ///////////////////////////////////////////////////////////////////
@@ -153,13 +177,13 @@ export default function Sections(props) {
   }, [finalAssets]);
 
   useEffect(() => {
-    console.log(startDate);
+    // console.log(startDate);
   }, [startDate]);
   useEffect(() => {
     //Added by design team
     endDate && setShowSections(true);
     ////////////////////////////////
-    console.log(endDate);
+    // console.log(endDate);
   }, [endDate]);
 
   const getSections = async () => {
@@ -171,7 +195,7 @@ export default function Sections(props) {
     sections.forEach((doc) => {
       temp.push({ id: doc.id, ...doc.data() });
     });
-    console.log(temp);
+    // console.log(temp);
     setAssetSections(temp);
   };
 
@@ -191,6 +215,7 @@ export default function Sections(props) {
         </View>
         <View style={styles.one}>
           <Text style={styles.cardTitle}>Choose Date & Time</Text>
+          <Button title='Show all assets' onPress={getAllList}></Button>
           <View style={{ flexDirection: "row" }}>
             <View
               style={{
@@ -386,6 +411,13 @@ export default function Sections(props) {
                       >
                         {l.code}
                       </Text>
+                      <Rating
+                        type='star'
+                        ratingCount={5}
+                        startingValue={l.rr}
+                        imageSize={5}
+                        readonly
+                      />
                     </View>
                   </TouchableOpacity>
                 </View>
