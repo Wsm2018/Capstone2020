@@ -326,3 +326,29 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
   });
   return response;
 });
+
+exports.getAdmin = functions.https.onCall(async (data, context) => {
+  if (context.auth.token.moderator !== true) {
+    return {
+      error:
+        "Request Not authorized. User must be an admin to make this request",
+    };
+  }
+  const email = data.email;
+  return grantAdminRole(email).then(async () => {
+    const user = await admin.auth().getUserByEmail(email);
+    return {
+      result: user.customClaims,
+    };
+  });
+});
+
+async function grantAdminRole(email) {
+  const user = await admin.auth().getUserByEmail(email);
+  if (user.customClaims.moderator) {
+    return user;
+  }
+  return admin.auth().setCustomUserClaims(user.uid, {
+    moderator: true,
+  });
+}

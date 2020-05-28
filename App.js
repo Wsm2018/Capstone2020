@@ -14,6 +14,7 @@ import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 import { encode, decode } from "base-64";
 
 if (!global.btoa) {
@@ -34,13 +35,14 @@ import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
-import HomePage from "./comps/HomePage";
+import AdminHomeStack from "./navigation/AdminHomeStack";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [firstLaunch, setFirstLaunch] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState(false);
   const [guideView, setGuideView] = useState(true);
+  const [admin, setAdmin] = useState(null);
 
   const handleLogout = () => {
     firebase.auth().signOut();
@@ -177,33 +179,37 @@ export default function App(props) {
     setUser(user);
   }
 
-  async function getFirstLaunch() {
-    const value = await AsyncStorage.getItem("alreadyLaunched");
-    console.log("valueeeeeeeeeeeee", value);
-    if (!value) {
-      AsyncStorage.setItem("alreadyLaunched", true);
-      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-      setFirstLaunch(true);
-    } else {
-      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
-      setFirstLaunch(false);
+  const getFirstLaunch = async () => {
+    try {
+      const value = await AsyncStorage.getItem("alreadyLaunched");
+      console.log("valueeeeeeeeeeeee", value);
+      if (!value) {
+        await AsyncStorage.setItem("alreadyLaunched", "true");
+        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(true);
+      } else {
+        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(false);
+      }
+    } catch (err) {
+      console.log(err);
     }
-  }
-
-  // useEffect(() => {
-  //   getFirstLaunch();
-  // }, []);
+  };
 
   useEffect(() => {
-    console.log(loggedIn);
+    getFirstLaunch();
+  }, []);
+
+  useEffect(() => {
     if (loggedIn) {
       getUser();
+      getAdminUser();
+    } else {
+      setAdmin(null);
     }
   }, [loggedIn]);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
@@ -214,6 +220,29 @@ export default function App(props) {
     setGuideView(false);
   };
 
+  const getAdminUser = async () => {
+    const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    const response = await getAdmin({
+      email: firebase.auth().currentUser.email,
+    });
+
+    // console.log("hello !!", response.data.result === undefined ? false : true);
+    const result = response.data.result !== undefined ? true : false;
+    setAdmin(result);
+
+    // console.log("res", result);
+  };
+
+  useEffect(() => {
+    console.log("this is admin stuff", admin);
+  }, [admin]);
+
+  const adminTabNav = createBottomTabNavigator({
+    Home: AdminHomeStack,
+    Profile: ProfileStack,
+  });
+  const AdminAppContainer = createAppContainer(adminTabNav);
+
   if (!loggedIn) {
     return (
       <View style={styles.container}>
@@ -221,25 +250,8 @@ export default function App(props) {
       </View>
     );
   } else {
-    // if (firstLaunch && guideView) {
-    //   return <Guide guideSkip={guideSkip} />;
-    // } else {
-    return <AppContainer />;
-    // }
+    return admin !== null && (admin ? <AdminAppContainer /> : <AppContainer />);
   }
-
-  // return (
-  //   // <View style={styles.container}>
-  //   //   {!loggedIn ? (
-
-  //   //   ) : (
-  //   //     // <View style={styles.container}>
-  //   //       <AppContainer />
-  //   //       {/* <HomePage /> */}
-  //   //     // </View>
-  //   //   )}
-  //   // </View>
-  // );
 }
 
 const styles = StyleSheet.create({
