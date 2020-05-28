@@ -350,7 +350,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
       outstandingBalance: 0,
       balance: 0,
       email: data.email,
-      role: data.role + "undone",
+      role: data.role + " (incomplete)",
       qrCode: "",
       displayName: data.displayName,
       phone: null,
@@ -378,7 +378,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
 
 exports.updatePassword = functions.https.onCall(async (data, context) => {
   console.log("updatePassword data", data);
-  const result = await admin.auth().updateUser(data.id, {
+  const result = await admin.auth().updateUser(data.user.id, {
     password: data.password,
   });
   console.log("after set", result);
@@ -390,7 +390,26 @@ exports.getAllUndoneUsers = functions.https.onCall(async (data, context) => {
   listResult.users.forEach((user) => {});
 });
 
-exports.test = functions.https.onCall(async (data, context) => {
+exports.resetEmployeePassword = functions.https.onCall(
+  async (data, context) => {
+    let password = Math.random().toString(36).slice(-8);
+    let role = data.user.role;
+    if (data.user.role.slice(-12) !== "(incomplete)") {
+      role = role + " (incomplete)";
+    }
+
+    const result = await admin.auth().updateUser(data.user.id, {
+      password,
+    });
+
+    await db.collection("users").doc(data.user.id).update({ role });
+
+    console.log("result", result);
+    return { password };
+  }
+);
+
+exports.testJose = functions.https.onCall(async (data, context) => {
   console.log("data.id", data.id);
   // let userId = data.id;
   // let additionalClaims = {

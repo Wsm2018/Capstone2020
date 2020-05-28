@@ -30,7 +30,7 @@ export default function EmployeeHandlerCreate(props) {
     "manager",
     "user handler",
   ];
-  const [role, setRole] = useState("-1");
+  const [role, setRole] = useState({ value: "-1", error: false });
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -42,7 +42,7 @@ export default function EmployeeHandlerCreate(props) {
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
 
-  // ------------------------------------------------------------------
+  // -------------------------------COMPANY DOMAIN-----------------------------------
   const handleCompany = async () => {
     let snapshot = await db.collection("company").get();
     let tempCompany = "";
@@ -51,7 +51,7 @@ export default function EmployeeHandlerCreate(props) {
     setCompany(tempCompany);
   };
 
-  // ------------------------------------------------------------------
+  // -------------------------------VALIDATE INPUTS-----------------------------------
   const validated = async () => {
     let count = 0;
 
@@ -62,7 +62,7 @@ export default function EmployeeHandlerCreate(props) {
 
     let nameList = await db
       .collection("users")
-      .where("displayName", "==", email.text + company)
+      .where("displayName", "==", displayName.text)
       .get();
 
     if (emailList.size > 0 || email.text === "") {
@@ -81,21 +81,29 @@ export default function EmployeeHandlerCreate(props) {
       count++;
     }
 
-    if (count === 2) {
+    if (role.value === "-1") {
+      console.log("role bad");
+      setRole({ value: role.value, error: true });
+    } else {
+      console.log("role good");
+      count++;
+    }
+    console.log(count);
+    if (count === 3) {
       return true;
     } else {
       return false;
     }
   };
 
-  // ------------------------------------------------------------------
+  // --------------------------------CREATE----------------------------------
   const handleCreate = async () => {
-    if (validated()) {
+    if (await validated()) {
       let create = firebase.functions().httpsCallable("createEmployee");
       let response = await create({
         email: email.text + company,
         displayName: displayName.text,
-        role,
+        role: role.value,
       });
       console.log("response", response.data);
 
@@ -119,7 +127,7 @@ export default function EmployeeHandlerCreate(props) {
     }
   };
 
-  // ------------------------------------------------------------------
+  // -------------------------------DELETE-----------------------------------
   const handleDelete = async () => {
     let query = await db
       .collection("users")
@@ -170,7 +178,7 @@ export default function EmployeeHandlerCreate(props) {
       <Text
         style={displayName.error ? { color: "red" } : { color: "transparent" }}
       >
-        * A Display Name is required
+        * Invalid Display Name
       </Text>
 
       {/* ---------------------------------ROLE--------------------------------- */}
@@ -178,8 +186,10 @@ export default function EmployeeHandlerCreate(props) {
       <View style={{ borderColor: "lightgray", backgroundColor: "lightgray" }}>
         <Picker
           // mode="dropdown"
-          selectedValue={role}
-          onValueChange={(itemValue, itemIndex) => setRole(itemValue)}
+          selectedValue={role.value}
+          onValueChange={(itemValue, itemIndex) =>
+            setRole({ value: itemValue, error: false })
+          }
         >
           <Picker.Item
             label="Select a role"
@@ -191,6 +201,9 @@ export default function EmployeeHandlerCreate(props) {
           ))}
         </Picker>
       </View>
+      <Text style={role.error ? { color: "red" } : { color: "transparent" }}>
+        * Select a Role
+      </Text>
 
       {/* ---------------------------------SUBMIT--------------------------------- */}
       <Text></Text>

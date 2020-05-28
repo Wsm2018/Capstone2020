@@ -41,9 +41,7 @@ export default function EmployeeHandlerCreate(props) {
   };
 
   // ------------------------------------------------------------------
-  useEffect(() => {
-    handleAccount();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <View style={styles.container}>
