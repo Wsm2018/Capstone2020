@@ -7,7 +7,7 @@ import {
   MaterialCommunityIcons,
   Ionicons,
 } from "@expo/vector-icons";
-
+import { Dimensions } from "react-native";
 export default function ReferralScreen(props) {
   const user = props.user;
   console.log("user from referrel ", user);
@@ -38,12 +38,13 @@ export default function ReferralScreen(props) {
               // elevation={2}
               style={{
                 width: "50%",
+                // flex: 1,
                 // backgroundColor: "#6b9c74",
                 // backgroundColor: "rgb(26,148,149)",
                 backgroundColor: "#e3e1e1",
 
                 // height: "50%",
-                flex: 0.4,
+                flex: 0.5,
                 borderWidth: 1,
                 // borderTopWidth: 0,
                 borderColor: "darkgray",
@@ -51,12 +52,16 @@ export default function ReferralScreen(props) {
             >
               <View
                 style={{
+                  // backgroundColor: "red",
+                  flex: 1,
                   flexDirection: "row",
                   justifyContent: "center",
                 }}
               >
                 <View
                   style={{
+                    // backgroundColor: "red",
+                    flex: 1,
                     // flexDirection: "row",
                     justifyContent: "center",
                   }}
@@ -78,7 +83,7 @@ export default function ReferralScreen(props) {
                     style={{
                       // marginStart: 10,
                       textAlign: "center",
-                      fontSize: 20,
+                      fontSize: 18,
                       // fontWeight: "bold",
                       // borderBottomWidth: 1,
                       color: "black",

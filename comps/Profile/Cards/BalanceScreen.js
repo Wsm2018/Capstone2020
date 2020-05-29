@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Button,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Button, StyleSheet, TouchableOpacity } from "react-native";
+import Image from "react-native-scalable-image";
 
 import GradientButton from "react-native-gradient-buttons";
 import { Text } from "react-native-elements";
@@ -14,6 +9,8 @@ import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
+import { Dimensions } from "react-native";
+
 import { isMoment } from "moment";
 
 export default function BalanceScreen({ navigation }) {
@@ -118,12 +115,13 @@ export default function BalanceScreen({ navigation }) {
               onPress={() => navigation.navigate("Cards", { user: user })}
             >
               <Image
+                width={Dimensions.get("window").width / 5}
                 source={require("../../../assets/images/listcards2.png")}
-                style={{ height: 68, width: 68 }}
+                //style={{ height: 68, width: 68 }}
               />
               <Text
                 style={{
-                  marginTop: -15,
+                  // marginTop: -15,
                   textAlign: "center",
                   fontSize: 16,
                   fontWeight: "bold",
