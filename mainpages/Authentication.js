@@ -48,7 +48,10 @@ export default function Authentication(props) {
 
   //***** Access Code  */
   const [AccessCode, setAccessCode] = useState("");
+  const [AccessEmail, setAccessEmail] = useState("email@email.com");
   const [AccessAmount, setAccessAmount] = useState("QR");
+  const [accessDisplayName, setAccessDisplayName] = useState("");
+  const [accessRef, setAccessRef] = useState();
   // ***** Register useState *****
 
   const [registerEmail, setRegisterEmail] = useState("");
@@ -330,12 +333,58 @@ export default function Authentication(props) {
   };
 
   const handleAccessCode = async () => {
-    if (AccessCode === "") {
+    if (AccessCode.length !== 8) {
       setAccessCodeError("red");
     } else {
-      setAccessCodeError("transparent");
-      setAccessValid(true);
+      const result = await db
+        .collectionGroup("gifts")
+        .where("expiryDate", ">", new Date())
+        .where("code", "==", AccessCode)
+        .where("status", "==", false)
+        .get();
+      if (result.size === 1) {
+        result.forEach((doc) => {
+          setAccessRef(doc.ref);
+          setAccessEmail(doc.data().email);
+          setAccessAmount("QR " + doc.data().giftBalance);
+          setAccessCodeError("transparent");
+          setAccessValid(true);
+        });
+      } else {
+        setAccessCodeError("red");
+      }
     }
+  };
+
+  const handleAccessCodeData = async () => {
+    if (accessDisplayName === "") {
+      return setDisplayErr2("red");
+    } else {
+      const result = allUsers.filter((item) => {
+        return item.displayName == accessDisplayName;
+      });
+      if (result.length > 0) {
+        return setDisplayErr2("red");
+      } else {
+        setDisplayErr2("transparent");
+      }
+    }
+    if (phoneAccess.length !== 8) {
+      return setPhoneErr2("red");
+    } else {
+      setPhoneErr2("transparent");
+    }
+    accessRef.update({ status: true });
+
+    await firebase.auth().signInAnonymously();
+
+    const response = await fetch(
+      `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
+        firebase.auth().currentUser.uid
+      }&phoneNumber=${phoneAccess}&displayName=${accessDisplayName}&referralStatus=${"false"}&role=${"guest"}&path=${
+        accessRef.path
+      }`
+    );
   };
 
   const handleSetRegisterView = () => {
@@ -875,8 +924,7 @@ export default function Authentication(props) {
                           />
                         }
                         containerStyle={styles.AccessInputs}
-                        onChangeText={setLoginEmail}
-                        value={"email@email.com"}
+                        value={AccessEmail}
                         inputStyle={{
                           color: "#20365F",
                           fontSize: 16,
@@ -926,13 +974,16 @@ export default function Authentication(props) {
                         />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setDisplayName}
+                      onChangeText={setAccessDisplayName}
                       placeholder="Display Name"
-                      value={displayName}
+                      value={accessDisplayName}
                       inputStyle={{
                         fontSize: 16,
                       }}
                       placeholderTextColor="#20365F"
+                      errorMessage="* Invalid Display Name"
+                      errorStyle={{ color: displayErr2 }}
+                      renderErrorMessage
                     />
                     <View
                       style={{
@@ -969,7 +1020,7 @@ export default function Authentication(props) {
                         keyboardType="number-pad"
                         placeholder="+974"
                         errorMessage="* Invalid Phone No."
-                        errorStyle={{ color: phoneError }}
+                        errorStyle={{ color: phoneErr2 }}
                         renderErrorMessage
                         disabled={true}
                       />
@@ -1005,7 +1056,7 @@ export default function Authentication(props) {
                         placeholder="Phone No."
                         value={phoneAccess}
                         errorMessage="* Invalid Phone No."
-                        errorStyle={{ color: phoneError }}
+                        errorStyle={{ color: phoneErr2 }}
                         renderErrorMessage
                       />
                     </View>
@@ -1013,7 +1064,7 @@ export default function Authentication(props) {
                     <View style={{ marginTop: "7%" }}>
                       <TouchableOpacity
                         style={styles.loginButton}
-                        onPress={() => setAccessValid(false)}
+                        onPress={handleAccessCodeData}
                       >
                         <Text style={{ color: "white" }}>Next</Text>
                       </TouchableOpacity>
