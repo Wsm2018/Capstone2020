@@ -203,11 +203,35 @@ export default function Sections(props) {
     setAssetSections(temp);
   };
 
+  const checkFavorites = async (id) => {
+    const favorites = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("favorites")
+      .get();
+    const ids = [];
+    favorites.forEach((doc) => {
+      ids.push(doc.id);
+    });
+    return ids.includes(id);
+  };
+
   const handleAddFavorite = async (item) => {
+    // console.log(item);
+    // if (!(await checkFavorites(item.id))) {
+    //   db.collection("users")
+    //     .doc(firebase.auth().currentUser.uid)
+    //     .collection("favorites")
+    //     .doc(item.id)
+    //     .set({ asset: item });
+    // } else {
+    //   alert("Already exists");
+    // }
+
     const addFavorite = firebase.functions().httpsCallable("addFavorite");
     const response = await addFavorite({
       uid: firebase.auth().currentUser.uid,
-      assetId: item.id,
+      asset: item,
     });
     console.log(response);
     if (response.data !== "Exists") {
@@ -322,7 +346,7 @@ export default function Sections(props) {
           <Text style={styles.cardTitle}>Sections</Text>
           {showSections === true ? (
             assetSections.map((s, i) => (
-              <View style={{ width: "33%", alignItems: "center" }}>
+              <View style={{ width: "33%", alignItems: "center" }} key={i}>
                 <TouchableOpacity
                   onPress={
                     // (
@@ -337,7 +361,6 @@ export default function Sections(props) {
                     //     assetTypeId: type,
                     //   }))
                   }
-                  key={i}
                   style={{
                     backgroundColor: selectedSection === s ? "gray" : "#C6CBD0",
                     width: 100,
@@ -384,7 +407,7 @@ export default function Sections(props) {
           {listView === true ? (
             finalAssets.length > 0 ? (
               finalAssets.map((l, i) => (
-                <View style={{ width: "20%", alignItems: "center" }}>
+                <View style={{ width: "20%", alignItems: "center" }} key={i}>
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {

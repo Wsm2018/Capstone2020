@@ -1,5 +1,13 @@
+//@refresh restart
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -15,20 +23,13 @@ export default function Favorites({
   const getUserFavoriteAssets = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
+      .collection("favorites")
       .onSnapshot((querySnap) => {
-        const data = querySnap.data();
-        const favorites = data.favorite;
-        let assetArr = [];
-        favorites.map(async (item) => {
-          db.collection("assets")
-            .doc(item)
-            .onSnapshot((doc) => {
-              assetArr.push({ id: doc.id, ...doc.data() });
-              if (favorites.length === assetArr.length) {
-                setFavoriteAssets([...assetArr]);
-              }
-            });
+        let favorites = [];
+        querySnap.forEach((document) => {
+          favorites.push({ id: document.id, ...document.data() });
         });
+        setFavoriteAssets([...favorites]);
       });
   };
 
@@ -49,6 +50,7 @@ export default function Favorites({
   };
 
   const handleDeleteFavorite = async (id) => {
+    // console.log(id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
@@ -65,23 +67,29 @@ export default function Favorites({
 
   return (
     <Modal visible={favoritesModal} transparent={false}>
-      <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity onPress={() => setFavoritesModal(false)}>
             <Text>X</Text>
           </TouchableOpacity>
         </View>
         <View style={{ flex: 10 }}>
-          {favoriteAssets.map((item) => (
-            <View>
-              <Text>{item.name}</Text>
-              <TouchableOpacity onPress={() => handleDeleteAlert(item.id)}>
-                <Text>X</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          {favoriteAssets.length === 0 ? (
+            <Text>No Fav</Text>
+          ) : (
+            favoriteAssets.map((item, index) => (
+              <View key={index}>
+                <Text>{item.asset.name}</Text>
+                <TouchableOpacity
+                  onPress={() => handleDeleteAlert(item.asset.id)}
+                >
+                  <Text>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }

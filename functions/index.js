@@ -181,7 +181,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       email:
         request.query.role === "guest" ? accessDoc.data().email : result.email,
       role: request.query.role === "guest" ? "guest" : "user",
-      qrCode: "",
+      qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
       referralCode,
@@ -363,24 +363,79 @@ exports.deleteFavorite = functions.https.onCall(async (data, context) => {
   const res = await db
     .collection("users")
     .doc(data.uid)
-    .update({
-      favorite: admin.firestore.FieldValue.arrayRemove(data.assetId),
-    });
+    .collection("favorites")
+    .doc(data.assetId)
+    .delete();
   return res;
 });
 
 exports.addFavorite = functions.https.onCall(async (data, context) => {
-  const user = (await db.collection("users").doc(data.uid).get()).data();
-  const userFavorite = user.favorite;
-  if (userFavorite.includes(data.assetId)) return "Exists";
+  // const user = (await db.collection("users").doc(data.uid).get()).data();
+  // const userFavorite = user.favorite;
+  // if (userFavorite.includes(data.assetId)) return "Exists";
 
-  userFavorite.push(data.assetId);
-  const response = await db.collection("users").doc(data.uid).update({
-    favorite: userFavorite,
-  });
-  return response;
+  // userFavorite.push(data.assetId);
+  // const response = await db.collection("users").doc(data.uid).update({
+  //   favorite: userFavorite,
+  // });
+  // return response;
+  console.log("data", data);
+  const status = await checkFavorites(data.uid, data.asset.id);
+  console.log("status", status);
+  if (!status) {
+    const response = await db
+      .collection("users")
+      .doc(data.uid)
+      .collection("favorites")
+      .doc(data.asset.id)
+      .set({ asset: data.asset });
+    console.log("response ", response);
+    return response;
+  } else {
+    return "Exists";
+  }
 });
 
+const checkFavorites = async (id, assetId) => {
+  console.log("id ,", id);
+  const favorites = await db
+    .collection("users")
+    .doc(id)
+    .collection("favorites")
+    .get();
+  const ids = [];
+  favorites.forEach((doc) => {
+    ids.push(doc.id);
+  });
+  console.log("ids ", ids);
+  return ids.includes(assetId);
+};
+
+exports.getAdmin = functions.https.onCall(async (data, context) => {
+  if (context.auth.token.moderator !== true) {
+    return {
+      error:
+        "Request Not authorized. User must be an admin to make this request",
+    };
+  }
+  const email = data.email;
+  return grantAdminRole(email).then(async () => {
+    const user = await admin.auth().getUserByEmail(email);
+    return {
+      result: user.customClaims,
+    };
+  });
+});
+
+async function grantAdminRole(email) {
+  const user = await admin.auth().getUserByEmail(email);
+  if (user.customClaims.moderator) {
+    return user;
+  }
+  return admin.auth().setCustomUserClaims(user.uid, {
+    moderator: true,
+  });
+}
 exports.giftsExpCheck = functions.pubsub
   .schedule("46 10 * * *")
   .timeZone("Asia/Qatar")
