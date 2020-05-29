@@ -34,7 +34,10 @@ export default function CheckOut(props) {
     "serviceBooking",
     "some default value"
   );
+
+  ////////////////////////////Front-End////////////////////////////////////////////
   const [displayServices, setDisplayServices] = useState([]);
+
   const [displayServices2, setDisplayServices2] = useState([
     {
       ServiceName: "Name #1",
@@ -67,13 +70,18 @@ export default function CheckOut(props) {
       hours: "10:30 AM",
     },
   ]);
+
+  const [subtotal, setSubTotal] = useState(0);
+
+  /////////////////////////////////////////////////////////////////////////////////////////////
+
   //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
 
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     if (assetBooking) {
-      console.log("assset -----------------------", assetBooking.asset.price);
+      // console.log("assset -----------------------", assetBooking.asset.price);
 
       var start = assetBooking.startDateTime.split(" ").join("");
       var end = assetBooking.endDateTime.split(" ").join("");
@@ -184,6 +192,16 @@ export default function CheckOut(props) {
 
   return (
     <ScrollView style={styles.container}>
+      {/* {console.log(
+        "-=-=-=-==-=-=-=-=-=-serviceBooking",
+        serviceBooking,
+        "--assetBooking",
+        assetBooking,
+        "--tName",
+        tName,
+        "--sName",
+        sName
+      )} */}
       <View style={styles.header}>
         <LottieView
           source={require("../../assets/trialimages/7337-credit-card-check-animation.json")}
@@ -205,41 +223,40 @@ export default function CheckOut(props) {
           <Text
             style={{
               marginLeft: "2%",
-              fontSize: 18,
+              fontSize: 22,
               color: "#474a47",
               padding: "2%",
             }}
           >
-            Parking Summary
+            Booking Summary
           </Text>
           <View style={styles.text}>
             <Text style={{ fontSize: 15, color: "gray", marginTop: "1%" }}>
-              Type Name
+              Type
             </Text>
             <Text style={{ fontSize: 15, marginTop: "1%" }}>{tName}</Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>Section name</Text>
+            <Text style={{ fontSize: 15, color: "gray" }}>Section</Text>
             <Text style={{ fontSize: 15 }}> {sName}</Text>
           </View>
           <View style={styles.text}>
+            <Text style={{ fontSize: 15, color: "gray" }}>Item</Text>
+            <Text style={{ fontSize: 15 }}> {assetBooking.asset.name}</Text>
+          </View>
+          <View style={styles.text}>
             <Text style={{ fontSize: 15, color: "gray" }}>
-              Start Date and Time{" "}
+              Start Date & Time
             </Text>
             <Text style={{ fontSize: 15 }}>{assetBooking.startDateTime}</Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>
-              End Date and Time{" "}
-            </Text>
+            <Text style={{ fontSize: 15, color: "gray" }}>End Date & Time</Text>
             <Text style={{ fontSize: 15 }}>{assetBooking.endDateTime}</Text>
           </View>
           <View style={styles.text}>
             <Text style={{ fontSize: 15, color: "gray" }}>Price Per Hour</Text>
-            <Text style={{ fontSize: 15 }}>
-              {" "}
-              {assetBooking.asset.price} QAR
-            </Text>
+            <Text style={{ fontSize: 15 }}>{assetBooking.asset.price} QAR</Text>
           </View>
           <View style={styles.text}>
             <Text style={{ fontSize: 15, color: "gray", marginBottom: "3%" }}>
@@ -264,27 +281,27 @@ export default function CheckOut(props) {
               padding: "2%",
             }}
           >
-            Service/s Summary
+            Service(s)
           </Text>
-          {displayServices3.map((s) => (
+          {serviceBooking.map((s, i) => (
             <View>
               <View style={styles.text}>
                 <Text style={{ fontSize: 15, color: "gray", marginTop: "1%" }}>
-                  {s.ServiceNo}
+                  Service #{i + 1}
                 </Text>
                 <Text style={{ fontSize: 15, marginTop: "1%" }}>
-                  {s.Service}
+                  {s.service.name}
                 </Text>
               </View>
               <View style={styles.text}>
-                <Text style={{ fontSize: 15, color: "gray" }}>Time</Text>
-                <Text style={{ fontSize: 15 }}>{s.hours} </Text>
+                <Text style={{ fontSize: 15, color: "gray" }}>Date & Time</Text>
+                <Text style={{ fontSize: 15 }}>{(s.day, "", s.show)} </Text>
               </View>
               <View style={styles.text}>
                 <Text style={{ fontSize: 15, color: "gray" }}>
                   Price Per Hour
                 </Text>
-                <Text style={{ fontSize: 15 }}>{s.PricePerHour} QAR</Text>
+                <Text style={{ fontSize: 15 }}>{s.service.price} QAR</Text>
               </View>
 
               <View style={styles.text}>
@@ -294,7 +311,7 @@ export default function CheckOut(props) {
                   Amount
                 </Text>
                 <Text style={{ fontSize: 15, marginBottom: "3%" }}>
-                  {s.Total} QAR
+                  {s.service.price} QAR
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
@@ -325,11 +342,13 @@ export default function CheckOut(props) {
             <Text style={{ fontSize: 15, color: "gray", marginTop: "3%" }}>
               Subtotal
             </Text>
-            <Text style={{ fontSize: 15, marginTop: "3%" }}>120 QAR</Text>
+            <Text style={{ fontSize: 15, marginTop: "3%" }}>
+              {subtotal} QAR (Backend code needed)
+            </Text>
           </View>
           <View style={styles.text}>
             <Text style={{ fontSize: 15, color: "gray" }}>Discount</Text>
-            <Text style={{ fontSize: 15 }}> 50%</Text>
+            <Text style={{ fontSize: 15 }}> 50% (Backend needed)</Text>
           </View>
           <View style={styles.text}>
             <Text
@@ -350,7 +369,7 @@ export default function CheckOut(props) {
                 marginBottom: "3%",
               }}
             >
-              60 QAR
+              {totalAmount} QAR (Backend needed)
             </Text>
           </View>
           <Card.Actions>
@@ -409,7 +428,7 @@ const styles = StyleSheet.create({
     // height: Math.round(Dimensions.get("window").height),
   },
   header: {
-    backgroundColor: "#00152B",
+    backgroundColor: "#e3e3e3",
     justifyContent: "flex-start",
     alignItems: "center",
     height: "17%",

@@ -17,7 +17,7 @@ import {
 import { Surface } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
 // import { Card, Divider } from "react-native-elements";
-import { Card, Dividerm, Badge } from "react-native-elements";
+import { Dividerm, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -263,7 +263,8 @@ export default function Sections(props) {
             source={require("../../assets/images/test.jpg")}
           /> */}
           <Card.Cover
-            source={{ uri: "https://picsum.photos/700" }}
+            // source={{ uri: "https://picsum.photos/700" }}
+            source={require("../../assets/images/bookingcover1.jpg")}
             style={{ width: "100%" }}
           />
         </View>
