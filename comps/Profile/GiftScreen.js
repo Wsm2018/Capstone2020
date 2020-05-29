@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   Platform,
   StyleSheet,
+  Modal,
   TextInput,
+  Dimensions,
   KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
@@ -14,7 +16,7 @@ import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
 import { Input, Button } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
 const validator = require("email-validator");
-
+const { width, height } = Dimensions.get("screen");
 import ReactNativePickerModule from "react-native-picker-module";
 import db from "../../db";
 import firebase from "firebase/app";
@@ -25,6 +27,7 @@ export default function GiftScreen(props) {
   const [amount, setAmount] = useState("");
   const [flag, setFlag] = useState(false);
   const [view, setView] = useState("first");
+  const [modal, setModal] = useState(false);
   const amounts = {
     labels: ["100", "50", "10", "Other Amount"],
     values: ["100", "50", "10", "other"],
@@ -44,9 +47,7 @@ export default function GiftScreen(props) {
   };
 
   const handleSend = async () => {
-    alert("sending...");
-    //const response = await fetch(`https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${email}?sub=Gift$body${}`)
-    // const message = `You got a gift code worth ${amount}QR from ${firebase.auth().currentUser.email}. \n Your code is`
+    // alert("sending...");
 
     // checking if the user balance is less than the gift balance
     const userDoc = await db
@@ -58,14 +59,14 @@ export default function GiftScreen(props) {
       alert("You don't have enough balance!");
       setAmount("");
     } else {
-      let send = firebase.functions().httpsCallable("sendGift");
-      let response = await send({
-        email,
-        giftBalance: parseInt(amount),
-        uid: firebase.auth().currentUser.uid,
-        displayName: firebase.auth().currentUser.displayName,
-      });
-      alert("sent");
+      // let send = firebase.functions().httpsCallable("sendGift");
+      // let response = await send({
+      //   email,
+      //   giftBalance: parseInt(amount),
+      //   uid: firebase.auth().currentUser.uid,
+      //   displayName: firebase.auth().currentUser.displayName,
+      // });
+      setModal(true);
     }
   };
 
@@ -465,6 +466,39 @@ export default function GiftScreen(props) {
           )}
         </Card>
       </View>
+      <Modal transparent={true} visible={modal}>
+        <View style={styles.centeredView}>
+          <View elevation={5} style={styles.modalView}>
+            <TouchableOpacity
+              style={{
+                justifyContent: "center",
+                alignItems: "flex-end",
+                marginEnd: 15,
+                marginTop: 15,
+              }}
+              onPress={() => setModal(false)}
+            >
+              <AntDesign name="close" size={25} style={{ color: "#224229" }} />
+            </TouchableOpacity>
+
+            <View
+              style={{
+                flex: 5,
+                borderColor: "black",
+                borderBottomWidth: 2,
+              }}
+            ></View>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                // backgroundColor: "red",
+                justifyContent: "center",
+              }}
+            ></View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -472,5 +506,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // backgroundColor: "#f5f0f0",
+  },
+
+  modalView: {
+    // flexDirection:
+    // flex: 1,
+    // margin: 20,
+    height: height / 1.5,
+    width: width / 1.2,
+    backgroundColor: "#fff",
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
+    borderRadius: 20,
+    // padding: 35,
+    // justifyContent: "center",
+    // alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    // flex: 0.7,
+    paddingTop: "15%",
+  },
+  title: {
+    // alignItems: "flex-end",
+    fontSize: 20,
+    color: "black",
+    textAlign: "center",
+    fontWeight: "bold",
+    textTransform: "capitalize",
   },
 });

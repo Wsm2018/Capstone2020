@@ -30,7 +30,7 @@ import Details from "./Details";
 import Review from "./Review";
 
 import { set } from "react-native-reanimated";
-import { Avatar, Card, Title, Paragraph } from "react-native-paper";
+// import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);

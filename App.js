@@ -169,7 +169,7 @@ export default function App(props) {
           </ScrollView>
           <View>
             <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout</Text>
+              <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
