@@ -418,8 +418,8 @@ export default function ProfileScreen(props) {
                 style={{
                   flex: 1,
                   flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignItems: "center",
+                  // justifyContent: "space-around",
+                  // alignItems: "center",
                 }}
               >
                 {/* <FontAwesome5
@@ -428,28 +428,42 @@ export default function ProfileScreen(props) {
                 color="black"
                 onPress={() =>
                   props.navigation.navigate("Car", { user: props.user })
-                }
+                } 
               /> */}
-                <TouchableOpacity onPress={() => setFavoritesModal(true)}>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1.5,
+                    // width: "100%",
+                    // flexDirection: "row",
+                    // justifyContent: "space-around",
+                    // alignItems: "center",
+                  }}
+                  onPress={() => setFavoritesModal(true)}
+                >
                   <LottieView
                     source={require("../../assets/lf30_editor_6YHFU0.json")}
                     autoPlay
                     // loop
-                    style={{
-                      width: "22%",
-                      height: "100%",
-                      // backgroundColor: "red",
-                      justifyContent: "space-evenly",
-                      alignItems: "center",
-                    }}
+                    style={
+                      {
+                        // width: "22%",
+                        // height: "100%",
+                        // backgroundColor: "red",
+                        // justifyContent: "space-evenly",
+                        // alignItems: "center",
+                      }
+                    }
                   />
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={() => setCarsModal(true)}
                   style={{
                     // position: "relative",
-                    width: "50%",
-                    height: "100%",
+                    // width: "100%",
+                    flex: 1.2,
+                    // height: "100%",
                     // backgroundColor: "blue",
                     justifyContent: "center",
                     alignItems: "center",
@@ -462,43 +476,43 @@ export default function ProfileScreen(props) {
                     // loop
                     style={{
                       // position: "relative",
-                      width: "35%",
-                      height: "65%",
+                      width: "71%",
+                      height: "66%",
+                      // flex: 1,
                       // backgroundColor: "blue",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      // justifyContent: "center",
+                      // alignItems: "center",
                       // paddingTop: "5%",
                     }}
                   />
                 </TouchableOpacity>
-
-                {/* <TouchableOpacity onPress={() => setCarsModal(true)}>
-                <Image
-                  source={require("../../assets/images/caricon4.png")}
-                  style={{ height: 38, width: 85 }}
-                />
-              </TouchableOpacity> */}
-                {/* <Image
-                source={require("../../assets/images/bookingicon.png")}
-                style={{ height: 48, width: 48 }}
-                onPress={() =>
-                  props.navigation.navigate("Car", { user: props.user })
-                }
-              /> */}
-                <Image
-                  source={require("../../assets/booking.gif")}
-                  autoPlay
-                  loop
+                <View
                   style={{
                     // position: "relative",
-                    width: "22%",
-                    height: "70%",
-                    // backgroundColor: "red",
+                    // width: "100%",
+                    flex: 1.5,
+                    // height: "100%",
+                    // backgroundColor: "blue",
                     justifyContent: "center",
                     alignItems: "center",
-                    // paddingTop: "5%",
                   }}
-                />
+                >
+                  <Image
+                    source={require("../../assets/booking.gif")}
+                    autoPlay
+                    loop
+                    style={{
+                      // position: "relative",
+                      width: "60%",
+                      height: "70%",
+                      // flex: 1,
+                      // backgroundColor: "blue",
+                      // justifyContent: "center",
+                      // alignItems: "center",
+                      // paddingTop: "5%",
+                    }}
+                  />
+                </View>
               </View>
             </Card>
           </View>

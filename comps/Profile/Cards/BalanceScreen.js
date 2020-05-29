@@ -41,7 +41,7 @@ export default function BalanceScreen({ navigation }) {
         }}
       >
         <View>
-          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#0D2C6A" }}>
+          <Text style={{ fontSize: 26, fontWeight: "bold", color: "#0D2C6A" }}>
             Current Balance
           </Text>
 
@@ -62,10 +62,10 @@ export default function BalanceScreen({ navigation }) {
                 props.navigation.navigate("Balance", { user: props.user })
               }
             /> */}
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginEnd: 5 }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginEnd: 5 }}>
               {user && user.balance}
             </Text>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>QR</Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>QR</Text>
           </View>
         </View>
 
@@ -119,10 +119,11 @@ export default function BalanceScreen({ navigation }) {
             >
               <Image
                 source={require("../../../assets/images/listcards2.png")}
-                style={{ height: 60, width: 60 }}
+                style={{ height: 68, width: 68 }}
               />
               <Text
                 style={{
+                  marginTop: -15,
                   textAlign: "center",
                   fontSize: 16,
                   fontWeight: "bold",
