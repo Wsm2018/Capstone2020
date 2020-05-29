@@ -44,8 +44,21 @@ export default function App(props) {
   const [guideView, setGuideView] = useState(true);
   const [admin, setAdmin] = useState(null);
 
-  const handleLogout = () => {
-    firebase.auth().signOut();
+  const handleLogout = async () => {
+    const userInfo = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    if (userInfo.data().role === "guest") {
+      await fetch(
+        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
+          firebase.auth().currentUser.uid
+        }`
+      );
+      firebase.auth().signOut();
+    } else {
+      firebase.auth().signOut();
+    }
   };
 
   const DashboardTabNavigator = createBottomTabNavigator(
