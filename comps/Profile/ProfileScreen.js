@@ -1,15 +1,17 @@
+//@refresh restart
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   Modal,
   StyleSheet,
   Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
 } from "react-native";
+// import { Dimensions } from "react-native";
+import Image from "react-native-scalable-image";
 const LottieView = require("lottie-react-native");
 import { Card } from "react-native-shadow-cards";
 
@@ -55,6 +57,8 @@ export default function ProfileScreen(props) {
   const [view, setView] = useState(0);
   const [carsModal, setCarsModal] = useState(false);
   const [favoritesModal, setFavoritesModal] = useState(false);
+  const [flag, setFlag] = useState(false);
+  const [editPic, setEditPic] = useState("");
 
   const getUser = async () => {
     db.collection("users")
@@ -92,7 +96,10 @@ export default function ProfileScreen(props) {
         .ref()
         .child(`users/${firebase.auth().currentUser.uid}`)
         .getDownloadURL();
+      console.log("url ", url);
+      handleSaveEdit(url);
       setPhotoURL(url);
+      setFlag(false);
     } else {
       const putResult = await firebase
         .storage()
@@ -122,9 +129,11 @@ export default function ProfileScreen(props) {
       quality: 1,
     });
     if (!result.cancelled) {
-      console.log("not cancelled", result.uri);
-      handleSave(result.uri, "profile");
-      //setPhotoURL(result.uri);
+      // console.log("not cancelled", result.uri);
+      // setFlag(true);
+      setEditPic(result.uri);
+      // setFlag(false);
+      // setPhotoURL(result.uri);
     }
   };
 
@@ -137,23 +146,37 @@ export default function ProfileScreen(props) {
     });
     if (!result.cancelled) {
       console.log("not cancelled", result.uri);
+
       handleSave(result.uri, "background");
-      handleSave(result.uri);
+
+      // handleSave(result.uri);
       //setPhotoURL(result.uri);
     }
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = async (url) => {
     const updateUserInfo = firebase.functions().httpsCallable("updateUserInfo");
     const result = await updateUserInfo({
       uid: firebase.auth().currentUser.uid,
       displayName: displayName,
-      photoURL: photoURL,
+      photoURL: url,
     });
     console.log(10, result);
     getUser();
     setEdit(false);
   };
+
+  const saveImage = async () => {
+    // setPhotoURL(editPic);
+    handleSave(editPic, "profile");
+    // if (flag) {
+    //   handleSaveEdit();
+    // }
+  };
+
+  useEffect(() => {
+    console.log("flag", flag);
+  }, [flag]);
 
   return (
     user && (
@@ -180,15 +203,6 @@ export default function ProfileScreen(props) {
             <Avatar
               rounded
               source={{ uri: photoURL }}
-              size="xlarge"
-              style={styles.profileImage}
-            />
-          </View>
-
-          <View style={styles.profileImageContainer}>
-            <Avatar
-              rounded
-              source={{ uri: user.photoURL }}
               size="xlarge"
               style={styles.profileImage}
             />
@@ -266,14 +280,17 @@ export default function ProfileScreen(props) {
                     alignItems: "center",
                   }}
                 >
-                  <Avatar
-                    rounded
-                    source={{ uri: photoURL }}
-                    showAccessory
-                    onAccessoryPress={handlePickImage}
-                    size="xlarge"
-                  />
-
+                  {!flag ? (
+                    <Avatar
+                      rounded
+                      source={{ uri: editPic }}
+                      showAccessory
+                      onAccessoryPress={handlePickImage}
+                      size="xlarge"
+                    />
+                  ) : (
+                    <Text>Loading...</Text>
+                  )}
                   <Input
                     inputContainerStyle={{
                       width: "100%",
@@ -282,7 +299,7 @@ export default function ProfileScreen(props) {
                     label="Display Name"
                     value={displayName}
                     onChangeText={setDisplayName}
-                    onSubmitEditing={handleSaveEdit}
+                    onSubmitEditing={saveImage}
                   />
                 </View>
 
@@ -311,7 +328,7 @@ export default function ProfileScreen(props) {
                       //marginBottom: 10,
                     }}
                   >
-                    <TouchableOpacity onPress={handleSaveEdit}>
+                    <TouchableOpacity onPress={saveImage}>
                       <Text
                         style={{
                           textAlign: "center",
@@ -337,7 +354,13 @@ export default function ProfileScreen(props) {
                       //marginBottom: 10,
                     }}
                   >
-                    <TouchableOpacity onPress={() => setEdit(false)}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setPhotoURL(firebase.auth().currentUser.photoURL);
+                        setEditPic(photoURL);
+                        setEdit(false);
+                      }}
+                    >
                       <Text
                         style={{
                           textAlign: "center",
@@ -407,7 +430,7 @@ export default function ProfileScreen(props) {
             <Card
               elevation={2}
               style={{
-                // marginTop: "5%",
+                marginTop: "-1.5%",
                 width: "95%",
                 borderWidth: 1,
                 borderColor: "darkgray",
@@ -418,6 +441,7 @@ export default function ProfileScreen(props) {
                 style={{
                   flex: 1,
                   flexDirection: "row",
+                  // backgroundColor: "red",
                   // justifyContent: "space-around",
                   // alignItems: "center",
                 }}
@@ -433,7 +457,9 @@ export default function ProfileScreen(props) {
 
                 <TouchableOpacity
                   style={{
-                    flex: 1.5,
+                    flex: 0.9,
+                    // backgroundColor: "green",
+
                     // width: "100%",
                     // flexDirection: "row",
                     // justifyContent: "space-around",
@@ -442,6 +468,7 @@ export default function ProfileScreen(props) {
                   onPress={() => setFavoritesModal(true)}
                 >
                   <LottieView
+                    width={Dimensions.get("window").width / 3.5}
                     source={require("../../assets/lf30_editor_6YHFU0.json")}
                     autoPlay
                     // loop
@@ -449,20 +476,49 @@ export default function ProfileScreen(props) {
                       {
                         // width: "22%",
                         // height: "100%",
-                        // backgroundColor: "red",
+                        // backgroundColor: "green",
                         // justifyContent: "space-evenly",
                         // alignItems: "center",
                       }
                     }
                   />
                 </TouchableOpacity>
+                <View
+                  style={{
+                    // position: "relative",
+                    // width: "100%",
+                    flex: 0.81,
+                    // height: "100%",
+                    // backgroundColor: "red",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    width={Dimensions.get("window").width / 3.5}
+                    source={require("../../assets/images/subs.gif")}
+                    autoPlay
+                    loop
+                    style={
+                      {
+                        // position: "relative",
+                        // width: "100%",
+                        // height: "49%",
+                        // flex: 1,
+                        // justifyContent: "center",
+                        // alignItems: "center",
+                        // paddingTop: "5%",
+                      }
+                    }
+                  />
+                </View>
 
                 <TouchableOpacity
                   onPress={() => setCarsModal(true)}
                   style={{
                     // position: "relative",
                     // width: "100%",
-                    flex: 1.2,
+                    flex: 1,
                     // height: "100%",
                     // backgroundColor: "blue",
                     justifyContent: "center",
@@ -470,29 +526,33 @@ export default function ProfileScreen(props) {
                   }}
                 >
                   <Image
+                    width={Dimensions.get("window").width / 5.5}
                     source={require("../../assets/car5.gif")}
                     autoPlay
                     onPress={() => setCarsModal(true)}
                     // loop
-                    style={{
-                      // position: "relative",
-                      width: "71%",
-                      height: "66%",
-                      // flex: 1,
-                      // backgroundColor: "blue",
-                      // justifyContent: "center",
-                      // alignItems: "center",
-                      // paddingTop: "5%",
-                    }}
+                    style={
+                      {
+                        // position: "relative",
+                        // width: "70%",
+                        // height: "75%",
+                        // flex: 1,
+                        // backgroundColor: "blue",
+                        // justifyContent: "center",
+                        // alignItems: "center",
+                        // paddingTop: "5%",
+                      }
+                    }
                   />
                 </TouchableOpacity>
-                <View
+
+                {/* <View
                   style={{
                     // position: "relative",
                     // width: "100%",
                     flex: 1.5,
                     // height: "100%",
-                    // backgroundColor: "blue",
+                    backgroundColor: "red",
                     justifyContent: "center",
                     alignItems: "center",
                   }}
@@ -512,7 +572,7 @@ export default function ProfileScreen(props) {
                       // paddingTop: "5%",
                     }}
                   />
-                </View>
+                </View> */}
               </View>
             </Card>
           </View>
