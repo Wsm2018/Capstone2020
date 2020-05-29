@@ -24,18 +24,18 @@ require("firebase/firestore");
 
 
 
-export default function Details(props) {
-  const tName = props.navigation.getParam("tName", 'failed')
-  const sName = props.navigation.getParam("sName", 'failed')
-  const asset = props.navigation.getParam("asset", 'failed');
+export default function ExtendServices(props) {
+  const tName = props.tName
+  const sName = props.sName
+  const asset = props.asset
   const [displayServices, setDisplayServices] = useState([])
   const showBookings = useRef()
   const [serviceBooking, setServiceBooking] = useState([])
   const SB = useRef()
   const [selectedService, setSelectedService] = useState()
-  const assetTypeId = props.navigation.getParam("assetTypeId", 'no');
-  const startDateTime = props.navigation.getParam("startDateTime", 'no');
-  const endDateTime = props.navigation.getParam("endDateTime", 'no');
+  const assetTypeId = props.assetTypeId
+  const startDateTime = props.startDateTime
+  const endDateTime = props.endDateTime
   const start = useRef()
   const end = useRef()
   const [workers, setWorkers] = useState([])
@@ -529,7 +529,7 @@ export default function Details(props) {
   )
 }
 
-Details.navigationOptions = (props) => ({
+ExtendServices.navigationOptions = (props) => ({
   title: "Details",
   headerStyle: { backgroundColor: "white" },
   headerTintColor: "black",
