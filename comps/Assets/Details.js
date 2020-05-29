@@ -730,13 +730,13 @@ const styles = StyleSheet.create({
   registerButton: {
     backgroundColor: "#20365F",
     height: 50,
-    width: "55%",
+    width: "100%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginStart: "2%",
-    // marginEnd: "2%",
-    borderRadius: 30,
+    // // marginStart: "2%",
+    // // marginEnd: "2%",
+    borderRadius: 12,
     // marginBottom: 10,
   },
   developmentModeText: {

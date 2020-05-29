@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Surface } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
-import { Card, Divider } from "react-native-elements";
+// import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -27,6 +27,7 @@ require("firebase/firestore");
 
 import Details from "./Details";
 import { set } from "react-native-reanimated";
+import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
@@ -221,7 +222,7 @@ export default function Sections(props) {
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <Image
+          {/* <Image
             style={{
               // width: "100%",
               // height: "100%",
@@ -229,8 +230,11 @@ export default function Sections(props) {
               flex: 1,
             }}
             source={require("../../assets/images/test.jpg")}
+          /> */}
+          <Card.Cover
+            source={{ uri: "https://picsum.photos/700" }}
+            style={{ width: "100%" }}
           />
-          {/* <Text>Image</Text> */}
         </View>
         <View style={styles.one}>
           <Text style={styles.cardTitle}>Choose Date & Time</Text>
