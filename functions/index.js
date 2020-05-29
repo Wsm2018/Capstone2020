@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const cors = require("cors")({ origin: true });
+const fetch = require("node-fetch");
 
 admin.initializeApp(functions.config().firebase);
 const db = admin.firestore();
@@ -22,6 +23,44 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
     phoneNumber: `+974${data.phoneNumber}`,
   });
   console.log("after set", result);
+});
+
+exports.sendGift = functions.https.onCall(async (data, context) => {
+  const giftBalance = data.giftBalance;
+
+  const decrement = admin.firestore.FieldValue.increment(-giftBalance);
+  // updating the balance in the user document by sending the decrement variable to it
+  db.collection("users").doc(data.uid).update({ balance: decrement });
+
+  // generate a random 6 digits gift code number using Math.random()
+  let giftCode = String(Math.floor(Math.random() * 100000000));
+
+  if (giftCode.length < 8) {
+    while (giftCode < 8) {
+      giftCode = "0" + giftCode;
+    }
+  }
+
+  // creating a 3 day expire date
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + 3);
+
+  // setting a new gift document inside the user gifts subcollection that has the giftcode,
+  // giftbalance and expiryDate. The status is = to false its if the user completely finished
+  // using it and used its for if the user used the code but the booking and the process
+  // of the parking is still not finished
+  db.collection("users").doc(data.uid).collection("gifts").doc().set({
+    email: data.email,
+    code: giftCode,
+    giftBalance: data.giftBalance,
+    status: false,
+    expiryDate,
+    used: false,
+  });
+
+  const response = await fetch(
+    `https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${data.email}&sub=Gift Code&body=<p style="font-size: 16px;">You got a gift code worth ${giftBalance}QR from ${data.displayName}<br />Your Code is: ${giftCode}<br />The gift code will expire in 3 Days on ${expiryDate}</p>`
+  );
 });
 
 // Maybe gonna remove these two
@@ -326,3 +365,16 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
   });
   return response;
 });
+
+exports.giftsExpCheck = functions.pubsub
+  .schedule("59 7 * * *")
+  .timeZone("Asia/Qatar")
+  .onRun((context) => {
+    db.collection("users")
+    .doc(documentName)
+    .collection(subCollectionName).ref  
+    .where(field, "==", something)
+    .onSnapshot(snapshot => snapshot.forEach(result => result.ref.delete()));
+
+    return null;
+  });
