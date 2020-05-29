@@ -30,13 +30,14 @@ export default function ReferralScreen(props) {
               marginTop: -10,
               // backgroundColor: "red",
               alignItems: "center",
+              flexDirection: "column",
               justifyContent: "space-evenly",
             }}
           >
             <Card
               // elevation={2}
               style={{
-                width: "42%",
+                width: "50%",
                 // backgroundColor: "#6b9c74",
                 // backgroundColor: "rgb(26,148,149)",
                 backgroundColor: "#e3e1e1",
@@ -65,7 +66,8 @@ export default function ReferralScreen(props) {
                       textAlign: "center",
                       // textAlign: "right",
                       // marginStart: 10,
-                      fontSize: 29,
+                      // flex: 4,
+                      fontSize: 32,
                       fontWeight: "bold",
                       color: "black",
                     }}
@@ -76,7 +78,7 @@ export default function ReferralScreen(props) {
                     style={{
                       // marginStart: 10,
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: 20,
                       // fontWeight: "bold",
                       // borderBottomWidth: 1,
                       color: "black",

@@ -6,7 +6,6 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import db from "../../../db";
 import { Text } from "react-native-elements";
 import firebase from "firebase";

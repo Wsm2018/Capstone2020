@@ -476,8 +476,8 @@ export default function ProfileScreen(props) {
                     // loop
                     style={{
                       // position: "relative",
-                      width: "79%",
-                      height: "75%",
+                      width: "71%",
+                      height: "66%",
                       // flex: 1,
                       // backgroundColor: "blue",
                       // justifyContent: "center",
@@ -503,8 +503,8 @@ export default function ProfileScreen(props) {
                     loop
                     style={{
                       // position: "relative",
-                      width: "70%",
-                      height: "80%",
+                      width: "60%",
+                      height: "70%",
                       // flex: 1,
                       // backgroundColor: "blue",
                       // justifyContent: "center",
