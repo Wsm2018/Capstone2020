@@ -16,6 +16,10 @@ import { Card } from "react-native-shadow-cards";
 const validator = require("email-validator");
 
 import ReactNativePickerModule from "react-native-picker-module";
+import db from "../../db";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/functions";
 export default function GiftScreen(props) {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
@@ -43,6 +47,26 @@ export default function GiftScreen(props) {
     alert("sending...");
     //const response = await fetch(`https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${email}?sub=Gift$body${}`)
     // const message = `You got a gift code worth ${amount}QR from ${firebase.auth().currentUser.email}. \n Your code is`
+
+    // checking if the user balance is less than the gift balance
+    const userDoc = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+
+    if (userDoc.data().balance < parseInt(amount)) {
+      alert("You don't have enough balance!");
+      setAmount("");
+    } else {
+      let send = firebase.functions().httpsCallable("sendGift");
+      let response = await send({
+        email,
+        giftBalance: parseInt(amount),
+        uid: firebase.auth().currentUser.uid,
+        displayName: firebase.auth().currentUser.displayName,
+      });
+      alert("sent");
+    }
   };
 
   const handleFlag = () => {
@@ -266,6 +290,7 @@ export default function GiftScreen(props) {
                     style={{ width: "80%", paddingLeft: 6 }}
                     placeholder="Enter Amount"
                     onChangeText={setAmount}
+                    keyboardType="numeric"
                   />
                 </View>
               </View>
