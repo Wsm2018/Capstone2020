@@ -309,23 +309,53 @@ exports.deleteFavorite = functions.https.onCall(async (data, context) => {
   const res = await db
     .collection("users")
     .doc(data.uid)
-    .update({
-      favorite: admin.firestore.FieldValue.arrayRemove(data.assetId),
-    });
+    .collection("favorites")
+    .doc(data.assetId)
+    .delete();
   return res;
 });
 
 exports.addFavorite = functions.https.onCall(async (data, context) => {
-  const user = (await db.collection("users").doc(data.uid).get()).data();
-  const userFavorite = user.favorite;
-  if (userFavorite.includes(data.assetId)) return "Exists";
+  // const user = (await db.collection("users").doc(data.uid).get()).data();
+  // const userFavorite = user.favorite;
+  // if (userFavorite.includes(data.assetId)) return "Exists";
 
-  userFavorite.push(data.assetId);
-  const response = await db.collection("users").doc(data.uid).update({
-    favorite: userFavorite,
-  });
-  return response;
+  // userFavorite.push(data.assetId);
+  // const response = await db.collection("users").doc(data.uid).update({
+  //   favorite: userFavorite,
+  // });
+  // return response;
+  console.log("data", data);
+  const status = await checkFavorites(data.uid, data.asset.id);
+  console.log("status", status);
+  if (!status) {
+    const response = await db
+      .collection("users")
+      .doc(data.uid)
+      .collection("favorites")
+      .doc(data.asset.id)
+      .set({ asset: data.asset });
+    console.log("response ", response);
+    return response;
+  } else {
+    return "Exists";
+  }
 });
+
+const checkFavorites = async (id, assetId) => {
+  console.log("id ,", id);
+  const favorites = await db
+    .collection("users")
+    .doc(id)
+    .collection("favorites")
+    .get();
+  const ids = [];
+  favorites.forEach((doc) => {
+    ids.push(doc.id);
+  });
+  console.log("ids ", ids);
+  return ids.includes(assetId);
+};
 
 exports.getAdmin = functions.https.onCall(async (data, context) => {
   if (context.auth.token.moderator !== true) {

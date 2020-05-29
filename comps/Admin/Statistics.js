@@ -4,7 +4,8 @@ import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import db from "../../db";
-import { PieChart } from "react-native-chart-kit";
+import { PieChart, BarChart } from "react-native-chart-kit";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function Statistics(props) {
   // --------------------------------------- STATE VARIABLES -----------------------------------------
@@ -13,49 +14,41 @@ export default function Statistics(props) {
   const [allAssetTypes, setAllAssetTypes] = useState([]);
   const [allAssetBookings, setAllAssetBookings] = useState([]);
   const [allAssetSections, setAllAssetSections] = useState([]);
-  const [allAssets, setAllAssets] = useState([]);
+  const [assetChartData, setAssetChartData] = useState([]);
   const [serviceBookings, setServiceBookings] = useState([]);
-  const [chartData, setChartData] = useState([]);
-  const data = [
-    {
-      booking: 0,
-      color: "rgb(42,13,115)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-      name: "projecter",
-    },
-    {
-      booking: 21,
-      color: "rgb(188,125,98)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-      name: "petrol",
-    },
-    {
-      booking: 2,
-      color: "rgb(143,214,170)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-      name: "carWash",
-    },
-    {
-      booking: 0,
-      color: "rgb(163,253,132)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-      name: "valet",
-    },
-  ];
+  const [serviceChartData, setServiceChartData] = useState([]);
   const screenWidth = Dimensions.get("window").width;
   const chartConfig = {
-    backgroundGradientFrom: "#1E2923",
+    backgroundColor: "white",
+    backgroundGradientFrom: "white",
     backgroundGradientFromOpacity: 0,
-    backgroundGradientTo: "#08130D",
+    backgroundGradientTo: "white",
     backgroundGradientToOpacity: 0.5,
     color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    strokeWidth: 2, // optional, default 3
-    barPercentage: 0.5,
-    useShadowColorFromDataset: false, // optional
+    strokeWidth: 2,
+    barPercentage: 1,
+    useShadowColorFromDataset: false,
+  };
+
+  const data = {
+    labels: [
+      "parking 01",
+      "parking 02",
+      "parking 03",
+      "parking 04",
+      "parking 05",
+      "parking 06",
+      "parking 07",
+      "parking 08",
+      "parking 09",
+      "parking 10",
+      "parking 11",
+    ],
+    datasets: [
+      {
+        data: [3, 2, 0, 0, 3, 0, 0, 1, 3, 0, 1],
+      },
+    ],
   };
 
   // ---------------------------------------- FUNCTIONS ----------------------------------------------
@@ -76,6 +69,15 @@ export default function Statistics(props) {
     });
   };
 
+  const getAllAssetSections = async () => {
+    const assetSectionRef = await db.collection("assetSections").get();
+    const assetSections = [];
+    assetSectionRef.forEach((doc) => {
+      assetSections.push({ id: doc.id, ...doc.data() });
+    });
+    return assetSections;
+  };
+
   const getAllAssetBookings = () => {
     db.collection("assetTypes").onSnapshot((assetTypeSnapshot) => {
       let count = 0;
@@ -85,14 +87,35 @@ export default function Statistics(props) {
           .where("assetType", "==", assetType.id)
           .onSnapshot((assetSectionSnapshot) => {
             assetSectionSnapshot.forEach((assetSection) => {
-              console.log("\n");
               db.collection("assets")
                 .where("assetSection", "==", assetSection.id)
                 .onSnapshot((assetSnapshot) => {
-                  // console.log(assetSnapshot.docs.length);
+                  count += assetSnapshot.docs.length;
                   assetSnapshot.forEach((asset) => {
-                    console.log(asset.id);
-                    // console.log("asset", asset.data());
+                    db.collection("assets")
+                      .doc(asset.id)
+                      .collection("assetBookings")
+                      .onSnapshot((assetBookingSnapshot) => {
+                        assetBookings.push({
+                          bookings: assetBookingSnapshot.docs.length,
+                          asset: asset.data().name,
+                          assetSection: assetSection.data().name,
+                          color: assetSection.data().color,
+                        });
+                        if (count === assetBookings.length) {
+                          setAllAssetBookings([...assetBookings]);
+                          setCharData(assetBookings);
+                        }
+                        // console.log("count ", count);
+                        // console.log("booking", assetBookings.length);
+                        // console.log(
+                        //   `${asset.data().name} ${assetSection.data().name} ${
+                        //     assetBookingSnapshot.docs.length
+                        //   }`
+                        // );
+                      });
+
+                    // console.log("asset", assetSnapshot.docs.length);
                   });
                 });
             });
@@ -163,12 +186,28 @@ export default function Statistics(props) {
     // });
   };
 
-  const fixData = (assetBookings) => {
-    // if (allAssetTypes.length !== 0) {
-    //   console.log("fixData ", allAssetTypes);
-    //   console.log("all assets", allAssets);
-    // }
-    // console.log(1111, assetBookings.length);
+  const setCharData = async (assetBookings) => {
+    const assetSection = await getAllAssetSections();
+    // console.log("assetsections ", assetSection);
+    // console.log("assetBookings", assetBookings);
+    let result = [];
+    assetSection.map((item) => {
+      // let count = 0;
+      assetBookings.map((ab) => {
+        // if (item.name === ab.assetSection) {
+        //   count++;
+        // }
+        console.log("aslkdnllkmdslkmansdlm", ab);
+      });
+      // result.push({
+      //   name: item.name,
+      //   booking: count,
+      //   color: item.color,
+      //   legendFontColor: "#7F7F7F",
+      //   legendFontSize: 15,
+      // });
+    });
+    console.log(result);
   };
 
   const getAllServiceBookings = () => {
@@ -195,7 +234,7 @@ export default function Statistics(props) {
             });
 
             if (count === querySnap.docs.length) {
-              setChartData([...chartData]);
+              setServiceChartData([...chartData]);
               setServiceBookings([...serviceBooking]);
             }
           });
@@ -211,7 +250,7 @@ export default function Statistics(props) {
     }
     // console.log(res);
     const color = `rgb(${res.substring(0, res.length - 1)})`;
-    // console.log("color", color);
+    console.log("color", color);
     // return color;
   };
 
@@ -228,23 +267,47 @@ export default function Statistics(props) {
     fetchAllData();
   }, []);
 
-  useEffect(() => {}, [allAssets]);
-
   // ----------------------------------------- VIEW -------------------------------------------------
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       <Text>Total Users</Text>
       <Text>{totalUsers}</Text>
 
       {/* <Text>All Asset Bookings</Text>
       <Text>{allBookings.length}</Text> */}
 
-      <View style={{ alignItems: "center" }}>
+      <View style={{ alignItems: "center", flex: 1 }}>
+        <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
+        {/* <BarChart
+          // style={{ backgroundColor: "white" }}
+          data={data}
+          width={screenWidth}
+          height={400}
+          withInnerLines={false}
+          // yAxisLabel="Bookings"
+          chartConfig={{
+            backgroundColor: "white",
+            backgroundGradientFrom: "white",
+            // backgroundGradientFromOpacity: 0,
+            backgroundGradientTo: "white",
+            // backgroundGradientToOpacity: 0.5,
+            barPercentage: 1,
+            color: () => `rgba(250,0,0,0.6)`,
+            style: {
+              borderRadius: 16,
+            },
+          }}
+          verticalLabelRotation={90}
+          fromZero
+        /> */}
+      </View>
+
+      <View style={{ alignItems: "center", backgroundColor: "white" }}>
         <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
 
         <PieChart
-          data={chartData}
+          data={serviceChartData}
           width={screenWidth}
           height={220}
           chartConfig={chartConfig}
@@ -256,6 +319,6 @@ export default function Statistics(props) {
       </View>
 
       <Button title="get color" onPress={() => generateRandomColor()} />
-    </View>
+    </ScrollView>
   );
 }

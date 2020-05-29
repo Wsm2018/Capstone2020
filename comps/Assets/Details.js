@@ -499,7 +499,10 @@ export default function Details(props) {
       {services ? (
         <View style={{ marginBottom: 5 }}>
           {services.map((s, i) => (
-            <View style={{ padding: 5, paddingTop: 0, marginBottom: 5 }}>
+            <View
+              style={{ padding: 5, paddingTop: 0, marginBottom: 5 }}
+              key={i}
+            >
               <TouchableOpacity
                 onPress={
                   selectedService === s
@@ -564,7 +567,7 @@ export default function Details(props) {
                     <View>
                       {/* <Text>Working Hours</Text> */}
                       {userDays.map((d, dayindex) => (
-                        <View style={{ margin: 5 }}>
+                        <View style={{ margin: 5 }} key={dayindex}>
                           <Text>{d.day}</Text>
                           <View
                             style={{ flexDirection: "row", flexWrap: "wrap" }}
@@ -582,6 +585,7 @@ export default function Details(props) {
                                       alignItems: "center",
                                       justifyContent: "center",
                                     }}
+                                    key={timeindex}
                                     onPress={() => book(dayindex, timeindex)}
                                   >
                                     <Text>{t.time.split(":")[0]}</Text>
@@ -664,6 +668,7 @@ export default function Details(props) {
                     // padding: 5,
                     flexDirection: "row",
                   }}
+                  key={index}
                 >
                   <View style={{ width: "80%", padding: 10 }}>
                     <Text style={{ fontSize: 12 }}>{s.day}</Text>
