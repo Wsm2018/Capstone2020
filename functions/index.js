@@ -118,14 +118,16 @@ exports.addCar = functions.https.onCall(async (data, context) => {
 
 exports.initUser = functions.https.onRequest(async (request, response) => {
   console.log("request", request.query.uid);
-
-  const result = await admin.auth().updateUser(request.query.uid, {
-    displayName: request.query.displayName,
-    photoURL:
-      "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
-    phoneNumber: `+974${request.query.phoneNumber}`,
-  });
-  console.log("after set", result);
+  let result;
+  if (request.query.role !== "guest") {
+    result = await admin.auth().updateUser(request.query.uid, {
+      displayName: request.query.displayName,
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      phoneNumber: `+974${request.query.phoneNumber}`,
+    });
+    console.log("after set", result);
+  }
 
   // generating a random 6 digit referralCode
   let referralCode = String(Math.floor(Math.random() * 1000000));
@@ -157,15 +159,28 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
 
     refResult = usersDocs.includes(referralCode);
   }
+  let path = String(request.query.path);
+  let accessDoc;
+  if (request.query.role === "guest") {
+    path = path.split("/");
+    accessDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+  }
 
   await db
     .collection("users")
     .doc(request.query.uid)
     .set({
       outstandingBalance: 0,
-      balance: 0,
-      email: result.email,
-      role: "user",
+      balance:
+        request.query.role === "guest" ? accessDoc.data().giftBalance : 0,
+      email:
+        request.query.role === "guest" ? accessDoc.data().email : result.email,
+      role: request.query.role === "guest" ? "guest" : "user",
       qrCode: "",
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
@@ -367,14 +382,32 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
 });
 
 exports.giftsExpCheck = functions.pubsub
-  .schedule("59 7 * * *")
+  .schedule("46 10 * * *")
   .timeZone("Asia/Qatar")
-  .onRun((context) => {
-    db.collection("users")
-    .doc(documentName)
-    .collection(subCollectionName).ref  
-    .where(field, "==", something)
-    .onSnapshot(snapshot => snapshot.forEach(result => result.ref.delete()));
+  .onRun(async (context) => {
+    const result = await db
+      .collectionGroup("gifts")
+      .where("expiryDate", "<=", new Date())
+      .where("status", "==", false)
+      .get();
+    result.forEach((doc) => {
+      const path = doc.ref.path.split("/");
+      const giftBalance = doc.data().giftBalance;
+      const increment = admin.firestore.FieldValue.increment(giftBalance);
 
+      db.collection("users").doc(path[1]).update({ balance: increment });
+
+      console.log(doc.data(), "Deleted");
+      doc.ref.delete();
+    });
     return null;
   });
+
+exports.deleteGuestUser = functions.https.onRequest(
+  async (request, response) => {
+    db.collection("users").doc(request.query.uid).delete();
+    await admin.auth().deleteUser(request.query.uid);
+
+    response.send("All done");
+  }
+);
