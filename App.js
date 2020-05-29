@@ -35,6 +35,8 @@ import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 
+// import AsyncStorage from "@react-native-community/async-storage";
+
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -177,7 +179,7 @@ export default function App(props) {
     const value = await AsyncStorage.getItem("alreadyLaunched");
     console.log("valueeeeeeeeeeeee", value);
     if (value === null) {
-      AsyncStorage.setItem("alreadyLaunched", true);
+      await AsyncStorage.setItem("alreadyLaunched", "true");
       console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(true);
     } else {

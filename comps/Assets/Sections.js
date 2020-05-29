@@ -17,15 +17,18 @@ import {
 import { Surface } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
 // import { Card, Divider } from "react-native-elements";
+import { Card, Dividerm, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
 import { Snackbar } from "react-native-paper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
 
 import Details from "./Details";
+import Review from "./Review";
+
 import { set } from "react-native-reanimated";
 import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
@@ -42,10 +45,10 @@ export default function Sections(props) {
   const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
-    console.log(
-      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
-      selectedSection
-    );
+    // console.log(
+    //   "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
+    //   selectedSection
+    // );
     if (selectedSection !== null) {
       var temp = [];
       setAssetList(temp);
@@ -162,6 +165,34 @@ export default function Sections(props) {
   //   //setSelectedList(l) || setDetailsView(true)
   // };
 
+  const [favoriteAssets, setFavoriteAssets] = useState([]);
+
+  useEffect(() => {
+    getUserFavoriteAssets();
+  }, []);
+
+  const getUserFavoriteAssets = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((querySnap) => {
+        const data = querySnap.data();
+        const favorites = data.favorite;
+        // let assetArr = [];
+        // favorites.map(async (item) => {
+        //   db.collection("assets")
+        //     .doc(item)
+        //     .onSnapshot((doc) => {
+        //       assetArr.push({ id: doc.id, ...doc.data() });
+        //       if (favorites.length === assetArr.length) {
+        //         setFavoriteAssets([...assetArr]);
+        //       }
+        //     });
+        // });
+        // console.log("------------------------", favorites);
+        setFavoriteAssets(favorites);
+      });
+  };
+
   ///////////////////////////////////////////////////////////////////
 
   const [showSections, setShowSections] = useState(false);
@@ -182,13 +213,13 @@ export default function Sections(props) {
   }, [finalAssets]);
 
   useEffect(() => {
-    console.log(startDate);
+    // console.log(startDate);
   }, [startDate]);
   useEffect(() => {
     //Added by design team
     endDate && setShowSections(true);
     ////////////////////////////////
-    console.log(endDate);
+    // console.log(endDate);
   }, [endDate]);
 
   const getSections = async () => {
@@ -200,7 +231,7 @@ export default function Sections(props) {
     sections.forEach((doc) => {
       temp.push({ id: doc.id, ...doc.data() });
     });
-    console.log(temp);
+    // console.log(temp);
     setAssetSections(temp);
   };
 
@@ -210,11 +241,11 @@ export default function Sections(props) {
       uid: firebase.auth().currentUser.uid,
       assetId: item.id,
     });
-    console.log(response);
+    // console.log(response);
     if (response.data !== "Exists") {
-      alert("Asset Added");
+      // alert("Asset Added");
     } else {
-      alert("Asset added before");
+      // alert("Asset added before");
     }
   };
 
@@ -282,7 +313,11 @@ export default function Sections(props) {
                 justifyContent: "center",
               }}
             >
-              <Icon name="arrow-right" size={20} color="#20365F" />
+              <MaterialCommunityIcons
+                name="arrow-right"
+                size={20}
+                color="#20365F"
+              />
             </View>
             <View
               style={{
@@ -343,7 +378,8 @@ export default function Sections(props) {
                   }
                   key={i}
                   style={{
-                    backgroundColor: selectedSection === s ? "gray" : "#C6CBD0",
+                    backgroundColor:
+                      selectedSection === s ? "#20365F" : "#e3e3e3",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -356,7 +392,7 @@ export default function Sections(props) {
                 >
                   <View
                     style={{
-                      height: "20%",
+                      // height: "20%",
                       width: "100%",
                       justifyContent: "center",
                       textAlign: "center",
@@ -364,11 +400,15 @@ export default function Sections(props) {
                       alignItems: "center",
                     }}
                   >
-                    <Icon name="map-marker" size={40} color="#20365F" />
+                    <MaterialCommunityIcons
+                      name="map-marker"
+                      size={40}
+                      color={selectedSection === s ? "white" : "#20365F"}
+                    />
                     <Text
                       style={{
                         textAlign: "center",
-                        color: "#20365F",
+                        color: selectedSection === s ? "white" : "#20365F",
                         fontSize: 20,
                       }}
                     >
@@ -388,7 +428,13 @@ export default function Sections(props) {
           {listView === true ? (
             finalAssets.length > 0 ? (
               finalAssets.map((l, i) => (
-                <View style={{ width: "20%", alignItems: "center" }}>
+                <View
+                  style={{
+                    width: "20%",
+                    alignItems: "center",
+                    marginBottom: 15,
+                  }}
+                >
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {
@@ -403,7 +449,8 @@ export default function Sections(props) {
                     onPress={() => setSelectedList(l) || setDetailsView(true)}
                     key={i}
                     style={{
-                      backgroundColor: selectedList === l ? "gray" : "#C6CBD0",
+                      backgroundColor:
+                        selectedList === l ? "#20365F" : "#e3e3e3",
                       width: 60,
                       height: 60,
                       margin: 5,
@@ -424,22 +471,59 @@ export default function Sections(props) {
                         alignItems: "center",
                       }}
                     >
-                      <Icon name="car" size={30} color="#20365F" />
+                      <MaterialCommunityIcons
+                        name="car"
+                        size={30}
+                        color={selectedList === l ? "white" : "#20365F"}
+                      />
                       <Text
                         style={{
                           textAlign: "center",
-                          color: "#20365F",
+                          color: selectedList === l ? "white" : "#20365F",
                           fontSize: 18,
                         }}
                       >
                         {l.code}
                       </Text>
+                      <Badge
+                        value={
+                          <MaterialCommunityIcons
+                            name="heart"
+                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                            size={18}
+                            color={
+                              favoriteAssets.includes(l.id)
+                                ? "#c44949"
+                                : "white"
+                            }
+                            onPress={
+                              favoriteAssets.includes(l.id)
+                                ? null
+                                : () => handleAddFavorite(l)
+                            }
+                            // style={{ borderColor: "blue", borderWidth: 1 }}
+                          />
+                        }
+                        containerStyle={{
+                          position: "absolute",
+                          top: -12,
+                          right: -12,
+                        }}
+                        badgeStyle={{
+                          backgroundColor: "#20365F",
+                          width: 22,
+                          height: 22,
+                          borderColor: "transparent",
+                        }}
+                      />
                     </View>
                   </TouchableOpacity>
-                  <Text>Add price </Text>
-                  <TouchableOpacity onPress={() => handleAddFavorite(l)}>
+                  {/* <Text>
+                    {l.price} QR
+                  </Text> */}
+                  {/* <TouchableOpacity onPress={() => handleAddFavorite(l)}>
                     <Text>Add to Favorite</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               ))
             ) : (
@@ -451,7 +535,7 @@ export default function Sections(props) {
         </View>
         {selectedList ? (
           <View style={styles.four}>
-            <Text style={styles.cardTitle}>Services</Text>
+            <Text style={styles.cardTitle}>Details</Text>
             {/* <Text>Price {selectedList.price}</Text>
             <Text>add what ever u want</Text> */}
             {detailsView === true ? (
@@ -460,19 +544,28 @@ export default function Sections(props) {
                 <Text>click2</Text>
               </TouchableOpacity> */}
                 {selectedSection === null ? null : (
-                  <Details
-                    sName={selectedSection.name}
-                    tName={tName}
-                    asset={selectedList}
-                    startDateTime={startDate}
-                    endDateTime={endDate}
-                    type={type}
-                    navigation={props.navigation}
-                  />
+                  <View>
+                    <Review
+                      // sName={selectedSection.name}
+                      // tName={tName}
+                      asset={selectedList}
+                      startDateTime={startDate}
+                      // endDateTime={endDate}
+                      // type={type}
+                      navigation={props.navigation}
+                    />
+
+                    <Details
+                      sName={selectedSection.name}
+                      tName={tName}
+                      asset={selectedList}
+                      startDateTime={startDate}
+                      endDateTime={endDate}
+                      type={type}
+                      navigation={props.navigation}
+                    />
+                  </View>
                 )}
-                {/* <TouchableOpacity>
-                <Text>click</Text>
-              </TouchableOpacity> */}
               </View>
             ) : (
               <View>
