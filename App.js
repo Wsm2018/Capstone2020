@@ -37,6 +37,10 @@ import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 
+import ManagersStack from "./comps/Managers/ManagersScreen";
+import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
+import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
+
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -184,12 +188,20 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get();
-    const user = userRef.data();
-    setUser(user);
+      .onSnapshot(async (userRef) => {
+        const getAdmin = firebase.functions().httpsCallable("getAdmin");
+        const response = await getAdmin({
+          email: firebase.auth().currentUser.email,
+        });
+
+        const admin = response.data.result !== undefined ? true : false;
+
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
   }
 
   const getFirstLaunch = async () => {
@@ -228,42 +240,48 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const guideSkip = () => {
-    console.log("Skipppped");
-    setGuideView(false);
-  };
-
-  const getAdminUser = async () => {
-    const getAdmin = firebase.functions().httpsCallable("getAdmin");
-    const response = await getAdmin({
-      email: firebase.auth().currentUser.email,
-    });
-
-    // console.log("hello !!", response.data.result === undefined ? false : true);
-    const result = response.data.result !== undefined ? true : false;
-    setAdmin(result);
-
-    // console.log("res", result);
-  };
-
-  useEffect(() => {
-    console.log("this is admin stuff", admin);
-  }, [admin]);
-
   const adminTabNav = createBottomTabNavigator({
     Home: AdminHomeStack,
     Profile: ProfileStack,
   });
   const AdminAppContainer = createAppContainer(adminTabNav);
 
-  if (!loggedIn) {
+  const guideSkip = () => {
+    console.log("Skipppped");
+    setGuideView(false);
+  };
+
+  if (loggedIn !== false) {
+    if (!loggedIn) {
+      return (
+        <View style={styles.container}>
+          <Authentication />
+        </View>
+      );
+    } else {
+      return (
+        user !== null &&
+        (user.admin ? (
+          <AdminAppContainer />
+        ) : user.role.slice(-12) === "(incomplete)" ? (
+          <EmployeeAuthentication />
+        ) : user.role === "manager" ? (
+          <ManagersStack />
+        ) : user.role === "user handler" ? (
+          <UserHandlerStack />
+        ) : firstLaunch && guideView ? (
+          <Guide guideSkip={guideSkip} />
+        ) : (
+          <AppContainer />
+        ))
+      );
+    }
+  } else {
     return (
-      <View style={styles.container}>
-        <Authentication />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
-  } else {
-    return admin !== null && (admin ? <AdminAppContainer /> : <AppContainer />);
   }
 }
 
