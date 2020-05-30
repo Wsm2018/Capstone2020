@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  SafeAreaView,
+} from "react-native";
 import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -31,7 +38,7 @@ export default function CarsScreen(props) {
 
   return (
     <Modal transparent={false} visible={props.carsModal}>
-      <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity onPress={() => props.setCarsModal(false)}>
             <Text>X</Text>
@@ -53,7 +60,7 @@ export default function CarsScreen(props) {
             <Text>Add Car</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }

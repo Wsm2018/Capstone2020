@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, Button, Picker, Image } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  Picker,
+  Image,
+  ScrollView,
+} from "react-native";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import firebase from "firebase";
@@ -10,7 +17,7 @@ import { Text } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
 
 import { CreditCardInput } from "react-native-credit-card-input";
-import { ScrollView } from "react-native-gesture-handler";
+// import { ScrollView } from "react-native-gesture-handler";
 export default function AddCard(props) {
   const user = props.navigation.getParam("user");
   const [cardNumber, setCardNumber] = useState("");
@@ -120,11 +127,10 @@ export default function AddCard(props) {
       setCardType(form.values.type);
     }
   };
-  //4025559100622727
 
   return (
     <View style={{ flex: 1, flexDirection: "column", flexWrap: "wrap" }}>
-      <Text h4 style={{ alignItems: "center" }}>
+      <Text h4 style={{ alignItems: "center", justifyContent: "center" }}>
         Add Credit Card
       </Text>
       <ScrollView
@@ -158,3 +164,7 @@ export default function AddCard(props) {
     </View>
   );
 }
+AddCard.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};

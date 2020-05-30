@@ -8,11 +8,13 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  AsyncStorage,
 } from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 import { encode, decode } from "base-64";
 
 if (!global.btoa) {
@@ -28,10 +30,12 @@ import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import HomeStack from "./navigation/HomeStack";
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
+import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
+import AdminHomeStack from "./navigation/AdminHomeStack";
 
 import ManagersStack from "./comps/Managers/ManagersScreen";
 import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
@@ -40,15 +44,31 @@ import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState(false);
+  const [guideView, setGuideView] = useState(true);
+  const [admin, setAdmin] = useState(null);
 
-  const handleLogout = () => {
-    firebase.auth().signOut();
+  const handleLogout = async () => {
+    const userInfo = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    if (userInfo.data().role === "guest") {
+      await fetch(
+        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
+          firebase.auth().currentUser.uid
+        }`
+      );
+      firebase.auth().signOut();
+    } else {
+      firebase.auth().signOut();
+    }
   };
 
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      News: NewsStack,
+      // News: NewsStack,
       Profile: ProfileStack,
     },
     // {
@@ -94,19 +114,20 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      defaultNavigationOptions: ({ navigation }) => {
-        return {
-          headerLeft: (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              type="ionicon"
-              size={30}
-            />
-          ),
-        };
-      },
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingLeft: 10 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      // },
+      headerMode: null,
     }
   );
 
@@ -136,10 +157,12 @@ export default function App(props) {
           >
             <SafeAreaView style={{ marginTop: "19%" }}>
               <View style={{ flexDirection: "row" }}>
-                <Image
-                  source={require("./assets/qrcodetest.png")}
-                  style={{ width: 50, height: 50 }}
-                />
+                {user && (
+                  <Image
+                    source={{ uri: user.qrCode }}
+                    style={{ width: 150, height: 150 }}
+                  />
+                )}
                 <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
               </View>
             </SafeAreaView>
@@ -147,9 +170,6 @@ export default function App(props) {
           <View>
             <Text>{user && user.email}</Text>
             <Text>{user && user.phone}</Text>
-            {/* since its 0, added the titles to know which is which */}
-            <Text>reputation: {user && user.reputation}</Text>
-            <Text>points: {user && user.points}</Text>
           </View>
 
           <ScrollView>
@@ -184,19 +204,52 @@ export default function App(props) {
       });
   }
 
+  const getFirstLaunch = async () => {
+    try {
+      const value = await AsyncStorage.getItem("alreadyLaunched");
+      console.log("valueeeeeeeeeeeee", value);
+      if (!value) {
+        await AsyncStorage.setItem("alreadyLaunched", "true");
+        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(true);
+      } else {
+        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getFirstLaunch();
+  }, []);
+
   useEffect(() => {
     if (loggedIn) {
       getUser();
+      getAdminUser();
+    } else {
+      setAdmin(null);
     }
   }, [loggedIn]);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
+
+  const adminTabNav = createBottomTabNavigator({
+    Home: AdminHomeStack,
+    Profile: ProfileStack,
+  });
+  const AdminAppContainer = createAppContainer(adminTabNav);
+
+  const guideSkip = () => {
+    console.log("Skipppped");
+    setGuideView(false);
+  };
 
   if (loggedIn !== false) {
     if (!loggedIn) {
@@ -209,16 +262,14 @@ export default function App(props) {
       return (
         user !== null &&
         (user.admin ? (
-          <View style={styles.container}>
-            <Text>ADMIN</Text>
-          </View>
+          <AdminAppContainer/>
         ) : user.role.slice(-12) === "(incomplete)" ? (
           <EmployeeAuthentication />
         ) : user.role === "manager" ? (
           <ManagersStack />
         ) : user.role === "user handler" ? (
           <UserHandlerStack />
-        ) : (
+        ) : firstLaunch && guideView ? (<Guide guideSkip={guideSkip} />):(
           <AppContainer />
         ))
       );
@@ -230,19 +281,6 @@ export default function App(props) {
       </View>
     );
   }
-
-  // return (
-  //   // <View style={styles.container}>
-  //   //   {!loggedIn ? (
-
-  //   //   ) : (
-  //   //     // <View style={styles.container}>
-  //   //       <AppContainer />
-  //   //       {/* <HomePage /> */}
-  //   //     // </View>
-  //   //   )}
-  //   // </View>
-  // );
 }
 
 const styles = StyleSheet.create({
