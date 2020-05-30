@@ -16,6 +16,15 @@ import { Octicons } from "@expo/vector-icons";
 
 export default function Card(props) {
   const cardInfo = props.card;
+  const images = [
+    require("../../../assets/images/creditcards/visa.png"),
+    require("../../../assets/images/creditcards/mastercard.png"),
+    require("../../../assets/images/creditcards/amex.png"),
+    require("../../../assets/images/creditcards/discover.png"),
+    require("../../../assets/images/creditcards/diners.png"),
+    require("../../../assets/images/creditcards/jcb.png"),
+  ];
+  console.log(cardInfo);
 
   const handleDelete = async () => {
     const deleteCard = firebase.functions().httpsCallable("deleteCard");
@@ -71,7 +80,19 @@ export default function Card(props) {
           justifyContent: "space-between",
         }}
       >
-        <Text style={styles.notes}>abcd</Text>
+        {cardInfo.cardType === "visa" ? (
+          <Image source={images[0]} />
+        ) : cardInfo.cardType === "master-card" ? (
+          <Image source={images[1]} />
+        ) : cardInfo.cardType === "amex" ? (
+          <Image source={images[2]} />
+        ) : cardInfo.cardType === "discover" ? (
+          <Image source={images[3]} />
+        ) : cardInfo.cardType === "diners" ? (
+          <Image source={images[4]} />
+        ) : (
+          cardInfo.cardType === "jcb"(<Image source={images[5]} />)
+        )}
 
         <TouchableOpacity onPress={() => handleDeleteAlert()}>
           {/* <Text style={styles.notes}>X</Text> */}

@@ -6,6 +6,9 @@ import "firebase/auth";
 import db from "../../db";
 
 export default function Home(props) {
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  };
   return (
     <View style={styles.container}>
       <Text>Admin Home</Text>
@@ -14,8 +17,14 @@ export default function Home(props) {
         <Text>Users List</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity>
-        <Text>Panel</Text>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate("Statistiscs")}
+      >
+        <Text>Statistics</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleLogout()}>
+        <Text>Logout</Text>
       </TouchableOpacity>
     </View>
   );
