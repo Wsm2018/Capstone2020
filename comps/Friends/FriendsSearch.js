@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  Alert
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -21,6 +22,7 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -29,6 +31,10 @@ export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [search, setSearch] = useState("");
+  const [scan, setScan] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [friendId, setFriendId] = useState("");
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -61,7 +67,7 @@ export default function FriendsList(props) {
       );
 
       // setUsers(tempUsers);
-      setAllUsers(tempUsers);
+      setAllUsers([...tempUsers]);
     });
   };
 
@@ -104,11 +110,11 @@ export default function FriendsList(props) {
   // -------------------------------ADD-----------------------------------
   // Sends a friend request to a user
   const addFriend = async (user, index) => {
-    users[index].loading = true;
+    allUsers[index].loading = true;
     const add = firebase.functions().httpsCallable("addFriend");
     const response = await add({ user: currentUser, friend: user });
     console.log("response", response);
-    users[index].loading = false;
+    allUsers[index].loading = false;
   };
 
   // ---------------------------------SEARCH---------------------------------
@@ -127,6 +133,28 @@ export default function FriendsList(props) {
       setUsers(null);
     }
   };
+
+  // ------------------------------ ADDING FRIEND USING SCANNED BARCODE -----------------------------
+  const handleBarCodeScanned = ({ type, data }) => {
+    if (data !== "") {
+      allUsers.map(async (item, index) => {
+        if (item.id === data) {
+          addFriend(item, index);
+          console.log(item);
+          setScan(false);
+        }
+      });
+    }
+  };
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Asks for camera permission
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
 
   // --------------------------------USE EFFECT----------------------------------
   // Runs at the beginning
@@ -150,7 +178,20 @@ export default function FriendsList(props) {
     handleSearch(search);
   }, [usersNoQuery, search]);
 
-  return (
+  // ------------------------------ USE EFFECT ----------------------------------
+  // Runs when state of scan changes
+  useEffect(() => {}, [scan]);
+
+  // ------------------------------- CONDITIONS ---------------------------------
+  // Runs if camera permission is denied
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  return !scan ? (
     <View style={styles.container}>
       {/* <Text>Friends Search</Text> */}
       <View
@@ -194,6 +235,9 @@ export default function FriendsList(props) {
           color="#fff"
           onPress={() => props.navigation.goBack()}
         />
+         <TouchableOpacity onPress={() => setScan(true)}>
+        <Icon name="qrcode-scan" type="material-community" size={28} />
+      </TouchableOpacity>
       </View>
       {/* <View
         style={{
@@ -356,6 +400,21 @@ export default function FriendsList(props) {
         //   </View>
         // ))
       }
+    </View>
+  ) : (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "flex-end",
+      }}
+    >
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+
+      <Button title="Cancel" bonPress={() => setScan(false)} />
     </View>
   );
 }

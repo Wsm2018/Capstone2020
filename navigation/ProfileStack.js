@@ -27,9 +27,8 @@ const ProfileStack = createStackNavigator(
     AllCars: CarsScreen,
   },
   {
-    // headerMode: null,
     defaultNavigationOptions: ({ navigation }) => {
-      if (navigation.state.routeName === "Profile") {
+      if (navigation.state.routeName === "FriendsList") {
         return {
           headerLeft: () => (
             <Icon

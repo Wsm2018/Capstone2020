@@ -14,6 +14,7 @@ import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 import { encode, decode } from "base-64";
 
 if (!global.btoa) {
@@ -34,14 +35,20 @@ import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
+import AdminHomeStack from "./navigation/AdminHomeStack";
+
+import ManagersStack from "./comps/Managers/ManagersScreen";
+import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
+import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 
 // import AsyncStorage from "@react-native-community/async-storage";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [firstLaunch, setFirstLaunch] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState(false);
   const [guideView, setGuideView] = useState(true);
+  const [admin, setAdmin] = useState(null);
 
   const handleLogout = async () => {
     const userInfo = await db
@@ -63,7 +70,7 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      News: NewsStack,
+      // News: NewsStack,
       Profile: ProfileStack,
     },
     // {
@@ -162,10 +169,12 @@ export default function App(props) {
           >
             <SafeAreaView style={{ marginTop: "19%" ,}}>
               <View style={{ flexDirection: "row" }}>
-                <Image
-                  source={require("./assets/qrcodetest.png")}
-                  style={{ width: 50, height: 50 }}
-                />
+                {user && (
+                  <Image
+                    source={{ uri: user.qrCode }}
+                    style={{ width: 150, height: 150 }}
+                  />
+                )}
                 <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
               </View>
             </SafeAreaView>
@@ -191,12 +200,20 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get();
-    const user = userRef.data();
-    setUser(user);
+      .onSnapshot(async (userRef) => {
+        const getAdmin = firebase.functions().httpsCallable("getAdmin");
+        const response = await getAdmin({
+          email: firebase.auth().currentUser.email,
+        });
+
+        const admin = response.data.result !== undefined ? true : false;
+
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
   }
 
   async function getFirstLaunch() {
@@ -210,7 +227,7 @@ export default function App(props) {
       console.log("falseeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(false);
     }
-  }
+  };
 
   useEffect(() => {
     getFirstLaunch();
@@ -222,51 +239,55 @@ export default function App(props) {
     }
   }, [loggedIn]);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
+
+  const adminTabNav = createBottomTabNavigator({
+    Home: AdminHomeStack,
+    Profile: ProfileStack,
+  });
+  const AdminAppContainer = createAppContainer(adminTabNav);
 
   const guideSkip = () => {
     // console.log("Skipppped");
     setGuideView(false);
   };
 
-  if (!loggedIn) {
-    return (
-      <View style={styles.container}>
-        <Authentication />
-      </View>
-    );
-  } else {
-    if (firstLaunch && guideView) {
+  if (loggedIn !== false) {
+    if (!loggedIn) {
       return (
-        <Guide
-          guideSkip={guideSkip}
-          // setFirstLaunch={setFirstLaunch}
-          // setGuideView={setGuideView}
-        />
+        <View style={styles.container}>
+          <Authentication />
+        </View>
       );
     } else {
-      return <AppContainer />;
+      return (
+        user !== null &&
+        (user.admin ? (
+          <AdminAppContainer />
+        ) : user.role.slice(-12) === "(incomplete)" ? (
+          <EmployeeAuthentication />
+        ) : user.role === "manager" ? (
+          <ManagersStack />
+        ) : user.role === "user handler" ? (
+          <UserHandlerStack />
+        ) : firstLaunch && guideView ? (
+          <Guide guideSkip={guideSkip} />
+        ) : (
+          <AppContainer />
+        ))
+      );
     }
+  } else {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
-
-  // return (
-  //   // <View style={styles.container}>
-  //   //   {!loggedIn ? (
-
-  //   //   ) : (
-  //   //     // <View style={styles.container}>
-  //   //       <AppContainer />
-  //   //       {/* <HomePage /> */}
-  //   //     // </View>
-  //   //   )}
-  //   // </View>
-  // );
 }
 
 const styles = StyleSheet.create({
