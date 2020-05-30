@@ -103,7 +103,37 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.editBooking = functions.https.onCall(async (data, context) => {
+  var newAssetBooking = data.assetBooking
+  newAssetBooking.endDateTime = data.endDateTime
+  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount , assetBooking: newAssetBooking})
+  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime})
 
+  for( let i =0 ; i < data.serviceBooking.length ; i++){
+    var serviceBooking = {
+      service:data.serviceBooking[i].service,
+    assetBooking: newAssetBooking,
+    dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
+    worker:data.serviceBooking[i].worker,
+    completed: false
+    }
+
+    var sId= ""
+    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef => 
+      sId = docRef.id
+    )
+    serviceBooking.id = sId
+
+    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
+      serviceBooking,
+      dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
+      worker:data.serviceBooking[i].worker,
+      completed: false
+    })
+  }
+
+
+});
 
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
