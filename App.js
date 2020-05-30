@@ -109,17 +109,28 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
+      // initialRouteName: "FriendsList",
+
+    
       defaultNavigationOptions: ({ navigation }) => {
         return {
+        
           headerLeft: (
             <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
+              style={{ paddingRight: 10 }}
+              onPress={() => navigation.FriendsList}
               name="md-menu"
               type="ionicon"
+              color='white'
               size={30}
             />
-          ),
+          )
+        ,
+         headerStyle:{
+           backgroundColor:'#20365F'
+         },
+         headerTitle:'Friends List',
+         headerTintColor:'white'
         };
       },
     }
@@ -149,7 +160,7 @@ export default function App(props) {
               justifyContent: "center",
             }}
           >
-            <SafeAreaView style={{ marginTop: "19%" }}>
+            <SafeAreaView style={{ marginTop: "19%" ,}}>
               <View style={{ flexDirection: "row" }}>
                 <Image
                   source={require("./assets/qrcodetest.png")}
