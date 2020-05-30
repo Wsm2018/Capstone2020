@@ -228,9 +228,6 @@ export default function App(props) {
   useEffect(() => {
     if (loggedIn) {
       getUser();
-      getAdminUser();
-    } else {
-      setAdmin(null);
     }
   }, [loggedIn]);
 
