@@ -28,10 +28,17 @@ export default function EmployeesRequest(props) {
     "customer support",
     "manager",
     "user handler",
+    "services employee",
     "asset handler (incomplete)",
     "customer support (incomplete)",
     "manager (incomplete)",
     "user handler (incomplete)",
+    "services employee (incomplete)",
+  ];
+  const roles2 = [
+    "asset handler (request)",
+    "manager (request)",
+    "user handler (request)",
   ];
 
   // ------------------------------CURRENT USER------------------------------------
@@ -125,6 +132,18 @@ export default function EmployeesRequest(props) {
       await db.collection("users").doc(doc.id).delete();
       await firebase.storage().ref().child(`pdf/${doc.id}`).delete();
     });
+
+    let query2 = await db.collection("users").where("role", "in", roles2).get();
+
+    query2.forEach(async (doc) => {
+      console.log(doc.id);
+      let remove = await fetch(
+        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteUser?uid=${doc.id}`
+      );
+
+      await db.collection("users").doc(doc.id).delete();
+      await firebase.storage().ref().child(`pdf/${doc.id}`).delete();
+    });
   };
 
   // ------------------------------------------------------------------
@@ -156,16 +175,6 @@ export default function EmployeesRequest(props) {
       <Text></Text>
       <ScrollView>
         {users.map((user, i) => (
-          // <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          //   <Text>{user.displayName}</Text>
-          //   <Text>{user.role}</Text>
-          //   <TouchableOpacity
-          //     onPress={() => handleDownload(user)}
-          //     style={{ borderWidth: 1 }}
-          //   >
-          //     <Text>Download PDF</Text>
-          //   </TouchableOpacity>
-          // </View>
           <ListItem
             key={i}
             // leftAvatar={{ source: { uri: l.avatar_url } }}
@@ -179,7 +188,7 @@ export default function EmployeesRequest(props) {
           />
         ))}
       </ScrollView>
-      {/* <Button title="test" onPress={test} /> */}
+
       {/* ---------------------------------DELETE--------------------------------- */}
       <Text></Text>
       <TouchableOpacity

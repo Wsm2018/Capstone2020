@@ -24,9 +24,9 @@ export default function EmployeesAllowed(props) {
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
   const roles = [
-    "asset handler (request)",
-    "manager (request)",
-    "user handler (request)",
+    "asset handler (allowed)",
+    "manager (allowed)",
+    "user handler (allowed)",
   ];
 
   // ------------------------------CURRENT USER------------------------------------
@@ -107,7 +107,18 @@ export default function EmployeesAllowed(props) {
     }
   };
 
-  // ------------------------------------------------------------------
+  // --------------------------------CREATE----------------------------------
+  const handleCreate = async (user) => {
+    let create = firebase.functions().httpsCallable("roleToIncomplete");
+    let response = await create({ user });
+
+    props.navigation.navigate("EmployeesCreateSuccess", {
+      id: user.id,
+      email: user.email,
+    });
+  };
+
+  // ---------------------------------USE EFFECT---------------------------------
   useEffect(() => {
     handleCurrentuser();
     handleUsers();
@@ -120,8 +131,8 @@ export default function EmployeesAllowed(props) {
   }, [allUsers, search]);
 
   const test = () => {
-    let word = "employee handler (incomplete)";
-    console.log(word.slice(-12));
+    let word = "employee handler1(allowed)";
+    console.log(word.slice(0, word.length - 10));
   };
 
   return users ? (
@@ -139,19 +150,28 @@ export default function EmployeesAllowed(props) {
           <ListItem
             key={i}
             // leftAvatar={{ source: { uri: l.avatar_url } }}
-            title={user.firstName + " " + user.lastName}
-            subtitle={
-              user.role[0].toUpperCase() +
-              user.role.slice(1, user.role.length - 10)
-            }
+            title={user.displayName}
+            subtitle={user.email}
             bottomDivider
-            chevron
-            onPress={() =>
-              props.navigation.navigate("ManagersRequestDetail", { user })
+            // chevron
+            rightElement={
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "80%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => handleCreate(user)}
+              >
+                <Text>Create</Text>
+              </TouchableOpacity>
             }
           />
         ))}
       </ScrollView>
+      <Button title="test" onPress={test} />
     </View>
   ) : (
     <View>

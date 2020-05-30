@@ -16,6 +16,14 @@ export default function indexUH(props) {
         onPress={() => props.navigation.navigate("EmployeesIndex")}
       />
       <Button
+        title="Employees Allowed"
+        onPress={() => props.navigation.navigate("EmployeesAllowed")}
+      />
+      <Button
+        title="Employees Pending"
+        onPress={() => props.navigation.navigate("EmployeesPending")}
+      />
+      <Button
         title="Employees Create"
         onPress={() => props.navigation.navigate("EmployeesCreate")}
       />
@@ -23,11 +31,18 @@ export default function indexUH(props) {
         title="Employees Create Success"
         onPress={() => props.navigation.navigate("EmployeesCreateSuccess")}
       />
+
       <Button
         title="Users Index"
         onPress={() => props.navigation.navigate("UsersIndex")}
       />
-      <Button title="Test" onPress={() => props.navigation.navigate("test")} />
+      <Button
+        title="Test"
+        onPress={() => {
+          firebase.auth().signOut();
+          console.log(firebase.auth().currentUser.uid);
+        }}
+      />
     </View>
   );
 }

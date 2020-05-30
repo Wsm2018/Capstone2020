@@ -5,11 +5,16 @@ import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
 
 import ManagersRequest from "./ManagersRequest";
+import ManagersRequestDetail from "./ManagersRequestDetail";
+
+import indexM from "./indexM";
 
 const ManagersStack = createAppContainer(
   createStackNavigator(
     {
+      indexM: indexM,
       ManagersRequest: ManagersRequest,
+      ManagersRequestDetail: ManagersRequestDetail,
     },
     {
       // initialRouteName: "FriendsList",

@@ -33,6 +33,10 @@ import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 
+import ManagersStack from "./comps/Managers/ManagersScreen";
+import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
+import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
+
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -164,19 +168,27 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get();
-    const user = userRef.data();
-    setUser(user);
+      .onSnapshot(async (userRef) => {
+        const getAdmin = firebase.functions().httpsCallable("getAdmin");
+        const response = await getAdmin({
+          email: firebase.auth().currentUser.email,
+        });
+
+        const admin = response.data.result !== undefined ? true : false;
+
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
   }
 
   useEffect(() => {
     if (loggedIn) {
       getUser();
     }
-  }, []);
+  }, [loggedIn]);
 
   useEffect(() => {
     console.log("user", user);
@@ -186,14 +198,37 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  if (!loggedIn) {
+  if (loggedIn !== false) {
+    if (!loggedIn) {
+      return (
+        <View style={styles.container}>
+          <Authentication />
+        </View>
+      );
+    } else {
+      return (
+        user !== null &&
+        (user.admin ? (
+          <View style={styles.container}>
+            <Text>ADMIN</Text>
+          </View>
+        ) : user.role.slice(-12) === "(incomplete)" ? (
+          <EmployeeAuthentication />
+        ) : user.role === "manager" ? (
+          <ManagersStack />
+        ) : user.role === "user handler" ? (
+          <UserHandlerStack />
+        ) : (
+          <AppContainer />
+        ))
+      );
+    }
+  } else {
     return (
-      <View style={styles.container}>
-        <Authentication />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
-  } else {
-    return <AppContainer />;
   }
 
   // return (

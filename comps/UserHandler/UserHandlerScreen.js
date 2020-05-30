@@ -9,6 +9,8 @@ import EmployeesCreateSuccess from "./EmployeesCreateSuccess";
 import UsersIndex from "./UsersIndex";
 import EmployeesIndex from "./EmployeesIndex";
 import EmployeesDetail from "./EmployeesDetail";
+import EmployeesPending from "./EmployeesPending";
+import EmployeesAllowed from "./EmployeesAllowed";
 
 import indexUH from "./indexUH";
 import test from "./test";
@@ -22,7 +24,8 @@ const EmployeeHandlerStack = createAppContainer(
       EmployeesCreate: EmployeesCreate,
       EmployeesCreateSuccess: EmployeesCreateSuccess,
       EmployeesDetail: EmployeesDetail,
-
+      EmployeesPending: EmployeesPending,
+      EmployeesAllowed: EmployeesAllowed,
       test: test,
     },
     {

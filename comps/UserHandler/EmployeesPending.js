@@ -18,7 +18,7 @@ import db from "../../db";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 
-export default function EmployeesAllowed(props) {
+export default function EmployeesRequest(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
   const [users, setUsers] = useState(null);
@@ -139,15 +139,12 @@ export default function EmployeesAllowed(props) {
           <ListItem
             key={i}
             // leftAvatar={{ source: { uri: l.avatar_url } }}
-            title={user.firstName + " " + user.lastName}
-            subtitle={
-              user.role[0].toUpperCase() +
-              user.role.slice(1, user.role.length - 10)
-            }
+            title={user.displayName}
+            subtitle={user.email}
             bottomDivider
             chevron
             onPress={() =>
-              props.navigation.navigate("ManagersRequestDetail", { user })
+              props.navigation.navigate("EmployeesDetail", { user })
             }
           />
         ))}

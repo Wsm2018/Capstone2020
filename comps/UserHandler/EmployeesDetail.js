@@ -115,8 +115,8 @@ export default function EmployeesRequest(props) {
             justifyContent: "center",
             // alignItems: "center",
             alignSelf: "center",
-            // alignContent: "center",
             marginTop: 22,
+            // ---This is for Width---
             width: "80%",
           }}
         >
@@ -130,12 +130,13 @@ export default function EmployeesRequest(props) {
               shadowColor: "#000",
               shadowOffset: {
                 width: 0,
-                //   height: 2,
+                height: 2,
               },
               shadowOpacity: 0.25,
               shadowRadius: 3.84,
               elevation: 5,
               justifyContent: "center",
+              // ---This is for Height---
               height: "50%",
             }}
           >
@@ -159,7 +160,7 @@ export default function EmployeesRequest(props) {
                 flexDirection: "row",
               }}
             >
-              {/* ---------------------------------SAVE--------------------------------- */}
+              {/* ---------------------------------CONFIRM--------------------------------- */}
               <TouchableOpacity
                 style={{
                   borderWidth: 1,
@@ -170,7 +171,7 @@ export default function EmployeesRequest(props) {
                 }}
                 onPress={handleDownload}
               >
-                <Text>Save</Text>
+                <Text>CONFIRM</Text>
               </TouchableOpacity>
               {/* ---------------------------------CANCEL--------------------------------- */}
               <TouchableOpacity

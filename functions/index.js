@@ -347,10 +347,17 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
     .collection("users")
     .doc(account.uid)
     .set({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      country: data.country,
+      dateOfBirth: data.dateOfBirth,
       outstandingBalance: 0,
       balance: 0,
       email: data.email,
-      role: data.role + " (incomplete)",
+      role:
+        data.role === "manager" || data.role.slice(-7) === "handler"
+          ? `${data.role} (request)`
+          : `${data.role} (incomplete)`,
       qrCode: "",
       displayName: data.displayName,
       phone: null,
@@ -408,6 +415,44 @@ exports.resetEmployeePassword = functions.https.onCall(
     return { password };
   }
 );
+
+exports.setEmployeeAuthentication = functions.https.onCall(
+  async (data, context) => {
+    console.log("setEmployeeAuthentication data", data);
+    const result = await admin.auth().updateUser(data.user.id, {
+      password: data.password,
+    });
+
+    let role = data.user.role.slice(0, data.user.role.length - 13);
+    await db
+      .collection("users")
+      .doc(data.user.id)
+      .update({ role, phone: `+974${data.phone}` });
+    console.log("after set", result);
+  }
+);
+
+exports.allowEmployeeCreation = functions.https.onCall(
+  async (data, context) => {
+    console.log("managerAllow data", data);
+    let role = data.user.role.slice(0, data.user.role.length - 10);
+    let result = await db
+      .collection("users")
+      .doc(data.user.id)
+      .update({ role: `${role} (allowed)` });
+    console.log("after set", result);
+  }
+);
+
+exports.roleToIncomplete = functions.https.onCall(async (data, context) => {
+  console.log("managerAllow data", data);
+  let role = data.user.role.slice(0, data.user.role.length - 10);
+  let result = await db
+    .collection("users")
+    .doc(data.user.id)
+    .update({ role: `${role} (incomplete)` });
+  console.log("after set", result);
+});
 
 exports.testJose = functions.https.onCall(async (data, context) => {
   console.log("data.id", data.id);
