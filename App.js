@@ -262,14 +262,16 @@ export default function App(props) {
       return (
         user !== null &&
         (user.admin ? (
-          <AdminAppContainer/>
+          <AdminAppContainer />
         ) : user.role.slice(-12) === "(incomplete)" ? (
           <EmployeeAuthentication />
         ) : user.role === "manager" ? (
           <ManagersStack />
         ) : user.role === "user handler" ? (
           <UserHandlerStack />
-        ) : firstLaunch && guideView ? (<Guide guideSkip={guideSkip} />):(
+        ) : firstLaunch && guideView ? (
+          <Guide guideSkip={guideSkip} />
+        ) : (
           <AppContainer />
         ))
       );
