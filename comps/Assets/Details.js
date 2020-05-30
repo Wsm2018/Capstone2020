@@ -540,7 +540,7 @@ export default function Details(props) {
               >
                 <View
                   style={{
-                    width: "30%",
+                    width: "25%",
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 5,
@@ -593,7 +593,7 @@ export default function Details(props) {
                     </View>
                   </TouchableOpacity>
                 </View>
-                <View style={{ width: "70%", padding: 10 }}>
+                <View style={{ width: "75%", padding: 10 }}>
                   <Text style={{ fontWeight: "bold" }}>Timing(s): </Text>
                   {s.hours.map((h) => (
                     <View style={{ flexDirection: "row" }}>
