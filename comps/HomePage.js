@@ -4,8 +4,9 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
+import AdminHome from "../comps/Admin/HomeScreen";
 
-export default function HomePage() {
+export default function HomePage(props) {
   const handleLogout = () => {
     firebase.auth().signOut();
   };
@@ -18,6 +19,13 @@ export default function HomePage() {
         }}
       >
         <Text>Logout !</Text>
+
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>props.navigation.navigate("CheckOut")}
+      >
+        <Text>Checkout</Text>
+        
       </TouchableOpacity>
     </View>
   );
@@ -33,8 +41,5 @@ const styles = StyleSheet.create({
 });
 
 HomePage.navigationOptions = {
-  title: null,
-  tabBarIcon: () => {
-    <Icon name="home" type="font-awesome" size={24} />
-  },
+  header: null,
 };
