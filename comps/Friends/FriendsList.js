@@ -47,6 +47,7 @@ export default function FriendsList(props) {
         if (queryBySnapshot.size > 0) {
           let tempFriends = [];
           queryBySnapshot.forEach((doc) => {
+            console.log("doc", doc.data())
             if (doc.data().status === "accepted") {
               tempFriends.push({ id: doc.id, ...doc.data() });
             }
@@ -57,7 +58,7 @@ export default function FriendsList(props) {
               .localeCompare(b.displayName.toLowerCase())
           );
 
-          // console.log(tempFriends);
+          console.log(tempFriends);
           setFriends(tempFriends);
         } else {
           setFriends([]);
@@ -110,7 +111,7 @@ export default function FriendsList(props) {
         paddingLeft: "3%",
       }}
     >
-      <LottieView
+      {/* <LottieView
         source={require("../../assets/loading.json")}
         autoPlay
         loop
@@ -120,7 +121,7 @@ export default function FriendsList(props) {
           paddingTop: "13%",
           paddingLeft: "5%",
         }}
-      />
+      /> */}
       <Text style={{ fontSize: 28, color: "#20365F", position: "relative" }}>
         LOADING
       </Text>
@@ -150,6 +151,7 @@ export default function FriendsList(props) {
               style={{ borderWidth: 1, borderColor: "#20365F" }}
               //contentContainerStyle={{alignItems:'flex-start', justifyContent:'space-around'}}
               renderItem={({ item, index }) => (
+                
                 <ListItem
                   key={item.id}
                   leftAvatar={{ source: { uri: item.photoURL } }}

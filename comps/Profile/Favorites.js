@@ -8,6 +8,7 @@ import {
   Alert,
   StyleSheet,
   Dimensions,
+  SafeAreaView
 } from "react-native";
 import LottieView from "lottie-react-native";
 

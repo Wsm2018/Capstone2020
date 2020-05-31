@@ -70,7 +70,7 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      // News: NewsStack,
+      News: NewsStack,
       Profile: ProfileStack,
     },
     // {
@@ -118,28 +118,28 @@ export default function App(props) {
     {
       // initialRouteName: "FriendsList",
 
-    
-      defaultNavigationOptions: ({ navigation }) => {
-        return {
+      headerMode: null
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
         
-          headerLeft: (
-            <Icon
-              style={{ paddingRight: 10 }}
-              onPress={() => navigation.FriendsList}
-              name="md-menu"
-              type="ionicon"
-              color='white'
-              size={30}
-            />
-          )
-        ,
-         headerStyle:{
-           backgroundColor:'#20365F'
-         },
-         headerTitle:'Friends List',
-         headerTintColor:'white'
-        };
-      },
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingRight: 10 }}
+      //         onPress={() => navigation.FriendsList}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         color='white'
+      //         size={30}
+      //       />
+      //     )
+      //   ,
+      //    headerStyle:{
+      //      backgroundColor:'#20365F'
+      //    },
+      //    headerTitle:'Friends List',
+      //    headerTintColor:'white'
+      //   };
+      // },
     }
   );
 

@@ -21,20 +21,26 @@ const FriendsStack = createAppContainer(
     {
       // headerMode: null,
       defaultNavigationOptions: ({ navigation }) => {
-        if (navigation.state.routeName === "FriendsList") {
-          return {
-            headerLeft: () => (
-              <Icon
-                style={{ paddingLeft: 10 }}
-                onPress={() => navigation.openDrawer()}
-                name="md-menu"
-                color="black"
-                type="ionicon"
-                size={30}
-              />
-            ),
-          };
-        }
+        // const { routeName } = navigation.state.routes[navigation.state.index];
+        return {
+        
+          headerLeft: (
+            <Icon
+              style={{ paddingRight: 10 }}
+              onPress={() => navigation.FriendsList}
+              name="md-menu"
+              type="ionicon"
+              color='white'
+              size={30}
+            />
+          )
+        ,
+         headerStyle:{
+           backgroundColor:'#20365F'
+         },
+         headerTitle:"FriendsList",
+         headerTintColor:'white'
+        };
       },
     }
   )
