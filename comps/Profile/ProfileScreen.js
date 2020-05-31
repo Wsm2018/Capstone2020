@@ -206,6 +206,8 @@ export default function ProfileScreen(props) {
           <View style={styles.profileImageContainer}>
             <Avatar
               rounded
+              // avatarStyle={{ maxHeight: "100%", maxWidth: "100%" }}
+              // overlayContainerStyle={{ backgroundColor: "red",  }}
               source={{ uri: photoURL }}
               size="xlarge"
               style={styles.profileImage}
@@ -451,27 +453,7 @@ export default function ProfileScreen(props) {
                   // alignItems: "center",
                 }}
               >
-                {/* <FontAwesome5
-                name="heart"
-                size={35}
-                color="black"
-                onPress={() =>
-                  props.navigation.navigate("Car", { user: props.user })
-                } 
-              /> */}
-
-                <TouchableOpacity
-                  style={{
-                    flex: 0.9,
-                    // backgroundColor: "green",
-
-                    // width: "100%",
-                    // flexDirection: "row",
-                    // justifyContent: "space-around",
-                    // alignItems: "center",
-                  }}
-                  onPress={() => setFavoritesModal(true)}
-                >
+                <TouchableOpacity onPress={() => setFavoritesModal(true)}>
                   <LottieView
                     width={Dimensions.get("window").width / 3.5}
                     source={require("../../assets/lf30_editor_6YHFU0.json")}
@@ -534,7 +516,7 @@ export default function ProfileScreen(props) {
                     width={Dimensions.get("window").width / 5.5}
                     source={require("../../assets/car5.gif")}
                     autoPlay
-                    onPress={() => setCarsModal(true)}
+                    // onPress={() => setCarsModal(true)}
                     // loop
                     style={
                       {

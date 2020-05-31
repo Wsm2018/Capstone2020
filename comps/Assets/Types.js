@@ -98,7 +98,7 @@ export default function Types(props) {
         </View>
         <View style={styles.assets}>
           {assetTypes.map((t, i) => (
-            <View style={styles.surface}>
+            <View style={styles.surface} key={i}>
               <TouchableOpacity
                 onPress={() =>
                   props.navigation.navigate("Sections", { type: t })
@@ -147,7 +147,7 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "Assets Types",
+  title: "QuickBookinQ",
   // headerStyle: { backgroundColor: "#3771b3" },
   headerStyle: { backgroundColor: "#20365F" },
 

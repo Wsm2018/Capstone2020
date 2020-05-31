@@ -7,6 +7,7 @@ import {
   Modal,
   StyleSheet,
   Dimensions,
+  SafeAreaView,
   ScrollView,
 } from "react-native";
 import LottieView from "lottie-react-native";
@@ -53,7 +54,7 @@ export default function CarsScreen(props) {
 
   return (
     <Modal transparent={true} visible={props.carsModal}>
-      <View style={styles.centeredView}>
+      <SafeAreaView style={styles.centeredView}>
         <View elevation={5} style={styles.modalView}>
           <TouchableOpacity
             style={{
@@ -136,7 +137,7 @@ export default function CarsScreen(props) {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }

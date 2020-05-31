@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  AsyncStorage,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -223,7 +224,7 @@ export default function Authentication(props) {
               firebase.auth().currentUser.uid
             }&phoneNumber=${phone}&displayName=${displayName}&referralStatus=${referralStatus}&referral=${referral}`
           );
-
+          await AsyncStorage.setItem(firebase.auth().currentUser.uid, true);
           //sending the user a verification email
           await firebase
             .auth()
@@ -467,22 +468,41 @@ export default function Authentication(props) {
                       style={{
                         flexDirection: "row",
                         justifyContent: "center",
+                        // width: "85%",
+
+                        // paddingLeft: "10%",
                       }}
                     >
                       <Input
                         inputContainerStyle={{ borderBottomWidth: 0 }}
                         leftIcon={<Icon name="key" size={20} color="#20365F" />}
-                        containerStyle={{
-                          borderRadius: 8,
-                          borderWidth: 1,
-                          borderColor: "#20365F",
-                          height: 50,
-                          width: "70%",
-                          alignSelf: "center",
-                          opacity: 0.8,
-                          marginTop: 20,
-                          marginRight: 30,
-                        }}
+                        rightIcon={
+                          <Tooltip
+                            height={150}
+                            width={370}
+                            backgroundColor={"#20365F"}
+                            popover={
+                              <Text style={{ color: "white", fontSize: 18 }}>
+                                Your password must be between 8 and 30
+                                characters. Password must contain at least one
+                                uppercase, or capital, letter (ex: A, B, etc.)
+                                One number digit and at least one special
+                                character.
+                              </Text>
+                            }
+                            containerStyle={{
+                              justifyContent: "center",
+                              alignSelf: "center",
+                            }}
+                          >
+                            <AntDesign
+                              name="exclamationcircleo"
+                              size={22}
+                              color="#20365F"
+                            />
+                          </Tooltip>
+                        }
+                        containerStyle={styles.Inputs}
                         onChangeText={setRegisterPassword}
                         placeholder="Password"
                         secureTextEntry={true}
@@ -496,29 +516,6 @@ export default function Authentication(props) {
                         placeholderTextColor="#20365F"
                         renderErrorMessage
                       />
-                      {/* <Tooltip popover={<Text>Info here</Text>}>
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: "white",
-                            height: 50,
-                            width: "15%",
-                            justifyContent: "center",
-                            alignSelf: "auto",
-                            paddingLeft: 0,
-                            marginTop: 20,
-                            marginLeft: 0,
-                            marginEnd: "20%",
-                            borderRadius: 30,
-                            marginBottom: 10,
-                          }}
-                        >
-                          <AntDesign
-                            name="exclamationcircleo"
-                            size={25}
-                            color="#20365F"
-                          />
-                        </TouchableOpacity>
-                      </Tooltip> */}
                     </View>
                     <Input
                       inputStyle={{
@@ -594,6 +591,7 @@ export default function Authentication(props) {
                           paddingLeft: 10,
                           marginTop: 20,
                           marginLeft: 20,
+                          paddingTop:5
                         }}
                         placeholderTextColor="#20365F"
                         keyboardType="number-pad"
@@ -639,36 +637,39 @@ export default function Authentication(props) {
                         renderErrorMessage
                       />
                     </View>
-                    <Input
-                      inputStyle={{
-                        fontSize: 16,
-                      }}
-                      inputContainerStyle={{ borderBottomWidth: 0 }}
-                      leftIcon={
-                        <Icon
-                          name="account-card-details"
-                          size={20}
-                          color="lightgray"
-                        />
-                      }
-                      containerStyle={styles.Inputs}
-                      placeholderTextColor="white"
-                      onChangeText={setReferral}
-                      placeholder="Referral Code"
-                      value={referral}
-                      errorMessage="* Invalid Code"
-                      errorStyle={{ color: refErr }}
-                      renderErrorMessage
-                    />
+                    <View style={{ flexDirection: "row" , justifyContent:'center'}}>
+                      <Input
+                        inputStyle={{
+                          fontSize: 16,
+                          // width:'50%'
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={
+                          <Icon
+                            name="account-card-details"
+                            size={20}
+                            color="lightgray"
+                          />
+                        }
+                        containerStyle={styles.useCodeInputs}
+                        placeholderTextColor="white"
+                        onChangeText={setReferral}
+                        placeholder="Referral Code"
+                        value={referral}
+                        errorMessage="* Invalid Code"
+                        errorStyle={{ color: refErr }}
+                        renderErrorMessage
+                      />
 
-                    <TouchableOpacity
-                      onPress={checkReferral}
-                      style={styles.registerButton}
-                    >
-                      <Text style={{ color: "white", fontWeight: "bold" }}>
-                        Use Code
-                      </Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={checkReferral}
+                        style={styles.useCodeButton}
+                      >
+                        <Text style={{ color: "white", fontWeight: "bold" }}>
+                          Use Code
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )
               ) : (
@@ -1224,6 +1225,31 @@ const styles = StyleSheet.create({
     marginEnd: "2%",
     borderRadius: 30,
     marginBottom: 10,
+  },
+  useCodeButton: {
+    backgroundColor: "#20365F",
+    height: 50,
+    width: "26%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "3%",
+    borderRadius: 10,
+    marginBottom: 0,
+    marginTop:20
+  },
+  useCodeInputs: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#20365F",
+    height: 50,
+    width: "52%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 10,
+    marginTop: 20,
+    marginLeft:8
   },
   header: {
     justifyContent: "center",
