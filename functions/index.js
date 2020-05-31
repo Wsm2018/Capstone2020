@@ -103,6 +103,24 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.assetManager = functions.https.onCall(async (data, context) => {
+  
+  if(data.type === "add"){
+    db.collection(data.collection).add(
+      data.obj
+  );
+  }
+  else if( data.type === "update"){
+    db.collection(data.collection).doc(data.doc).set(
+      data.obj
+  );
+  }
+  else{
+    db.collection(data.collection).doc(data.doc).delete()
+  }
+
+});
+
 exports.editBooking = functions.https.onCall(async (data, context) => {
   var newAssetBooking = data.assetBooking
   newAssetBooking.endDateTime = data.endDateTime
