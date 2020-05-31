@@ -31,8 +31,9 @@ export default function SupportChat(props) {
         Snap.forEach((doc) => {
           temp.push({ id: doc.id, ...doc.data() });
           console.log(doc.id, "==>", doc.data());
-        }),
-          console.log("hello", temp);
+        });
+        temp = temp.sort((a, b) => a.dateTime.toDate() - b.dateTime.toDate());
+        console.log("hello", temp);
         setMessages(temp);
       });
   }, []);
@@ -49,33 +50,21 @@ export default function SupportChat(props) {
       .get();
     console.log("---------------------", c.size);
     if (c.size == 0) {
-      Create();
+      addLiveChatRoom();
     }
   };
-  const Create = async () => {
-    console.log("Creating a Room", ticket);
-    await db
-      .collection("customerSupport")
-      .doc(ticket.id)
-      .collection("liveChat")
-      .add({
-        from: "Auto Reply",
-        name: "Support Bot",
-        text: "Please wait until a Support Agent Joins!",
-        dateTime: new Date(),
-      });
+
+  // -------------------------------ADD-----------------------------------
+  // Create a live chat room between agents and users
+  const addLiveChatRoom = async () => {
+    const add = firebase.functions().httpsCallable("addLiveChatRoom");
+    const response = await add({ ticket });
+    console.log("response", response);
   };
-  const send = async () => {
-    await db
-      .collection("customerSupport")
-      .doc(ticket.id + "")
-      .collection("liveChat")
-      .add({
-        from: firebase.auth().currentUser.uid,
-        name: user.displayName,
-        text,
-        dateTime: new Date(),
-      });
+
+  const sendSupportMessage = async () => {
+    const send = firebase.functions().httpsCallable("sendSupportMessage");
+    const response = await send({ ticket, user, text });
     setText("");
   };
   return (
@@ -102,9 +91,10 @@ export default function SupportChat(props) {
           )}
           <TextInput
             placeholder="Subject"
-            onChangeText={(text) => setText(text)}
+            value={text}
+            onChangeText={setText}
           />
-          <Button title="send" onPress={() => send()} />
+          <Button title="send" onPress={() => sendSupportMessage()} />
         </View>
       ) : null}
     </View>

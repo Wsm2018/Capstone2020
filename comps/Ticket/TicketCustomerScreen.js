@@ -23,8 +23,8 @@ export default function TicketScreen(props) {
   const [servicesList, setServicesList] = useState(null);
   const [selectedValue, setSelectedValue] = useState("projecter");
 
-  const [title, setTitle] = useState(null);
-  const [description, setDescription] = useState(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [view, setView] = useState("home");
   const [ticketList, setTicketList] = useState(null);
   const [other, setOther] = useState("");
@@ -54,144 +54,93 @@ export default function TicketScreen(props) {
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
-    tempUser = info.data();
+    tempUser = { id: info.id, ...info.data() };
+    console.log(tempUser);
     setUser(tempUser);
-
-    if (tempUser.role == "customer support") {
-      let temp = [];
-      const info = await db.collection("customerSupport").get();
-      info.forEach((data) => temp.push({ id: data.id, ...data.data() }));
-      setTicketList(temp);
-    } else {
-      let temp = [];
-      const info1 = await db
-        .collection("customerSupport")
-        .where("userId", "==", firebase.auth().currentUser.uid)
-        .get();
-      info1.forEach((data) => temp.push({ id: data.id, ...data.data() }));
-      setTicketList(temp);
-      temp = [];
-      const info2 = await db.collection("services").get();
-      info2.forEach((data) => temp.push(data.data()));
-      setServicesList(temp);
-    }
+    console.log("user", user);
   };
 
   //Submiting a ticket
-  const Submit = async () => {
-    await db.collection("customerSupport").add({
-      userId: firebase.auth().currentUser.uid,
-      title: title,
-      description: description,
-      dateOpen: new Date(),
-      dateClose: "",
-      target: selectedValue,
-      status: "pending",
-      supportAgentUid: "",
-      agentsContributed: [],
-      extraInfo: other,
-    });
+  const addTicket = async () => {
+    if (description != "" && title != "") {
+      console.log("user", user);
+      const add = firebase.functions().httpsCallable("addTicket");
+      const response = await add({
+        user,
+        description,
+        title,
+        selectedValue,
+        other,
+      });
+      console.log("response", response);
+      setView("home");
+    } else {
+      alert("Please fill the required fields");
+    }
   };
 
   // Render
   return user ? (
-    user.role != "customer support" ? (
-      <View style={styles.container}>
-        {view == "create" ? (
-          <View>
-            <Text>Customer Support</Text>
-            <Text>Ticket Subject</Text>
-            <TextInput
-              placeholder="Subject"
-              onChangeText={(text) => setTitle(text)}
-            />
-            {/* <Button
-              title="yo"
-              onPress={props.navigation.navigate("TicketSupportChat")}
-            /> */}
-            <Text>Issued For?</Text>
-            <TextInput
-              placeholder="Description"
-              onChangeText={(text) => setDescription(text)}
-            />
-            <Text>Issued On?</Text>
-            <Picker
-              selectedValue={selectedValue}
-              style={{ height: 50, width: 150 }}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedValue(itemValue)
-              }
-            >
-              {servicesList ? (
-                servicesList.map((item, index) => (
-                  <Picker.Item label={item.name} value={item.name} />
-                ))
-              ) : (
-                <Picker.Item label="Loading" value="Loading" />
-              )}
+    <View style={styles.container}>
+      {view == "create" ? (
+        <View>
+          <Text>Customer Support</Text>
+          <Text>Ticket Subject</Text>
+          <TextInput
+            placeholder="Subject"
+            onChangeText={(text) => setTitle(text)}
+          />
+          <Text>Issued For?</Text>
+          <TextInput
+            placeholder="Description"
+            onChangeText={(text) => setDescription(text)}
+          />
+          <Text>Issued On?</Text>
+          <Picker
+            selectedValue={selectedValue}
+            style={{ height: 50, width: 150 }}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedValue(itemValue)
+            }
+          >
+            {servicesList ? (
+              servicesList.map((item, index) => (
+                <Picker.Item label={item.name} value={item.name} />
+              ))
+            ) : (
+              <Picker.Item label="Loading" value="Loading" />
+            )}
 
-              <Picker.Item label="Other User" value="user" />
-            </Picker>
-            {selectedValue == "user" ? (
-              <TextInput
-                placeholder="User Details"
-                onChangeText={(text) => setOther(text)}
-              />
-            ) : null}
-            <Button title="Submit" onPress={() => Submit()} />
-            <Button title="back" onPress={() => setView("home")} />
-          </View>
-        ) : (
-          <View>
-            <Text>Customer Support</Text>
-            {ticketList ? (
-              <ScrollView>
-                {ticketList.map((item, index) => (
-                  <View
-                    style={{ flexDirection: "row", padding: 5, borderWidth: 1 }}
-                  >
-                    <View style={{ flexDirection: "column", padding: 10 }}>
-                      <Text>Title: {item.title}</Text>
-                      <Text>Status: {item.status}</Text>
-                      {item.supportAgentUid != "" ? (
-                        <Text>Agent: {item.supportAgentUid}</Text>
-                      ) : null}
-                    </View>
-
-                    <Button
-                      title="details"
-                      onPress={() =>
-                        props.navigation.navigate("Details", {
-                          ticket: item,
-                          user,
-                        })
-                      }
-                    />
+            <Picker.Item label="Other User" value="user" />
+          </Picker>
+          {selectedValue == "user" ? (
+            <TextInput
+              placeholder="User Details"
+              onChangeText={(text) => setOther(text)}
+            />
+          ) : null}
+          <Button title="Submit" onPress={() => addTicket()} />
+          <Button title="back" onPress={() => setView("home")} />
+        </View>
+      ) : (
+        <View>
+          <Text>Customer Support</Text>
+          {ticketList ? (
+            <ScrollView>
+              {ticketList.map((item, index) => (
+                <View
+                  style={{ flexDirection: "row", padding: 5, borderWidth: 1 }}
+                >
+                  <View style={{ flexDirection: "column", padding: 10 }}>
+                    <Text>Title: {item.title}</Text>
+                    <Text>Status: {item.status}</Text>
+                    {item.supportAgentUid != "" ? (
+                      <Text>Agent: {item.supportAgentUid}</Text>
+                    ) : null}
                   </View>
-                ))}
-              </ScrollView>
-            ) : null}
 
-            <Button
-              title="Report a problem"
-              onPress={() => setView("create")}
-            />
-          </View>
-        )}
-      </View>
-    ) : (
-      <View>
-        {ticketList
-          ? ticketList.map((item, index) =>
-              item.supportAgentUid == firebase.auth().currentUser.uid ||
-              item.status == "pending" ? (
-                <View style={{ borderWidth: 1, padding: 10 }}>
-                  <Text>Title:</Text>
-                  <Text>{item.title}</Text>
-                  <Text>Status</Text>
-                  <Text>{item.status}</Text>
                   <Button
-                    title="Details"
+                    title="details"
                     onPress={() =>
                       props.navigation.navigate("Details", {
                         ticket: item,
@@ -200,13 +149,18 @@ export default function TicketScreen(props) {
                     }
                   />
                 </View>
-              ) : null
-            )
-          : null}
-      </View>
-    )
+              ))}
+            </ScrollView>
+          ) : null}
+
+          <Button title="Report a problem" onPress={() => setView("create")} />
+        </View>
+      )}
+    </View>
   ) : (
-    <Text>Loading...</Text>
+    <View>
+      <Text>Loading...</Text>
+    </View>
   );
 }
 

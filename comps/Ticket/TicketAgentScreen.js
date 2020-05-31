@@ -22,6 +22,7 @@ export default function TicketAgentScreen(props) {
   const [user, setUser] = useState(null);
   const [servicesList, setServicesList] = useState(null);
   const [selectedValue, setSelectedValue] = useState("projecter");
+  const [agentList, setAgentList] = useState([]);
 
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
@@ -41,7 +42,6 @@ export default function TicketAgentScreen(props) {
         let temp = [];
         Snap.forEach((doc) => {
           temp.push({ id: doc.id, ...doc.data() });
-          console.log(doc.id, "==>", doc.data());
         }),
           setTicketList(temp);
       });
@@ -52,23 +52,9 @@ export default function TicketAgentScreen(props) {
       let temp = [];
       Snap.forEach((doc) => {
         temp.push({ id: doc.id, ...doc.data() });
-        console.log(doc.id, "==>", doc.data());
       }),
         setTicketList(temp);
     });
-  }, []);
-
-  useEffect(() => {
-    db.collection("customerSupport")
-      .where()
-      .onSnapshot((Snap) => {
-        let temp = [];
-        Snap.forEach((doc) => {
-          temp.push({ id: doc.id, ...doc.data() });
-          console.log(doc.id, "==>", doc.data());
-        }),
-          setTicketList(temp);
-      });
   }, []);
 
   //fetching user data from firebase
@@ -78,8 +64,16 @@ export default function TicketAgentScreen(props) {
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
-    tempUser = info.data();
+    tempUser = { id: info.id, ...info.data() };
     setUser(tempUser);
+
+    let agentsTemp = [];
+    const info2 = await db
+      .collection("users")
+      .where("role", "==", "customer support")
+      .get();
+    info2.forEach((doc) => agentsTemp.push({ id: doc.id, ...doc.data() }));
+    setAgentList(agentsTemp);
   };
 
   // Render
@@ -100,6 +94,7 @@ export default function TicketAgentScreen(props) {
                     props.navigation.navigate("Details", {
                       ticket: item,
                       user,
+                      agentList,
                     })
                   }
                 />

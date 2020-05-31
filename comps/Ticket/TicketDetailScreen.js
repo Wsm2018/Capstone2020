@@ -17,12 +17,15 @@ import "firebase/auth";
 export default function TicketDetailScreen(props) {
   const ticket = props.navigation.getParam("ticket");
   const user = props.navigation.getParam("user");
+  const agentList = props.navigation.getParam("agentList");
 
-  const [chat, setChat] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     Check();
   }, []);
+
   const Check = async () => {
     const c = await db
       .collection("customerSupport")
@@ -30,24 +33,36 @@ export default function TicketDetailScreen(props) {
       .collection("liveChat")
       .get();
     if (c.size != 0) {
-      setChat(true);
+      loading(true);
     }
   };
-  const TakeTicket = async () => {
-    db.collection("customerSupport")
-      .doc(ticket.id)
-      .update({
-        status: "in Process",
-        supportAgentUid: firebase.auth().currentUser.uid,
-        agentsContributed: firebase.firestore.FieldValue.arrayUnion(
-          firebase.auth().currentUser.uid
-        ),
-      });
-  };
 
-  const CloseTicket = () => {
-    db.collection("customerSupport").doc(ticket.id).update({
-      status: "Closed",
+  // -------------------------------ADD-----------------------------------
+  // Create a live chat room between agents and users
+  const TakeTicket = async () => {
+    let temp = [...ticket.agentsContributed];
+    temp.push(user.id);
+    const add = firebase.functions().httpsCallable("updateTicket");
+    const response = await add({ ticket, agents: temp, user, query: "take" });
+    console.log("response", response);
+  };
+  const CloseTicket = async () => {
+    const add = firebase.functions().httpsCallable("updateTicket");
+    const response = await add({ ticket, query: "close" });
+    console.log("response", response);
+  };
+  const Transfare = async () => {
+    let temp = [...ticket.agentsContributed];
+    if (temp.includes(selectedValue.id)) {
+      temp.push(selectedValue.id);
+    }
+    console.log("g", ticket, selectedValue, temp);
+    const add = firebase.functions().httpsCallable("updateTicket");
+    const response = await add({
+      ticket,
+      user: selectedValue,
+      agents: temp,
+      query: "transfare",
     });
   };
 
@@ -56,29 +71,37 @@ export default function TicketDetailScreen(props) {
       <Text>Ticket {ticket.title}</Text>
       <Text>status {ticket.status}</Text>
       <Text>description {ticket.description}</Text>
-      {user.role !== "customer support" ? (
+      <View>
         <Button
-          title="Live Chat"
+          title="Chat"
           onPress={() => props.navigation.navigate("Chat", { ticket, user })}
         />
-      ) : (
-        <View>
-          {chat ? (
-            <Button
-              title="Live Chat"
-              onPress={() =>
-                props.navigation.navigate("Chat", { ticket, user })
-              }
-            />
-          ) : null}
-
-          {ticket.status === "pending" ? (
-            <Button title="Take" onPress={() => TakeTicket()} />
-          ) : null}
-        </View>
-      )}
-      {user.role == "customer support" && ticket.status != "Closed" ? (
-        <Button title="Close Ticket" onPress={() => CloseTicket()} />
+        {ticket.status === "pending" ? (
+          <Button title="Take" onPress={() => TakeTicket()} />
+        ) : null}
+      </View>
+      {user.role == "customer support" &&
+      ticket.status != "Closed" &&
+      ticket.supportAgentUid == user.id ? (
+        <>
+          <Button title="Close Ticket" onPress={() => CloseTicket()} />
+          <Button title="transfare Ticket" onPress={() => Transfare()} />
+          <Picker
+            selectedValue={selectedValue}
+            style={{ height: 50, width: 150 }}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedValue(itemValue)
+            }
+          >
+            {agentList ? (
+              agentList.map((item, index) => (
+                <Picker.Item label={item.displayName} value={item} />
+              ))
+            ) : (
+              <Picker.Item label="Loading" value="Loading" />
+            )}
+          </Picker>
+        </>
       ) : null}
     </View>
   );

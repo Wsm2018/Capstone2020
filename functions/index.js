@@ -648,3 +648,57 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+//-------------Ticket---------------//
+exports.sendSupportMessage = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  db.collection("customerSupport")
+    .doc(data.ticket.id)
+    .collection("liveChat")
+    .add({
+      from: data.user.id,
+      name: data.user.displayName,
+      text: data.text,
+      dateTime: new Date(),
+    });
+});
+exports.addTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  const response = await db.collection("customerSupport").add({
+    userId: data.user.id,
+    title: data.title,
+    description: data.description,
+    dateOpen: new Date(),
+    dateClose: "",
+    target: data.selectedValue,
+    status: "pending",
+    supportAgentUid: "",
+    agentsContributed: [],
+    extraInfo: data.other,
+  });
+  response.collection("liveChat").add({
+    from: "Auto Reply",
+    name: "Support Bot",
+    text: "Please wait until a Support Agent Joins!",
+    dateTime: new Date(),
+  });
+});
+exports.updateTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "take") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "in Process",
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  } else if (data.query === "close") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "Closed",
+    });
+  } else if (data.query === "transfare") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  }
+});
+//--------------------------------//
