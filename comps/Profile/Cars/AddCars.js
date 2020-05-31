@@ -197,6 +197,7 @@ export default function AddCars(props) {
             onChangeText={setPlate}
             // label="Plate Number"
             value={plate}
+            maxLength={6}
             keyboardType="number-pad"
           />
         </View>
