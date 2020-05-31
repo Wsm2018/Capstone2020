@@ -36,6 +36,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^2.0.0",
     "react-native-gesture-handler": "~1.6.0",
+    "react-native-navybits-date-time-picker": "^1.2.3",
     "react-native-gradient-buttons": "^2.0.1",
     "react-native-paper": "^3.10.1",
     "react-native-picker-module": "^1.3.1",

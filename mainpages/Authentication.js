@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TextInput,
+  Button,
   TouchableOpacity,
   Dimensions,
   Modal,
@@ -161,6 +162,8 @@ export default function Authentication(props) {
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
+    // trying creating user and if there is any error it will alert it for example:
+    // email is not corrent or password is not strong
   };
 
   // checkReferral will check if the referral exists and the code is available

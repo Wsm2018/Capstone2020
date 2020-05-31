@@ -30,61 +30,30 @@ import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import HomeStack from "./navigation/HomeStack";
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
-import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
-import NewsStack from "./navigation/NewsStack";
 import db from "./db";
-import AdminHomeStack from "./navigation/AdminHomeStack";
-
-import ManagersStack from "./comps/Managers/ManagersScreen";
-import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
-import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [firstLaunch, setFirstLaunch] = useState(false);
-  const [guideView, setGuideView] = useState(true);
-  const [admin, setAdmin] = useState(null);
 
-  const handleLogout = async () => {
-    const userInfo = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get();
-    if (userInfo.data().role === "guest") {
-      await fetch(
-        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
-          firebase.auth().currentUser.uid
-        }`
-      );
-      firebase.auth().signOut();
-    } else {
-      firebase.auth().signOut();
-    }
+  const handleLogout = () => {
+    firebase.auth().signOut();
   };
 
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      // News: NewsStack,
       Profile: ProfileStack,
     },
-    // {
-    //   navigationOptions: ({ navigation }) => {
-    //     const { routeName } = navigation.state.routes[navigation.state.index];
-    //     return {
-    //       headerShown: true,
-    //       headerTitle: routeName,
-    //     };
-    //   },
-    // },
     {
-      tabBarOptions: {
-        activeTintColor: "white",
-        inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+      navigationOptions: ({ navigation }) => {
+        const { routeName } = navigation.state.routes[navigation.state.index];
+        return {
+          headerShown: true,
+          headerTitle: routeName,
+        };
       },
     }
   );
