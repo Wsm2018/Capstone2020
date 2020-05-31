@@ -8,11 +8,13 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  AsyncStorage,
 } from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 import { encode, decode } from "base-64";
 
 if (!global.btoa) {
@@ -81,78 +83,172 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      defaultNavigationOptions: ({ navigation }) => {
-        return {
-          headerLeft: (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              type="ionicon"
-              size={30}
-            />
-          ),
-        };
-      },
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingLeft: 10 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      // },
+      headerMode: null,
     }
   );
 
-  const AppDrawerNavigator = createDrawerNavigator({
-    Home: {
-      screen: DashboardStackNavigator,
+  const AppDrawerNavigator = createDrawerNavigator(
+    {
+      Home: {
+        screen: DashboardStackNavigator,
+      },
+      Friends: {
+        screen: FriendsStk,
+      },
     },
-    Friends: {
-      screen: FriendsStk,
-    },
-  });
+    {
+      drawerBackgroundColor: "#F0F8FF",
+      contentOptions: {
+        activeTintColor: "black",
+        inactiveTintColor: "black",
+      },
+      contentComponent: (props) => (
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              height: 200,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SafeAreaView style={{ marginTop: "19%" }}>
+              <View style={{ flexDirection: "row" }}>
+                {user && (
+                  <Image
+                    source={{ uri: user.qrCode }}
+                    style={{ width: 150, height: 150 }}
+                  />
+                )}
+                <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
+              </View>
+            </SafeAreaView>
+          </View>
+          <View>
+            <Text>{user && user.email}</Text>
+            <Text>{user && user.phone}</Text>
+          </View>
+
+          <ScrollView>
+            <DrawerItems {...props} />
+          </ScrollView>
+          <View>
+            <TouchableOpacity onPress={handleLogout}>
+              <Text>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      ),
+    }
+  );
 
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get();
-    const user = userRef.data();
-    setUser(user);
+      .onSnapshot(async (userRef) => {
+        const getAdmin = firebase.functions().httpsCallable("getAdmin");
+        const response = await getAdmin({
+          email: firebase.auth().currentUser.email,
+        });
+
+        const admin = response.data.result !== undefined ? true : false;
+
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
   }
 
-  useEffect(() => {
-    if (!loggedIn) {
-      getUser();
+  const getFirstLaunch = async () => {
+    try {
+      const value = await AsyncStorage.getItem("alreadyLaunched");
+      console.log("valueeeeeeeeeeeee", value);
+      if (!value) {
+        await AsyncStorage.setItem("alreadyLaunched", "true");
+        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(true);
+      } else {
+        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(false);
+      }
+    } catch (err) {
+      console.log(err);
     }
+  };
+
+  useEffect(() => {
+    getFirstLaunch();
   }, []);
 
   useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+    if (loggedIn) {
+      getUser();
+    }
+  }, [loggedIn]);
+
+  useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  if (!loggedIn) {
+  const adminTabNav = createBottomTabNavigator({
+    Home: AdminHomeStack,
+    Profile: ProfileStack,
+  });
+  const AdminAppContainer = createAppContainer(adminTabNav);
+
+  const guideSkip = () => {
+    console.log("Skipppped");
+    setGuideView(false);
+  };
+
+  if (loggedIn !== false) {
+    if (!loggedIn) {
+      return (
+        <View style={styles.container}>
+          <Authentication />
+        </View>
+      );
+    } else {
+      return (
+        user !== null &&
+        (user.admin ? (
+          <AdminAppContainer />
+        ) : user.role.slice(-12) === "(incomplete)" ? (
+          <EmployeeAuthentication />
+        ) : user.role === "manager" ? (
+          <ManagersStack />
+        ) : user.role === "user handler" ? (
+          <UserHandlerStack />
+        ) : firstLaunch && guideView ? (
+          <Guide guideSkip={guideSkip} />
+        ) : (
+          <AppContainer />
+        ))
+      );
+    }
+  } else {
     return (
-      <View style={styles.container}>
-        <Authentication />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
-  } else {
-    return <AppContainer />;
   }
-
-  // return (
-  //   // <View style={styles.container}>
-  //   //   {!loggedIn ? (
-
-  //   //   ) : (
-  //   //     // <View style={styles.container}>
-  //   //       <AppContainer />
-  //   //       {/* <HomePage /> */}
-  //   //     // </View>
-  //   //   )}
-  //   // </View>
-  // );
 }
 
 const styles = StyleSheet.create({
