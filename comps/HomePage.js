@@ -5,7 +5,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
 
-export default function HomePage() {
+export default function HomePage(props) {
   const handleLogout = () => {
     firebase.auth().signOut();
   };
@@ -18,7 +18,9 @@ export default function HomePage() {
         }}
       >
         <Text>Logout !</Text>
+
       </TouchableOpacity>
+      
     </View>
   );
 }
@@ -33,8 +35,5 @@ const styles = StyleSheet.create({
 });
 
 HomePage.navigationOptions = {
-  title: null,
-  tabBarIcon: () => {
-    <Icon name="home" type="font-awesome" size={24} />
-  },
+  header: null,
 };

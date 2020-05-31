@@ -16,16 +16,17 @@ const FriendsStack = createAppContainer(
       FriendsChat: FriendsChat,
     },
     {
-      initialRouteName: "FriendsList",
+      // initialRouteName: "FriendsList",
 
       defaultNavigationOptions: {
-        headerStyle: {
-          backgroundColor: "#006cab",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "normal",
-        },
+        header: null,
+        // headerStyle: {
+        //   backgroundColor: "#006cab",
+        // },
+        //   headerTintColor: "#fff",
+        //   headerTitleStyle: {
+        //     fontWeight: "normal",
+        //   },
       },
     }
   )
