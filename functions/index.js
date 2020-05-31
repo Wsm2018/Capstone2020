@@ -181,7 +181,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       email:
         request.query.role === "guest" ? accessDoc.data().email : result.email,
       role: request.query.role === "guest" ? "guest" : "user",
-      qrCode: "",
+      qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
       referralCode,
@@ -358,29 +358,266 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
   }
 });
 
+exports.createEmployee = functions.https.onCall(async (data, context) => {
+  // ---------------------------------Referral Code---------------------------------
+  // generating a random 6 digit referralCode
+  let referralCode = String(Math.floor(Math.random() * 1000000));
+
+  while (referralCode.length < 6) {
+    referralCode = "0" + referralCode;
+  }
+
+  const usersCollection = await db.collection("users").get();
+  const usersDocs = [];
+  usersCollection.forEach((doc) => {
+    usersDocs.push(doc.data().referralCode);
+  });
+
+  // checking if any other user has the generated referralCode and waiting because its
+  // checking all the users document
+  let refResult = usersDocs.includes(referralCode);
+  // while there is any user with that referralCode it will generate a new code and try
+  // again till it returns 0 documents
+
+  while (refResult) {
+    referralCode = String(Math.floor(Math.random() * 1000000));
+
+    while (referralCode.length < 6) {
+      referralCode = "0" + referralCode;
+    }
+
+    refResult = usersDocs.includes(referralCode);
+  }
+
+  // ----------------------------------Creation--------------------------------
+  let password = Math.random().toString(36).slice(-8);
+
+  let account = await admin.auth().createUser({
+    email: data.email,
+    password,
+  });
+
+  await db
+    .collection("users")
+    .doc(account.uid)
+    .set({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      country: data.country,
+      dateOfBirth: data.dateOfBirth,
+      outstandingBalance: 0,
+      balance: 0,
+      email: data.email,
+      role:
+        data.role === "manager" || data.role.slice(-7) === "handler"
+          ? `${data.role} (request)`
+          : `${data.role} (incomplete)`,
+      qrCode: "",
+      displayName: data.displayName,
+      phone: null,
+      referralCode,
+      loyaltyCode: "",
+      tokens: 0,
+      location: null,
+      privacy: {
+        emailP: false,
+        nameP: false,
+        locationP: false,
+        carsP: false,
+      },
+      favorite: [],
+      reputation: 0,
+      points: 0,
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+    });
+
+  return { id: account.uid, password };
+});
+
+exports.updatePassword = functions.https.onCall(async (data, context) => {
+  console.log("updatePassword data", data);
+  const result = await admin.auth().updateUser(data.user.id, {
+    password: data.password,
+  });
+  console.log("after set", result);
+});
+
+exports.getAllUndoneUsers = functions.https.onCall(async (data, context) => {
+  let listResult = await admin.auth().listUsers();
+  let users = [];
+  listResult.users.forEach((user) => {});
+});
+
+exports.resetEmployeePassword = functions.https.onCall(
+  async (data, context) => {
+    let password = Math.random().toString(36).slice(-8);
+    let role = data.user.role;
+    if (data.user.role.slice(-12) !== "(incomplete)") {
+      role = role + " (incomplete)";
+    }
+
+    const result = await admin.auth().updateUser(data.user.id, {
+      password,
+    });
+
+    await db.collection("users").doc(data.user.id).update({ role });
+
+    console.log("result", result);
+    return { password };
+  }
+);
+
+exports.setEmployeeAuthentication = functions.https.onCall(
+  async (data, context) => {
+    console.log("setEmployeeAuthentication data", data);
+    const result = await admin.auth().updateUser(data.user.id, {
+      password: data.password,
+    });
+
+    let role = data.user.role.slice(0, data.user.role.length - 13);
+    await db
+      .collection("users")
+      .doc(data.user.id)
+      .update({ role, phone: `+974${data.phone}` });
+    console.log("after set", result);
+  }
+);
+
+exports.allowEmployeeCreation = functions.https.onCall(
+  async (data, context) => {
+    console.log("managerAllow data", data);
+    let role = data.user.role.slice(0, data.user.role.length - 10);
+    let result = await db
+      .collection("users")
+      .doc(data.user.id)
+      .update({ role: `${role} (allowed)` });
+    console.log("after set", result);
+  }
+);
+
+exports.roleToIncomplete = functions.https.onCall(async (data, context) => {
+  console.log("managerAllow data", data);
+  let role = data.user.role.slice(0, data.user.role.length - 10);
+  let result = await db
+    .collection("users")
+    .doc(data.user.id)
+    .update({ role: `${role} (incomplete)` });
+  console.log("after set", result);
+});
+
+exports.testJose = functions.https.onCall(async (data, context) => {
+  console.log("data.id", data.id);
+  // let userId = data.id;
+  // let additionalClaims = {
+  //   done: false,
+  // };
+  // let response = await admin.auth().createCustomToken(userId, additionalClaims);
+  // console.log("response", response);
+  // Set admin privilege on the user corresponding to uid.
+  // try {
+  //   let response = await admin
+  //     .auth()
+  //     .setCustomUserClaims(data.id, { admin: true });
+  //   console.log(response);
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  let userId = data.id;
+  let additionalClaims = {
+    premiumAccount: true,
+  };
+
+  admin
+    .auth()
+    .createCustomToken(userId, additionalClaims)
+    .then(function (customToken) {
+      return customToken;
+    })
+    .catch(function (error) {
+      console.log("Error creating custom token:", error);
+    });
+});
 exports.deleteFavorite = functions.https.onCall(async (data, context) => {
   console.log("deleteFavorite   ", data);
   const res = await db
     .collection("users")
     .doc(data.uid)
-    .update({
-      favorite: admin.firestore.FieldValue.arrayRemove(data.assetId),
-    });
+    .collection("favorites")
+    .doc(data.assetId)
+    .delete();
   return res;
 });
 
 exports.addFavorite = functions.https.onCall(async (data, context) => {
-  const user = (await db.collection("users").doc(data.uid).get()).data();
-  const userFavorite = user.favorite;
-  if (userFavorite.includes(data.assetId)) return "Exists";
+  // const user = (await db.collection("users").doc(data.uid).get()).data();
+  // const userFavorite = user.favorite;
+  // if (userFavorite.includes(data.assetId)) return "Exists";
 
-  userFavorite.push(data.assetId);
-  const response = await db.collection("users").doc(data.uid).update({
-    favorite: userFavorite,
-  });
-  return response;
+  // userFavorite.push(data.assetId);
+  // const response = await db.collection("users").doc(data.uid).update({
+  //   favorite: userFavorite,
+  // });
+  // return response;
+  console.log("data", data);
+  const status = await checkFavorites(data.uid, data.asset.id);
+  console.log("status", status);
+  if (!status) {
+    const response = await db
+      .collection("users")
+      .doc(data.uid)
+      .collection("favorites")
+      .doc(data.asset.id)
+      .set({ asset: data.asset });
+    console.log("response ", response);
+    return response;
+  } else {
+    return "Exists";
+  }
 });
 
+const checkFavorites = async (id, assetId) => {
+  console.log("id ,", id);
+  const favorites = await db
+    .collection("users")
+    .doc(id)
+    .collection("favorites")
+    .get();
+  const ids = [];
+  favorites.forEach((doc) => {
+    ids.push(doc.id);
+  });
+  console.log("ids ", ids);
+  return ids.includes(assetId);
+};
+
+exports.getAdmin = functions.https.onCall(async (data, context) => {
+  if (context.auth.token.moderator !== true) {
+    return {
+      error:
+        "Request Not authorized. User must be an admin to make this request",
+    };
+  }
+  const email = data.email;
+  return grantAdminRole(email).then(async () => {
+    const user = await admin.auth().getUserByEmail(email);
+    return {
+      result: user.customClaims,
+    };
+  });
+});
+
+async function grantAdminRole(email) {
+  const user = await admin.auth().getUserByEmail(email);
+  if (user.customClaims.moderator) {
+    return user;
+  }
+  return admin.auth().setCustomUserClaims(user.uid, {
+    moderator: true,
+  });
+}
 exports.giftsExpCheck = functions.pubsub
   .schedule("0 0 * * *")
   .timeZone("Asia/Qatar")
