@@ -10,6 +10,9 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import LottieView from "lottie-react-native";
+
+import { Tooltip } from "react-native-elements";
 
 import { Card } from "react-native-shadow-cards";
 import { FontAwesome, Fontisto, AntDesign, Ionicons } from "@expo/vector-icons";
@@ -77,6 +80,50 @@ export default function ReferralScreen(props) {
               justifyContent: "space-evenly",
             }}
           >
+            <View
+              style={{
+                flex: 0.2,
+
+                // marginTop: -5,
+                // backgroundColor: "blue",
+                alignItems: "center",
+                // flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <Tooltip
+                height={100}
+                width={355}
+                backgroundColor={"#229277"}
+                popover={
+                  <Text style={{ color: "white", fontSize: 18 }}>
+                    You can receive tokens by referring the App to new users!
+                    Just click on the ({" "}
+                    <Fontisto name="share" size={16} color="white" /> ) icon to
+                    share your referral code using an SMS.
+                  </Text>
+                }
+                containerStyle={{
+                  justifyContent: "center",
+                  alignSelf: "center",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    // borderBottomWidth: 1,
+                    // borderBottomColor: "gray",
+                  }}
+                >
+                  <Text style={{ fontSize: 16, color: "black" }}>
+                    What is this{" "}
+                  </Text>
+                  <AntDesign name="questioncircle" size={20} color="darkred" />
+                </View>
+              </Tooltip>
+            </View>
             <Card
               // elevation={2}
               style={{
@@ -217,50 +264,88 @@ export default function ReferralScreen(props) {
             {/* <TouchableOpacity onPress={() => setPhoneModal(false)}>
               <Text>X</Text>
             </TouchableOpacity> */}
-
             <View
-              width={Dimensions.get("window").width / 2}
               style={{
-                // backgroundColor: "green",
+                flex: 1,
                 alignItems: "center",
-
-                // flexDirection: "row",
-                // paddingLeft: 6,
-                // width: "60%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 10,
-                // marginBottom: 10,
+                justifyContent: "center",
+                // backgroundColor: "blue",
+                // marginTop: "-2%",
               }}
             >
-              <TextInput
-                placeholder=" 1234 5678"
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-                maxLength={8}
+              <LottieView
+                width={Dimensions.get("window").width / 3.5}
+                source={require("../../assets/images/2442-send.json")}
+                autoPlay
+                loop
+                style={{
+                  position: "relative",
+                  // width: "100%",
+                }}
               />
+
+              <Text
+                style={{
+                  // paddingTop: "10%",
+                  paddingBottom: "5%",
+                  fontSize: 16,
+                  // color: "darkred",
+                  fontWeight: "bold",
+                }}
+              >
+                Enter a Phone Number:
+              </Text>
+              <View
+                width={Dimensions.get("window").width / 1.8}
+                style={{
+                  height: 50,
+                  // backgroundColor: "green",
+                  // alignItems: "center",
+                  justifyContent: "center",
+                  // flexDirection: "row",
+                  paddingLeft: 6,
+                  // width: "60%",
+                  borderColor: "gray",
+                  borderWidth: 2,
+                  borderRadius: 5,
+                  // marginBottom: 10,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={{ fontSize: 20, color: "gray" }}>🇶🇦 +974 </Text>
+                  <TextInput
+                    placeholder="1234 5678"
+                    onChangeText={setPhone}
+                    keyboardType="phone-pad"
+                    maxLength={8}
+                    fontSize={20}
+                  />
+                </View>
+              </View>
             </View>
+
             <View
               style={{
-                flex: 4,
+                flex: 0.4,
                 // backgroundColor: "red",
                 justifyContent: "space-evenly",
                 alignItems: "center",
-                flexDirection: "row-reverse",
+                // flexDirection: "row-reverse",
               }}
             >
               <TouchableOpacity
                 style={{
+                  flex: 0.4,
                   backgroundColor: "#20365F",
                   // borderWidth: 4,
-                  height: 40,
-                  width: "30%",
+                  // height: 20,
+                  width: "40%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
                   //marginStart: "2%",
                   //marginEnd: "2%",
-                  borderRadius: 15,
+                  borderRadius: 10,
                   //marginBottom: 10,
                 }}
                 onPress={() => handleSendSMS()}
@@ -270,7 +355,7 @@ export default function ReferralScreen(props) {
                     textAlign: "center",
                     fontSize: 16,
                     color: "white",
-                    // fontWeight: "bold",
+                    fontWeight: "bold",
                   }}
                 >
                   Send
@@ -290,8 +375,8 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 2.5,
-    width: width / 1.5,
+    height: height / 2.2,
+    width: width / 1.6,
     backgroundColor: "#fff",
     shadowOpacity: 1,
     shadowRadius: 2,

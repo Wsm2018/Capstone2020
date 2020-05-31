@@ -11,7 +11,10 @@ import {
   Button,
   Dimensions,
 } from "react-native";
-import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
+import Image from "react-native-scalable-image";
+import { Card } from "react-native-shadow-cards";
+
+import { AntDesign, FontAwesome } from "react-native-vector-icons";
 
 import db from "../../db";
 import firebase from "firebase";
@@ -177,20 +180,137 @@ export default function Favorites({
               </View>
             ) : (
               favoriteAssets.map((item, index) => (
-                <View key={index}>
-                  <Text>{item.asset.name}</Text>
-                  <TouchableOpacity
+                <View
+                  width={Dimensions.get("window").width / 1.2}
+                  style={{
+                    flex: 0.1,
+                    marginTop: "5%",
+                    // backgroundColor: "red",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                  key={index}
+                >
+                  {/* <TouchableOpacity
                     onPress={() => handleDeleteAlert(item.asset.id)}
                   >
                     <Text>X</Text>
-                  </TouchableOpacity>
-                  <Button
+                  </TouchableOpacity> */}
+
+                  {/* ================== */}
+
+                  <Card
+                    elevation={2}
+                    style={{
+                      // flex: 2,
+                      height: 50,
+                      // marginTop: "-1.5%",
+                      width: "95%",
+                      borderWidth: 0.5,
+                      justifyContent: "center",
+                      borderColor: "lightgray",
+                      // flex: 0.95,
+                    }}
+                  >
+                    {/* ============================================== */}
+                    <View
+                      style={{
+                        // flex: 1,
+                        justifyContent: "space-between",
+                        alignItems: "stretch",
+                        flexDirection: "row-reverse",
+                        // // marginEnd: 15,
+                        // backgroundColor: "yellow",
+
+                        // marginTop: 15,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: "row-reverse",
+                        }}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flex: 0.2,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            // marginEnd: 15,
+                            // backgroundColor: "yellow",
+
+                            // marginTop: 15,
+                          }}
+                          onPress={() => handleDeleteAlert(item.asset.id)}
+                        >
+                          <FontAwesome
+                            name="remove"
+                            size={24}
+                            color="darkgray"
+                          />
+                        </TouchableOpacity>
+                        {/* <Button
                     title="Book This"
                     onPress={() => {
                       setAssetModal(true);
                       setSelectedAsset(item.asset);
                     }}
-                  />
+                  /> */}
+                        {/* -------------- */}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setAssetModal(true);
+                            setSelectedAsset(item.asset);
+                          }}
+                          style={{
+                            flex: 0.4,
+
+                            // position: "relative",
+                            // width: "100%",
+                            // flex: 1,
+                            // height: "100%",
+                            // backgroundColor: "blue",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Image
+                            width={Dimensions.get("window").width / 5}
+                            source={require("../../assets/images/bookit2.png")}
+                            autoPlay
+                            // onPress={() => setCarsModal(true)}
+                            // loop
+                            style={
+                              {
+                                // position: "relative",
+                                // width: "70%",
+                                // height: "75%",
+                                // flex: 1,
+                                // backgroundColor: "blue",
+                                // justifyContent: "center",
+                                // alignItems: "center",
+                                // paddingTop: "5%",
+                              }
+                            }
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          paddingStart: 10,
+                          fontWeight: "bold",
+                          color: "darkgreen",
+                          // fontVariant: 4,
+                          // backgroundColor: "green",
+                          // backgroundColor: "blue",
+                        }}
+                      >
+                        {item.asset.name}
+                      </Text>
+                    </View>
+                  </Card>
                 </View>
               ))
             )}
@@ -306,7 +426,7 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 1.2,
+    height: height / 1.3,
     width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,

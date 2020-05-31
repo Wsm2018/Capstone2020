@@ -53,7 +53,7 @@ export default function Car({ car }) {
               // marginEnd: "-3%",
             }}
           >
-            <TouchableOpacity onPress={() => handleDeleteAlert()}>
+            <TouchableOpacity>
               {/* <Text style={styles.notes}>X</Text> */}
               <Octicons name="trashcan" size={20} color="black" />
             </TouchableOpacity>
