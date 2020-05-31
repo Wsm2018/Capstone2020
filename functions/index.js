@@ -382,7 +382,7 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
 });
 
 exports.giftsExpCheck = functions.pubsub
-  .schedule("46 10 * * *")
+  .schedule("0 0 * * *")
   .timeZone("Asia/Qatar")
   .onRun(async (context) => {
     const result = await db
