@@ -15,7 +15,7 @@ import Card from "./Card";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user", "No param");
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState(null);
 
   useEffect(() => {
     getCards();
@@ -56,7 +56,7 @@ export default function CardsScreen(props) {
         </Text>
       </View>
       <ScrollView style={{ flex: 5 }}>
-        {cards.length === 0 ? (
+        {cards && cards.length === 0 ? (
           <Text>No Cards</Text>
         ) : (
           <FlatList

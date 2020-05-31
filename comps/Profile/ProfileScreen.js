@@ -59,6 +59,7 @@ export default function ProfileScreen(props) {
   const [favoritesModal, setFavoritesModal] = useState(false);
   const [flag, setFlag] = useState(false);
   const [editPic, setEditPic] = useState("");
+  const [editDisplayName, setEditDisplayName] = useState("");
 
   const getUser = async () => {
     db.collection("users")
@@ -68,6 +69,8 @@ export default function ProfileScreen(props) {
         setPhotoURL(user.photoURL);
         setDisplayName(user.displayName);
         setProfileBackground(user.profileBackground);
+        setEditDisplayName(user.displayName);
+        setEditPic(user.photoURL);
         setUser(user);
       });
   };
@@ -82,7 +85,7 @@ export default function ProfileScreen(props) {
     askPermission();
   }, []);
 
-  const handleSave = async (uri, type) => {
+  const handleSave = async (uri, type, displayName) => {
     const response = await fetch(uri);
     const blob = await response.blob();
     if (type === "profile") {
@@ -97,7 +100,7 @@ export default function ProfileScreen(props) {
         .child(`users/${firebase.auth().currentUser.uid}`)
         .getDownloadURL();
       console.log("url ", url);
-      handleSaveEdit(url);
+      handleSaveEdit(url, displayName);
       setPhotoURL(url);
       setFlag(false);
     } else {
@@ -154,7 +157,7 @@ export default function ProfileScreen(props) {
     }
   };
 
-  const handleSaveEdit = async (url) => {
+  const handleSaveEdit = async (url, displayName) => {
     const updateUserInfo = firebase.functions().httpsCallable("updateUserInfo");
     const result = await updateUserInfo({
       uid: firebase.auth().currentUser.uid,
@@ -168,7 +171,8 @@ export default function ProfileScreen(props) {
 
   const saveImage = async () => {
     // setPhotoURL(editPic);
-    handleSave(editPic, "profile");
+
+    handleSave(editPic, "profile", editDisplayName);
     // if (flag) {
     //   handleSaveEdit();
     // }
@@ -297,9 +301,9 @@ export default function ProfileScreen(props) {
                       borderColor: "black",
                     }}
                     label="Display Name"
-                    value={displayName}
-                    onChangeText={setDisplayName}
-                    onSubmitEditing={saveImage}
+                    value={editDisplayName}
+                    onChangeText={setEditDisplayName}
+                    // onSubmitEditing={saveImage}
                   />
                 </View>
 
@@ -359,6 +363,7 @@ export default function ProfileScreen(props) {
                         setPhotoURL(firebase.auth().currentUser.photoURL);
                         setEditPic(photoURL);
                         setEdit(false);
+                        setEditDisplayName(displayName);
                       }}
                     >
                       <Text

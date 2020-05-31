@@ -161,19 +161,23 @@ export default function AddCard(props) {
         }}
       >
         <CreditCardInput
+          elevation={5}
           labels={labels}
           requiresName={true}
           onChange={handleCard}
           allowScroll={true}
           labelStyle={{ textAlign: "center" }}
           inputStyle={{
-            borderBottomWidth: 2,
+            // borderBottomWidth: 2,
+
             borderRadius: 5,
             textAlign: "center",
           }}
-          inputContainerStyle={{
-            marginTop: 60,
-          }}
+          inputContainerStyle={
+            {
+              // marginTop: 60,
+            }
+          }
           labelStyle={{ color: "gray" }}
           cardImageFront={require("../../../assets/images/dark1.jpg")}
           cardImageBack={require("../../../assets/images/dark2.png")}

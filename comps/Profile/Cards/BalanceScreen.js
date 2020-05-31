@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import Image from "react-native-scalable-image";
 
 import GradientButton from "react-native-gradient-buttons";
@@ -15,6 +21,7 @@ import { isMoment } from "moment";
 
 export default function BalanceScreen({ navigation }) {
   const [user, setUser] = useState(null);
+  const [codeView, setCodeView] = useState(false);
 
   const getUser = () => {
     db.collection("users")
@@ -35,10 +42,12 @@ export default function BalanceScreen({ navigation }) {
           flex: 1,
           justifyContent: "space-evenly",
           alignItems: "center",
+          // backgroundColor: "blue",
+          // marginTop: "-5%",
         }}
       >
-        <View>
-          <Text style={{ fontSize: 26, fontWeight: "bold", color: "#0D2C6A" }}>
+        <View style={{ flex: 0.5 }}>
+          <Text style={{ fontSize: 25, fontWeight: "bold", color: "#0D2C6A" }}>
             Current Balance
           </Text>
 
@@ -59,116 +68,195 @@ export default function BalanceScreen({ navigation }) {
                 props.navigation.navigate("Balance", { user: props.user })
               }
             /> */}
-            <Text style={{ fontSize: 24, fontWeight: "bold", marginEnd: 5 }}>
+            <Text style={{ fontSize: 22, fontWeight: "bold", marginEnd: 5 }}>
               {user && user.balance}
             </Text>
-            <Text style={{ fontSize: 24, fontWeight: "bold" }}>QR</Text>
+            <Text style={{ fontSize: 22, fontWeight: "bold" }}>QR</Text>
           </View>
         </View>
 
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             width: "100%",
+            backgroundColor: "red",
+
             justifyContent: "space-evenly",
             alignItems: "center",
           }}
         >
-          {/* <View
-            style={{
-              // backgroundColor: "#20365F",
-              // height: 50,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => navigation.navigate("AddCard", { user: user })}
-            >
-              <Image
-                source={require("../../../assets/images/addcard.png")}
-                style={{ height: 60, width: 60 }}
-              />
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#20365F",
-                }}
-              >
-                Add Credit Card
-              </Text>
-            </TouchableOpacity>
-          </View> */}
           <View
             style={{
-              // backgroundColor: "#20365F",
+              flex: 2,
+              // backgroundColor: "red",
               // height: 50,
-              justifyContent: "center",
+              flexDirection: "row",
+              justifyContent: "space-around",
               alignItems: "center",
             }}
-          >
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => navigation.navigate("Cards", { user: user })}
-            >
-              <Image
-                width={Dimensions.get("window").width / 5}
-                source={require("../../../assets/images/listcards2.png")}
-                //style={{ height: 68, width: 68 }}
-              />
-              <Text
-                style={{
-                  // marginTop: -15,
-                  textAlign: "center",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#20365F",
-                }}
-              >
-                My Credit Cards
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* <TouchableOpacity
+          > */}
+        {/* ------------------------the gift code input and button---------------------------- */}
+        {!codeView ? (
+          <View
             style={{
-              backgroundColor: "#20365F",
-              height: 50,
-              justifyContent: "center",
+              flexDirection: "row",
+              width: "100%",
+              // backgroundColor: "red",
+
+              justifyContent: "space-evenly",
               alignItems: "center",
             }}
-            onPress={() => navigation.navigate("Cards", { user: user })}
           >
-            <Text
+            <View
               style={{
-                textAlign: "center",
-                fontSize: 16,
-                color: "white",
+                flex: 2,
+                // backgroundColor: "red",
+                // height: 50,
+                flexDirection: "row",
+                justifyContent: "space-around",
+                alignItems: "center",
               }}
             >
-              My Credit Cards
-            </Text>
-          </TouchableOpacity> */}
-          {/* <GradientButton
-            text="My Credit Cards"
-            width="30%"
-            height="50%"
-            deepBlue
-            impact
-            textStyle={{
-              fontSize: 15,
+              <View
+                style={{
+                  flex: 1,
+                  // backgroundColor: "red",
+                  // height: 50,
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPress={() => navigation.navigate("Cards", { user: user })}
+                >
+                  {/* <Image
+                    width={Dimensions.get("window").width / 4}
+                    source={require("../../../assets/images/listcard22.png")}
+                    //style={{ height: 68, width: 68 }}
+                  /> */}
+                  <Text
+                    style={{
+                      // marginTop: -15,
+                      textAlign: "center",
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#20365F",
+                    }}
+                  >
+                    Show My Cards
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPress={() => setCodeView(true)}
+                >
+                  {/* <Image
+                    width={Dimensions.get("window").width / 5}
+                    source={require("../../../assets/images/giftbox2.png")}
+                    //style={{ height: 68, width: 68 }}
+                  /> */}
+                  <Text
+                    style={{
+                      // marginTop: -15,
+                      textAlign: "center",
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#20365F",
+                    }}
+                  >
+                    Use Gift Code
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View
+            width={Dimensions.get("window").width / 2}
+            style={{
+              flex: 1,
+              // backgroundColor: "yellow",
+              // flexDirection: "row",
+              justifyContent: "space-evenly",
             }}
-          /> */}
+          >
+            <View
+              style={{
+                // backgroundColor: "green",
+                // alignItems: "center",
 
-          {/* <Button
-          title="My Credit Cards"
-          onPress={() => navigation.navigate("Cards", { user: user })}
-        /> */}
-        </View>
+                // flexDirection: "row",
+                // paddingLeft: 6,
+                // width: "60%",
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 10,
+                // marginBottom: 10,
+              }}
+            >
+              {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
+              <TextInput
+                width={Dimensions.get("window").width / 2}
+                style={{ height: 40, paddingLeft: 6 }}
+                placeholder="Enter the code"
+                // value={"email"}
+                onChangeText={"setEmail"}
+              />
+            </View>
+            <View
+              // width={Dimensions.get("window").width}
+              style={{
+                flex: 0.5,
+                // backgroundColor: "red",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <TouchableOpacity
+                // width={Dimensions.get("window").width}
+                style={{
+                  // flex: 0.2,
+                  // backgroundColor: "red",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  // paddingLeft: 6,
+                  // width: "50%",
+                  // borderBottomColor: "black",
+                  // borderBottomWidth: 1,
+                  // borderRadius: 10,
+                  // marginBottom: 10,
+                }}
+                onPress={() => setCodeView(false)}
+              >
+                <Text style={{ fontSize: 15 }}>Go Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  // flex: 0.2,
+                  // backgroundColor: "red",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  // paddingLeft: 6,
+                  // width: "50%",
+                  // borderBottomColor: "black",
+                  // borderBottomWidth: 1,
+                  // borderRadius: 10,
+                  // marginBottom: 10,
+                }}
+              >
+                <Text style={{ fontSize: 15 }}>Use Code</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* ------------------------the gift code input ---------------------------- */}
       </View>
+      {/* */}
     </View>
   );
 }

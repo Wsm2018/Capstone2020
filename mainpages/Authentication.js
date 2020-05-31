@@ -448,7 +448,9 @@ export default function Authentication(props) {
                         <Icon name="email-outline" size={20} color="#20365F" />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setRegisterEmail}
+                      onChangeText={(email) =>
+                        setRegisterEmail(email.toLowerCase())
+                      }
                       placeholder="E-mail"
                       value={registerEmail}
                       placeholderTextColor="#20365F"
