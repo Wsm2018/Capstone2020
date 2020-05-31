@@ -147,7 +147,7 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "QuickBookinQ",
+  title: "QuickbookinQ",
   // headerStyle: { backgroundColor: "#3771b3" },
   headerStyle: { backgroundColor: "#20365F" },
 
