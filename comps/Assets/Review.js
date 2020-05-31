@@ -239,13 +239,13 @@ export default function Details(props) {
                           <View
                             style={{
                               width: "10%",
-                              justifyContent: "space-evenly",
+                              justifyContent: "flex-end",
                               // alignItems: "center",
                               // padding: 5,
                               // marginTop: 10,
                             }}
                           >
-                            <TouchableOpacity
+                            {/* <TouchableOpacity
                               style={{
                                 // width: "70%",
                                 backgroundColor: "#20365F",
@@ -256,15 +256,13 @@ export default function Details(props) {
                               }}
                               onPress={() => setModalAddReview(true)}
                             >
-                              {/* <Text style={{ fontSize: 12, color: "gray" }}>
-                              +
-                            </Text> */}
+                              
                               <MaterialCommunityIcons
                                 name="plus"
                                 size={22}
                                 color={"white"}
                               />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity
                               style={{
                                 // width: "70%",
