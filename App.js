@@ -70,7 +70,7 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      // News: NewsStack,
+      News: NewsStack,
       Profile: ProfileStack,
     },
     // {
@@ -118,26 +118,23 @@ export default function App(props) {
     {
       // initialRouteName: "FriendsList",
 
-    
       defaultNavigationOptions: ({ navigation }) => {
         return {
-        
           headerLeft: (
             <Icon
               style={{ paddingRight: 10 }}
               onPress={() => navigation.FriendsList}
               name="md-menu"
               type="ionicon"
-              color='white'
+              color="white"
               size={30}
             />
-          )
-        ,
-         headerStyle:{
-           backgroundColor:'#20365F'
-         },
-         headerTitle:'Friends List',
-         headerTintColor:'white'
+          ),
+          headerStyle: {
+            backgroundColor: "#20365F",
+          },
+          headerTitle: "Friends List",
+          headerTintColor: "white",
         };
       },
     }
@@ -167,7 +164,7 @@ export default function App(props) {
               justifyContent: "center",
             }}
           >
-            <SafeAreaView style={{ marginTop: "19%" ,}}>
+            <SafeAreaView style={{ marginTop: "19%" }}>
               <View style={{ flexDirection: "row" }}>
                 {user && (
                   <Image
@@ -227,7 +224,7 @@ export default function App(props) {
       console.log("falseeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(false);
     }
-  };
+  }
 
   useEffect(() => {
     getFirstLaunch();
