@@ -170,8 +170,9 @@ export default function AddCars(props) {
           <TextInput
             style={{
               height: 50,
-              // width: "80%",
+              width: "80%",
               paddingLeft: 6,
+              // backgroundColor: "red",
             }}
             placeholder="Enter Car Brand"
             onChangeText={setBrand}
@@ -194,7 +195,7 @@ export default function AddCars(props) {
         >
           {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 50, paddingLeft: 6 }}
+            style={{ height: 50, paddingLeft: 6, width: "80%" }}
             placeholder="Enter Car Model"
             // label="Car Model"
             onChangeText={setModel}
@@ -217,7 +218,7 @@ export default function AddCars(props) {
         >
           {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 50, paddingLeft: 6 }}
+            style={{ height: 50, paddingLeft: 6, width: "80%" }}
             placeholder="Enter Plate Number"
             onChangeText={setPlate}
             // label="Plate Number"
