@@ -9,7 +9,6 @@ import {
   Modal,
   TouchableOpacity,
   FlatList,
-  KeyboardAvoidingView,
 } from "react-native";
 import { Header } from "react-navigation-stack";
 
