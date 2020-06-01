@@ -706,3 +706,14 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+
+exports.deleteCar = functions.https.onCall(async (data, context) => {
+  console.log("delete car ", data);
+  const response = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cars")
+    .doc(data.carId)
+    .delete();
+  console.log(response);
+});

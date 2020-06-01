@@ -147,8 +147,10 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "Assets Types",
-  headerStyle: { backgroundColor: "#3771b3" },
+  title: "QuickbookinQ",
+  // headerStyle: { backgroundColor: "#3771b3" },
+  headerStyle: { backgroundColor: "#20365F" },
+
   headerTintColor: "white",
 });
 
