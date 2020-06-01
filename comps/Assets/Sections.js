@@ -26,9 +26,10 @@ import List from "./List";
 require("firebase/firestore");
 
 import Details from "./Details";
-import { set } from "react-native-reanimated";
+import { prototype } from "lottie-react-native";
 
 export default function Sections(props) {
+  // const [fromFav, setFromFav] = useState(false);
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
@@ -39,12 +40,30 @@ export default function Sections(props) {
   // const endDateTime = props.navigation.getParam("endDate", "failed");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const fav = props.navigation.getParam("flag", false);
+  console.log(fav);
+  useEffect(() => {
+    if (fav) {
+      console.log("hello");
+      // console.log(props.navigation.getParam("startDate", ""));
+      setStartDate(props.navigation.getParam("startDate", ""));
+      setEndDate(props.navigation.getParam("startDate", ""));
+      console.log(props.navigation.getParam("asset", null).type);
+      type = props.navigation.getParam("asset", null).type;
+      tName = props.navigation.getParam("asset", null).tName;
+      console.log(props.navigation.getParam("asset", null).assetSection);
+      setSelectedSection(props.navigation.getParam("asset", null).assetSection);
+      console.log("asset", props.navigation.getParam("asset", null));
+      setSelectedList(props.navigation.getParam("asset", null));
+      setDetailsView(true);
+    }
+  }, []);
 
   useEffect(() => {
-    console.log(
-      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
-      selectedSection
-    );
+    // console.log(
+    //   "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
+    //   selectedSection
+    // );
     if (selectedSection !== null) {
       var temp = [];
       setAssetList(temp);
@@ -166,8 +185,8 @@ export default function Sections(props) {
   const [showSections, setShowSections] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const type = props.navigation.getParam("type", "failed").id;
-  const tName = props.navigation.getParam("type", "failed").name;
+  let type = props.navigation.getParam("type", "failed").id;
+  let tName = props.navigation.getParam("type", "failed").name;
 
   useEffect(() => {
     //console.log("++++++++++++++++++++++", type);
@@ -181,6 +200,10 @@ export default function Sections(props) {
   }, [finalAssets]);
 
   useEffect(() => {
+    console.log("list ------> ", selectedList);
+  }, [selectedList]);
+
+  useEffect(() => {
     console.log(startDate);
   }, [startDate]);
   useEffect(() => {
@@ -192,6 +215,7 @@ export default function Sections(props) {
 
   const getSections = async () => {
     const temp = [];
+    console.log("getSections ", type);
     const sections = await db
       .collection("assetSections")
       .where("assetType", "==", type)
@@ -199,22 +223,22 @@ export default function Sections(props) {
     sections.forEach((doc) => {
       temp.push({ id: doc.id, ...doc.data() });
     });
-    console.log(temp);
+    console.log("Sections 0-000000000000000000000000000000000000", temp);
     setAssetSections(temp);
   };
 
-  const checkFavorites = async (id) => {
-    const favorites = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("favorites")
-      .get();
-    const ids = [];
-    favorites.forEach((doc) => {
-      ids.push(doc.id);
-    });
-    return ids.includes(id);
-  };
+  // const checkFavorites = async (id) => {
+  //   const favorites = await db
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .collection("favorites")
+  //     .get();
+  //   const ids = [];
+  //   favorites.forEach((doc) => {
+  //     ids.push(doc.id);
+  //   });
+  //   return ids.includes(id);
+  // };
 
   const handleAddFavorite = async (item) => {
     // console.log(item);
@@ -227,7 +251,10 @@ export default function Sections(props) {
     // } else {
     //   alert("Already exists");
     // }
-
+    item.type = type;
+    item.tName = tName;
+    item.assetSection = selectedSection;
+    console.log(item);
     const addFavorite = firebase.functions().httpsCallable("addFavorite");
     const response = await addFavorite({
       uid: firebase.auth().currentUser.uid,

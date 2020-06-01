@@ -5,7 +5,7 @@ import {
   Button,
   Picker,
   Image,
-  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
@@ -17,6 +17,7 @@ import { Text } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
 
 import { CreditCardInput } from "react-native-credit-card-input";
+// import { TouchableOpacity } from "react-native-gesture-handler";
 // import { ScrollView } from "react-native-gesture-handler";
 export default function AddCard(props) {
   const user = props.navigation.getParam("user");
@@ -129,38 +130,89 @@ export default function AddCard(props) {
   };
 
   return (
-    <View style={{ flex: 1, flexDirection: "column", flexWrap: "wrap" }}>
-      <Text h4 style={{ alignItems: "center", justifyContent: "center" }}>
-        Add Credit Card
+    <View
+      style={{
+        flex: 1,
+        // flexDirection: "column",
+        // flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: "5%",
+        // marginBottom: "10%",
+      }}
+    >
+      <Text
+        style={{
+          // fontSize: 20,
+          fontSize: 25,
+          fontWeight: "bold",
+        }}
+      >
+        Add a Credit Card
       </Text>
-      <ScrollView
+      <View
         style={{
           flex: 3,
+          marginTop: "15%",
+
+          // borderWidth: 1,
           // backgroundColor: "red",
-          // width: "90%",
+          width: "90%",
         }}
       >
         <CreditCardInput
+          elevation={5}
           labels={labels}
           requiresName={true}
           onChange={handleCard}
           allowScroll={true}
           labelStyle={{ textAlign: "center" }}
           inputStyle={{
-            borderBottomWidth: 2,
+            // borderBottomWidth: 2,
+
             borderRadius: 5,
             textAlign: "center",
           }}
-          inputContainerStyle={{
-            marginTop: 20,
-          }}
+          inputContainerStyle={
+            {
+              // marginTop: 60,
+            }
+          }
           labelStyle={{ color: "gray" }}
           cardImageFront={require("../../../assets/images/dark1.jpg")}
           cardImageBack={require("../../../assets/images/dark2.png")}
         />
-      </ScrollView>
 
-      <Button onPress={handleAddCard} title="Add Card" />
+        {/* <Button onPress={handleAddCard} title="Add Card" /> */}
+      </View>
+      <TouchableOpacity
+        style={{
+          flex: 0.2,
+          borderWidth: 3,
+          borderRadius: 20,
+          // backgroundColor: "red",
+          // height: 50,
+          width: "30%",
+
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onPress={handleAddCard}
+      >
+        <Text
+          style={{
+            // height: 60,
+            // backgroundColor: "red",
+            // width: "80%",
+            textAlign: "center",
+            fontSize: 20,
+            fontWeight: "bold",
+            color: "#20365F",
+          }}
+        >
+          Save!
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -7,6 +7,7 @@ import {
   Modal,
   TouchableOpacity,
   FlatList,
+  KeyboardAvoidingView,
 } from "react-native";
 import BalanceScreen from "./Cards/BalanceScreen";
 import { Icon } from "react-native-elements";
@@ -24,6 +25,10 @@ import "firebase/auth";
 
 export default function DetailsScreen(props) {
   return (
+    // <KeyboardAvoidingView
+    //   behavior={Platform.OS == "ios" ? "padding" : "height"}
+    //   style={{ flex: 1 }}
+    // >
     <View style={styles.container}>
       <View style={{ flex: 2 }}>
         <Card
@@ -87,6 +92,7 @@ export default function DetailsScreen(props) {
         navigation={props.navigation}
       /> */}
     </View>
+    // </KeyboardAvoidingView>
   );
 }
 const styles = StyleSheet.create({
