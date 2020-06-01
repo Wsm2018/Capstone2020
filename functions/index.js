@@ -295,13 +295,21 @@ exports.addFriend = functions.https.onCall(async (data, context) => {
     .doc(data.user.id)
     .collection("friends")
     .doc(data.friend.id)
-    .set({ displayName: data.friend.displayName, status: "pending" });
+    .set({
+      displayName: data.friend.displayName,
+      status: "pending",
+      photoURL: data.friend.photoURL,
+    });
 
   db.collection("users")
     .doc(data.friend.id)
     .collection("friends")
     .doc(data.user.id)
-    .set({ displayName: data.user.displayName, status: "requested" });
+    .set({
+      displayName: data.user.displayName,
+      status: "requested",
+      photoURL: data.user.photoURL,
+    });
 });
 
 exports.acceptFriend = functions.https.onCall((data, context) => {
@@ -341,6 +349,7 @@ exports.sendMessage = functions.https.onCall((data, context) => {
     to: data.to,
     from: data.from,
     text: data.text,
+    status: "unread",
     dateTime: new Date(),
   });
 });
@@ -459,6 +468,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
     .collection("users")
     .doc(account.uid)
     .set({
+      activeRole: null,
       firstName: data.firstName,
       lastName: data.lastName,
       country: data.country,
@@ -706,6 +716,14 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+
+exports.updateToRead = functions.https.onCall(async (data, context) => {
+  console.log("updateToRead data", data);
+  const response = await data.messages.forEach((message) =>
+    db.collection("chats").doc(message.id).update({ status: "read" })
+  );
+  console.log("after update", response);
+});
 
 exports.deleteCar = functions.https.onCall(async (data, context) => {
   console.log("delete car ", data);

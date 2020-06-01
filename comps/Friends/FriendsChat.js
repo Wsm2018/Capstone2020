@@ -24,9 +24,13 @@ export default function FriendsList(props) {
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
 
+  // const [unsubscribe, setUnsubscribe] = useState(null);
+  // const [unsubscribe2, setUnsubscribe2] = useState(null);
+
   // -------------------------------FROM-----------------------------------
   const handleFrom = () => {
-    db.collection("chats")
+    const unsubscribe = db
+      .collection("chats")
       .where("from", "==", firebase.auth().currentUser.uid)
       .where("to", "==", friend.id)
       .onSnapshot((queryBySnapshot) => {
@@ -34,22 +38,38 @@ export default function FriendsList(props) {
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: true });
         });
+        // console.log(tempFrom);
         setFrom(tempFrom);
       });
+    screenListener(unsubscribe);
   };
 
   // --------------------------------TO----------------------------------
   const handleTo = () => {
-    db.collection("chats")
+    console.log("yo we in to");
+    const unsubscribe = db
+      .collection("chats")
       .where("from", "==", friend.id)
       .where("to", "==", firebase.auth().currentUser.uid)
-      .onSnapshot((queryBySnapshot) => {
+      .onSnapshot(async (queryBySnapshot) => {
+        console.log("we in this?");
         let tempFrom = [];
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: false });
         });
+        // get all of this shit
+        // filter only unread messages
+        // update into read using their id
+        let unread = tempFrom.filter((message) => message.status === "unread");
+        if (unread.length > 0) {
+          const update = firebase.functions().httpsCallable("updateToRead");
+          const response = await update({ messages: unread });
+        }
+        // console.log(response);
+
         setTo(tempFrom);
       });
+    screenListener(unsubscribe);
   };
 
   // -------------------------------CHAT-----------------------------------
@@ -83,6 +103,19 @@ export default function FriendsList(props) {
     });
   };
 
+  // --------------------------------SCREEN LISTENER----------------------------------
+  const screenListener = (unsubscribe) => {
+    let timerId = setInterval(() => {
+      if (!props.navigation.isFocused()) {
+        console.log("we stopping it");
+        unsubscribe();
+        clearInterval(timerId);
+      } else {
+        console.log("scrnlistener running");
+      }
+    }, 1000);
+  };
+
   // ------------------------------------------------------------------
   useEffect(() => {
     handleFrom();
@@ -95,6 +128,13 @@ export default function FriendsList(props) {
       handleChat();
     }
   }, [from, to]);
+
+  // ------------------------------------------------------------------
+  // useEffect(() => {
+  //   if (unsubscribe && unsubscribe2) {
+  //     screenListener();
+  //   }
+  // }, [unsubscribe && unsubscribe2]);
 
   return (
     <KeyboardAvoidingView
