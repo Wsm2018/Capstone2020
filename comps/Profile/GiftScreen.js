@@ -153,7 +153,7 @@ export default function GiftScreen(props) {
       style={styles.container}
     >
       {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+      <View style={{ flex: 1 }}>
         <Card
           elevation={2}
           style={{

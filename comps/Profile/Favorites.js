@@ -188,6 +188,50 @@ export default function Favorites({
                 >
                   No Favorites
                 </Text>
+                <View
+                  style={{
+                    flex: 4,
+                    // backgroundColor: "red",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    flexDirection: "row-reverse",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#20365F",
+                      // borderWidth: 4,
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      //marginStart: "2%",
+                      //marginEnd: "2%",
+                      borderRadius: 15,
+                      //marginBottom: 10,
+                    }}
+                    onPress={() => {
+                      setFavoritesModal(false);
+                      navigation.navigate(
+                        "Home",
+                        {},
+                        NavigationActions.navigate("Types")
+                      );
+                    }}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      Add Favorite
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : (
               favoriteAssets.map((item, index) => (

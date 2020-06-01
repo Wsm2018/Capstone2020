@@ -37,12 +37,20 @@ import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 
+import ManagersStack from "./comps/Managers/ManagersScreen";
+import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
+import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
+import ChooseRole from "./mainpages/ChooseRole";
+
+// import AsyncStorage from "@react-native-community/async-storage";
+
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [firstLaunch, setFirstLaunch] = useState(false);
   const [guideView, setGuideView] = useState(true);
   const [admin, setAdmin] = useState(null);
+  const [activeRole, setActiveRole] = useState(null);
 
   const handleLogout = async () => {
     const userInfo = await db
@@ -61,10 +69,20 @@ export default function App(props) {
     }
   };
 
+  const Test = () => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Test</Text>
+      </View>
+    );
+  };
+
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      // News: NewsStack,
+
+      News: NewsStack,
+
       Profile: ProfileStack,
     },
     // {
@@ -110,20 +128,27 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      // defaultNavigationOptions: ({ navigation }) => {
-      //   return {
-      //     headerLeft: (
-      //       <Icon
-      //         style={{ paddingLeft: 10 }}
-      //         onPress={() => navigation.openDrawer()}
-      //         name="md-menu"
-      //         type="ionicon"
-      //         size={30}
-      //       />
-      //     ),
-      //   };
-      // },
-      headerMode: null,
+      // initialRouteName: "FriendsList",
+
+      defaultNavigationOptions: ({ navigation }) => {
+        return {
+          headerLeft: (
+            <Icon
+              style={{ paddingRight: 10 }}
+              onPress={() => navigation.FriendsList}
+              name="md-menu"
+              type="ionicon"
+              color="white"
+              size={30}
+            />
+          ),
+          headerStyle: {
+            backgroundColor: "#20365F",
+          },
+          headerTitle: "Friends List",
+          headerTintColor: "white",
+        };
+      },
     }
   );
 
@@ -173,7 +198,7 @@ export default function App(props) {
           </ScrollView>
           <View>
             <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout</Text>
+              <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -184,30 +209,46 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((userRef) => {
+        console.log("userRef", userRef.data().activeRole);
+        setActiveRole(userRef.data().activeRole);
+      });
+
     const userRef = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
-    const user = userRef.data();
+    const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    const response = await getAdmin({
+      email: firebase.auth().currentUser.email,
+    });
+
+    const admin = response.data.result !== undefined ? true : false;
+
+    const user = { ...userRef.data(), admin };
+    console.log("userRole", user.role);
+    console.log("userActiveRole", user.activeRole);
     setUser(user);
   }
 
-  const getFirstLaunch = async () => {
-    try {
-      const value = await AsyncStorage.getItem("alreadyLaunched");
-      console.log("valueeeeeeeeeeeee", value);
-      if (!value) {
-        await AsyncStorage.setItem("alreadyLaunched", "true");
-        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(true);
-      } else {
-        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(false);
-      }
-    } catch (err) {
-      console.log(err);
+  async function getFirstLaunch() {
+    const value = await AsyncStorage.getItem("alreadyLaunched");
+    console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      await AsyncStorage.setItem("alreadyLaunched", "true");
+      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(true);
+    } else {
+      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(false);
     }
-  };
+  }
 
   useEffect(() => {
     getFirstLaunch();
@@ -216,9 +257,6 @@ export default function App(props) {
   useEffect(() => {
     if (loggedIn) {
       getUser();
-      getAdminUser();
-    } else {
-      setAdmin(null);
     }
   }, [loggedIn]);
 
@@ -228,42 +266,107 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const guideSkip = () => {
-    console.log("Skipppped");
-    setGuideView(false);
-  };
-
-  const getAdminUser = async () => {
-    const getAdmin = firebase.functions().httpsCallable("getAdmin");
-    const response = await getAdmin({
-      email: firebase.auth().currentUser.email,
-    });
-
-    // console.log("hello !!", response.data.result === undefined ? false : true);
-    const result = response.data.result !== undefined ? true : false;
-    setAdmin(result);
-
-    // console.log("res", result);
-  };
-
-  useEffect(() => {
-    console.log("this is admin stuff", admin);
-  }, [admin]);
-
   const adminTabNav = createBottomTabNavigator({
     Home: AdminHomeStack,
     Profile: ProfileStack,
   });
   const AdminAppContainer = createAppContainer(adminTabNav);
 
-  if (!loggedIn) {
+  const guideSkip = () => {
+    // console.log("Skipppped");
+    setGuideView(false);
+  };
+
+  if (loggedIn !== false) {
+    if (!loggedIn) {
+      return (
+        <View style={styles.container}>
+          <Authentication />
+        </View>
+      );
+    } else {
+      // if user info already retrieved
+      if (user) {
+        // if users first launch show guideView
+        if (firstLaunch && guideView) {
+          return <Guide guideSkip={guideSkip} />;
+        }
+        // --------------------------------CUSTOMER/SERVICES EMPLOYEE----------------------------------
+        // if user is customer or services employee go to <AppContainer/>
+        else if (
+          user.role === "customer" ||
+          user.role === "services employee"
+        ) {
+          return <AppContainer />;
+        }
+        // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
+        // If employee account is incomplete go to employeeAuthenticate
+        else if (user.role.slice(-12) === "(incomplete)") {
+          return <EmployeeAuthentication />;
+        }
+        // If employee is any OTHER role
+        else {
+          // --------------------------------CHOOSE ROLE----------------------------------
+          // if big boi employee with null active roll THEN choose active role
+          if (activeRole === null) {
+            return <ChooseRole role={user.role} />;
+          }
+          // Which activeRole did you choose
+          else {
+            switch (activeRole) {
+              case "admin":
+                return <AdminAppContainer />;
+
+              case "manager":
+                return <ManagersStack />;
+
+              case "user handler":
+                return <UserHandlerStack />;
+
+              case "asset handler":
+                return <AppContainer />;
+
+              case "customer support":
+                return <AppContainer />;
+
+              case "services employee":
+                return <AppContainer />;
+
+              case "customer":
+                return <AppContainer />;
+
+              default:
+                // ---We dun goofed---
+                return (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text>WTF THERES A NEW ROLE?</Text>
+                  </View>
+                );
+            }
+          }
+        }
+      } else {
+        return (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text>Loading...</Text>
+          </View>
+        );
+      }
+    }
+  } else {
     return (
-      <View style={styles.container}>
-        <Authentication />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
-  } else {
-    return admin !== null && (admin ? <AdminAppContainer /> : <AppContainer />);
   }
 }
 

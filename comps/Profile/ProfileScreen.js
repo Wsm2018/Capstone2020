@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
 } from "react-native";
 // import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
@@ -184,10 +185,42 @@ export default function ProfileScreen(props) {
     console.log("flag", flag);
   }, [flag]);
 
+  ///////////////////////////////Font-End////////////////////////////////
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const _keyboardDidShow = () => {
+    // console.log("keyyyyyyyyyyyyyyyShow");
+
+    setMargin(-200);
+  };
+
+  const _keyboardDidHide = () => {
+    // console.log("keyyyyyyyyyyyyyyyHide");
+    setMargin(0);
+  };
+
+  const [marginVal, setMargin] = useState(0);
+  /////////////////////////////////////////////////////////////////////////////////////
+
   return (
     user && (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+        <View
+          style={[
+            styles.container,
+            { marginTop: !Platform.isPad && marginVal },
+          ]}
+        >
           <View style={styles.headerContainer}>
             <View style={styles.coverContainer}>
               <ImageBackground
@@ -217,13 +250,14 @@ export default function ProfileScreen(props) {
           </View>
           {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
           <View style={styles.tabRowLeft}>
+            {/* ========================================================================== ======================== */}
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                // justifyContent: "space-between",
                 // alignItems: "center",
                 // width: "100%",
-                marginTop: "-13%",
+                marginTop: -50,
                 // backgroundColor: "red",
                 flex: 2,
               }}
@@ -242,6 +276,7 @@ export default function ProfileScreen(props) {
                 </Text>
                 <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
               </View>
+              <View style={{ width: "30%" }}></View>
               <View
                 style={{
                   // backgroundColor: "red",
@@ -257,6 +292,7 @@ export default function ProfileScreen(props) {
                 <Text style={styles.tabLabelNumber}>{user.points}</Text>
               </View>
             </View>
+            {/* ================================================= */}
           </View>
           {/* </View> */}
 
@@ -390,7 +426,7 @@ export default function ProfileScreen(props) {
             </View>
           </Modal>
           <View style={{ flex: 1 }}>
-            <View>
+            <View style={{ width: "100%", alignSelf: "center" }}>
               <ButtonGroup
                 onPress={(index) => setView(index)}
                 selectedIndex={view}
@@ -420,7 +456,7 @@ export default function ProfileScreen(props) {
                 textStyle={{ color: "#535150", fontWeight: "bold" }}
               />
             </View>
-            <View style={styles.containerLogin}>
+            <View style={[styles.containerLogin]}>
               {view === 0 ? (
                 <DetailsScreen user={user} navigation={props.navigation} />
               ) : view === 1 ? (
@@ -432,21 +468,24 @@ export default function ProfileScreen(props) {
             <View
               style={{
                 // marginTop: "5%",
-                // width: "90%",
+                // width: "100%",
                 // borderWidth: 1,
                 // borderColor: "darkgray",
                 alignItems: "center",
+                alignSelf: "center",
                 flex: 0.8,
+                // backgroundColor: "red",
               }}
             >
               <Card
                 elevation={2}
                 style={{
                   marginTop: "-1.5%",
-                  width: "95%",
+                  // width: "95%",
                   borderWidth: 1,
                   borderColor: "darkgray",
                   flex: 0.95,
+                  // backgroundColor: "red",
                 }}
               >
                 <View
@@ -469,21 +508,21 @@ export default function ProfileScreen(props) {
 
                   <TouchableOpacity
                     style={{
-                      flex: 0.9,
+                      flex: 0.8,
                       // backgroundColor: "green",
-
+                      //
                       // width: "100%",
                       // flexDirection: "row",
-                      // justifyContent: "space-around",
-                      // alignItems: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                     onPress={() => setFavoritesModal(true)}
                   >
-                    <LottieView
-                      width={Dimensions.get("window").width / 3.5}
-                      source={require("../../assets/lf30_editor_6YHFU0.json")}
+                    <Image
+                      width={Dimensions.get("window").width / 5.6}
+                      source={require("../../assets/images/editheart.gif")}
                       autoPlay
-                      // loop
+                      loop
                       style={
                         {
                           // width: "22%",
@@ -495,11 +534,11 @@ export default function ProfileScreen(props) {
                       }
                     />
                   </TouchableOpacity>
-                  <View
+                  <TouchableOpacity
                     style={{
-                      // position: "relative",
+                      position: "relative",
                       // width: "100%",
-                      flex: 0.81,
+                      flex: 0.8,
                       // height: "100%",
                       // backgroundColor: "red",
                       justifyContent: "center",
@@ -507,7 +546,7 @@ export default function ProfileScreen(props) {
                     }}
                   >
                     <Image
-                      width={Dimensions.get("window").width / 3.5}
+                      width={Dimensions.get("window").width / 4}
                       source={require("../../assets/images/subs.gif")}
                       autoPlay
                       loop
@@ -523,14 +562,14 @@ export default function ProfileScreen(props) {
                         }
                       }
                     />
-                  </View>
+                  </TouchableOpacity>
 
                   <TouchableOpacity
                     onPress={() => setCarsModal(true)}
                     style={{
                       // position: "relative",
                       // width: "100%",
-                      flex: 1,
+                      flex: 0.9,
                       // height: "100%",
                       // backgroundColor: "blue",
                       justifyContent: "center",
@@ -538,11 +577,11 @@ export default function ProfileScreen(props) {
                     }}
                   >
                     <Image
-                      width={Dimensions.get("window").width / 5.5}
+                      width={Dimensions.get("window").width / 6}
                       source={require("../../assets/car5.gif")}
                       autoPlay
                       onPress={() => setCarsModal(true)}
-                      // loop
+                      loop
                       style={
                         {
                           // position: "relative",
@@ -749,11 +788,13 @@ const styles = StyleSheet.create({
   },
   containerLogin: {
     flex: 1.5,
-    marginLeft: 10.5,
+    // marginLeft: 10.5,
     // backgroundColor: "#E8ECF4",
+    // backgroundColor: "red",
     width: "95%",
     marginTop: -5,
     marginBottom: "4%",
+    alignSelf: "center",
   },
 });
 
