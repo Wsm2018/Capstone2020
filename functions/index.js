@@ -25,6 +25,28 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
+exports.updatePhoto = functions.https.onCall(async (data, context) => {
+  console.log("updatePhoto data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    photoURL: data.photoURL,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    photoURL: data.photoURL,
+  });
+});
+
+exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+  console.log("updateDisplayName data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
+  });
+});
+
 exports.sendGift = functions.https.onCall(async (data, context) => {
   const giftBalance = data.giftBalance;
 
@@ -331,11 +353,11 @@ exports.sendMessage = functions.https.onCall((data, context) => {
     dateTime: new Date(),
   });
 });
-
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  var booking = {
+  console.log(" in functions");
+  var assetBooking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
@@ -346,27 +368,63 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     .collection("assets")
     .doc(data.asset.id)
     .collection("assetBookings")
-    .add(booking)
+    .add(assetBooking)
     .then((docRef) => (bId = docRef.id));
-
-  booking.id = bId;
-
+  assetBooking.id = bId;
+  console.log("booking added");
+  for (let i = 0; i < data.serviceBooking.length; i++) {
+    console.log("add service");
+    var serviceBooking = {
+      service: data.serviceBooking[i].service,
+      assetBooking: assetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false,
+    };
+    //add service booking
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
+    //update worker schedule
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
+  }
+  console.log("payment");
   db.collection("payments").add({
     user: data.user,
     card: data.card,
-    assetBooking: booking,
+    assetBooking: assetBooking,
     serviceBooking: null,
     totalAmount: data.totalAmount,
     dateTime: data.dateTime,
     status: data.status,
     promotionCode: null,
   });
+  const u = data.user;
+  u.points = u.points + 10;
+  db.collection("users").doc(data.user.id).update(u);
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
   }
 });
 
+exports.handlePointsExchange = functions.https.onCall(async (data, context) => {
+  db.collection("users").doc(data.user.id).update(data.user);
+});
 exports.createEmployee = functions.https.onCall(async (data, context) => {
   // ---------------------------------Referral Code---------------------------------
   // generating a random 6 digit referralCode
@@ -665,4 +723,15 @@ exports.updateToRead = functions.https.onCall(async (data, context) => {
     db.collection("chats").doc(message.id).update({ status: "read" })
   );
   console.log("after update", response);
+});
+
+exports.deleteCar = functions.https.onCall(async (data, context) => {
+  console.log("delete car ", data);
+  const response = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cars")
+    .doc(data.carId)
+    .delete();
+  console.log(response);
 });

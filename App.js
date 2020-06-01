@@ -42,6 +42,8 @@ import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 
+// import AsyncStorage from "@react-native-community/async-storage";
+
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -67,10 +69,20 @@ export default function App(props) {
     }
   };
 
+  const Test = () => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Test</Text>
+      </View>
+    );
+  };
+
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      // News: NewsStack,
+
+      News: NewsStack,
+
       Profile: ProfileStack,
     },
     // {
@@ -116,20 +128,27 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      // defaultNavigationOptions: ({ navigation }) => {
-      //   return {
-      //     headerLeft: (
-      //       <Icon
-      //         style={{ paddingLeft: 10 }}
-      //         onPress={() => navigation.openDrawer()}
-      //         name="md-menu"
-      //         type="ionicon"
-      //         size={30}
-      //       />
-      //     ),
-      //   };
-      // },
-      headerMode: null,
+      // initialRouteName: "FriendsList",
+
+      defaultNavigationOptions: ({ navigation }) => {
+        return {
+          headerLeft: (
+            <Icon
+              style={{ paddingRight: 10 }}
+              onPress={() => navigation.FriendsList}
+              name="md-menu"
+              type="ionicon"
+              color="white"
+              size={30}
+            />
+          ),
+          headerStyle: {
+            backgroundColor: "#20365F",
+          },
+          headerTitle: "Friends List",
+          headerTintColor: "white",
+        };
+      },
     }
   );
 
@@ -138,9 +157,9 @@ export default function App(props) {
       Home: {
         screen: DashboardStackNavigator,
       },
-      Friends: {
-        screen: FriendsStk,
-      },
+      // Friends: {
+      //   screen: FriendsStk,
+      // },
     },
     {
       drawerBackgroundColor: "#F0F8FF",
@@ -179,7 +198,7 @@ export default function App(props) {
           </ScrollView>
           <View>
             <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout</Text>
+              <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -218,22 +237,18 @@ export default function App(props) {
     setUser(user);
   }
 
-  const getFirstLaunch = async () => {
-    try {
-      const value = await AsyncStorage.getItem("alreadyLaunched");
-      console.log("valueeeeeeeeeeeee", value);
-      if (!value) {
-        await AsyncStorage.setItem("alreadyLaunched", "true");
-        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(true);
-      } else {
-        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(false);
-      }
-    } catch (err) {
-      console.log(err);
+  async function getFirstLaunch() {
+    const value = await AsyncStorage.getItem("alreadyLaunched");
+    console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      await AsyncStorage.setItem("alreadyLaunched", "true");
+      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(true);
+    } else {
+      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(false);
     }
-  };
+  }
 
   useEffect(() => {
     getFirstLaunch();
@@ -258,7 +273,7 @@ export default function App(props) {
   const AdminAppContainer = createAppContainer(adminTabNav);
 
   const guideSkip = () => {
-    console.log("Skipppped");
+    // console.log("Skipppped");
     setGuideView(false);
   };
 
