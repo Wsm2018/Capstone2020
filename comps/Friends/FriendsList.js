@@ -22,10 +22,17 @@ import {
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-navigation";
 import { ListItem } from "react-native-elements";
-
+import moment from "moment";
 export default function FriendsList(props) {
   const [friends, setFriends] = useState(null);
+  const [allFriends, setAllFriends] = useState(null);
+
   const [currentUser, setCurrentUser] = useState(null);
+  const [messages, setMessages] = useState(null);
+
+  const [from, setFrom] = useState(null);
+  const [to, setTo] = useState(null);
+  const [chats, setChats] = useState(null);
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -48,7 +55,12 @@ export default function FriendsList(props) {
           let tempFriends = [];
           queryBySnapshot.forEach((doc) => {
             if (doc.data().status === "accepted") {
-              tempFriends.push({ id: doc.id, ...doc.data() });
+              tempFriends.push({
+                id: doc.id,
+                ...doc.data(),
+                notifications: 0,
+                dateTime: new Date(0),
+              });
             }
           });
           tempFriends = tempFriends.sort((a, b) =>
@@ -57,13 +69,104 @@ export default function FriendsList(props) {
               .localeCompare(b.displayName.toLowerCase())
           );
 
-          // console.log(tempFriends);
-          setFriends(tempFriends);
+          setAllFriends(tempFriends);
         } else {
-          setFriends([]);
+          setAllFriends([]);
         }
       });
   };
+
+  // -------------------------------FROM-----------------------------------
+  const handleFrom = () => {
+    db.collection("chats")
+      .where("from", "==", firebase.auth().currentUser.uid)
+      .onSnapshot((queryBySnapshot) => {
+        let tempFrom = [];
+        queryBySnapshot.forEach((doc) => {
+          tempFrom.push({ id: doc.id, ...doc.data() });
+        });
+        setFrom(tempFrom);
+      });
+  };
+
+  // --------------------------------TO----------------------------------
+  const handleTo = () => {
+    db.collection("chats")
+      .where("to", "==", firebase.auth().currentUser.uid)
+      .onSnapshot((queryBySnapshot) => {
+        let tempFrom = [];
+        queryBySnapshot.forEach((doc) => {
+          tempFrom.push({ id: doc.id, ...doc.data() });
+        });
+        setTo(tempFrom);
+      });
+  };
+
+  // -------------------------------CHAT-----------------------------------
+  const handleChat = () => {
+    let tempChat = from.concat(to);
+    tempChat = tempChat.sort(
+      (a, b) => a.dateTime.toDate() - b.dateTime.toDate()
+    );
+    setChats(tempChat);
+  };
+
+  // -------------------------------NOTIFICATIONS-----------------------------------
+  const handleFriendsMessages = () => {
+    let tempFriends = JSON.parse(JSON.stringify(allFriends));
+    if (chats.length > 0) {
+      tempFriends = tempFriends.map((friend, index) => {
+        let from = chats.filter((chat) => chat.from === friend.id);
+        let to = chats.filter((chat) => chat.to === friend.id);
+        let chat = from.concat(to);
+        chat = chat.sort((a, b) => b.dateTime.toDate() - a.dateTime.toDate());
+
+        if (chat.length > 0) {
+          friend.dateTime = new Date(
+            moment(chat[0].dateTime.toDate()).format()
+          );
+          let notifications = chat.filter(
+            (c) =>
+              c.status === "unread" &&
+              c.from !== firebase.auth().currentUser.uid
+          ).length;
+          friend.notifications = notifications;
+        } else {
+          friend.dateTime = new Date(friend.dateTime);
+        }
+        return friend;
+      });
+    }
+
+    tempFriends = tempFriends.sort((a, b) => b.dateTime - a.dateTime);
+    setFriends(tempFriends);
+  };
+
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    handleCurrentuser();
+    handleFriends();
+    handleFrom();
+    handleTo();
+  }, []);
+
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    if (from && to) {
+      handleChat();
+    }
+  }, [from, to]);
+
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    if (allFriends && chats) {
+      if (allFriends.length > 0) {
+        handleFriendsMessages();
+      } else {
+        setFriends([]);
+      }
+    }
+  }, [allFriends, chats]);
 
   // -------------------------------DELETE-----------------------------------
   const deleteAll = async () => {
@@ -92,12 +195,6 @@ export default function FriendsList(props) {
     const response = await dec({ user: currentUser, friend: user });
     console.log("response", response);
   };
-
-  // ------------------------------------------------------------------
-  useEffect(() => {
-    handleCurrentuser();
-    handleFriends();
-  }, []);
 
   return !friends ? (
     <View
