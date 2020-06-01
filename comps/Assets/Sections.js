@@ -11,13 +11,16 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Picker,
   ImageBackground,
   Dimensions,
 } from "react-native";
-import { Surface } from "react-native-paper";
+
 import DatePicker from "react-native-datepicker";
-import { Divider } from "react-native-elements";
-import { Dividerm, Badge } from "react-native-elements";
+import moment from "moment";
+// import { Divider } from "react-native-elements";
+import { Surface } from "react-native-paper";
+import { Divider, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -37,6 +40,8 @@ export default function Sections(props) {
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [tempstartDate, settempStartDate] = useState("");
+  const [tempendDate, settempEndDate] = useState("");
   // const tName = props.navigation.getParam("tName", "failed");
   // const sName = props.navigation.getParam("section", "failed").name;
   // const startDateTime = props.navigation.getParam("startDate", "failed");
@@ -207,6 +212,21 @@ export default function Sections(props) {
   }, [type]);
 
   useEffect(() => {
+    if (tempstartDate) {
+      var dateTime = tempstartDate.split(" ");
+      var update =
+        dateTime[0] +
+        " " +
+        dateTime[1] +
+        " " +
+        dateTime[2].split(":")[0] +
+        ":00 " +
+        dateTime[3];
+      setStartDate(update);
+    }
+  }, [tempstartDate]);
+
+  useEffect(() => {
     if (finalAssets.length > 0) {
       setListView(true);
     }
@@ -259,18 +279,18 @@ export default function Sections(props) {
     // } else {
     //   alert("Already exists");
     // }
-
-    const addFavorite = firebase.functions().httpsCallable("addFavorite");
-    const response = await addFavorite({
-      uid: firebase.auth().currentUser.uid,
-      asset: item,
-    });
-    // console.log(response);
-    if (response.data !== "Exists") {
-      // alert("Asset Added");
-    } else {
-      // alert("Asset added before");
-    }
+    alert("hello!!!!");
+    // const addFavorite = firebase.functions().httpsCallable("addFavorite");
+    // const response = await addFavorite({
+    //   uid: firebase.auth().currentUser.uid,
+    //   asset: item,
+    // });
+    // // console.log(response);
+    // if (response.data !== "Exists") {
+    //   // alert("Asset Added");
+    // } else {
+    //   // alert("Asset added before");
+    // }
   };
 
   return (
@@ -516,37 +536,44 @@ export default function Sections(props) {
                       >
                         {l.code}
                       </Text>
-                      <Badge
-                        value={
-                          <MaterialCommunityIcons
-                            name="heart"
-                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-                            size={18}
-                            color={
-                              favoriteAssets.includes(l.id)
-                                ? "#c44949"
-                                : "white"
-                            }
-                            onPress={
-                              favoriteAssets.includes(l.id)
-                                ? null
-                                : () => handleAddFavorite(l)
-                            }
-                            // style={{ borderColor: "blue", borderWidth: 1 }}
-                          />
-                        }
-                        containerStyle={{
+                      <TouchableOpacity
+                        style={{
                           position: "absolute",
                           top: -12,
                           right: -12,
+                          // backgroundColor: "red",
                         }}
-                        badgeStyle={{
-                          backgroundColor: "#20365F",
-                          width: 22,
-                          height: 22,
-                          borderColor: "transparent",
-                        }}
-                      />
+                        onPress={() => handleAddFavorite(l)}
+                      >
+                        <Badge
+                          // onPress={() => handleAddFavorite(l)}
+                          value={
+                            <MaterialCommunityIcons
+                              name="heart"
+                              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                              size={18}
+                              color={
+                                favoriteAssets.includes(l.id)
+                                  ? "#c44949"
+                                  : "white"
+                              }
+
+                              // style={{ borderColor: "blue", borderWidth: 1 }}
+                            />
+                          }
+                          // containerStyle={{
+                          //   position: "absolute",
+                          //   top: -12,
+                          //   right: -12,
+                          // }}
+                          badgeStyle={{
+                            backgroundColor: "#20365F",
+                            width: 25,
+                            height: 25,
+                            borderColor: "transparent",
+                          }}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
                   {/* <Text>

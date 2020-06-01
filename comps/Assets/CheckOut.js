@@ -81,7 +81,6 @@ export default function CheckOut(props) {
   /////////////////////////////////////////////////////////////////////////////////////////////
 
   //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
-
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
@@ -237,6 +236,7 @@ export default function CheckOut(props) {
       .get();
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
 
+    user.id = firebase.auth().currentUser.uid;
     const response = await handleBooking({
       user: user.data(),
       asset: assetBooking.asset,
