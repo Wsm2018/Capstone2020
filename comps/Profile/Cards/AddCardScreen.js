@@ -158,7 +158,7 @@ export default function AddCard(props) {
 
           // borderWidth: 1,
           // backgroundColor: "red",
-          // width: "90%",
+          width: "90%",
         }}
       >
         <CreditCardInput
