@@ -4,12 +4,8 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
-<<<<<<< HEAD
 import Assets from "./Assets/Assets";
-
-=======
 import AdminHome from "../comps/Admin/HomeScreen";
->>>>>>> master
 
 export default function HomePage(props) {
   const handleLogout = () => {
@@ -17,10 +13,6 @@ export default function HomePage(props) {
   };
 
   return (
-<<<<<<< HEAD
-      <Assets />
-      //<AddForm />
-=======
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => {
@@ -38,7 +30,6 @@ export default function HomePage(props) {
       </TouchableOpacity>
       
     </View>
->>>>>>> master
   );
 }
 

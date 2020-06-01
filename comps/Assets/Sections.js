@@ -11,34 +11,32 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker,
   ImageBackground,
   Dimensions,
 } from "react-native";
-
-import DatePicker from "react-native-datepicker";
-import moment from "moment";
-
 import { Surface } from "react-native-paper";
-import { Card, Divider } from "react-native-elements";
+import DatePicker from "react-native-datepicker";
+import { Divider } from "react-native-elements";
+import { Dividerm, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
 import { Snackbar } from "react-native-paper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
 
 import Details from "./Details";
+import Review from "./Review";
+
 import { set } from "react-native-reanimated";
+import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [tempstartDate, settempStartDate] = useState("");
-  const [tempendDate, settempEndDate] = useState("");
   // const tName = props.navigation.getParam("tName", "failed");
   // const sName = props.navigation.getParam("section", "failed").name;
   // const startDateTime = props.navigation.getParam("startDate", "failed");
@@ -47,10 +45,10 @@ export default function Sections(props) {
   const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
-    console.log(
-      "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
-      selectedSection
-    );
+    // console.log(
+    //   "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
+    //   selectedSection
+    // );
     if (selectedSection !== null) {
       var temp = [];
       setAssetList(temp);
@@ -128,67 +126,34 @@ export default function Sections(props) {
     setFinalAssets(assetsToShow);
   };
 
-          if(temp.length === snapshot.docs.length){
-            //console.log('assets',temp)
-            setAssetList(temp)
-          }
-      });
-    }
-    )
-  } 
+  //design testing variable
+  const [assetSections2, setAssetSections2] = useState([
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+    { name: "c1" },
+  ]);
+  const [finalAssets2, setFinalAssets2] = useState([
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+    { code: "1" },
+  ]);
 
-  const getList = () => {
-    
-    // console.log("section rn", selectedSection);
-    const temp = [];
-
-    db.collection("assets")
-      .orderBy("code")
-      .where("assetSection", "==", selectedSection.id)
-      .onSnapshot((snapshot) => {
-        snapshot.forEach(async (doc) => {
-          //console.log(section)
-          let bookingTemp = [];
-          let bookings = await db
-            .collection("assets")
-            .doc(doc.id)
-            .collection("assetBookings")
-            .get();
-          if (bookings) {
-            bookings.forEach((b) => {
-              bookingTemp.push(b.data());
-            });
-          }
-          temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
-          if (temp.length === snapshot.docs.length) {
-            //console.log("assets", temp);
-            setAssetList(temp);
-          }
-        });
-      });
-  };
-
-  const checkTime = () => {
-    // console.log("hii");
-    let assetsToShow = assetList;
-
-    assetsToShow = assetsToShow.filter(
-      (asset) =>
-        asset.assetBookings.filter((assetBooking) => {
-          return !(
-            (startDate <= assetBooking.startDateTime &&
-              endDate <= assetBooking.startDateTime) ||
-            (startDate >= assetBooking.endDateTime &&
-              endDate >= assetBooking.endDateTime)
-          );
-        }).length === 0
-    );
-
-    //console.log("after checking time", assetsToShow);
-    setFinalAssets(assetsToShow);
-  };
-
- 
   //design view new variables
   const [listView, setListView] = useState(false);
   const [detailsView, setDetailsView] = useState(false);
@@ -199,6 +164,34 @@ export default function Sections(props) {
   //   setDetailsView(true);
   //   //setSelectedList(l) || setDetailsView(true)
   // };
+
+  const [favoriteAssets, setFavoriteAssets] = useState([]);
+
+  useEffect(() => {
+    getUserFavoriteAssets();
+  }, []);
+
+  const getUserFavoriteAssets = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((querySnap) => {
+        const data = querySnap.data();
+        const favorites = data.favorite;
+        // let assetArr = [];
+        // favorites.map(async (item) => {
+        //   db.collection("assets")
+        //     .doc(item)
+        //     .onSnapshot((doc) => {
+        //       assetArr.push({ id: doc.id, ...doc.data() });
+        //       if (favorites.length === assetArr.length) {
+        //         setFavoriteAssets([...assetArr]);
+        //       }
+        //     });
+        // });
+        // console.log("------------------------", favorites);
+        setFavoriteAssets(favorites);
+      });
+  };
 
   ///////////////////////////////////////////////////////////////////
 
@@ -214,28 +207,13 @@ export default function Sections(props) {
   }, [type]);
 
   useEffect(() => {
-    if (tempstartDate) {
-      var dateTime = tempstartDate.split(" ");
-      var update =
-        dateTime[0] +
-        " " +
-        dateTime[1] +
-        " " +
-        dateTime[2].split(":")[0] +
-        ":00 " +
-        dateTime[3];
-      setStartDate(update);
-    }
-  }, [tempstartDate]);
-
-  useEffect(() => {
     if (finalAssets.length > 0) {
       setListView(true);
     }
   }, [finalAssets]);
 
   useEffect(() => {
-    console.log(startDate);
+    // console.log(startDate);
   }, [startDate]);
   useEffect(() => {
     //Added by design team
@@ -287,11 +265,11 @@ export default function Sections(props) {
       uid: firebase.auth().currentUser.uid,
       asset: item,
     });
-    console.log(response);
+    // console.log(response);
     if (response.data !== "Exists") {
-      alert("Asset Added");
+      // alert("Asset Added");
     } else {
-      alert("Asset added before");
+      // alert("Asset added before");
     }
   };
 
@@ -299,7 +277,7 @@ export default function Sections(props) {
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-          <Image
+          {/* <Image
             style={{
               // width: "100%",
               // height: "100%",
@@ -307,18 +285,28 @@ export default function Sections(props) {
               flex: 1,
             }}
             source={require("../../assets/images/test.jpg")}
+          /> */}
+          <Card.Cover
+            // source={{ uri: "https://picsum.photos/700" }}
+            source={require("../../assets/images/bookingcover1.jpg")}
+            style={{ width: "100%" }}
           />
-          {/* <Text>Image</Text> */}
         </View>
         <View style={styles.one}>
           <Text style={styles.cardTitle}>Choose Date & Time</Text>
-          <Button title='Show all assets' onPress={getAllList}></Button>
-          <View style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              // backgroundColor: "red",
+              minHeight: 50,
+            }}
+          >
             <View
               style={{
                 width: "45%",
                 alignItems: "center",
                 justifyContent: "center",
+                // borderWidth: 1,
               }}
             >
               <DatePicker
@@ -357,7 +345,11 @@ export default function Sections(props) {
                 justifyContent: "center",
               }}
             >
-              <Icon name="arrow-right" size={20} color="#20365F" />
+              <MaterialCommunityIcons
+                name="arrow-right"
+                size={20}
+                color="#20365F"
+              />
             </View>
             <View
               style={{
@@ -417,7 +409,8 @@ export default function Sections(props) {
                     //   }))
                   }
                   style={{
-                    backgroundColor: selectedSection === s ? "gray" : "#C6CBD0",
+                    backgroundColor:
+                      selectedSection === s ? "#20365F" : "#e3e3e3",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -430,7 +423,7 @@ export default function Sections(props) {
                 >
                   <View
                     style={{
-                      height: "20%",
+                      // height: "20%",
                       width: "100%",
                       justifyContent: "center",
                       textAlign: "center",
@@ -438,11 +431,15 @@ export default function Sections(props) {
                       alignItems: "center",
                     }}
                   >
-                    <Icon name="map-marker" size={40} color="#20365F" />
+                    <MaterialCommunityIcons
+                      name="map-marker"
+                      size={40}
+                      color={selectedSection === s ? "white" : "#20365F"}
+                    />
                     <Text
                       style={{
                         textAlign: "center",
-                        color: "#20365F",
+                        color: selectedSection === s ? "white" : "#20365F",
                         fontSize: 20,
                       }}
                     >
@@ -462,7 +459,13 @@ export default function Sections(props) {
           {listView === true ? (
             finalAssets.length > 0 ? (
               finalAssets.map((l, i) => (
-                <View style={{ width: "20%", alignItems: "center" }} key={i}>
+                <View
+                  style={{
+                    width: "20%",
+                    alignItems: "center",
+                    marginBottom: 15,
+                  }}
+                >
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {
@@ -477,7 +480,8 @@ export default function Sections(props) {
                     onPress={() => setSelectedList(l) || setDetailsView(true)}
                     key={i}
                     style={{
-                      backgroundColor: selectedList === l ? "gray" : "#C6CBD0",
+                      backgroundColor:
+                        selectedList === l ? "#20365F" : "#e3e3e3",
                       width: 60,
                       height: 60,
                       margin: 5,
@@ -498,29 +502,59 @@ export default function Sections(props) {
                         alignItems: "center",
                       }}
                     >
-                      <Icon name="car" size={30} color="#20365F" />
+                      <MaterialCommunityIcons
+                        name="car"
+                        size={30}
+                        color={selectedList === l ? "white" : "#20365F"}
+                      />
                       <Text
                         style={{
                           textAlign: "center",
-                          color: "#20365F",
+                          color: selectedList === l ? "white" : "#20365F",
                           fontSize: 18,
                         }}
                       >
                         {l.code}
                       </Text>
-                      <Rating
-                        type='star'
-                        ratingCount={5}
-                        startingValue={l.rr}
-                        imageSize={5}
-                        readonly
+                      <Badge
+                        value={
+                          <MaterialCommunityIcons
+                            name="heart"
+                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                            size={18}
+                            color={
+                              favoriteAssets.includes(l.id)
+                                ? "#c44949"
+                                : "white"
+                            }
+                            onPress={
+                              favoriteAssets.includes(l.id)
+                                ? null
+                                : () => handleAddFavorite(l)
+                            }
+                            // style={{ borderColor: "blue", borderWidth: 1 }}
+                          />
+                        }
+                        containerStyle={{
+                          position: "absolute",
+                          top: -12,
+                          right: -12,
+                        }}
+                        badgeStyle={{
+                          backgroundColor: "#20365F",
+                          width: 22,
+                          height: 22,
+                          borderColor: "transparent",
+                        }}
                       />
                     </View>
                   </TouchableOpacity>
-                  <Text>Add price </Text>
-                  <TouchableOpacity onPress={() => handleAddFavorite(l)}>
+                  {/* <Text>
+                    {l.price} QR
+                  </Text> */}
+                  {/* <TouchableOpacity onPress={() => handleAddFavorite(l)}>
                     <Text>Add to Favorite</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               ))
             ) : (
@@ -532,7 +566,7 @@ export default function Sections(props) {
         </View>
         {selectedList ? (
           <View style={styles.four}>
-            <Text style={styles.cardTitle}>Services</Text>
+            <Text style={styles.cardTitle}>Details</Text>
             {/* <Text>Price {selectedList.price}</Text>
             <Text>add what ever u want</Text> */}
             {detailsView === true ? (
@@ -541,19 +575,28 @@ export default function Sections(props) {
                 <Text>click2</Text>
               </TouchableOpacity> */}
                 {selectedSection === null ? null : (
-                  <Details
-                    sName={selectedSection.name}
-                    tName={tName}
-                    asset={selectedList}
-                    startDateTime={startDate}
-                    endDateTime={endDate}
-                    type={type}
-                    navigation={props.navigation}
-                  />
+                  <View>
+                    <Review
+                      // sName={selectedSection.name}
+                      // tName={tName}
+                      asset={selectedList}
+                      startDateTime={startDate}
+                      // endDateTime={endDate}
+                      // type={type}
+                      navigation={props.navigation}
+                    />
+
+                    <Details
+                      sName={selectedSection.name}
+                      tName={tName}
+                      asset={selectedList}
+                      startDateTime={startDate}
+                      endDateTime={endDate}
+                      type={type}
+                      navigation={props.navigation}
+                    />
+                  </View>
                 )}
-                {/* <TouchableOpacity>
-                <Text>click</Text>
-              </TouchableOpacity> */}
               </View>
             ) : (
               <View>
