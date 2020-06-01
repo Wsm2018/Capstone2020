@@ -13,7 +13,6 @@ import EmployeesPending from "./EmployeesPending";
 import EmployeesAllowed from "./EmployeesAllowed";
 
 import indexUH from "./indexUH";
-import test from "./test";
 
 const EmployeeHandlerStack = createAppContainer(
   createStackNavigator(
@@ -26,7 +25,6 @@ const EmployeeHandlerStack = createAppContainer(
       EmployeesDetail: EmployeesDetail,
       EmployeesPending: EmployeesPending,
       EmployeesAllowed: EmployeesAllowed,
-      test: test,
     },
     {
       // initialRouteName: "FriendsList",

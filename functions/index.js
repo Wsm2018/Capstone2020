@@ -648,3 +648,64 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+
+exports.redeemGiftCode = functions.https.onRequest(
+  async (request, response) => {
+    let path = String(request.query.path);
+    path = path.split("/");
+    const giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+    giftDoc.ref.update({ status: true });
+
+    const userDoc = await db.collection("users").doc(request.query.uid).get();
+    const increment = admin.firestore.FieldValue.increment(
+      giftDoc.data().giftBalance
+    );
+    userDoc.ref.update({ balance: increment });
+
+    response.send("Balance Added");
+  }
+);
+
+exports.resetUserPassword = functions.https.onCall(async (data, context) => {
+  const result = await admin.auth().updateUser(data.user.id, {
+    password: data.password,
+  });
+
+  return { result };
+});
+
+exports.adminUpdateUser = functions.https.onCall(async (data, context) => {
+  if (data.user.email !== data.email) {
+    await admin.auth().updateUser(data.user.id, {
+      email: data.email,
+      emailVerified: true,
+    });
+  }
+  if (data.user.displayName !== data.displayName) {
+    await admin.auth().updateUser(data.user.id, {
+      displayName: data.displayName,
+    });
+  }
+  if (data.user.phone !== data.phone) {
+    await admin.auth().updateUser(data.user.id, {
+      phoneNumber: "+974" + data.phone,
+    });
+  }
+
+  db.collection("users")
+    .doc(data.user.id)
+    .update({
+      role: data.selectedRole,
+      email: data.email,
+      displayName: data.displayName,
+      phone: "+974" + data.phone,
+      balance: parseInt(data.balance),
+      tokens: parseInt(data.tokens),
+      reputation: parseInt(data.reputation),
+    });
+});
