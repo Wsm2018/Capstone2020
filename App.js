@@ -138,16 +138,23 @@ const TabNavigator = createBottomTabNavigator({
   Home: HomeStack,
 });
 
-          email: firebase.auth().currentUser.email,
-        });
 
-        const admin = response.data.result !== undefined ? true : false;
-
-        const user = { ...userRef.data(), admin };
-        console.log("userROLE", user.role.slice(-12));
-        setUser(user);
+async function getUser() {
+  db.collection("users")
+    .doc(firebase.auth().currentUser.uid)
+    .onSnapshot(async (userRef) => {
+      const getAdmin = firebase.functions().httpsCallable("getAdmin");
+      const response = await getAdmin({
+        email: firebase.auth().currentUser.email,
       });
-  }
+
+      const admin = response.data.result !== undefined ? true : false;
+
+      const user = { ...userRef.data(), admin };
+      console.log("userROLE", user.role.slice(-12));
+      setUser(user);
+    });
+}
 
   const getFirstLaunch = async () => {
     try {
