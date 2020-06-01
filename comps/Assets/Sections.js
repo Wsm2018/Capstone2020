@@ -171,30 +171,49 @@ export default function Sections(props) {
   // };
 
   const [favoriteAssets, setFavoriteAssets] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
 
   useEffect(() => {
     getUserFavoriteAssets();
+    // console.log(favoriteAssets);
   }, []);
+
+  // const getUserFavoriteAssets = () => {
+  //   db.collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .onSnapshot((querySnap) => {
+  //       const data = querySnap.data();
+  //       const favorites = data.favorite;
+  //       // let assetArr = [];
+  //       // favorites.map(async (item) => {
+  //       //   db.collection("assets")
+  //       //     .doc(item)
+  //       //     .onSnapshot((doc) => {
+  //       //       assetArr.push({ id: doc.id, ...doc.data() });
+  //       //       if (favorites.length === assetArr.length) {
+  //       //         setFavoriteAssets([...assetArr]);
+  //       //       }
+  //       //     });
+  //       // });
+  //       // console.log("------------------------", favorites);
+  //       setFavoriteAssets(favorites);
+  //     });
+  // };
 
   const getUserFavoriteAssets = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
+      .collection("favorites")
       .onSnapshot((querySnap) => {
-        const data = querySnap.data();
-        const favorites = data.favorite;
-        // let assetArr = [];
-        // favorites.map(async (item) => {
-        //   db.collection("assets")
-        //     .doc(item)
-        //     .onSnapshot((doc) => {
-        //       assetArr.push({ id: doc.id, ...doc.data() });
-        //       if (favorites.length === assetArr.length) {
-        //         setFavoriteAssets([...assetArr]);
-        //       }
-        //     });
-        // });
-        // console.log("------------------------", favorites);
-        setFavoriteAssets(favorites);
+        let favorites = [];
+        let favoritesId = [];
+
+        querySnap.forEach((document) => {
+          favorites.push({ id: document.id, ...document.data() });
+          favoritesId.push(document.id);
+        });
+        setFavoriteAssets([...favorites]);
+        setFavoriteIds([...favoritesId]);
       });
   };
 
@@ -279,18 +298,32 @@ export default function Sections(props) {
     // } else {
     //   alert("Already exists");
     // }
-    alert("hello!!!!");
-    // const addFavorite = firebase.functions().httpsCallable("addFavorite");
-    // const response = await addFavorite({
-    //   uid: firebase.auth().currentUser.uid,
-    //   asset: item,
-    // });
-    // // console.log(response);
-    // if (response.data !== "Exists") {
-    //   // alert("Asset Added");
-    // } else {
-    //   // alert("Asset added before");
-    // }
+    // alert("item", item);
+
+    const addFavorite = firebase.functions().httpsCallable("addFavorite");
+    const response = await addFavorite({
+      uid: firebase.auth().currentUser.uid,
+      asset: item,
+    });
+    // console.log(response);
+    if (response.data !== "Exists") {
+      alert("Asset Added");
+      // getUserFavoriteAssets();
+    } else {
+      handleDeleteFavorite(item.id);
+    }
+  };
+
+  const handleDeleteFavorite = async (id) => {
+    // console.log(id);
+    const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
+    const response = await deleteFavorite({
+      uid: firebase.auth().currentUser.uid,
+      assetId: id,
+    });
+    if (response.data !== null) {
+      // alert("Asset Deleteted");
+    }
   };
 
   return (
@@ -484,6 +517,7 @@ export default function Sections(props) {
                     width: "20%",
                     alignItems: "center",
                     marginBottom: 15,
+                    // backgroundColor: "red",
                   }}
                 >
                   <TouchableOpacity
@@ -536,44 +570,36 @@ export default function Sections(props) {
                       >
                         {l.code}
                       </Text>
-                      <TouchableOpacity
-                        style={{
+                      <Badge
+                        value={
+                          <MaterialCommunityIcons
+                            name="heart"
+                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                            size={18}
+                            color={
+                              favoriteIds.includes(l.id) ? "#c44949" : "white"
+                            }
+                            // onPress={
+                            //   favoriteAssets.includes(l.id)
+                            //     ? null
+                            //     : () => handleAddFavorite(l)
+                            // }
+                            disabled
+                            // style={{ borderColor: "blue", borderWidth: 1 }}
+                          />
+                        }
+                        containerStyle={{
                           position: "absolute",
                           top: -12,
-                          right: -12,
-                          // backgroundColor: "red",
+                          right: -10,
                         }}
-                        onPress={() => handleAddFavorite(l)}
-                      >
-                        <Badge
-                          // onPress={() => handleAddFavorite(l)}
-                          value={
-                            <MaterialCommunityIcons
-                              name="heart"
-                              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-                              size={18}
-                              color={
-                                favoriteAssets.includes(l.id)
-                                  ? "#c44949"
-                                  : "white"
-                              }
-
-                              // style={{ borderColor: "blue", borderWidth: 1 }}
-                            />
-                          }
-                          // containerStyle={{
-                          //   position: "absolute",
-                          //   top: -12,
-                          //   right: -12,
-                          // }}
-                          badgeStyle={{
-                            backgroundColor: "#20365F",
-                            width: 25,
-                            height: 25,
-                            borderColor: "transparent",
-                          }}
-                        />
-                      </TouchableOpacity>
+                        badgeStyle={{
+                          backgroundColor: "#20365F",
+                          width: 25,
+                          height: 25,
+                          borderColor: "transparent",
+                        }}
+                      />
                     </View>
                   </TouchableOpacity>
                   {/* <Text>
@@ -611,6 +637,8 @@ export default function Sections(props) {
                       // endDateTime={endDate}
                       // type={type}
                       navigation={props.navigation}
+                      handleAddFavorite={handleAddFavorite}
+                      favoriteAssets={favoriteIds}
                     />
 
                     <Details
