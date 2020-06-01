@@ -9,6 +9,9 @@ import {
   Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
 } from "react-native";
 // import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
@@ -182,276 +185,319 @@ export default function ProfileScreen(props) {
     console.log("flag", flag);
   }, [flag]);
 
+  ///////////////////////////////Font-End////////////////////////////////
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const _keyboardDidShow = () => {
+    // console.log("keyyyyyyyyyyyyyyyShow");
+
+    setMargin(-200);
+  };
+
+  const _keyboardDidHide = () => {
+    // console.log("keyyyyyyyyyyyyyyyHide");
+    setMargin(0);
+  };
+
+  const [marginVal, setMargin] = useState(0);
+  /////////////////////////////////////////////////////////////////////////////////////
+
   return (
     user && (
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.coverContainer}>
-            <ImageBackground
-              source={{
-                uri: profileBackground,
-              }}
-              style={styles.coverImage}
-            >
-              <View style={styles.coverTitleContainer}>
-                <Ionicons
-                  name="md-images"
-                  size={40}
-                  color="white"
-                  onPress={handlePickBackgroundImage}
-                />
-              </View>
-            </ImageBackground>
-          </View>
-          <View style={styles.profileImageContainer}>
-            <Avatar
-              rounded
-              source={{ uri: photoURL }}
-              size="xlarge"
-              style={styles.profileImage}
-            />
-          </View>
-        </View>
-        {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
-        <View style={styles.tabRowLeft}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              // alignItems: "center",
-              // width: "100%",
-              marginTop: "-13%",
-              // backgroundColor: "red",
-              flex: 2,
-            }}
-          >
-            <View
-              style={{
-                // backgroundColor: "red",
-                width: "35%",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
-              >
-                Reputation
-              </Text>
-              <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
-            </View>
-            <View
-              style={{
-                // backgroundColor: "red",
-                width: "35%",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
-              >
-                Points
-              </Text>
-              <Text style={styles.tabLabelNumber}>{user.points}</Text>
-            </View>
-          </View>
-        </View>
-        {/* </View> */}
-
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          style={[
+            styles.container,
+            { marginTop: !Platform.isPad && marginVal },
+          ]}
         >
-          <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
-          <TouchableOpacity onPress={() => setEdit(true)}>
-            <FontAwesome5 name="edit" size={20} style={{ color: "#224229" }} />
-          </TouchableOpacity>
-        </View>
-
-        <Modal visible={edit} animationType="fade" transparent={true}>
-          <View style={styles.centeredView}>
-            <View elevation={5} style={styles.modalView}>
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "height" : "padding"}
-                style={{ flex: 1 }}
+          <View style={styles.headerContainer}>
+            <View style={styles.coverContainer}>
+              <ImageBackground
+                source={{
+                  uri: profileBackground,
+                }}
+                style={styles.coverImage}
               >
-                <View
-                  style={{
-                    justifyContent: "space-around",
-                    flex: 1,
-                    alignItems: "center",
-                  }}
-                >
-                  {!flag ? (
-                    <Avatar
-                      rounded
-                      source={{ uri: editPic }}
-                      showAccessory
-                      onAccessoryPress={handlePickImage}
-                      size="xlarge"
-                    />
-                  ) : (
-                    <Text>Loading...</Text>
-                  )}
-                  <Input
-                    inputContainerStyle={{
-                      width: "100%",
-                      borderColor: "black",
-                    }}
-                    label="Display Name"
-                    value={editDisplayName}
-                    onChangeText={setEditDisplayName}
-                    // onSubmitEditing={saveImage}
+                <View style={styles.coverTitleContainer}>
+                  <Ionicons
+                    name="md-images"
+                    size={40}
+                    color="white"
+                    onPress={handlePickBackgroundImage}
                   />
                 </View>
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    // backgroundColor: "red",
-                    marginTop: 20,
-                    width: "100%",
-                    // marginEnd: 50,
-                    // flex: 1,
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: "#20365F",
-                      height: 40,
-                      width: "40%",
-                      // alignSelf: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      //marginStart: "2%",
-                      //marginEnd: "2%",
-                      borderRadius: 30,
-                      //marginBottom: 10,
-                    }}
-                  >
-                    <TouchableOpacity onPress={saveImage}>
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 16,
-                          color: "white",
-                        }}
-                      >
-                        Save
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: "#20365F",
-                      height: 40,
-                      width: "40%",
-                      // alignSelf: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      // marginStart: "2%",
-                      // marginEnd: "2%",
-                      borderRadius: 30,
-                      //marginBottom: 10,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        setPhotoURL(firebase.auth().currentUser.photoURL);
-                        setEditPic(photoURL);
-                        setEdit(false);
-                        setEditDisplayName(displayName);
-                      }}
-                    >
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 16,
-                          color: "white",
-                        }}
-                      >
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </KeyboardAvoidingView>
+              </ImageBackground>
+            </View>
+            <View style={styles.profileImageContainer}>
+              <Avatar
+                rounded
+                source={{ uri: photoURL }}
+                size="xlarge"
+                style={styles.profileImage}
+              />
             </View>
           </View>
-        </Modal>
-        <View style={{ flex: 1 }}>
-          <View>
-            <ButtonGroup
-              onPress={(index) => setView(index)}
-              selectedIndex={view}
-              buttons={buttons}
-              // containerStyle={{ height: 100 }}
-              containerStyle={{
-                backgroundColor: "#D2D4DA",
-                borderWidth: 1,
-                // borderBottomColor: "red",
-                // borderBottomWidth: 0,
-                // borderTopLeftRadius: 6,
-                // borderTopRightRadius: 6,
-                // borderBottomLeftRadius: 40,
-
-                borderColor: "darkgrey",
-                // borderRightColor: "black",
-              }}
-              selectedButtonStyle={{
-                backgroundColor: "white",
-                borderBottomWidth: 0,
-                // borderBottomColor: "red",
-              }}
-              selectedTextStyle={{
-                color: "black",
-                fontWeight: "bold",
-              }}
-              textStyle={{ color: "#535150", fontWeight: "bold" }}
-            />
-          </View>
-          <View style={styles.containerLogin}>
-            {view === 0 ? (
-              <DetailsScreen user={user} navigation={props.navigation} />
-            ) : view === 1 ? (
-              <GiftScreen user={user} navigation={props.navigation} />
-            ) : (
-              <ReferralScreen user={user} navigation={props.navigation} />
-            )}
-          </View>
-          <View
-            style={{
-              // marginTop: "5%",
-              // width: "90%",
-              // borderWidth: 1,
-              // borderColor: "darkgray",
-              alignItems: "center",
-              flex: 0.8,
-            }}
-          >
-            <Card
-              elevation={2}
+          {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
+          <View style={styles.tabRowLeft}>
+            {/* ========================================================================== ======================== */}
+            <View
               style={{
-                marginTop: "-1.5%",
-                width: "95%",
-                borderWidth: 1,
-                borderColor: "darkgray",
-                flex: 0.95,
+                flexDirection: "row",
+                // justifyContent: "space-between",
+                // alignItems: "center",
+                // width: "100%",
+                marginTop: -50,
+                // backgroundColor: "red",
+                flex: 2,
               }}
             >
               <View
                 style={{
-                  flex: 1,
-                  flexDirection: "row",
                   // backgroundColor: "red",
-                  // justifyContent: "space-around",
-                  // alignItems: "center",
+                  width: "35%",
+                  alignItems: "center",
                 }}
               >
-                {/* <FontAwesome5
+                <Text
+                  style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
+                >
+                  Reputation
+                </Text>
+                <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
+              </View>
+              <View style={{ width: "30%" }}></View>
+              <View
+                style={{
+                  // backgroundColor: "red",
+                  width: "35%",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+                >
+                  Points
+                </Text>
+                <Text style={styles.tabLabelNumber}>{user.points}</Text>
+              </View>
+            </View>
+            {/* ================================================= */}
+          </View>
+          {/* </View> */}
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+            <TouchableOpacity onPress={() => setEdit(true)}>
+              <FontAwesome5
+                name="edit"
+                size={20}
+                style={{ color: "#224229" }}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Modal visible={edit} animationType="fade" transparent={true}>
+            <View style={styles.centeredView}>
+              <View elevation={5} style={styles.modalView}>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === "ios" ? "height" : "padding"}
+                  style={{ flex: 1 }}
+                >
+                  <View
+                    style={{
+                      justifyContent: "space-around",
+                      flex: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    {!flag ? (
+                      <Avatar
+                        rounded
+                        source={{ uri: editPic }}
+                        showAccessory
+                        onAccessoryPress={handlePickImage}
+                        size="xlarge"
+                      />
+                    ) : (
+                      <Text>Loading...</Text>
+                    )}
+                    <Input
+                      inputContainerStyle={{
+                        width: "100%",
+                        borderColor: "black",
+                      }}
+                      label="Display Name"
+                      value={editDisplayName}
+                      onChangeText={setEditDisplayName}
+                      // onSubmitEditing={saveImage}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      // backgroundColor: "red",
+                      marginTop: 20,
+                      width: "100%",
+                      // marginEnd: 50,
+                      // flex: 1,
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: "#20365F",
+                        height: 40,
+                        width: "40%",
+                        // alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        //marginStart: "2%",
+                        //marginEnd: "2%",
+                        borderRadius: 30,
+                        //marginBottom: 10,
+                      }}
+                    >
+                      <TouchableOpacity onPress={saveImage}>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            fontSize: 16,
+                            color: "white",
+                          }}
+                        >
+                          Save
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: "#20365F",
+                        height: 40,
+                        width: "40%",
+                        // alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        // marginStart: "2%",
+                        // marginEnd: "2%",
+                        borderRadius: 30,
+                        //marginBottom: 10,
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          setPhotoURL(firebase.auth().currentUser.photoURL);
+                          setEditPic(photoURL);
+                          setEdit(false);
+                          setEditDisplayName(displayName);
+                        }}
+                      >
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            fontSize: 16,
+                            color: "white",
+                          }}
+                        >
+                          Cancel
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </KeyboardAvoidingView>
+              </View>
+            </View>
+          </Modal>
+          <View style={{ flex: 1 }}>
+            <View style={{ width: "100%", alignSelf: "center" }}>
+              <ButtonGroup
+                onPress={(index) => setView(index)}
+                selectedIndex={view}
+                buttons={buttons}
+                // containerStyle={{ height: 100 }}
+                containerStyle={{
+                  backgroundColor: "#D2D4DA",
+                  borderWidth: 1,
+                  // borderBottomColor: "red",
+                  // borderBottomWidth: 0,
+                  // borderTopLeftRadius: 6,
+                  // borderTopRightRadius: 6,
+                  // borderBottomLeftRadius: 40,
+
+                  borderColor: "darkgrey",
+                  // borderRightColor: "black",
+                }}
+                selectedButtonStyle={{
+                  backgroundColor: "white",
+                  borderBottomWidth: 0,
+                  // borderBottomColor: "red",
+                }}
+                selectedTextStyle={{
+                  color: "black",
+                  fontWeight: "bold",
+                }}
+                textStyle={{ color: "#535150", fontWeight: "bold" }}
+              />
+            </View>
+            <View style={[styles.containerLogin]}>
+              {view === 0 ? (
+                <DetailsScreen user={user} navigation={props.navigation} />
+              ) : view === 1 ? (
+                <GiftScreen user={user} navigation={props.navigation} />
+              ) : (
+                <ReferralScreen user={user} navigation={props.navigation} />
+              )}
+            </View>
+            <View
+              style={{
+                // marginTop: "5%",
+                // width: "100%",
+                // borderWidth: 1,
+                // borderColor: "darkgray",
+                alignItems: "center",
+                alignSelf: "center",
+                flex: 0.8,
+                // backgroundColor: "red",
+              }}
+            >
+              <Card
+                elevation={2}
+                style={{
+                  marginTop: "-1.5%",
+                  // width: "95%",
+                  borderWidth: 1,
+                  borderColor: "darkgray",
+                  flex: 0.95,
+                  // backgroundColor: "red",
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    // backgroundColor: "red",
+                    // justifyContent: "space-around",
+                    // alignItems: "center",
+                  }}
+                >
+                  {/* <FontAwesome5
                 name="heart"
                 size={35}
                 color="black"
@@ -460,98 +506,98 @@ export default function ProfileScreen(props) {
                 } 
               /> */}
 
-                <TouchableOpacity
-                  style={{
-                    flex: 0.9,
-                    // backgroundColor: "green",
-
-                    // width: "100%",
-                    // flexDirection: "row",
-                    // justifyContent: "space-around",
-                    // alignItems: "center",
-                  }}
-                  onPress={() => setFavoritesModal(true)}
-                >
-                  <LottieView
-                    width={Dimensions.get("window").width / 3.5}
-                    source={require("../../assets/lf30_editor_6YHFU0.json")}
-                    autoPlay
-                    // loop
-                    style={
-                      {
-                        // width: "22%",
-                        // height: "100%",
-                        // backgroundColor: "green",
-                        // justifyContent: "space-evenly",
-                        // alignItems: "center",
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.8,
+                      // backgroundColor: "green",
+                      //
+                      // width: "100%",
+                      // flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    onPress={() => setFavoritesModal(true)}
+                  >
+                    <Image
+                      width={Dimensions.get("window").width / 5.6}
+                      source={require("../../assets/images/editheart.gif")}
+                      autoPlay
+                      loop
+                      style={
+                        {
+                          // width: "22%",
+                          // height: "100%",
+                          // backgroundColor: "green",
+                          // justifyContent: "space-evenly",
+                          // alignItems: "center",
+                        }
                       }
-                    }
-                  />
-                </TouchableOpacity>
-                <View
-                  style={{
-                    // position: "relative",
-                    // width: "100%",
-                    flex: 0.81,
-                    // height: "100%",
-                    // backgroundColor: "red",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    width={Dimensions.get("window").width / 3.5}
-                    source={require("../../assets/images/subs.gif")}
-                    autoPlay
-                    loop
-                    style={
-                      {
-                        // position: "relative",
-                        // width: "100%",
-                        // height: "49%",
-                        // flex: 1,
-                        // justifyContent: "center",
-                        // alignItems: "center",
-                        // paddingTop: "5%",
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      position: "relative",
+                      // width: "100%",
+                      flex: 0.8,
+                      // height: "100%",
+                      // backgroundColor: "red",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      width={Dimensions.get("window").width / 4}
+                      source={require("../../assets/images/subs.gif")}
+                      autoPlay
+                      loop
+                      style={
+                        {
+                          // position: "relative",
+                          // width: "100%",
+                          // height: "49%",
+                          // flex: 1,
+                          // justifyContent: "center",
+                          // alignItems: "center",
+                          // paddingTop: "5%",
+                        }
                       }
-                    }
-                  />
-                </View>
+                    />
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={() => setCarsModal(true)}
-                  style={{
-                    // position: "relative",
-                    // width: "100%",
-                    flex: 1,
-                    // height: "100%",
-                    // backgroundColor: "blue",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    width={Dimensions.get("window").width / 5.5}
-                    source={require("../../assets/car5.gif")}
-                    autoPlay
+                  <TouchableOpacity
                     onPress={() => setCarsModal(true)}
-                    // loop
-                    style={
-                      {
-                        // position: "relative",
-                        // width: "70%",
-                        // height: "75%",
-                        // flex: 1,
-                        // backgroundColor: "blue",
-                        // justifyContent: "center",
-                        // alignItems: "center",
-                        // paddingTop: "5%",
+                    style={{
+                      // position: "relative",
+                      // width: "100%",
+                      flex: 0.9,
+                      // height: "100%",
+                      // backgroundColor: "blue",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      width={Dimensions.get("window").width / 6}
+                      source={require("../../assets/car5.gif")}
+                      autoPlay
+                      onPress={() => setCarsModal(true)}
+                      loop
+                      style={
+                        {
+                          // position: "relative",
+                          // width: "70%",
+                          // height: "75%",
+                          // flex: 1,
+                          // backgroundColor: "blue",
+                          // justifyContent: "center",
+                          // alignItems: "center",
+                          // paddingTop: "5%",
+                        }
                       }
-                    }
-                  />
-                </TouchableOpacity>
+                    />
+                  </TouchableOpacity>
 
-                {/* <View
+                  {/* <View
                   style={{
                     // position: "relative",
                     // width: "100%",
@@ -578,23 +624,24 @@ export default function ProfileScreen(props) {
                     }}
                   />
                 </View> */}
-              </View>
-            </Card>
-          </View>
+                </View>
+              </Card>
+            </View>
 
-          <CarsScreen
-            carsModal={carsModal}
-            setCarsModal={setCarsModal}
-            navigation={props.navigation}
-          />
-          <Favorites
-            favoritesModal={favoritesModal}
-            setFavoritesModal={setFavoritesModal}
-            navigation={props.navigation}
-            user={user}
-          />
+            <CarsScreen
+              carsModal={carsModal}
+              setCarsModal={setCarsModal}
+              navigation={props.navigation}
+            />
+            <Favorites
+              favoritesModal={favoritesModal}
+              setFavoritesModal={setFavoritesModal}
+              navigation={props.navigation}
+              user={user}
+            />
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     )
   );
 }
@@ -741,11 +788,13 @@ const styles = StyleSheet.create({
   },
   containerLogin: {
     flex: 1.5,
-    marginLeft: 10.5,
+    // marginLeft: 10.5,
     // backgroundColor: "#E8ECF4",
+    // backgroundColor: "red",
     width: "95%",
     marginTop: -5,
     marginBottom: "4%",
+    alignSelf: "center",
   },
 });
 

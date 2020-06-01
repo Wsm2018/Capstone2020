@@ -71,6 +71,11 @@ export default function AddCars(props) {
       return false;
     }
 
+    if (plate.length < 3) {
+      alert("Invalid Plate Number");
+      return;
+    }
+
     cars.map((item) => {
       if (
         item.plate === plate &&
@@ -107,47 +112,67 @@ export default function AddCars(props) {
   return (
     <View style={styles.container}>
       <View
+        // width={Dimensions.get("window").width / 1.1}
         style={{
           flex: 1,
-          marginTop: "-30%",
+
+          alignItems: "center",
+          justifyContent: "center",
+          // marginTop: "-30%",
           // backgroundColor: "blue",
         }}
       >
-        <LottieView
+        <View
+          style={{
+            flex: 0.5,
+
+            alignItems: "center",
+            justifyContent: "center",
+            // marginTop: "-30%",
+            // backgroundColor: "blue",
+          }}
+        >
+          <Text>Fill in your car information</Text>
+        </View>
+        {/* <LottieView
           width={Dimensions.get("window").width}
           source={require("../../../assets/cars.json")}
           autoPlay
-        />
-      </View>
+        /> */}
+        {/* </View>
       <View
         style={{
-          marginTop: "-40%",
+          // marginTop: "-40%",
           // backgroundColor: "red",
           flex: 0.5,
           alignItems: "center",
           justifyContent: "flex-start",
         }}
-      >
+      > */}
         {/* <Text style={{ fontSize: 22, marginTop: "-30%" }}>
           Register your Car
         </Text> */}
         <View
           style={{
-            // backgroundColor: "white",
+            backgroundColor: "white",
             alignItems: "center",
 
             flexDirection: "row",
             paddingLeft: 6,
-            width: "60%",
+            width: "80%",
             borderColor: "black",
             borderWidth: 1,
             borderRadius: 10,
             marginBottom: 10,
           }}
         >
-          <MaterialCommunityIcons name="email" size={20} color="gray" />
+          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 40, width: "80%", paddingLeft: 6 }}
+            style={{
+              height: 50,
+              // width: "80%",
+              paddingLeft: 6,
+            }}
             placeholder="Enter Car Brand"
             onChangeText={setBrand}
             value={brand}
@@ -155,21 +180,21 @@ export default function AddCars(props) {
         </View>
         <View
           style={{
-            // backgroundColor: "white",
+            backgroundColor: "white",
             alignItems: "center",
 
             flexDirection: "row",
             paddingLeft: 6,
-            width: "60%",
+            width: "80%",
             borderColor: "black",
             borderWidth: 1,
             borderRadius: 10,
             marginBottom: 10,
           }}
         >
-          <MaterialCommunityIcons name="email" size={20} color="gray" />
+          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 40, width: "80%", paddingLeft: 6 }}
+            style={{ height: 50, paddingLeft: 6 }}
             placeholder="Enter Car Model"
             // label="Car Model"
             onChangeText={setModel}
@@ -178,21 +203,21 @@ export default function AddCars(props) {
         </View>
         <View
           style={{
-            // backgroundColor: "white",
+            backgroundColor: "white",
             alignItems: "center",
 
             flexDirection: "row",
             paddingLeft: 6,
-            width: "60%",
+            width: "80%",
             borderColor: "black",
             borderWidth: 1,
             borderRadius: 10,
             marginBottom: 10,
           }}
         >
-          <MaterialCommunityIcons name="email" size={20} color="gray" />
+          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 40, width: "80%", paddingLeft: 6 }}
+            style={{ height: 50, paddingLeft: 6 }}
             placeholder="Enter Plate Number"
             onChangeText={setPlate}
             // label="Plate Number"
@@ -235,11 +260,11 @@ export default function AddCars(props) {
 
       <View
         style={{
-          flex: 0.2,
+          flex: 0.5,
           justifyContent: "center",
           alignItems: "center",
           // backgroundColor: "red",
-          justifyContent: "flex-start",
+          // justifyContent: "flex-start",
 
           // marginVertical: 5,
         }}
@@ -281,6 +306,7 @@ AddCars.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+
+    backgroundColor: "lightgray",
   },
 });

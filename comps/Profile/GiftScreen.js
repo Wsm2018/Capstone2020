@@ -10,6 +10,8 @@ import {
   TextInput,
   Dimensions,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 const LottieView = require("lottie-react-native");
 
@@ -81,6 +83,7 @@ export default function GiftScreen(props) {
         uid: firebase.auth().currentUser.uid,
         displayName: firebase.auth().currentUser.displayName,
       });
+      console.log("dsfsdfdsfsfsadfadsf", response);
       setModal(true);
     }
   };
@@ -145,7 +148,11 @@ export default function GiftScreen(props) {
   }, [email]);
   //aminehmollazehi@gmail.com
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS == "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
       <View style={{ flex: 1 }}>
         <Card
           elevation={2}
@@ -559,15 +566,7 @@ export default function GiftScreen(props) {
                 }
               />
             </TouchableOpacity>
-            <View
-              style={
-                {
-                  // flex: 1,
-                  // borderColor: "black",
-                  // borderBottomWidth: 2,
-                }
-              }
-            ></View>
+
             <View
               style={{
                 flex: 1,
@@ -591,6 +590,7 @@ export default function GiftScreen(props) {
           </View>
         </View>
       </Modal>
+      {/* </TouchableWithoutFeedback> */}
     </KeyboardAvoidingView>
   );
 }

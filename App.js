@@ -197,20 +197,22 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    db.collection("users")
+    const userRef = await db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .onSnapshot(async (userRef) => {
-        const getAdmin = firebase.functions().httpsCallable("getAdmin");
-        const response = await getAdmin({
-          email: firebase.auth().currentUser.email,
-        });
+      .get();
+    // .onSnapshot(async (userRef) => {
+    const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    const response = await getAdmin({
+      email: firebase.auth().currentUser.email,
+    });
 
-        const admin = response.data.result !== undefined ? true : false;
+    const admin = response.data.result !== undefined ? true : false;
 
-        const user = { ...userRef.data(), admin };
-        console.log("userROLE", user.role.slice(-12));
-        setUser(user);
-      });
+    const user = { ...userRef.data(), admin };
+    console.log("userROLE", user.role.slice(-12));
+    setUser(user);
+    // });
   }
 
   async function getFirstLaunch() {

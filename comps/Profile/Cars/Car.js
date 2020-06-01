@@ -6,9 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
 // import { Octicons } from "@expo/vector-icons";
-
+import firebase from "firebase";
+import "firebase/auth";
+import "firebase/functions";
 import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
 import { Divider, Card as Cards } from "react-native-elements";
@@ -16,6 +19,29 @@ import { Octicons } from "@expo/vector-icons";
 // import { ScrollView } from "react-native-gesture-handler";
 
 export default function Car({ car }) {
+  const handleConfirmation = () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to remove this car? ",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => handleRemoveCar() },
+      ],
+      { cancelable: false }
+    );
+  };
+  const handleRemoveCar = async () => {
+    const deleteCar = firebase.functions().httpsCallable("deleteCar");
+    const response = await deleteCar({
+      uid: firebase.auth().currentUser.uid,
+      carId: car.id,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Cards containerStyle={styles.card}>
@@ -53,7 +79,7 @@ export default function Car({ car }) {
               // marginEnd: "-3%",
             }}
           >
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleConfirmation}>
               {/* <Text style={styles.notes}>X</Text> */}
               <Octicons name="trashcan" size={20} color="black" />
             </TouchableOpacity>

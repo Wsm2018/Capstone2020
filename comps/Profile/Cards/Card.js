@@ -77,7 +77,7 @@ export default function Card(props) {
     //       </TouchableOpacity>
     //     </Cards> */}
       <Cards
-        height={Dimensions.get("window").height / 4}
+        // height={Dimensions.get("window").height / 4}
         width={Dimensions.get("window").width / 1.3}
         containerStyle={styles.card}
       >

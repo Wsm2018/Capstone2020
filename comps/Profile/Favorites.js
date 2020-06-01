@@ -57,7 +57,7 @@ export default function Favorites({
   const handleDeleteAlert = (id) => {
     Alert.alert(
       "Confirm Delete",
-      "Are you sure you want to remove this asset ?",
+      "Remove from Favorites?",
       [
         {
           text: "No",
@@ -155,7 +155,18 @@ export default function Favorites({
             <AntDesign name="close" size={25} style={{ color: "#224229" }} />
           </TouchableOpacity>
 
-          <View style={{ flex: 10 }}>
+          <View style={{ flex: 10, alignItems: "center" }}>
+            <Text
+              style={{
+                // paddingTop: "15%",
+
+                fontSize: 20,
+                color: "darkred",
+                fontWeight: "bold",
+              }}
+            >
+              My Favorites
+            </Text>
             {favoriteAssets.length === 0 ? (
               <View style={styles.header}>
                 <LottieView
@@ -177,6 +188,50 @@ export default function Favorites({
                 >
                   No Favorites
                 </Text>
+                <View
+                  style={{
+                    flex: 4,
+                    // backgroundColor: "red",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    flexDirection: "row-reverse",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#20365F",
+                      // borderWidth: 4,
+                      height: 40,
+                      width: "40%",
+                      // alignSelf: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      //marginStart: "2%",
+                      //marginEnd: "2%",
+                      borderRadius: 15,
+                      //marginBottom: 10,
+                    }}
+                    onPress={() => {
+                      setFavoritesModal(false);
+                      navigation.navigate(
+                        "Home",
+                        {},
+                        NavigationActions.navigate("Types")
+                      );
+                    }}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      Add Favorite
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : (
               favoriteAssets.map((item, index) => (
@@ -301,7 +356,7 @@ export default function Favorites({
                           fontSize: 20,
                           paddingStart: 10,
                           fontWeight: "bold",
-                          color: "darkgreen",
+                          color: "#20365F",
                           // fontVariant: 4,
                           // backgroundColor: "green",
                           // backgroundColor: "blue",
@@ -338,9 +393,16 @@ export default function Favorites({
                   style={{ color: "#224229" }}
                 />
               </TouchableOpacity>
-              <View>
+              <View
+                style={{
+                  flex: 0.5,
+                  // backgroundColor: "red",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <DatePicker
-                  style={{ width: "100%" }}
+                  style={{ width: "90%" }}
                   date={startDate}
                   mode="datetime"
                   placeholder="Start Date"
@@ -353,16 +415,23 @@ export default function Favorites({
                     dateInput: {
                       // marginLeft: 36,
                       // backgroundColor: "lightgray",
-                      borderWidth: 0,
+                      borderWidth: 1,
                     },
                     // ... You can check the source to find the other keys.
                   }}
                   onDateChange={setStartDate}
                 />
               </View>
-              <View>
+              <View
+                style={{
+                  flex: 0.5,
+                  // backgroundColor: "green",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+              >
                 <DatePicker
-                  style={{ width: "100%" }}
+                  style={{ width: "90%" }}
                   date={endDate}
                   mode="datetime"
                   placeholder="End Date"
@@ -375,13 +444,51 @@ export default function Favorites({
                     dateInput: {
                       // marginLeft: 36,
                       // backgroundColor: "lightgray",
-                      borderWidth: 0,
+                      borderWidth: 1,
                     },
                   }}
                   onDateChange={setEndDate}
                 />
               </View>
-              <Button title="Book" onPress={handleBooking} />
+              <View
+                style={{
+                  flex: 0.4,
+                  // backgroundColor: "red",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  // flexDirection: "row-reverse",
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 0.5,
+                    backgroundColor: "#20365F",
+                    // borderWidth: 4,
+                    // height: 20,
+                    width: "40%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    //marginEnd: "2%",
+                    borderRadius: 10,
+                    //marginBottom: 10,
+                  }}
+                  // style={{ flex: 0.5, backgroundColor: "yellow" }}
+                  onPress={() => handleBooking()}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Book
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

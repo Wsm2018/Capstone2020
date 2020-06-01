@@ -133,11 +133,12 @@ export default function AddCard(props) {
     <View
       style={{
         flex: 1,
+        backgroundColor: "lightgray",
         // flexDirection: "column",
         // flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: "5%",
+        // marginTop: "5%",
         // marginBottom: "10%",
       }}
     >
@@ -157,7 +158,7 @@ export default function AddCard(props) {
 
           // borderWidth: 1,
           // backgroundColor: "red",
-          width: "90%",
+          // width: "90%",
         }}
       >
         <CreditCardInput
@@ -166,12 +167,14 @@ export default function AddCard(props) {
           requiresName={true}
           onChange={handleCard}
           allowScroll={true}
-          labelStyle={{ textAlign: "center" }}
+          // labelStyle={{ textAlign: "center" }}
           inputStyle={{
-            // borderBottomWidth: 2,
-
-            borderRadius: 5,
-            textAlign: "center",
+            borderWidth: 1,
+            backgroundColor: "white",
+            height: 50,
+            // marginStart: 2,
+            // borderRadius: 5,
+            // textAlign: "center",
           }}
           inputContainerStyle={
             {
