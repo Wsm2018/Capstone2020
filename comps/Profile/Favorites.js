@@ -180,9 +180,9 @@ export default function Favorites({
                 />
                 <Text
                   style={{
-                    paddingTop: "15%",
+                    // paddingTop: "15%",
                     fontSize: 20,
-                    color: "darkred",
+                    color: "darkgray",
                     fontWeight: "bold",
                   }}
                 >
@@ -192,8 +192,8 @@ export default function Favorites({
                   style={{
                     flex: 4,
                     // backgroundColor: "red",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
+                    // justifyContent: "flex-end",
+                    alignItems: "flex-end",
                     flexDirection: "row-reverse",
                   }}
                 >
@@ -228,7 +228,7 @@ export default function Favorites({
                         // fontWeight: "bold",
                       }}
                     >
-                      Add Favorite
+                      Add Favorites
                     </Text>
                   </TouchableOpacity>
                 </View>

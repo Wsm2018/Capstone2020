@@ -154,10 +154,11 @@ export default function GiftScreen(props) {
     >
       {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
       <View style={{ flex: 1 }}>
-        <Card
-          elevation={2}
+        <View
+          //elevation={2}
           style={{
             width: "100%",
+            backgroundColor: "white",
             flex: 1,
             borderWidth: 1,
             borderTopWidth: 0,
@@ -522,7 +523,7 @@ export default function GiftScreen(props) {
               </TouchableOpacity>
             </View>
           )}
-        </Card>
+        </View>
       </View>
       <Modal transparent={true} visible={modal}>
         <View style={styles.centeredView}>

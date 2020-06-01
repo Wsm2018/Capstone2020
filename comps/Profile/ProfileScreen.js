@@ -56,7 +56,7 @@ export default function ProfileScreen(props) {
   const [edit, setEdit] = useState(false);
   const [profileBackground, setProfileBackground] = useState("");
   const [displayName, setDisplayName] = useState();
-  const buttons = ["Balance", "Send Gift", "Referral Code"];
+  const buttons = ["Balance", "Send Gift", "Referral"];
   const [view, setView] = useState(0);
   const [carsModal, setCarsModal] = useState(false);
   const [favoritesModal, setFavoritesModal] = useState(false);
@@ -232,7 +232,7 @@ export default function ProfileScreen(props) {
                 <View style={styles.coverTitleContainer}>
                   <Ionicons
                     name="md-images"
-                    size={40}
+                    size={35}
                     color="white"
                     onPress={handlePickBackgroundImage}
                   />
@@ -329,6 +329,9 @@ export default function ProfileScreen(props) {
                   >
                     {!flag ? (
                       <Avatar
+                        accessory={{
+                          size: 40,
+                        }}
                         rounded
                         source={{ uri: editPic }}
                         showAccessory
@@ -426,28 +429,40 @@ export default function ProfileScreen(props) {
             </View>
           </Modal>
           <View style={{ flex: 1 }}>
-            <View style={{ width: "100%", alignSelf: "center" }}>
+            <View
+              style={{
+                // backgroundColor: "green",
+                //paddingLeft: -5,
+                width: "104.6%",
+                marginStart: -20,
+                marginEnd: 50,
+              }}
+            >
               <ButtonGroup
                 onPress={(index) => setView(index)}
                 selectedIndex={view}
                 buttons={buttons}
+                //width={"100%"}
                 // containerStyle={{ height: 100 }}
+                //style={{ width: "100%" }}
                 containerStyle={{
                   backgroundColor: "#D2D4DA",
                   borderWidth: 1,
+                  //backgroundColor: "red",
                   // borderBottomColor: "red",
                   // borderBottomWidth: 0,
                   // borderTopLeftRadius: 6,
                   // borderTopRightRadius: 6,
                   // borderBottomLeftRadius: 40,
-
+                  width: "100%",
                   borderColor: "darkgrey",
                   // borderRightColor: "black",
                 }}
                 selectedButtonStyle={{
                   backgroundColor: "white",
                   borderBottomWidth: 0,
-                  // borderBottomColor: "red",
+                  //backgroundColor: "blue",
+                  width: "100%",
                 }}
                 selectedTextStyle={{
                   color: "black",
@@ -456,7 +471,10 @@ export default function ProfileScreen(props) {
                 textStyle={{ color: "#535150", fontWeight: "bold" }}
               />
             </View>
-            <View style={[styles.containerLogin]}>
+            <View
+              //width={Dimensions.get("window").width}
+              style={[styles.containerLogin]}
+            >
               {view === 0 ? (
                 <DetailsScreen user={user} navigation={props.navigation} />
               ) : view === 1 ? (
@@ -468,24 +486,35 @@ export default function ProfileScreen(props) {
             <View
               style={{
                 // marginTop: "5%",
-                // width: "100%",
-                // borderWidth: 1,
-                // borderColor: "darkgray",
+                width: "100%",
+                borderTopWidth: 1,
+                borderColor: "darkgray",
                 alignItems: "center",
                 alignSelf: "center",
                 flex: 0.8,
-                // backgroundColor: "red",
+                backgroundColor: "white",
               }}
             >
-              <Card
+              <View
+                // elevation={2}
+                // style={{
+                //   marginTop: "-1.5%",
+                //   // width: "95%",
+                //   borderWidth: 1,
+                //   borderColor: "darkgray",
+                //   flex: 0.95,
+
+                //   // backgroundColor: "red",
+                // }}
                 elevation={2}
                 style={{
-                  marginTop: "-1.5%",
-                  // width: "95%",
+                  width: "100%",
+                  flex: 1,
                   borderWidth: 1,
+                  borderTopWidth: 0,
                   borderColor: "darkgray",
-                  flex: 0.95,
-                  // backgroundColor: "red",
+                  // borderRadius: 0,
+                  backgroundColor: "white",
                 }}
               >
                 <View
@@ -625,7 +654,7 @@ export default function ProfileScreen(props) {
                   />
                 </View> */}
                 </View>
-              </Card>
+              </View>
             </View>
 
             <CarsScreen
@@ -688,6 +717,8 @@ const styles = StyleSheet.create({
   coverTitleContainer: {
     flex: 1,
     alignItems: "flex-end",
+    marginRight: "2%",
+    marginTop: "1%",
   },
   headerContainer: {
     alignItems: "center",
@@ -791,10 +822,13 @@ const styles = StyleSheet.create({
     // marginLeft: 10.5,
     // backgroundColor: "#E8ECF4",
     // backgroundColor: "red",
-    width: "95%",
+    // width: "100%",
     marginTop: -5,
     marginBottom: "4%",
-    alignSelf: "center",
+    //borderColor: "red",
+    //borderWidth: 3,
+    //backgroundColor: "yellow",
+    // alignSelf: "center",
   },
 });
 

@@ -65,9 +65,10 @@ export default function ReferralScreen(props) {
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <Card
-            elevation={2}
+          <View
+            // elevation={2}
             style={{
+              backgroundColor: "white",
               width: "100%",
               flex: 1,
               borderWidth: 1,
@@ -254,7 +255,7 @@ export default function ReferralScreen(props) {
               </View> */}
               </View>
             </View>
-          </Card>
+          </View>
         </View>
         <Modal visible={phoneModal} transparent={true}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
