@@ -764,6 +764,8 @@ export default function Details(props) {
                                 }
                               }
                             >
+                              {/* {console.log(userDays)} */}
+
                               {d.timesList.length > 0 && (
                                 <Text>{getDay(d.day)}</Text>
                               )}
@@ -864,9 +866,8 @@ export default function Details(props) {
                                       // </Text>
                                       null}
                                 </View>
-                              ) : (
-                                <Text>No Available Services</Text>
-                              )}
+                              ) : // <Text>No Available Services</Text>
+                              null}
                             </View>
                           ))}
                         </View>
