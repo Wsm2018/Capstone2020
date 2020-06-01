@@ -547,7 +547,7 @@ export default function ProfileScreen(props) {
                   >
                     <Image
                       width={Dimensions.get("window").width / 4}
-                      source={require("../../assets/images/subs.gif")}
+                      source={require("../../assets/images/sub.gif")}
                       autoPlay
                       loop
                       style={
@@ -578,7 +578,7 @@ export default function ProfileScreen(props) {
                   >
                     <Image
                       width={Dimensions.get("window").width / 6}
-                      source={require("../../assets/car5.gif")}
+                      source={require("../../assets/images/car5.gif")}
                       autoPlay
                       onPress={() => setCarsModal(true)}
                       loop
@@ -764,10 +764,10 @@ const styles = StyleSheet.create({
     // position: "relative",
     // flexDirection: "row",
     // backgroundColor: "blue",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    // alignItems: "flex-start",
-    flex: 0.07,
+    // flexWrap: "wrap",
+    // justifyContent: "flex-start",
+    // // alignItems: "flex-start",
+    // flex: 0.07,
   },
   tabRowRight: {
     // backgroundColor: "red",

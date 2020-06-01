@@ -96,7 +96,7 @@ export default function BalanceScreen({ navigation }) {
         }}
       >
         <View style={{ flex: 0.5 }}>
-          <Text style={{ fontSize: 25, fontWeight: "bold", color: "#0D2C6A" }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0D2C6A" }}>
             Current Balance
           </Text>
 
@@ -117,10 +117,10 @@ export default function BalanceScreen({ navigation }) {
                 props.navigation.navigate("Balance", { user: props.user })
               }
             /> */}
-            <Text style={{ fontSize: 22, fontWeight: "bold", marginEnd: 5 }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginEnd: 5 }}>
               {user && user.balance}
             </Text>
-            <Text style={{ fontSize: 22, fontWeight: "bold" }}>QR</Text>
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>QR</Text>
           </View>
         </View>
 
