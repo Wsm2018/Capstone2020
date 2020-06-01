@@ -26,7 +26,7 @@ const EmployeeHandlerStack = createAppContainer(
       EmployeesDetail: EmployeesDetail,
       EmployeesPending: EmployeesPending,
       EmployeesAllowed: EmployeesAllowed,
-      test: test,
+      // test: test,
     },
     {
       // initialRouteName: "FriendsList",
