@@ -34,6 +34,11 @@ export default function CheckOut(props) {
     "serviceBooking",
     "some default value"
   );
+  //const [displayServices, setDisplayServices] = useState([]);
+  //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
+  const [start, setStart] = useState();
+  const [end, setEnd] = useState();
+  //const [totalAmount, setTotalAmount] = useState(0);
 
   ////////////////////////////Front-End////////////////////////////////////////////
   const [displayServices, setDisplayServices] = useState([]);
@@ -81,81 +86,148 @@ export default function CheckOut(props) {
 
   useEffect(() => {
     if (assetBooking) {
-      // console.log("assset -----------------------", assetBooking.asset.price);
-
-      var start = assetBooking.startDateTime.split(" ").join("");
-      var end = assetBooking.endDateTime.split(" ").join("");
-
-      //fix the hour if between 1 - 9
-      var startHour = "";
-      var endHour = "";
-
-      if (
-        assetBooking.startDateTime.split(" ")[2].split(":")[0].split("")
-          .length == 1
-      ) {
-        startHour =
-          "0" +
-          assetBooking.startDateTime.split(" ")[2].split(":")[0].split("")[0];
-        start =
-          assetBooking.startDateTime.split(" ")[0] + "T" + startHour + ":00:00";
-      }
-      if (
-        assetBooking.endDateTime.split(" ")[2].split(":")[0].split("").length ==
-        1
-      ) {
-        endHour =
-          "0" +
-          assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")[0];
-        end = assetBooking.endDateTime.split(" ")[0] + "T" + endHour + ":00:00";
-      }
-
-      console.log("start", startHour, "end", endHour);
-
-      var s = new Date(start);
-      var e = new Date(end);
-      var diff = (e.getTime() - s.getTime()) / 1000;
-      //console.log("diff 40-----------------------",diff , s, e)
-      diff /= 60 * 60;
-      //console.log("diff 42-----------------------",diff)
-      var assetTotal =
-        Math.round(diff * parseInt(assetBooking.asset.price) * 100) / 100;
-      //console.log("total asset",assetTotal)
-      var serviceTotal = 0;
-      if (serviceBooking.length > 0) {
-        for (let i = 0; i < serviceBooking.length; i++) {
-          serviceTotal =
-            serviceTotal + parseInt(serviceBooking[i].service.price);
-        }
-      }
-      //console.log("total service",serviceTotal)
-      setTotalAmount(assetTotal + serviceTotal);
-
-      //get all booked services
-      var newServiceArr = [];
-      for (let i = 0; i < serviceBooking.length; i++) {
-        // console.log("here 67")
-        newServiceArr = newServiceArr.filter(
-          (s) => s.service !== serviceBooking[i].service
-        );
-        // console.log(" resulttt", newServiceArr)
-        //get booked hours of service
-        var bookedhours = serviceBooking.filter(
-          (s) => s.service == serviceBooking[i].service
-        );
-        var hours = [];
-        for (let k = 0; k < bookedhours.length; k++) {
-          // console.log("73")
-          hours.push(bookedhours[k].day + "T" + bookedhours[k].time);
-        }
-        newServiceArr.push({ service: serviceBooking[i].service, hours });
-        ///console.log(" new",newServiceArr)
-      }
-      setDisplayServices(newServiceArr);
-      //console.log(" ahaa??", displayServices)
-      // add the hours of each
+      fixTimings();
+      countTotal();
+      orderList();
     }
   }, []);
+
+  const fixTimings = () => {
+    if (assetBooking.startDateTime.split(" ")[3] == "PM") {
+      setStart(
+        assetBooking.startDateTime.split(" ")[0] +
+          " T " +
+          (parseInt(assetBooking.startDateTime.split(" ")[2].split(":")[0]) +
+            12) +
+          ":00:00"
+      );
+    } else {
+      setStart(
+        assetBooking.startDateTime.split(" ")[0] +
+          " T " +
+          assetBooking.startDateTime.split(" ")[2] +
+          ":00"
+      );
+    }
+    if (assetBooking.endDateTime.split(" ")[3] == "PM") {
+      setEnd(
+        assetBooking.endDateTime.split(" ")[0] +
+          " T " +
+          (parseInt(assetBooking.endDateTime.split(" ")[2].split(":")[0]) +
+            12) +
+          ":00:00"
+      );
+    } else {
+      setEnd(
+        assetBooking.endDateTime.split(" ")[0] +
+          " T " +
+          assetBooking.endDateTime.split(" ")[2] +
+          ":00"
+      );
+    }
+  };
+
+  const countTotal = () => {
+    var start = assetBooking.startDateTime.split(" ").join("");
+    var end = assetBooking.endDateTime.split(" ").join("");
+    var startHour = "";
+    var endHour = "";
+
+    if (
+      assetBooking.startDateTime.split(" ")[2].split(":")[0].split("").length ==
+      1
+    ) {
+      startHour =
+        "0" +
+        assetBooking.startDateTime.split(" ")[2].split(":")[0].split("")[0];
+      start =
+        assetBooking.startDateTime.split(" ")[0] + " T " + startHour + ":00";
+    }
+    if (
+      assetBooking.endDateTime.split(" ")[2].split(":")[0].split("").length == 1
+    ) {
+      endHour =
+        "0" + assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")[0];
+      end = assetBooking.endDateTime.split(" ")[0] + " T " + endHour + ":00";
+    }
+
+    // count days and total
+    var s = new Date(start);
+    var e = new Date(end);
+    console.log(" eeehhhh", start, end);
+    var diff = (e.getTime() - s.getTime()) / 1000;
+
+    diff /= 60 * 60;
+
+    var assetTotal =
+      Math.round(diff * parseInt(assetBooking.asset.price) * 100) / 100;
+
+    var serviceTotal = 0;
+    if (serviceBooking.length > 0) {
+      for (let i = 0; i < serviceBooking.length; i++) {
+        serviceTotal = serviceTotal + parseInt(serviceBooking[i].service.price);
+      }
+    }
+    console.log(" total", assetTotal, serviceTotal);
+    setTotalAmount(assetTotal + serviceTotal);
+  };
+
+  const orderList = () => {
+    var newServiceArr = [];
+    for (let i = 0; i < serviceBooking.length; i++) {
+      newServiceArr = newServiceArr.filter(
+        (s) => s.service !== serviceBooking[i].service
+      );
+      var bookedhours = serviceBooking.filter(
+        (s) => s.service == serviceBooking[i].service
+      );
+      var hours = [];
+      var whatever = [];
+      for (let k = 0; k < bookedhours.length; k++) {
+        hours.push(bookedhours[k].day + " " + bookedhours[k].show);
+        if (bookedhours[k].time.split(":")[0].split("").length == 1) {
+          whatever.push({
+            hr24: bookedhours[k].day + "T0" + bookedhours[k].time,
+            hr12: bookedhours[k].day + "T0" + bookedhours[k].show,
+          });
+        } else {
+          whatever.push({
+            hr24: bookedhours[k].day + "T" + bookedhours[k].time,
+            hr12: bookedhours[k].day + "T" + bookedhours[k].show,
+          });
+        }
+      }
+      newServiceArr.push({
+        service: serviceBooking[i].service,
+        hours,
+        whatever,
+      });
+    }
+
+    //order timings
+    for (let i = 0; i < newServiceArr.length; i++) {
+      var arranged = [];
+      var use = newServiceArr[i].whatever;
+      if (use.length > 0) {
+        var counter = use.length;
+        while (counter > 0) {
+          var min = use[0].hr24;
+          var index = 0;
+          for (let k = 0; k < use.length; k++) {
+            if (new Date(min).getTime() > new Date(use[k].hr24).getTime()) {
+              min = newServiceArr[i].whatever[k];
+              index = k;
+            }
+          }
+          arranged.push(use[index].hr12);
+          use = use.filter((t, i) => i != index);
+          counter = counter - 1;
+        }
+      }
+      newServiceArr[i].hours = arranged;
+    }
+    setDisplayServices(newServiceArr);
+  };
 
   const payLater = async () => {
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
@@ -283,39 +355,44 @@ export default function CheckOut(props) {
           >
             Service(s)
           </Text>
-          {serviceBooking.map((s, i) => (
-            <View>
-              <View style={styles.text}>
-                <Text style={{ fontSize: 15, color: "gray", marginTop: "1%" }}>
-                  Service #{i + 1}
-                </Text>
-                <Text style={{ fontSize: 15, marginTop: "1%" }}>
-                  {s.service.name}
-                </Text>
-              </View>
-              <View style={styles.text}>
-                <Text style={{ fontSize: 15, color: "gray" }}>Date & Time</Text>
-                <Text style={{ fontSize: 15 }}>{(s.day, "", s.show)} </Text>
-              </View>
-              <View style={styles.text}>
-                <Text style={{ fontSize: 15, color: "gray" }}>
-                  Price Per Hour
-                </Text>
-                <Text style={{ fontSize: 15 }}>{s.service.price} QAR</Text>
-              </View>
+          {serviceBooking.length > 0 ? (
+            serviceBooking.map((s, i) => (
+              <View>
+                <View style={styles.text}>
+                  <Text
+                    style={{ fontSize: 15, color: "gray", marginTop: "1%" }}
+                  >
+                    Service #{i + 1}
+                  </Text>
+                  <Text style={{ fontSize: 15, marginTop: "1%" }}>
+                    {s.service.name}
+                  </Text>
+                </View>
+                <View style={styles.text}>
+                  <Text style={{ fontSize: 15, color: "gray" }}>
+                    Date & Time
+                  </Text>
+                  <Text style={{ fontSize: 15 }}>{(s.day, "", s.show)} </Text>
+                </View>
+                <View style={styles.text}>
+                  <Text style={{ fontSize: 15, color: "gray" }}>
+                    Price Per Hour
+                  </Text>
+                  <Text style={{ fontSize: 15 }}>{s.service.price} QAR</Text>
+                </View>
 
-              <View style={styles.text}>
-                <Text
-                  style={{ fontSize: 15, color: "gray", marginBottom: "3%" }}
-                >
-                  Amount
-                </Text>
-                <Text style={{ fontSize: 15, marginBottom: "3%" }}>
-                  {s.service.price} QAR
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
-                {/* <TouchableOpacity
+                <View style={styles.text}>
+                  <Text
+                    style={{ fontSize: 15, color: "gray", marginBottom: "3%" }}
+                  >
+                    Amount
+                  </Text>
+                  <Text style={{ fontSize: 15, marginBottom: "3%" }}>
+                    {s.service.price} QAR
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
+                  {/* <TouchableOpacity
                   onPress={() => payLater()}
                   style={styles.edit}
                 >
@@ -323,7 +400,7 @@ export default function CheckOut(props) {
                     <Feather name="edit-3" size={24} color="#809cb0" />
                   </Text>
                 </TouchableOpacity> */}
-                {/* <TouchableOpacity
+                  {/* <TouchableOpacity
                   onPress={() => payLater()}
                   style={styles.delete}
                 >
@@ -331,9 +408,14 @@ export default function CheckOut(props) {
                     <FontAwesome name="remove" size={20} color="#d64231" />
                   </Text>
                 </TouchableOpacity> */}
+                </View>
               </View>
+            ))
+          ) : (
+            <View style={{ paddingLeft: "4%", paddingBottom: "1%" }}>
+              <Text>No services added</Text>
             </View>
-          ))}
+          )}
           {/* <Divider style={{ backgroundColor: "lightgray" }} /> */}
         </View>
         <View style={{ marginTop: "3%" }}></View>

@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Surface } from "react-native-paper";
 import DatePicker from "react-native-datepicker";
-// import { Card, Divider } from "react-native-elements";
+import { Divider } from "react-native-elements";
 import { Dividerm, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -30,7 +30,7 @@ import Details from "./Details";
 import Review from "./Review";
 
 import { set } from "react-native-reanimated";
-// import { Avatar, Card, Title, Paragraph } from "react-native-paper";
+import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
   const [assetSections, setAssetSections] = useState([]);
@@ -294,12 +294,19 @@ export default function Sections(props) {
         </View>
         <View style={styles.one}>
           <Text style={styles.cardTitle}>Choose Date & Time</Text>
-          <View style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              // backgroundColor: "red",
+              minHeight: 50,
+            }}
+          >
             <View
               style={{
                 width: "45%",
                 alignItems: "center",
                 justifyContent: "center",
+                // borderWidth: 1,
               }}
             >
               <DatePicker
