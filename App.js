@@ -155,9 +155,9 @@ export default function App(props) {
       Home: {
         screen: DashboardStackNavigator,
       },
-      // Friends: {
-      //   screen: FriendsStk,
-      // },
+      Friends: {
+        screen: FriendsStk,
+      },
     },
     {
       drawerBackgroundColor: "#F0F8FF",

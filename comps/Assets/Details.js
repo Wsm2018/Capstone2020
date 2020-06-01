@@ -93,6 +93,53 @@ export default function Details(props) {
   ]);
   const [updateAvailableTimings, setUpdateAvailableTimings] = useState([]);
 
+  // const reduceViewer = async (a) => {
+  //   const lessViewers = firebase.functions().httpsCallable("lessViewers");
+  //   const result = await lessViewers({ 
+  //     asset:a
+  //    });
+  // }
+
+  // const increaseViewer = async (a) => {
+  //   const moreViewers = firebase.functions().httpsCallable("moreViewers");
+  //   const result = await moreViewers({ 
+  //     asset:a
+  //    });
+  // }
+
+  // const subscribe = props.navigation.addListener("didFocus", () => {
+  //   console.log("focussed from details");
+  //   //increaseViewer(props.asset)
+  // });
+
+  const increaseViewer = async (a) => {
+    const moreViewers = firebase.functions().httpsCallable("moreViewers");
+    const result = await moreViewers({ 
+      asset:a
+     });
+  }
+
+  useEffect(() => {
+    if (props.navigation.isFocused()) {
+      console.log("asset is focussed from details");
+      //increaseViewer(props.asset)
+    }
+  },[asset])
+
+  // const timeListener = () => {
+  //   let timerId = setInterval(() => {
+  //     if (!props.navigation.isFocused()) {
+  //       console.log("adios in details");
+  //       //reduceViewer(props.asset);
+  //       clearInterval(timerId);
+  //     }
+  //   }, 1000);
+  // };
+
+  // useEffect(() => {
+  //   timeListener()
+  // },[])
+
   useEffect(() => {
     getServices();
   }, [asset]);

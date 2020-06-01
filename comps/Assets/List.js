@@ -34,6 +34,8 @@ export default function List(props) {
     props.navigation.getParam("section",'failed') === 'failed'?getAllList():getList();
   },[section]);
 
+  
+
   useEffect(() => {
     checkTime()
   },[assetList.length > 0 && finalAssets.length == 0])

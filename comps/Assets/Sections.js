@@ -222,6 +222,68 @@ export default function Sections(props) {
     // console.log(endDate);
   }, [endDate]);
 
+
+  let flag = false;
+  
+  const reduceViewer = async (a) => {
+    const lessViewers = firebase.functions().httpsCallable("lessViewers");
+    const result = await lessViewers({ 
+      asset:a
+     });
+  }
+
+
+
+  // const subscribe = props.navigation.addListener("didFocus", () => {
+  //   console.log("focussed");
+  //   //increaseViewer(props.asset)
+  // });
+
+  const timeListener = () => {
+    let timerId = setInterval(() => {
+      if (!props.navigation.isFocused() || flag) {
+        console.log("adios");
+        //reduceViewer(props.asset);
+        clearInterval(timerId);
+        flag = false;
+      }
+    }, 1000);
+  };
+
+
+  useEffect(() => {
+    timeListener()
+  },[])
+
+
+
+  
+
+  // not working
+  // window.addEventListener('beforeunload', () => {
+  //   console.log("adios");
+  // });
+
+  // not working
+  // const unsubscribe = props.navigation.addListener("didBlur", () => {
+
+  //   console.log("adios");
+  //   // track();
+  // });
+
+  // const track = async () => {
+  //   let old = await db.collection("tracking").doc("track").get();
+  //   let newTrack = parseInt(old.data().parking) + 1;
+  //   db.collection("tracking").doc("track").update({ parking: newTrack });
+  //   AsyncStorage.setItem("parking", "yes");
+
+  //   showMessage({
+  //     message: newTrack + " User/Users Trying To Book a Parking Right Now!!",
+  //     //description: newTrack + " Users Are Trying To Book a Parking Right Now !!",
+  //     type: "success",
+  //   });
+  // };
+
   const getSections = async () => {
     const temp = [];
     const sections = await db
@@ -247,6 +309,13 @@ export default function Sections(props) {
     });
     return ids.includes(id);
   };
+
+  const flipSecurity = async (a) => {
+      const updateAssetSecurity = firebase.functions().httpsCallable("updateAssetSecurity");
+      const result = await updateAssetSecurity({
+        asset:a
+      });
+  }
 
   const handleAddFavorite = async (item) => {
     // console.log(item);
