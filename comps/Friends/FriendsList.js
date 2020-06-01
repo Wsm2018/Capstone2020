@@ -110,7 +110,7 @@ export default function FriendsList(props) {
         paddingLeft: "3%",
       }}
     >
-      <LottieView
+      {/* <LottieView
         source={require("../../assets/loading.json")}
         autoPlay
         loop
@@ -120,7 +120,7 @@ export default function FriendsList(props) {
           paddingTop: "13%",
           paddingLeft: "5%",
         }}
-      />
+      /> */}
       <Text style={{ fontSize: 28, color: "#20365F", position: "relative" }}>
         LOADING
       </Text>
@@ -159,11 +159,15 @@ export default function FriendsList(props) {
                   //     size={30}
                   //     color="#20365F"
                   //   />
-                    //  <AntDesign name="adduser" size={35} color="#20365F" />
+                  //  <AntDesign name="adduser" size={35} color="#20365F" />
                   // }
                   rightElement={
                     <TouchableOpacity onPress={() => removeFriend(item)}>
-                      <MaterialCommunityIcons name="delete-forever-outline" size={30} color="#1B2D4F" />
+                      <MaterialCommunityIcons
+                        name="delete-forever-outline"
+                        size={30}
+                        color="#1B2D4F"
+                      />
                       {/* <Feather name="x-circle" size={30} color="black" /> */}
                     </TouchableOpacity>
                   }
@@ -175,13 +179,17 @@ export default function FriendsList(props) {
                         })
                       }
                     >
-                      <FontAwesome5 name="rocketchat" size={24} color="#1B2D4F" />
+                      <FontAwesome5
+                        name="rocketchat"
+                        size={24}
+                        color="#1B2D4F"
+                      />
                       {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
                     </TouchableOpacity>
                     // <FontAwesome5 name="rocketchat" size={24} color="black" />
                   }
                   title={item.displayName}
-                  titleStyle={{ fontSize: 20 ,}}
+                  titleStyle={{ fontSize: 20 }}
                   subtitle={item.status}
                   //subtitle={item.status + " to add you"}
                   subtitleStyle={{ fontSize: 12, color: "grey" }}

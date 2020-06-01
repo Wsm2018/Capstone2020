@@ -280,7 +280,7 @@ export default function Authentication(props) {
       const provider = providerParts[0];
       return providers.includes(provider);
     } else {
-      alert("Not a valid email");
+      // alert("Not a valid email");
     }
   };
 
@@ -329,7 +329,10 @@ export default function Authentication(props) {
         setRegisterView(1);
       }
     } else {
-      alert("Enter a real email address");
+      // alert("Enter a real email address");
+      setRegisterEmailError("red");
+      // setRegisterPasswordError("red");
+      // setConfirmRegisterPasswordError("red");
     }
   };
 
