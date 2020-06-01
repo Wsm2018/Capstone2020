@@ -111,7 +111,7 @@ export default function FriendsList(props) {
         unsubscribe();
         clearInterval(timerId);
       } else {
-        console.log("scrnlistener running");
+        // console.log("scrnlistener running");
       }
     }, 1000);
   };
@@ -193,7 +193,6 @@ export default function FriendsList(props) {
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
-                      
                       }
                 }
                 key={chat.id}
@@ -203,11 +202,10 @@ export default function FriendsList(props) {
                     chat.from
                       ? {
                           textAlign: "left",
-                          paddingLeft:'4%',
+                          paddingLeft: "4%",
                           paddingRight: "4%",
                           fontSize: 20,
                           color: "white",
-
                         }
                       : {
                           textAlign: "left",
@@ -215,7 +213,6 @@ export default function FriendsList(props) {
                           paddingRight: "4%",
                           fontSize: 20,
                           color: "#20365F",
-                       
                         }
                   }
                   key={chat.id}
@@ -233,22 +230,22 @@ export default function FriendsList(props) {
           alignContent: "center",
           alignItems: "center",
           marginBottom: 20,
-         // height: "8%",
-          minHeight:'12%',
+          // height: "8%",
+          minHeight: "12%",
           maxHeight: "8%",
           backgroundColor: "#20365F",
           justifyContent: "space-evenly",
           flex: 1,
           flexWrap: "wrap",
-          paddingTop:'1%'
+          paddingTop: "1%",
           //position:'relative'
         }}
       >
         <TextInput
           style={{
             borderWidth: 1,
-            minHeight:'50%',
-            maxHeight:'100%',
+            minHeight: "50%",
+            maxHeight: "100%",
             width: "80%",
             paddingLeft: "4%",
             backgroundColor: "white",
