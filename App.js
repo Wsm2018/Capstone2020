@@ -67,10 +67,20 @@ export default function App(props) {
     }
   };
 
+  const Test = () => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Test</Text>
+      </View>
+    );
+  };
+
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
+
       News: NewsStack,
+
       Profile: ProfileStack,
     },
     // {
@@ -145,9 +155,9 @@ export default function App(props) {
       Home: {
         screen: DashboardStackNavigator,
       },
-      Friends: {
-        screen: FriendsStk,
-      },
+      // Friends: {
+      //   screen: FriendsStk,
+      // },
     },
     {
       drawerBackgroundColor: "#F0F8FF",
@@ -197,22 +207,20 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
-      .collection("users")
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .get();
-    // .onSnapshot(async (userRef) => {
-    const getAdmin = firebase.functions().httpsCallable("getAdmin");
-    const response = await getAdmin({
-      email: firebase.auth().currentUser.email,
-    });
+      .onSnapshot(async (userRef) => {
+        const getAdmin = firebase.functions().httpsCallable("getAdmin");
+        const response = await getAdmin({
+          email: firebase.auth().currentUser.email,
+        });
 
-    const admin = response.data.result !== undefined ? true : false;
+        const admin = response.data.result !== undefined ? true : false;
 
-    const user = { ...userRef.data(), admin };
-    console.log("userROLE", user.role.slice(-12));
-    setUser(user);
-    // });
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
   }
 
   async function getFirstLaunch() {

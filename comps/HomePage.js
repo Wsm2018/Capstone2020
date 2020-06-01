@@ -27,6 +27,7 @@ export default function HomePage(props) {
         <Text>Checkout</Text>
         
       </TouchableOpacity>
+      
     </View>
   );
 }

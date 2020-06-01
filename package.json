@@ -42,6 +42,7 @@
     "react-native-elements": "^2.0.0",
     "react-native-foldview": "^1.2.1",
     "react-native-gesture-handler": "~1.6.0",
+    "react-native-navybits-date-time-picker": "^1.2.3",
     "react-native-gradient-buttons": "^2.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-keyboard-aware-view": "^0.0.14",

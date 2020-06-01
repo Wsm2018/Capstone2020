@@ -11,13 +11,16 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Picker,
   ImageBackground,
   Dimensions,
 } from "react-native";
-import { Surface } from "react-native-paper";
+
 import DatePicker from "react-native-datepicker";
-import { Divider } from "react-native-elements";
-import { Dividerm, Badge } from "react-native-elements";
+import moment from "moment";
+// import { Divider } from "react-native-elements";
+import { Surface } from "react-native-paper";
+import { Divider, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -37,6 +40,8 @@ export default function Sections(props) {
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [tempstartDate, settempStartDate] = useState("");
+  const [tempendDate, settempEndDate] = useState("");
   // const tName = props.navigation.getParam("tName", "failed");
   // const sName = props.navigation.getParam("section", "failed").name;
   // const startDateTime = props.navigation.getParam("startDate", "failed");
@@ -226,6 +231,21 @@ export default function Sections(props) {
   }, [type]);
 
   useEffect(() => {
+    if (tempstartDate) {
+      var dateTime = tempstartDate.split(" ");
+      var update =
+        dateTime[0] +
+        " " +
+        dateTime[1] +
+        " " +
+        dateTime[2].split(":")[0] +
+        ":00 " +
+        dateTime[3];
+      setStartDate(update);
+    }
+  }, [tempstartDate]);
+
+  useEffect(() => {
     if (finalAssets.length > 0) {
       setListView(true);
     }
@@ -287,7 +307,7 @@ export default function Sections(props) {
     });
     // console.log(response);
     if (response.data !== "Exists") {
-      // alert("Asset Added");
+      alert("Asset Added");
       // getUserFavoriteAssets();
     } else {
       handleDeleteFavorite(item.id);
