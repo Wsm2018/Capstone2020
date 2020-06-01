@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TextInput,
+  Button,
   TouchableOpacity,
   Dimensions,
   Modal,
@@ -11,10 +12,11 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  AsyncStorage,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
-import db from "../db";
+import db, { config } from "../db";
 import LottieView from "lottie-react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign, Ionicons } from "react-native-vector-icons";
@@ -22,20 +24,21 @@ import { Input, Tooltip } from "react-native-elements";
 import { ButtonGroup, Image } from "react-native-elements";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { Octicons } from "@expo/vector-icons";
-const config = {
-  apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
-  authDomain: "capstone2020-b64fd.firebaseapp.com",
-  databaseURL: "https://capstone2020-b64fd.firebaseio.com",
-  projectId: "capstone2020-b64fd",
-  storageBucket: "capstone2020-b64fd.appspot.com",
-  messagingSenderId: "930744827368",
-  appId: "1:930744827368:web:6f2a6287721546d272785d",
-};
-try {
-  firebase.initializeApp(config);
-} catch (err) {
-  console.log(err);
-}
+const validator = require("email-validator");
+// const config = {
+//   apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
+//   authDomain: "capstone2020-b64fd.firebaseapp.com",
+//   databaseURL: "https://capstone2020-b64fd.firebaseio.com",
+//   projectId: "capstone2020-b64fd",
+//   storageBucket: "capstone2020-b64fd.appspot.com",
+//   messagingSenderId: "930744827368",
+//   appId: "1:930744827368:web:6f2a6287721546d272785d",
+// };
+// try {
+//   firebase.initializeApp(config);
+// } catch (err) {
+//   console.log(err);
+// }
 
 export default function Authentication(props) {
   const [view, setView] = useState(0);
@@ -47,7 +50,10 @@ export default function Authentication(props) {
 
   //***** Access Code  */
   const [AccessCode, setAccessCode] = useState("");
+  const [AccessEmail, setAccessEmail] = useState("email@email.com");
   const [AccessAmount, setAccessAmount] = useState("QR");
+  const [accessDisplayName, setAccessDisplayName] = useState("");
+  const [accessRef, setAccessRef] = useState();
   // ***** Register useState *****
 
   const [registerEmail, setRegisterEmail] = useState("");
@@ -58,6 +64,7 @@ export default function Authentication(props) {
   const [referral, setReferral] = useState("");
   // the referralStatus will show if a referral code is used
   const [referralStatus, setReferralStatus] = useState("false");
+  const [allUsers, setAllUsers] = useState([]);
 
   // ***** Login useState *****
 
@@ -107,6 +114,20 @@ export default function Authentication(props) {
   const [phoneErr2, setPhoneErr2] = useState("transparent");
   const [phoneAccess, setPhoneAccess] = useState("");
 
+  const getAllUsers = () => {
+    db.collection("users").onSnapshot((querySnapshot) => {
+      let users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      setAllUsers([...users]);
+    });
+  };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
     if (phone !== "") {
@@ -141,6 +162,8 @@ export default function Authentication(props) {
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
+    // trying creating user and if there is any error it will alert it for example:
+    // email is not corrent or password is not strong
   };
 
   // checkReferral will check if the referral exists and the code is available
@@ -204,7 +227,7 @@ export default function Authentication(props) {
               firebase.auth().currentUser.uid
             }&phoneNumber=${phone}&displayName=${displayName}&referralStatus=${referralStatus}&referral=${referral}`
           );
-
+          await AsyncStorage.setItem(firebase.auth().currentUser.uid, true);
           //sending the user a verification email
           await firebase
             .auth()
@@ -252,41 +275,120 @@ export default function Authentication(props) {
       });
   };
 
+  const emailValidity = () => {
+    if (validator.validate(registerEmail)) {
+      const emailParts = registerEmail.split("@");
+      const providers = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"];
+      const providerParts = emailParts[1].split(".");
+      const provider = providerParts[0];
+      return providers.includes(provider);
+    } else {
+      alert("Not a valid email");
+    }
+  };
+
+  const passwordStrength = () => {
+    const strongRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+    );
+    console.log("pass", strongRegex.test(registerPassword));
+    return strongRegex.test(registerPassword);
+  };
+
   const registerNext = async () => {
-    let count = 0;
-    if (!registerEmail.includes("@")) {
-      setRegisterEmailError("red");
-    } else {
-      setRegisterEmailError("transparent");
-      count = count + 1;
-    }
+    const result = true;
+    allUsers.map((item) => {
+      if (item.email === registerEmail) {
+        alert("Email already exists");
+        result = false;
+      }
+    });
 
-    if (registerPassword.length < 6) {
-      setRegisterPasswordError("red");
-    } else {
-      setRegisterPasswordError("transparent");
-      count = count + 1;
-    }
+    if (emailValidity()) {
+      let count = 0;
 
-    if (registerPassword !== confirmRegisterPassword) {
-      setConfirmRegisterPasswordError("red");
-    } else {
-      setConfirmRegisterPasswordError("transparent");
-      count = count + 1;
-    }
+      if (!registerEmail.includes("@")) {
+        setRegisterEmailError("red");
+      } else {
+        setRegisterEmailError("transparent");
+        count = count + 1;
+      }
 
-    if (count === 3) {
-      setRegisterView(1);
+      if (!passwordStrength()) {
+        setRegisterPasswordError("red");
+      } else {
+        setRegisterPasswordError("transparent");
+        count = count + 1;
+      }
+
+      if (registerPassword !== confirmRegisterPassword) {
+        setConfirmRegisterPasswordError("red");
+      } else {
+        setConfirmRegisterPasswordError("transparent");
+        count = count + 1;
+      }
+
+      if (count === 3 && result) {
+        setRegisterView(1);
+      }
+    } else {
+      alert("Enter a real email address");
     }
   };
 
   const handleAccessCode = async () => {
-    if (AccessCode === "") {
+    if (AccessCode.length !== 8) {
       setAccessCodeError("red");
     } else {
-      setAccessCodeError("transparent");
-      setAccessValid(true);
+      const result = await db
+        .collectionGroup("gifts")
+        .where("expiryDate", ">", new Date())
+        .where("code", "==", AccessCode)
+        .where("status", "==", false)
+        .get();
+      if (result.size === 1) {
+        result.forEach((doc) => {
+          setAccessRef(doc.ref);
+          setAccessEmail(doc.data().email);
+          setAccessAmount("QR " + doc.data().giftBalance);
+          setAccessCodeError("transparent");
+          setAccessValid(true);
+        });
+      } else {
+        setAccessCodeError("red");
+      }
     }
+  };
+
+  const handleAccessCodeData = async () => {
+    if (accessDisplayName === "") {
+      return setDisplayErr2("red");
+    } else {
+      const result = allUsers.filter((item) => {
+        return item.displayName == accessDisplayName;
+      });
+      if (result.length > 0) {
+        return setDisplayErr2("red");
+      } else {
+        setDisplayErr2("transparent");
+      }
+    }
+    if (phoneAccess.length !== 8) {
+      return setPhoneErr2("red");
+    } else {
+      setPhoneErr2("transparent");
+    }
+    accessRef.update({ status: true });
+
+    await firebase.auth().signInAnonymously();
+
+    const response = await fetch(
+      `https://us-central1-capstone2020-b64fd.cloudfunctions.net/initUser?uid=${
+        firebase.auth().currentUser.uid
+      }&phoneNumber=${phoneAccess}&displayName=${accessDisplayName}&referralStatus=${"false"}&role=${"guest"}&path=${
+        accessRef.path
+      }`
+    );
   };
 
   const handleSetRegisterView = () => {
@@ -387,7 +489,7 @@ export default function Authentication(props) {
                         placeholder="Password"
                         secureTextEntry={true}
                         value={registerPassword}
-                        errorMessage="* Password must be atleast 6 characters"
+                        errorMessage="* Enter a strong password"
                         errorStyle={{ color: registerPasswordError }}
                         inputStyle={{
                           color: "#20365F",
@@ -396,7 +498,7 @@ export default function Authentication(props) {
                         placeholderTextColor="#20365F"
                         renderErrorMessage
                       />
-                      <Tooltip popover={<Text>Info here</Text>}>
+                      {/* <Tooltip popover={<Text>Info here</Text>}>
                         <TouchableOpacity
                           style={{
                             backgroundColor: "white",
@@ -418,7 +520,7 @@ export default function Authentication(props) {
                             color="#20365F"
                           />
                         </TouchableOpacity>
-                      </Tooltip>
+                      </Tooltip> */}
                     </View>
                     <Input
                       inputStyle={{
@@ -826,8 +928,7 @@ export default function Authentication(props) {
                           />
                         }
                         containerStyle={styles.AccessInputs}
-                        onChangeText={setLoginEmail}
-                        value={"email@email.com"}
+                        value={AccessEmail}
                         inputStyle={{
                           color: "#20365F",
                           fontSize: 16,
@@ -877,13 +978,16 @@ export default function Authentication(props) {
                         />
                       }
                       containerStyle={styles.Inputs}
-                      onChangeText={setDisplayName}
+                      onChangeText={setAccessDisplayName}
                       placeholder="Display Name"
-                      value={displayName}
+                      value={accessDisplayName}
                       inputStyle={{
                         fontSize: 16,
                       }}
                       placeholderTextColor="#20365F"
+                      errorMessage="* Invalid Display Name"
+                      errorStyle={{ color: displayErr2 }}
+                      renderErrorMessage
                     />
                     <View
                       style={{
@@ -920,7 +1024,7 @@ export default function Authentication(props) {
                         keyboardType="number-pad"
                         placeholder="+974"
                         errorMessage="* Invalid Phone No."
-                        errorStyle={{ color: phoneError }}
+                        errorStyle={{ color: phoneErr2 }}
                         renderErrorMessage
                         disabled={true}
                       />
@@ -956,7 +1060,7 @@ export default function Authentication(props) {
                         placeholder="Phone No."
                         value={phoneAccess}
                         errorMessage="* Invalid Phone No."
-                        errorStyle={{ color: phoneError }}
+                        errorStyle={{ color: phoneErr2 }}
                         renderErrorMessage
                       />
                     </View>
@@ -964,7 +1068,7 @@ export default function Authentication(props) {
                     <View style={{ marginTop: "7%" }}>
                       <TouchableOpacity
                         style={styles.loginButton}
-                        onPress={() => setAccessValid(false)}
+                        onPress={handleAccessCodeData}
                       >
                         <Text style={{ color: "white" }}>Next</Text>
                       </TouchableOpacity>

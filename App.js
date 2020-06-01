@@ -1,23 +1,38 @@
 //@refresh reset
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Image,
+  AsyncStorage,
+} from "react-native";
 import Authentication from "./mainpages/Authentication";
 import Assets from "./comps/Assets/Assets";
 
 console.disableYellowBox = true;
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
+import { encode, decode } from "base-64";
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+if (!global.atob) {
+  global.atob = decode;
+}
 
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import HomeStack from "./navigation/HomeStack";
-<<<<<<< HEAD
-=======
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
-import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 
 export default function App(props) {
@@ -31,32 +46,40 @@ export default function App(props) {
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
-      News: NewsStack,
       Profile: ProfileStack,
     },
-    // {
-    //   navigationOptions: ({ navigation }) => {
-    //     const { routeName } = navigation.state.routes[navigation.state.index];
-    //     return {
-    //       headerShown: true,
-    //       headerTitle: routeName,
-    //     };
-    //   },
-    // },
     {
-      tabBarOptions: {
-        activeTintColor: "white",
-        inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+      navigationOptions: ({ navigation }) => {
+        const { routeName } = navigation.state.routes[navigation.state.index];
+        return {
+          headerShown: true,
+          headerTitle: routeName,
+        };
       },
     }
   );
->>>>>>> master
 
 
+  const FriendsStk = createStackNavigator(
+    { Friends: FriendsStack },
+    {
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   return {
+      //     headerLeft: (
+      //       <Icon
+      //         style={{ paddingLeft: 10 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      // },
+      headerMode: null,
+    }
+  );
 
-<<<<<<< HEAD
-=======
   const AppDrawerNavigator = createDrawerNavigator(
     {
       Home: {
@@ -83,10 +106,12 @@ export default function App(props) {
           >
             <SafeAreaView style={{ marginTop: "19%" }}>
               <View style={{ flexDirection: "row" }}>
-                <Image
-                  source={require("./assets/qrcodetest.png")}
-                  style={{ width: 50, height: 50 }}
-                />
+                {user && (
+                  <Image
+                    source={{ uri: user.qrCode }}
+                    style={{ width: 150, height: 150 }}
+                  />
+                )}
                 <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
               </View>
             </SafeAreaView>
@@ -94,9 +119,6 @@ export default function App(props) {
           <View>
             <Text>{user && user.email}</Text>
             <Text>{user && user.phone}</Text>
-            {/* since its 0, added the titles to know which is which */}
-            <Text>reputation: {user && user.reputation}</Text>
-            <Text>points: {user && user.points}</Text>
           </View>
 
           <ScrollView>
@@ -111,44 +133,97 @@ export default function App(props) {
       ),
     }
   );
->>>>>>> master
 
 const TabNavigator = createBottomTabNavigator({
   Home: HomeStack,
 });
 
-const AppContainer = createAppContainer(TabNavigator);
+          email: firebase.auth().currentUser.email,
+        });
 
-export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+        const admin = response.data.result !== undefined ? true : false;
+
+        const user = { ...userRef.data(), admin };
+        console.log("userROLE", user.role.slice(-12));
+        setUser(user);
+      });
+  }
+
+  const getFirstLaunch = async () => {
+    try {
+      const value = await AsyncStorage.getItem("alreadyLaunched");
+      console.log("valueeeeeeeeeeeee", value);
+      if (!value) {
+        await AsyncStorage.setItem("alreadyLaunched", "true");
+        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(true);
+      } else {
+        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+        setFirstLaunch(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getFirstLaunch();
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn) {
+      getUser();
+    }
+  }, [loggedIn]);
+
+  useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  if (!loggedIn) {
+  const adminTabNav = createBottomTabNavigator({
+    Profile: ProfileStack,
+  });
+  const AdminAppContainer = createAppContainer(adminTabNav);
+
+  const guideSkip = () => {
+    console.log("Skipppped");
+    setGuideView(false);
+  };
+
+  if (loggedIn !== false) {
+    if (!loggedIn) {
+      return (
+        <View style={styles.container}>
+          <Authentication />
+        </View>
+      );
+    } else {
+      return (
+        user !== null &&
+        (user.admin ? (
+          <AdminAppContainer />
+        ) : user.role.slice(-12) === "(incomplete)" ? (
+          <EmployeeAuthentication />
+        ) : user.role === "manager" ? (
+          <ManagersStack />
+        ) : user.role === "user handler" ? (
+          <UserHandlerStack />
+        ) : firstLaunch && guideView ? (
+          <Guide guideSkip={guideSkip} />
+        ) : (
+          <AppContainer />
+        ))
+      );
+    }
+  } else {
     return (
-      <View style={styles.container}>
-        
-        <Authentication />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
       </View>
     );
-  } else {
-    return <Assets />;
   }
-
-  // return (
-  //   // <View style={styles.container}>
-  //   //   {!loggedIn ? (
-
-  //   //   ) : (
-  //   //     // <View style={styles.container}>
-  //   //       <AppContainer />
-  //   //       {/* <HomePage /> */}
-  //   //     // </View>
-  //   //   )}
-  //   // </View>
-  // );
 }
 
 const styles = StyleSheet.create({
