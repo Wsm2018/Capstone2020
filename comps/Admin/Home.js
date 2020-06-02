@@ -18,31 +18,83 @@ export default function Home(props) {
 
   return (
     <View style={styles.container}>
-      <Text>Admin Home</Text>
+      <View
+        style={{
+          flex: 0.5,
+          alignItems: "center",
+        }}
+      >
+        <Text>Admin Home</Text>
+      </View>
+      <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity onPress={() => props.navigation.navigate("Users")}>
+          <Text>Users List</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("Users")}>
-        <Text>Users List</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("Statistics")}
+        >
+          <Text>Statistics</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("Statistics")}>
-        <Text>Statistics</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("Promotion")}
+        >
+          <Text>Promotion Code</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => handleLogout()}>
-        <Text>Logout</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleLogout()}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("MakeAdmin")}>
-        <Text>Make Admin</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("MakeAdmin")}
+        >
+          <Text>Make Admin</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
-        <Text>Booking</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
+          <Text>Booking</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity onPress={() => handleChangeRole()}>
-        <Text>Change Role</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity onPress={() => handleChangeRole()}>
+          <Text>Change Role</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -50,8 +102,10 @@ export default function Home(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // flexDirection: "row",
+    // flexWrap: "wrap",
     backgroundColor: "#fff",
-    alignItems: "center",
+    // alignItems: "center",
     justifyContent: "space-evenly",
   },
 });
