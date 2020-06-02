@@ -12,7 +12,8 @@ import {
     Text,
     TouchableOpacity,
     View,
-    Modal
+    Modal,
+    CheckBox
 } from "react-native";
 
 
@@ -53,6 +54,8 @@ export default function AssetManagement(props) {
     const [uri, setUri] = useState("");
     const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
     const [photoURL, setPhotoURL] = useState("");
+    const [showInMap, setShowInMap] = useState(false);
+    const [update , setUpdate] = useState(false)
 
     const icons = [
         "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
@@ -66,7 +69,11 @@ export default function AssetManagement(props) {
         "forklift", "garage-open", "gift", "golf", "hammer", "home", "home-group", "lamp", "lock", "map-marker", "medal", "pac-man", "palette-outline",
         "parking", "phone", "percent", "piano", "pill", "pipe-leak", "printer", "radio", "roller-skate", "room-service-outline", "scissors-cutting",
         "settings-outline", "shower", "shower-head", "smoking", "smoking-off", "star", "stocking", "toilet", "tooth", "tower-fire", "trash-can", "water",
-        "xbox-controller", "account", "car-key", "doctor",
+        "xbox-controller", "account", "car-key", "doctor","human-female","human","image-filter-drama","mailbox","map-outline","motorbike","needle",
+        "numeric-1","numeric-2","numeric-3","numeric-4","numeric-5","numeric-6",
+        "numeric-7","numeric-8","numeric-9","package-variant-closed","phone-classic","pier-crane",
+        "pier","power-plug","pulse","puzzle","radiobox-blank","react",
+        "screw-flat-top","script-text","local-gas-station"
     ]
 
     const askPermission = async () => {
@@ -194,6 +201,7 @@ export default function AssetManagement(props) {
 
         if (selectedAsset) {
             setSelectedAsset()
+            setUpdate(!update)
         }
         else if (selectedSection) {
             setSelectedSection()
@@ -209,6 +217,7 @@ export default function AssetManagement(props) {
         setShowAddAsset(false)
         setShowEditAsset(false)
         setShowEditType(false)
+        setShowInMap(false)
         setName()
         setPrice()
         setLocation()
@@ -234,8 +243,8 @@ export default function AssetManagement(props) {
                                 setShowAddType(false) ||
                                 setName(t.name) ||
                                 setAssetIcon(t.assetIcon) ||
-                                setSectionIcon(t.sectionIcon)
-
+                                setSectionIcon(t.sectionIcon) ||
+                                setShowInMap(t.showInMap)
                             }><Text>{t.name}</Text></TouchableOpacity>
                         )
                     }
@@ -421,13 +430,19 @@ export default function AssetManagement(props) {
                                     placeholder="Name"
                                     value={name}
                                 />
+
+                                <Text>Show In Map</Text>
+                                <CheckBox
+                                    value={showInMap}
+                                    onValueChange={() => setShowInMap(!showInMap)}
+                                />
+
                                 <TouchableOpacity onPress={() => setOpenSectionIcon(true)}>
                                     <Text>Section Icon</Text>
                                     <MaterialCommunityIcons
                                         name={sectionIcon ? sectionIcon : "help"}
                                         size={30}
                                         color={"#20365F"}
-
                                     />
                                 </TouchableOpacity>
 
@@ -441,14 +456,12 @@ export default function AssetManagement(props) {
                                     />
                                 </TouchableOpacity>
                                 <View
-                                    style={{ width: "30%", marginLeft: "35%", marginBottom: "2%" }}
+                                    style={{ width: "30%" }}
                                 >
                                     <Button title="Pick Image" onPress={handlePickImage} />
                                 </View>
-                                <TouchableOpacity onPress={() => handleType({ name, sectionIcon, assetIcon })} disabled={!name}><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity>
-                                <TouchableOpacity onPress={() => setShowAddType(false) || setShowEditType(false) || setName()}><Text>Cancel</Text></TouchableOpacity>
-
-
+                                <TouchableOpacity onPress={() => handleType({ name, sectionIcon, assetIcon , showInMap })} disabled={!name || !sectionIcon  || !uri || !assetIcon}><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity>
+                                <TouchableOpacity onPress={() => setShowInMap(false) || setShowAddType(false) || setShowEditType(false) || setName()}><Text>Cancel</Text></TouchableOpacity>
                             </View>
                         </View>
                     </Modal>

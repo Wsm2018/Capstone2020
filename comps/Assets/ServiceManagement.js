@@ -6,11 +6,11 @@ import "firebase/auth";
 import "firebase/functions";
 import { ScrollView } from "react-native-gesture-handler";
 import Collapsible from 'react-native-collapsible';
-
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function ServiceManagement(props) {
-    //const assetType = props.navigation.getParam("assetType", '2pioF3LLXnx2Btr4OJPn');
-    const assetType = { id: '2pioF3LLXnx2Btr4OJPn' }
+    const assetType = props.navigation.getParam("assetType", '2pioF3LLXnx2Btr4OJPn');
+    //const assetType = { id: '2pioF3LLXnx2Btr4OJPn' }
     const [services, setServices] = useState([])
     const [selectedService, setSelectedService] = useState()
     const [showEdit, setShowEdit] = useState(false)
@@ -46,12 +46,36 @@ export default function ServiceManagement(props) {
         { use: false, show: "10:00 PM", time: "22:00:00" },
         { use: false, show: "11:00 PM", time: "23:00:00" },
     ])
-
+    const [showIcons , setShowIcons] = useState(false)
+    const [serviceIcon , setServiceIcon] = useState() 
     const [week, setWeek] = useState(["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
-
     const [serviceWorkHoursDays, setServiceWorkHoursDays] = useState([])
+    const [update , setUpdate] = useState(false)
+    const icons = [
+        "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
+        "alpha-m", "alpha-n", "alpha-o", "alpha-p", "alpha-q", "alpha-r", "alpha-s", "alpha-t", "alpha-u", "alpha-v", "alpha-w", "alpha-x",
+        "alpha-y", "alpha-z", "car",
+        "airballoon", "air-conditioner", "air-horn", "airplane-takeoff", "airport", "alarm", "airplane", "album", "alien",
+        "ambulance", "apple", "archive", "artist", "assistant", "audiobook", "audio-video", "atom", "baby-buggy", "bag-personal", "bank", "barley",
+        "barn", "barrel", "battery", "basketball-hoop", "basketball", "beaker-outline", "bed-empty", "bell", "battery-charging", "beach", "beer",
+        "billiards", "billiards-rack", "bowling", "boombox", "bowl", "bottle-wine", "broom", "bus", "cake", "car-wash", "car-estate", "cart",
+        "cctv", "chef-hat", "creation", "crown", "cup", "diamond-stone", "dog-service", "doctor", "dump-truck", "flower-tulip", "food-fork-drink",
+        "forklift", "garage-open", "gift", "golf", "hammer", "home", "home-group", "lamp", "lock", "map-marker", "medal", "pac-man", "palette-outline",
+        "parking", "phone", "percent", "piano", "pill", "pipe-leak", "printer", "radio", "roller-skate", "room-service-outline", "scissors-cutting",
+        "settings-outline", "shower", "shower-head", "smoking", "smoking-off", "star", "stocking", "toilet", "tooth", "tower-fire", "trash-can", "water",
+        "xbox-controller", "account", "car-key", "doctor","human-female","human","image-filter-drama","mailbox","map-outline","motorbike","needle",
+        "numeric-1","numeric-2","numeric-3","numeric-4","numeric-5","numeric-6",
+        "numeric-7","numeric-8","numeric-9","package-variant-closed","phone-classic","pier-crane",
+        "pier","power-plug","pulse","puzzle","radiobox-blank","react",
+        "screw-flat-top","script-text","local-gas-station"
+    ]
 
     useEffect(() => {
+        getServices()
+        
+    }, [])
+
+    const getServices =()=>{
         db.collection("services").onSnapshot((snapshot) => {
             const temp = []
             snapshot.forEach(doc => {
@@ -61,11 +85,12 @@ export default function ServiceManagement(props) {
             });
             setServices(temp)
         })
-    }, [])
+    }
 
     useEffect(() => {
 
         if (services.length > 0) {
+            setServiceWorkHoursDays([])
             var temp = services
             for (let i = 0; i < services.length; i++) {
                 db.collection('services').doc(services[i].id).collection("workingDays").onSnapshot((snapshot) => {
@@ -77,6 +102,7 @@ export default function ServiceManagement(props) {
                 });
             }
         }
+       
 
     }, [services])
 
@@ -93,9 +119,7 @@ export default function ServiceManagement(props) {
         setServiceWorkHoursDays(temp)
     }
 
-    useEffect(() => {
-        //console.log(" finaal ", serviceWorkHoursDays)
-    }, [serviceWorkHoursDays])
+ 
 
 
     const handleDB = async () => {
@@ -106,6 +130,7 @@ export default function ServiceManagement(props) {
                 price,
                 maxBookings,
                 rating: 0,
+                serviceIcon,
                 assetType: assetType.id
             }).then(docRef =>
                 sId = docRef.id
@@ -113,21 +138,31 @@ export default function ServiceManagement(props) {
             for (let i = 0; i < weekDays.length; i++) {
                 db.collection("services").doc(sId).collection("weekDays").doc(weekDays.day).set(hours)
             }
-
+            
             setShowAdd(false)
         }
         else if (showEdit) {
-            db.collection("services").doc(selectedService.id).update({
+           
+                if( !serviceIcon){
+                    setServiceIcon("help")
+                }
+            db.collection("services").doc(selectedService.service.id).update({
                 name,
                 price,
-                maxBookings
+                maxBookings,
+                serviceIcon
             })
+            var fix = await db.collection("services").doc(selectedService.service.id).get()
+            var temp = selectedService
+            temp.service = fix.data()
+            temp.service.id = selectedService.service.id
+            setSelectedService(temp)
             setShowEdit(false)
         }
         else {
-            Alert.alert("Delete " + selectedService.name + " ?",
+            Alert.alert("Delete " + selectedService.service.name + " ?",
                 "", [
-                { text: "Yes", onPress: () => db.collection("services").doc(selectedService.id).delete() && setSelectedService() },
+                { text: "Yes", onPress: () => db.collection("services").doc(selectedService.service.id).delete() && setSelectedService() },
                 { text: "No", onPress: () => console.log("NOO") }
 
             ],
@@ -136,6 +171,8 @@ export default function ServiceManagement(props) {
         setName()
         setPrice()
         setMaxBookings()
+        setServiceIcon()
+        setUpdate(!update)
 
     }
 
@@ -229,12 +266,15 @@ export default function ServiceManagement(props) {
                         <Button title={"Edit"}
                             onPress={() =>
                                 setShowEdit(true) ||
-                                setMaxBookings(selectedService.maxBookings) ||
-                                setPrice(selectedService.price) ||
-                                setName(selectedService.name)
+                                setMaxBookings(selectedService.service.maxBookings) ||
+                                setPrice(selectedService.service.price) ||
+                                setName(selectedService.service.name)||
+                                setServiceIcon(selectedService.service.serviceIcon)
+                                //console.log("ehhh", selectedService)
                             }
                         />
-                        {/* <Button title={"Delete"} onPress={() => handleDB()} /> */}
+                        <Button title={"Delete"} onPress={() => handleDB()} />
+                        <Button title={"Back"} onPress={() => setSelectedService()} />
 
                     </View>
                     :
@@ -257,6 +297,15 @@ export default function ServiceManagement(props) {
                         placeholder="Max Bookings Per Day"
                         value={maxBookings}
                     />
+                    <TouchableOpacity onPress={() => setShowIcons(true)}>
+                                    <Text>Asset Icon</Text>
+                                    <MaterialCommunityIcons
+                                        name={serviceIcon ? serviceIcon : "help"}
+                                        size={30}
+                                        color={"#20365F"}
+
+                                    />
+                                </TouchableOpacity>
 
                     <Text>Working Hours</Text>
 
@@ -363,6 +412,50 @@ export default function ServiceManagement(props) {
                             </View>
                         )
                     }
+
+        {/* {icons modal} */}
+        { showIcons ?
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        //visible={}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <ScrollView>
+                            <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <View style={{
+                                        width: "100%", flexDirection: "row",
+                                        flexWrap: "wrap"
+                                    }}>
+                                        {
+                                            icons.map((i, index) =>
+                                                <View
+                                                    style={{
+                                                        width: "20%",
+                                                        alignItems: "center",
+                                                        marginBottom: 15,
+                                                    }}
+                                                >
+                                                    <TouchableOpacity onPress={() => setServiceIcon(i) || setShowIcons(false)}>
+                                                        <MaterialCommunityIcons
+                                                            name={i}
+                                                            size={30}
+                                                            color={"#20365F"}
+                                                        />
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )}
+                                    </View>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </Modal>
+                    :
+                    null
+            }
 
                     {showAdd ?
                         <Button title={"Add"} onPress={() => handleDB()} />
