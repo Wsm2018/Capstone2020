@@ -75,12 +75,13 @@ export default function Sections(props) {
 
   const getList = () => {
     //console.log("section rn", selectedSection);
-    const temp = [];
+    
 
     db.collection("assets")
       .orderBy("code")
       .where("assetSection", "==", selectedSection.id)
       .onSnapshot((snapshot) => {
+        const temp = [];
         snapshot.forEach(async (doc) => {
           //console.log(section)
           let bookingTemp = [];
@@ -98,8 +99,11 @@ export default function Sections(props) {
             });
           }
           temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
+          // console.log("temp.length",temp.length)
+          // console.log("snapshot.docs.length",snapshot.docs.length)
           if (temp.length === snapshot.docs.length) {
             //console.log("assets", temp);
+            console.log("Oui Oui")
             setAssetList(temp);
           }
         });
@@ -226,11 +230,15 @@ export default function Sections(props) {
   let flag = false;
   
   const reduceViewer = async (a) => {
+    //console.log('unfocus', a)
+    //console.log("adios",assetList.filter(a => a.id === selectedList.id)[0]);
     const lessViewers = firebase.functions().httpsCallable("lessViewers");
     const result = await lessViewers({ 
       asset:a
     });
+    
   }
+
 
 
   // const subscribe = props.navigation.addListener("didFocus", () => {
@@ -241,8 +249,9 @@ export default function Sections(props) {
   const timeListener = () => {
     let timerId = setInterval(() => {
       if (!props.navigation.isFocused()) {
-        console.log("adios");
-        reduceViewer(selectedList);
+        console.log("timer stoooooooooooooooooooped")
+        //console.log("adiiiiiiiiiiios",assetList.filter(a => a.id === selectedList.id)[0]);
+        reduceViewer(assetList.filter(a => a.id === selectedList.id)[0]);
         clearInterval(timerId);
         flag = false;
       }
@@ -260,15 +269,17 @@ export default function Sections(props) {
     const result = await moreViewers({ 
       asset:a
      });
+     
   }
 
   const assetFocus = (a) =>{
     if (selectedList === a) {
       return
     }else{
+      console.log('focus', a)
       if(selectedList != ""){
         console.log(`asset ${selectedList.code} is unfocussed now`);
-        reduceViewer(selectedList);
+        reduceViewer(assetList.filter(a => a.id === selectedList.id)[0]);
       }
       console.log(`asset ${a.code} is focussed from details`);
       increaseViewer(a)
@@ -547,7 +558,9 @@ export default function Sections(props) {
           <Text style={styles.cardTitle}>List</Text>
           {listView === true ? (
             finalAssets.length > 0 ? (
+              
               finalAssets.map((l, i) => (
+                
                 <View
                   style={{
                     width: "20%",
@@ -555,6 +568,7 @@ export default function Sections(props) {
                     marginBottom: 15,
                   }}
                 >
+                  
                   <TouchableOpacity
                     // onPress={() =>
                     //   props.navigation.navigate("Details", {
