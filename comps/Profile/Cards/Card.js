@@ -5,13 +5,9 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  Dimensions,
+  Image,
   Alert,
 } from "react-native";
-import Image from "react-native-scalable-image";
-
-const { width, height } = Dimensions.get("screen");
-
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
@@ -58,10 +54,9 @@ export default function Card(props) {
   };
 
   return (
-    <View style={styles.container}>
-      {/* // <View style={styles.container}>
-    //   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}> */}
-      {/* <Cards
+    // <View style={styles.container}>
+    //   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    //     {/* <Cards
     //       elevation={2}
     //       style={{
     //         width: "100%",
@@ -76,85 +71,66 @@ export default function Card(props) {
     //         <Text>X</Text>
     //       </TouchableOpacity>
     //     </Cards> */}
-      <Cards
-        // height={Dimensions.get("window").height / 4}
-        width={Dimensions.get("window").width / 1.3}
-        containerStyle={styles.card}
+
+    <Cards containerStyle={styles.card}>
+      <View
+        style={{
+          marginBottom: 10,
+          flexDirection: "row-reverse",
+          justifyContent: "space-between",
+        }}
       >
-        <View
-          style={{
-            marginBottom: 10,
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-          }}
-        >
-          {cardInfo && cardInfo.cardType === "visa" ? (
-            <Image
-              source={images[0]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "master-card" ? (
-            <Image
-              source={images[1]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "amex" ? (
-            <Image
-              source={images[2]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "discover" ? (
-            <Image
-              source={images[3]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "diners" ? (
-            <Image
-              source={images[4]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : (
-            cardInfo &&
-            cardInfo.cardType === "jcb"(<Image source={images[5]} />)
-          )}
+        {cardInfo.cardType === "visa" ? (
+          <Image source={images[0]} />
+        ) : cardInfo.cardType === "master-card" ? (
+          <Image source={images[1]} />
+        ) : cardInfo.cardType === "amex" ? (
+          <Image source={images[2]} />
+        ) : cardInfo.cardType === "discover" ? (
+          <Image source={images[3]} />
+        ) : cardInfo.cardType === "diners" ? (
+          <Image source={images[4]} />
+        ) : (
+          cardInfo.cardType === "jcb"(<Image source={images[5]} />)
+        )}
 
-          <TouchableOpacity onPress={() => handleDeleteAlert()}>
-            {/* <Text style={styles.notes}>X</Text> */}
-            <Octicons name="trashcan" size={20} color="#ede9eb" />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            // flexDirection: "row",
-            justifyContent: "space-between",
-            // alignItems: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <Image
-            width={Dimensions.get("window").width / 9}
-            // style={{ marginTop: 5 }}
-            source={require("../../../assets/images/chip.png")}
-          />
-          <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
-        </View>
+        <TouchableOpacity onPress={() => handleDeleteAlert()}>
+          {/* <Text style={styles.notes}>X</Text> */}
+          <Octicons name="trashcan" size={27} color="#ede9eb" />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          // flexDirection: "row",
+          justifyContent: "space-between",
+          // alignItems: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        <Image
+          style={{ width: 50, height: 50, marginTop: 10 }}
+          source={require("../../../assets/images/chip.png")}
+        />
+        <Text style={styles.time}>{cardInfo.cardNumber}</Text>
+      </View>
 
-        <Divider style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }} />
+      <Divider style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }} />
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={styles.notes}>{cardInfo && cardInfo.holderName}</Text>
-          <Text style={styles.notes}>{cardInfo && cardInfo.expiryDate}</Text>
-        </View>
-      </Cards>
-    </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={styles.notes}>{cardInfo.holderName}</Text>
+        <Text style={styles.notes}>{cardInfo.expiryDate}</Text>
+      </View>
+    </Cards>
+    //   </View>
+    // </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
+    // backgroundColor: "yellow",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
   card: {
     // backgroundColor: "rgb(221,216,216)",
@@ -164,13 +140,13 @@ const styles = StyleSheet.create({
   },
 
   time: {
-    // marginTop: 5,
-    fontSize: 25,
+    marginTop: 5,
+    fontSize: 30,
     color: "white",
   },
   notes: {
     // alignItems: "flex-end",
-    fontSize: 16,
+    fontSize: 18,
     color: "white",
     textTransform: "capitalize",
   },

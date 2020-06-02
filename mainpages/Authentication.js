@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TextInput,
-  Button,
   TouchableOpacity,
   Dimensions,
   Modal,
@@ -162,8 +161,6 @@ export default function Authentication(props) {
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
-    // trying creating user and if there is any error it will alert it for example:
-    // email is not corrent or password is not strong
   };
 
   // checkReferral will check if the referral exists and the code is available
@@ -283,7 +280,7 @@ export default function Authentication(props) {
       const provider = providerParts[0];
       return providers.includes(provider);
     } else {
-      // alert("Not a valid email");
+      alert("Not a valid email");
     }
   };
 
@@ -332,10 +329,7 @@ export default function Authentication(props) {
         setRegisterView(1);
       }
     } else {
-      // alert("Enter a real email address");
-      setRegisterEmailError("red");
-      // setRegisterPasswordError("red");
-      // setConfirmRegisterPasswordError("red");
+      alert("Enter a real email address");
     }
   };
 
@@ -399,120 +393,530 @@ export default function Authentication(props) {
     setRegistered(false);
   };
 
-  ///////////////////////////////Font-End////////////////////////////////
-
-  useEffect(() => {
-    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
-    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
-
-    // cleanup function
-    return () => {
-      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
-      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
-    };
-  }, []);
-
-  const _keyboardDidShow = () => {
-    // console.log("keyyyyyyyyyyyyyyyShow");
-
-    setMargin(-200);
-  };
-
-  const _keyboardDidHide = () => {
-    // console.log("keyyyyyyyyyyyyyyyHide");
-    setMargin(0);
-  };
-
-  const [marginVal, setMargin] = useState(0);
-  /////////////////////////////////////////////////////////////////////////////////////
-
   return (
-    <KeyboardAvoidingView
-      // behavior="position"
-      // behavior="height"
-      // behavior="padding"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      // contentContainerStyle={{ flex: 1 }}
-      style={{
-        width: "100%",
-        flex: 1,
-        backgroundColor: "#20365F",
-        height: "100%",
-      }}
-      // keyboardVerticalOffset={-100}
-    >
-      <View
-        style={[
-          styles.container,
-          { marginTop: Platform.isPad ? 0 : marginVal },
-        ]}
-      >
-        {/* {marginVal === 0 && ( */}
-        <View style={styles.header}>
-          <LottieView
-            source={require("../assets/login1.json")}
-            autoPlay
-            loop
-            style={{
-              position: "relative",
-              // width: "60%",
-              flex: 1,
-              alignSelf: "center",
-              // backgroundColor: "red",
-            }}
-          />
-        </View>
-        {/* )} */}
-        <View style={styles.buttonGroup}>
-          <ButtonGroup
-            onPress={() => (view === 1 ? setView(0) : setView(1))}
-            selectedIndex={view}
-            selectedTextStyle={{ color: "#20365F" }}
-            textStyle={{ color: "white", fontSize: 21 }}
-            buttons={buttons}
-            containerStyle={{
-              backgroundColor: "#20365F",
-              borderTopRightRadius: 30,
-              borderTopLeftRadius: 30,
-              borderWidth: 0,
-              borderColor: "white",
-              marginTop: 50,
-              width: "87%",
-            }}
-            selectMultiple={false}
-            selectedButtonStyle={{
-              backgroundColor: "white",
-            }}
-            innerBorderStyle={{
-              color: "transparent",
-            }}
-          />
-        </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <LottieView
+          source={require("../assets/login.json")}
+          autoPlay
+          loop
+          style={{ position: "relative", width: "55%", paddingTop: "5%" }}
+        />
+      </View>
+      <View style={styles.buttonGroup}>
+        <ButtonGroup
+          onPress={() => (view === 1 ? setView(0) : setView(1))}
+          selectedIndex={view}
+          selectedTextStyle={{ color: "#20365F" }}
+          textStyle={{ color: "white", fontSize: 21 }}
+          buttons={buttons}
+          containerStyle={{
+            backgroundColor: "#20365F",
+            borderTopRightRadius: 30,
+            borderTopLeftRadius: 30,
+            borderWidth: 0,
+            borderColor: "white",
+            marginTop: 50,
+            width: "87%",
+          }}
+          selectMultiple={false}
+          selectedButtonStyle={{
+            backgroundColor: "white",
+          }}
+          innerBorderStyle={{
+            color: "transparent",
+          }}
+        />
+      </View>
 
-        {view === 1 ? (
-          <View style={styles.containerRegister}>
+      {view === 1 ? (
+        <View style={styles.containerRegister}>
+          <View style={styles.form}>
+            <FirebaseRecaptchaVerifierModal
+              ref={recaptchaVerifier}
+              firebaseConfig={config}
+            />
+            <View style={{ flex: 6, width: "100%" }}>
+              {!registered ? (
+                registerView === 0 ? (
+                  <View>
+                    <Input
+                      inputContainerStyle={{
+                        borderBottomWidth: 0,
+                        // color: "white",
+                      }}
+                      leftIcon={
+                        <Icon name="email-outline" size={20} color="#20365F" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setRegisterEmail}
+                      placeholder="E-mail"
+                      value={registerEmail}
+                      placeholderTextColor="#20365F"
+                      inputStyle={{
+                        color: "#20365F",
+                        fontSize: 16,
+                      }}
+                      errorMessage="* Invalid E-mail"
+                      errorStyle={{ color: registerEmailError }}
+                      renderErrorMessage
+                    />
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        // width: "85%",
+
+                        // paddingLeft: "10%",
+                      }}
+                    >
+                      <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={<Icon name="key" size={20} color="#20365F" />}
+                        rightIcon={
+                          <Tooltip
+                            height={150}
+                            width={370}
+                            backgroundColor={"#20365F"}
+                            popover={
+                              <Text style={{ color: "white", fontSize: 18 }}>
+                                Your password must be between 8 and 30
+                                characters. Password must contain at least one
+                                uppercase, or capital, letter (ex: A, B, etc.)
+                                One number digit and at least one special
+                                character.
+                              </Text>
+                            }
+                            containerStyle={{
+                              justifyContent: "center",
+                              alignSelf: "center",
+                            }}
+                          >
+                            <AntDesign
+                              name="exclamationcircleo"
+                              size={22}
+                              color="#20365F"
+                            />
+                          </Tooltip>
+                        }
+                        containerStyle={styles.Inputs}
+                        onChangeText={setRegisterPassword}
+                        placeholder="Password"
+                        secureTextEntry={true}
+                        value={registerPassword}
+                        errorMessage="* Enter a strong password"
+                        errorStyle={{ color: registerPasswordError }}
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        placeholderTextColor="#20365F"
+                        renderErrorMessage
+                      />
+                    </View>
+                    <Input
+                      inputStyle={{
+                        color: "#20365F",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon name="lock-outline" size={20} color="#20365F" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setConfirmRegisterPassword}
+                      placeholder="Confirm Password"
+                      secureTextEntry={true}
+                      value={confirmRegisterPassword}
+                      placeholderTextColor="#20365F"
+                      errorMessage="* Password doesn't match"
+                      errorStyle={{ color: confirmRegisterPasswordError }}
+                      renderErrorMessage
+                    />
+                  </View>
+                ) : (
+                  <View>
+                    <Input
+                      inputStyle={{
+                        color: "#20365F",
+                        fontSize: 16,
+                      }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="#20365F"
+                        />
+                      }
+                      containerStyle={styles.Inputs}
+                      placeholderTextColor="#20365F"
+                      onChangeText={setDisplayName}
+                      placeholder="Display Name"
+                      value={displayName}
+                      errorMessage="* Invalid name"
+                      errorStyle={{ color: displayNameError }}
+                      renderErrorMessage
+                    />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-evenly",
+                        alignContent: "center",
+                      }}
+                    >
+                      <Input
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Image
+                        //     source={require("../assets/qatarFlag.png")}
+                        //     style={{ width: 20, height: 25 }}
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "25%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 10,
+                          marginTop: 20,
+                          marginLeft: 20,
+                          paddingTop:5
+                        }}
+                        placeholderTextColor="#20365F"
+                        keyboardType="number-pad"
+                        placeholder="+974"
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneError }}
+                        renderErrorMessage
+                        disabled={true}
+                      />
+                      <Input
+                        inputStyle={{
+                          color: "#20365F",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="cellphone-android"
+                        //     size={20}
+                        //     color="#20365F"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "50%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                          marginRight: 25,
+                          paddingTop: "1%",
+                        }}
+                        placeholderTextColor="#20365F"
+                        onChangeText={setPhone}
+                        keyboardType="number-pad"
+                        placeholder="Phone No."
+                        value={phone}
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneError }}
+                        renderErrorMessage
+                      />
+                    </View>
+                    <View style={{ flexDirection: "row" , justifyContent:'center'}}>
+                      <Input
+                        inputStyle={{
+                          fontSize: 16,
+                          // width:'50%'
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={
+                          <Icon
+                            name="account-card-details"
+                            size={20}
+                            color="lightgray"
+                          />
+                        }
+                        containerStyle={styles.useCodeInputs}
+                        placeholderTextColor="white"
+                        onChangeText={setReferral}
+                        placeholder="Referral Code"
+                        value={referral}
+                        errorMessage="* Invalid Code"
+                        errorStyle={{ color: refErr }}
+                        renderErrorMessage
+                      />
+
+                      <TouchableOpacity
+                        onPress={checkReferral}
+                        style={styles.useCodeButton}
+                      >
+                        <Text style={{ color: "white", fontWeight: "bold" }}>
+                          Use Code
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )
+              ) : (
+                <View>
+                  <Input
+                    inputStyle={{
+                      //color: "white",
+                      fontSize: 16,
+                    }}
+                    editable={!!verificationId}
+                    // inputContainerStyle={{ borderBottomWidth: 10 }}
+                    leftIcon={
+                      <Octicons name="verified" size={20} color="lightgray" />
+                    }
+                    containerStyle={styles.Inputs}
+                    placeholderTextColor="gray"
+                    onChangeText={setVerificationCode}
+                    placeholder="Verification Code"
+                  />
+                </View>
+              )}
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                width: "100%",
+              }}
+            >
+              {registerView === 0 ? (
+                <TouchableOpacity
+                  onPress={() => registerNext()}
+                  style={styles.loginButton}
+                >
+                  <Text style={{ color: "white" }}>Next</Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{ flexDirection: "row", justifyContent: "center" }}
+                >
+                  <TouchableOpacity
+                    onPress={() => handleSetRegisterView()}
+                    style={styles.backButton}
+                  >
+                    <Ionicons name="ios-arrow-back" size={30} color="#20365F" />
+                  </TouchableOpacity>
+                  {!registered ? (
+                    <TouchableOpacity
+                      onPress={() => handleSendVerificationCode()}
+                      style={styles.registerButton}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Sign Up!
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={handleRegister}
+                      disabled={!verificationId}
+                      style={{ ...styles.registerButton }}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Confirm Verification Code
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      ) : view === 0 ? (
+        <View style={styles.containerLogin}>
+          {modalViewLogin === false && accessFlag == false ? (
             <View style={styles.form}>
-              <FirebaseRecaptchaVerifierModal
-                ref={recaptchaVerifier}
-                firebaseConfig={config}
-              />
+              <View style={{ flex: 6, width: "100%" }}>
+                <Input
+                  inputStyle={{
+                    color: "#20365F",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="#20365F" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  errorMessage="* E-mail not valid"
+                  placeholderTextColor="#20365F"
+                  errorStyle={{
+                    color: loginEmailError,
+                  }}
+                  renderErrorMessage
+                />
+                <Input
+                  inputStyle={{
+                    color: "#20365F",
+                    fontSize: 16,
+                  }}
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={<Icon name="key" size={20} color="#20365F" />}
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginPassword}
+                  placeholder="Password"
+                  secureTextEntry={true}
+                  value={loginPassword}
+                  placeholderTextColor="#20365F"
+                  errorMessage="* Please check your email and password"
+                  errorStyle={{
+                    color: loginPasswordError,
+                    fontSize: 13,
+                  }}
+                  renderErrorMessage
+                />
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  width: "100%",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => handleLogin()}
+                >
+                  <Text style={{ color: "white" }}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => setAccessFlag(true)}
+                >
+                  <Text style={{ color: "white" }}>Access Code</Text>
+                </TouchableOpacity>
+                <Text
+                  onPress={() => setModalViewLogin(true)}
+                  style={{ textAlign: "center", color: "#20365F" }}
+                >
+                  Forgot Password?
+                </Text>
+              </View>
+            </View>
+          ) : modalViewLogin === true && accessFlag == false ? (
+            <View style={styles.form}>
               <View
                 style={{
                   flex: 6,
                   width: "100%",
-                  justifyContent: "center",
-                  // backgroundColor: "red",
-                  // minHeight: "70%",
+                  justifyContent: "space-evenly",
                 }}
               >
-                {!registered ? (
-                  registerView === 0 ? (
+                <Input
+                  inputContainerStyle={{ borderBottomWidth: 0 }}
+                  leftIcon={
+                    <Icon name="email-outline" size={20} color="#20365F" />
+                  }
+                  containerStyle={styles.Inputs}
+                  onChangeText={setLoginEmail}
+                  placeholder="E-mail"
+                  value={loginEmail}
+                  inputStyle={{
+                    fontSize: 16,
+                  }}
+                  placeholderTextColor="#20365F"
+                  errorMessage="* Email not valid"
+                  errorStyle={{ color: loginEmailError }}
+                  renderErrorMessage
+                />
+                <View>
+                  <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={() => handleSubmit()}
+                  >
+                    <Text style={{ color: "white" }}>Submit</Text>
+                  </TouchableOpacity>
+                  <Text
+                    onPress={() => setModalViewLogin(false)}
+                    style={{ textAlign: "center", color: "#20365F" }}
+                  >
+                    Back to Login
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            modalViewLogin === false &&
+            accessFlag === true && (
+              <View style={styles.form}>
+                {accessValid == false ? (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <Input
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
+                      leftIcon={
+                        <Icon name="account-key" size={20} color="#20365F" />
+                      }
+                      containerStyle={styles.Inputs}
+                      onChangeText={setAccessCode}
+                      placeholder="Access Code"
+                      value={AccessCode}
+                      errorMessage="* Code Invalid"
+                      inputStyle={{
+                        color: "#20365F",
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="#20365F"
+                      errorStyle={{ color: accessCodeError }}
+                      renderErrorMessage
+                    />
                     <View>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={() => handleAccessCode()}
+                      >
+                        <Text style={{ color: "white" }}>Use Code</Text>
+                      </TouchableOpacity>
+                      <Text
+                        onPress={() => setAccessFlag(false)}
+                        style={{ textAlign: "center", color: "#20365F" }}
+                      >
+                        Back to Login
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <Input
-                        inputContainerStyle={{
-                          borderBottomWidth: 0,
-                          // color: "white",
-                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
                         leftIcon={
                           <Icon
                             name="email-outline"
@@ -520,676 +924,162 @@ export default function Authentication(props) {
                             color="#20365F"
                           />
                         }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setRegisterEmail}
-                        placeholder="E-mail"
-                        value={registerEmail}
-                        placeholderTextColor="#20365F"
+                        containerStyle={styles.AccessInputs}
+                        value={AccessEmail}
                         inputStyle={{
                           color: "#20365F",
                           fontSize: 16,
+                          textAlign: "center",
                         }}
-                        errorMessage="* Invalid E-mail"
-                        errorStyle={{ color: registerEmailError }}
-                        renderErrorMessage
+                        placeholderTextColor="#20365F"
+                        disabled={true}
                       />
 
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                          // width: "85%",
-
-                          // paddingLeft: "10%",
-                        }}
-                      >
-                        <Input
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          leftIcon={
-                            <Icon name="key" size={20} color="#20365F" />
-                          }
-                          rightIcon={
-                            <Tooltip
-                              height={180}
-                              width={370}
-                              backgroundColor={"#20365F"}
-                              popover={
-                                <View>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Your password must be between 8 and 30
-                                    characters.
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Password must contain at least one
-                                    uppercase, or capital, letter (ex: A, B,
-                                    etc.)
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - One number digit and at least one special
-                                    character.
-                                  </Text>
-                                </View>
-                              }
-                              containerStyle={{
-                                justifyContent: "center",
-                                alignSelf: "center",
-                              }}
-                            >
-                              <AntDesign
-                                name="exclamationcircleo"
-                                size={22}
-                                color="#20365F"
-                              />
-                            </Tooltip>
-                          }
-                          containerStyle={styles.Inputs}
-                          onChangeText={setRegisterPassword}
-                          placeholder="Password"
-                          secureTextEntry={true}
-                          value={registerPassword}
-                          errorMessage="* Enter a strong password"
-                          errorStyle={{ color: registerPasswordError }}
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          placeholderTextColor="#20365F"
-                          renderErrorMessage
-                        />
-                      </View>
                       <Input
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="email-outline"
+                        //     size={20}
+                        //     color="#20365F"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "20%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                          paddingTop: "1%",
+                        }}
                         inputStyle={{
                           color: "#20365F",
-                          fontSize: 16,
+                          textAlign: "center",
                         }}
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon name="lock-outline" size={20} color="#20365F" />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setConfirmRegisterPassword}
-                        placeholder="Confirm Password"
-                        secureTextEntry={true}
-                        value={confirmRegisterPassword}
                         placeholderTextColor="#20365F"
-                        errorMessage="* Password doesn't match"
-                        errorStyle={{ color: confirmRegisterPasswordError }}
-                        renderErrorMessage
+                        value={AccessAmount}
+                        disabled={true}
                       />
                     </View>
-                  ) : (
-                    <View>
-                      <Input
-                        inputStyle={{
-                          color: "#20365F",
-                          fontSize: 16,
-                        }}
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon
-                            name="account-card-details"
-                            size={20}
-                            color="#20365F"
-                          />
-                        }
-                        containerStyle={styles.Inputs}
-                        placeholderTextColor="#20365F"
-                        onChangeText={setDisplayName}
-                        placeholder="Display Name"
-                        value={displayName}
-                        errorMessage="* Invalid name"
-                        errorStyle={{ color: displayNameError }}
-                        renderErrorMessage
-                      />
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-evenly",
-                          alignContent: "center",
-                        }}
-                      >
-                        <Input
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Image
-                          //     source={require("../assets/qatarFlag.png")}
-                          //     style={{ width: 20, height: 25 }}
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "25%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 10,
-                            marginTop: 20,
-                            marginLeft: 20,
-                            paddingTop: 5,
-                          }}
-                          placeholderTextColor="#20365F"
-                          keyboardType="number-pad"
-                          placeholder="+974"
-                          // errorMessage="* Invalid Phone No."
-                          // errorStyle={{ color: phoneError }}
-                          // renderErrorMessage
-                          disabled={true}
-                        />
-                        <Input
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Icon
-                          //     name="cellphone-android"
-                          //     size={20}
-                          //     color="#20365F"
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "50%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 12,
-                            marginTop: 20,
-                            marginRight: 25,
-                            paddingTop: "1%",
-                          }}
-                          placeholderTextColor="#20365F"
-                          onChangeText={setPhone}
-                          keyboardType="number-pad"
-                          placeholder="Phone No."
-                          value={phone}
-                          errorMessage="* Invalid Phone No."
-                          errorStyle={{ color: phoneError }}
-                          renderErrorMessage
-                        />
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Input
-                          inputStyle={{
-                            fontSize: 16,
-                            // width:'50%'
-                          }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          leftIcon={
-                            <Icon
-                              name="account-card-details"
-                              size={20}
-                              color="lightgray"
-                            />
-                          }
-                          containerStyle={styles.useCodeInputs}
-                          placeholderTextColor="white"
-                          onChangeText={setReferral}
-                          placeholder="Referral Code"
-                          value={referral}
-                          errorMessage="* Invalid Code"
-                          errorStyle={{ color: refErr }}
-                          renderErrorMessage
-                        />
-
-                        <TouchableOpacity
-                          onPress={checkReferral}
-                          style={styles.useCodeButton}
-                        >
-                          <Text style={{ color: "white", fontWeight: "bold" }}>
-                            Use Code
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  )
-                ) : (
-                  <View>
                     <Input
-                      inputStyle={{
-                        //color: "white",
-                        fontSize: 16,
-                      }}
-                      editable={!!verificationId}
-                      // inputContainerStyle={{ borderBottomWidth: 10 }}
+                      inputContainerStyle={{ borderBottomWidth: 0 }}
                       leftIcon={
-                        <Octicons name="verified" size={20} color="lightgray" />
+                        <Icon
+                          name="account-card-details"
+                          size={20}
+                          color="#20365F"
+                        />
                       }
                       containerStyle={styles.Inputs}
-                      placeholderTextColor="gray"
-                      onChangeText={setVerificationCode}
-                      placeholder="Verification Code"
+                      onChangeText={setAccessDisplayName}
+                      placeholder="Display Name"
+                      value={accessDisplayName}
+                      inputStyle={{
+                        fontSize: 16,
+                      }}
+                      placeholderTextColor="#20365F"
+                      errorMessage="* Invalid Display Name"
+                      errorStyle={{ color: displayErr2 }}
+                      renderErrorMessage
                     />
-                  </View>
-                )}
-              </View>
-
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-                }}
-              >
-                {registerView === 0 ? (
-                  <TouchableOpacity
-                    onPress={() => registerNext()}
-                    style={styles.loginButton}
-                  >
-                    <Text style={{ color: "white" }}>Next</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <View
-                    style={{ flexDirection: "row", justifyContent: "center" }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => handleSetRegisterView()}
-                      style={styles.backButton}
-                    >
-                      <Ionicons
-                        name="ios-arrow-back"
-                        size={30}
-                        color="#20365F"
-                      />
-                    </TouchableOpacity>
-                    {!registered ? (
-                      <TouchableOpacity
-                        onPress={() => handleSendVerificationCode()}
-                        style={styles.registerButton}
-                      >
-                        <Text style={{ color: "white", fontWeight: "bold" }}>
-                          Sign Up!
-                        </Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={handleRegister}
-                        disabled={!verificationId}
-                        style={{ ...styles.registerButton }}
-                      >
-                        <Text style={{ color: "white", fontWeight: "bold" }}>
-                          Confirm Verification Code
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
-        ) : view === 0 ? (
-          <View style={styles.containerLogin}>
-            {modalViewLogin === false && accessFlag == false ? (
-              <View style={styles.form}>
-                <View
-                  style={{
-                    flex: 2,
-                    width: "100%",
-                    // backgroundColor: "red",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginEmail}
-                    placeholder="E-mail"
-                    value={loginEmail}
-                    errorMessage="* E-mail not valid"
-                    placeholderTextColor="#20365F"
-                    errorStyle={{
-                      color: loginEmailError,
-                    }}
-                    renderErrorMessage
-                  />
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={<Icon name="key" size={20} color="#20365F" />}
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginPassword}
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    value={loginPassword}
-                    placeholderTextColor="#20365F"
-                    errorMessage="* Please check your email and password"
-                    errorStyle={{
-                      color: loginPasswordError,
-                      fontSize: 13,
-                    }}
-                    renderErrorMessage
-                  />
-                </View>
-
-                <View
-                  style={{
-                    flex: 1,
-                    width: "100%",
-                    justifyContent: "center",
-                    // backgroundColor: "yellow",
-                    // marginTop: "15%",
-                  }}
-                >
-                  <View style={{}}>
-                    <TouchableOpacity
-                      style={[styles.loginButton]}
-                      onPress={() => handleLogin()}
-                    >
-                      <Text style={{ color: "white" }}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.loginButton}
-                      onPress={() => setAccessFlag(true)}
-                    >
-                      <Text style={{ color: "white" }}>Access Code</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <Text
-                      onPress={() => setModalViewLogin(true)}
-                      style={{ textAlign: "center", color: "#20365F" }}
-                    >
-                      Forgot Password?
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ) : modalViewLogin === true && accessFlag == false ? (
-              <View style={styles.form}>
-                <View
-                  style={{
-                    flex: 6,
-                    width: "100%",
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <Input
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginEmail}
-                    placeholder="E-mail"
-                    value={loginEmail}
-                    inputStyle={{
-                      fontSize: 16,
-                    }}
-                    placeholderTextColor="#20365F"
-                    errorMessage="* Email not valid"
-                    errorStyle={{ color: loginEmailError }}
-                    renderErrorMessage
-                  />
-                  <View>
-                    <TouchableOpacity
-                      style={styles.loginButton}
-                      onPress={() => handleSubmit()}
-                    >
-                      <Text style={{ color: "white" }}>Submit</Text>
-                    </TouchableOpacity>
-                    <Text
-                      onPress={() => setModalViewLogin(false)}
-                      style={{ textAlign: "center", color: "#20365F" }}
-                    >
-                      Back to Login
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ) : (
-              modalViewLogin === false &&
-              accessFlag === true && (
-                <View style={styles.form}>
-                  {accessValid == false ? (
                     <View
                       style={{
-                        flex: 6,
-                        width: "100%",
+                        flexDirection: "row",
                         justifyContent: "space-evenly",
+                        alignContent: "center",
                       }}
                     >
                       <Input
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon name="account-key" size={20} color="#20365F" />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setAccessCode}
-                        placeholder="Access Code"
-                        value={AccessCode}
-                        errorMessage="* Code Invalid"
                         inputStyle={{
                           color: "#20365F",
                           fontSize: 16,
                         }}
-                        placeholderTextColor="#20365F"
-                        errorStyle={{ color: accessCodeError }}
-                        renderErrorMessage
-                      />
-                      <View>
-                        <TouchableOpacity
-                          style={styles.loginButton}
-                          onPress={() => handleAccessCode()}
-                        >
-                          <Text style={{ color: "white" }}>Use Code</Text>
-                        </TouchableOpacity>
-                        <Text
-                          onPress={() => setAccessFlag(false)}
-                          style={{ textAlign: "center", color: "#20365F" }}
-                        >
-                          Back to Login
-                        </Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <View
-                      style={{
-                        flex: 6,
-                        width: "100%",
-                        justifyContent: "space-evenly",
-                      }}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Input
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          leftIcon={
-                            <Icon
-                              name="email-outline"
-                              size={20}
-                              color="#20365F"
-                            />
-                          }
-                          containerStyle={styles.AccessInputs}
-                          value={AccessEmail}
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                            textAlign: "center",
-                          }}
-                          placeholderTextColor="#20365F"
-                          disabled={true}
-                        />
-
-                        <Input
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Icon
-                          //     name="email-outline"
-                          //     size={20}
-                          //     color="#20365F"
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "20%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 12,
-                            marginTop: 20,
-                            paddingTop: "1%",
-                          }}
-                          inputStyle={{
-                            color: "#20365F",
-                            textAlign: "center",
-                          }}
-                          placeholderTextColor="#20365F"
-                          value={AccessAmount}
-                          disabled={true}
-                        />
-                      </View>
-                      <Input
                         inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon
-                            name="account-card-details"
-                            size={20}
-                            color="#20365F"
-                          />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setAccessDisplayName}
-                        placeholder="Display Name"
-                        value={accessDisplayName}
+                        // leftIcon={
+                        //   <Image
+                        //     source={require("../assets/qatarFlag.png")}
+                        //     style={{ width: 20, height: 25 }}
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "25%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 10,
+                          marginTop: 20,
+                          marginLeft: 20,
+                        }}
+                        placeholderTextColor="#20365F"
+                        keyboardType="number-pad"
+                        placeholder="+974"
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneErr2 }}
+                        renderErrorMessage
+                        disabled={true}
+                      />
+                      <Input
                         inputStyle={{
+                          color: "#20365F",
                           fontSize: 16,
                         }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        // leftIcon={
+                        //   <Icon
+                        //     name="cellphone-android"
+                        //     size={20}
+                        //     color="#20365F"
+                        //   />
+                        // }
+                        containerStyle={{
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: "#20365F",
+                          height: 50,
+                          width: "50%",
+                          alignSelf: "center",
+                          opacity: 0.8,
+                          paddingLeft: 12,
+                          marginTop: 20,
+                          marginRight: 25,
+                          paddingTop: "1%",
+                        }}
                         placeholderTextColor="#20365F"
-                        errorMessage="* Invalid Display Name"
-                        errorStyle={{ color: displayErr2 }}
+                        onChangeText={setPhoneAccess}
+                        keyboardType="number-pad"
+                        placeholder="Phone No."
+                        value={phoneAccess}
+                        errorMessage="* Invalid Phone No."
+                        errorStyle={{ color: phoneErr2 }}
                         renderErrorMessage
                       />
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-evenly",
-                          alignContent: "center",
-                        }}
-                      >
-                        <Input
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Image
-                          //     source={require("../assets/qatarFlag.png")}
-                          //     style={{ width: 20, height: 25 }}
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "25%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 10,
-                            marginTop: 20,
-                            marginLeft: 20,
-                          }}
-                          placeholderTextColor="#20365F"
-                          keyboardType="number-pad"
-                          placeholder="+974"
-                          // errorMessage="* Invalid Phone No."
-                          // errorStyle={{ color: phoneErr2 }}
-                          // renderErrorMessage
-                          disabled={true}
-                        />
-                        <Input
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Icon
-                          //     name="cellphone-android"
-                          //     size={20}
-                          //     color="#20365F"
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "50%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 12,
-                            marginTop: 20,
-                            marginRight: 25,
-                            paddingTop: "1%",
-                          }}
-                          placeholderTextColor="#20365F"
-                          onChangeText={setPhoneAccess}
-                          keyboardType="number-pad"
-                          placeholder="Phone No."
-                          value={phoneAccess}
-                          errorMessage="* Invalid Phone No."
-                          errorStyle={{ color: phoneErr2 }}
-                          renderErrorMessage
-                        />
-                      </View>
-
-                      <View style={{ marginTop: "7%" }}>
-                        <TouchableOpacity
-                          style={styles.loginButton}
-                          onPress={handleAccessCodeData}
-                        >
-                          <Text style={{ color: "white" }}>Next</Text>
-                        </TouchableOpacity>
-                      </View>
                     </View>
-                  )}
-                </View>
-              )
-            )}
-          </View>
-        ) : (
-          <View>
-            {/* <Text>Forgot Password</Text> */}
-            {/* <TextInput
+
+                    <View style={{ marginTop: "7%" }}>
+                      <TouchableOpacity
+                        style={styles.loginButton}
+                        onPress={handleAccessCodeData}
+                      >
+                        <Text style={{ color: "white" }}>Next</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )
+          )}
+        </View>
+      ) : (
+        <View>
+          {/* <Text>Forgot Password</Text> */}
+          {/* <TextInput
           placeholder="Email"
           value={forgotPassEmail}
           onChangeText={setForgotPassEmail}
@@ -1201,10 +1091,9 @@ export default function Authentication(props) {
         <TouchableOpacity onPress={() => setView("Login")}>
           <Text>Back to Login</Text>
         </TouchableOpacity> */}
-          </View>
-        )}
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -1213,15 +1102,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#20365F",
     alignItems: "center",
-    // width: Math.round(Dimensions.get("window").width),
-    // width: "100%",
-    justifyContent: "flex-end",
-    // height: Math.round(Dimensions.get("window").height),
-    // height: "100%",
+    width: Math.round(Dimensions.get("window").width),
+    height: Math.round(Dimensions.get("window").height),
   },
   buttonGroup: {
     alignItems: "center",
-    // flex: 0.25,
   },
   containerLogin: {
     flex: 1,
@@ -1249,7 +1134,6 @@ const styles = StyleSheet.create({
   },
   headerText: {
     alignItems: "center",
-    // justifyContent: "center",
     textAlign: "center",
     color: "#20365F",
     fontSize: 34,
@@ -1264,12 +1148,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   form: {
-    flex: 1,
-    // height: Math.round(Dimensions.get("window").height),
-    // paddingTop: "2%",
+    flex: 4,
+    paddingTop: "15%",
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "red",
   },
   Inputs: {
     borderRadius: 8,
@@ -1328,8 +1210,7 @@ const styles = StyleSheet.create({
     marginStart: "2%",
     marginEnd: "2%",
     borderRadius: 30,
-    marginBottom: 5,
-    marginTop: 5,
+    marginBottom: 10,
   },
   registerButton: {
     backgroundColor: "#20365F",
@@ -1354,7 +1235,7 @@ const styles = StyleSheet.create({
     marginEnd: "3%",
     borderRadius: 10,
     marginBottom: 0,
-    marginTop: 20,
+    marginTop:20
   },
   useCodeInputs: {
     borderRadius: 8,
@@ -1366,12 +1247,12 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     paddingLeft: 10,
     marginTop: 20,
-    marginLeft: 8,
+    marginLeft:8
   },
   header: {
     justifyContent: "center",
     alignItems: "center",
-    flex: 0.5,
+    flex: 0.7,
     paddingTop: "9%",
   },
 });

@@ -20,14 +20,12 @@ import db from "../../db";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-import moment from "moment";
 
 export default function EmployeesRequest(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
-  const [phone, setPhone] = useState(null);
 
   const user = props.navigation.getParam("user");
   const roles = [
@@ -214,13 +212,9 @@ export default function EmployeesRequest(props) {
           <Text>Edit</Text>
         </TouchableOpacity>
       </View>
-      {/* ---------------------------------ACCOUNT INFO--------------------------------- */}
       <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
-      <Text></Text>
-      <Text>Account Info</Text>
       <Text>Email: {user.email}</Text>
       <Text>Display Name: {user.displayName}</Text>
-
       {/* ---------------------------------PICKER--------------------------------- */}
       {editMode ? (
         <View>
@@ -248,13 +242,6 @@ export default function EmployeesRequest(props) {
       <Text>Phone: {user.phone}</Text>
 
       <Text></Text>
-
-      {/* ---------------------------------PERSONAL INFO--------------------------------- */}
-      <Text>Personal Info</Text>
-      <Text>First Name: {user.firstName}</Text>
-      <Text>Last Name: {user.lastName}</Text>
-      <Text>Date of Birth: {moment(user.dateOfBirth).format("LL")}</Text>
-      <Text>Nationality: {user.country}</Text>
 
       {editMode && (
         <View

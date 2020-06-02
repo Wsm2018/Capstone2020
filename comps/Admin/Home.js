@@ -17,20 +17,14 @@ export default function Home(props) {
         <Text>Users List</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => props.navigation.navigate("Statistics")}>
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate("Statistiscs")}
+      >
         <Text>Statistics</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => handleLogout()}>
         <Text>Logout</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => props.navigation.navigate("MakeAdmin")}>
-        <Text>Make Admin</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
-        <Text>Booking</Text>
       </TouchableOpacity>
     </View>
   );
@@ -41,6 +35,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
 });

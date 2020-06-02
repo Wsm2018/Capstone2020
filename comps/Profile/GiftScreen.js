@@ -10,11 +10,7 @@ import {
   TextInput,
   Dimensions,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
-const LottieView = require("lottie-react-native");
-
 import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
 
 import { Input, Button } from "react-native-elements";
@@ -37,8 +33,6 @@ export default function GiftScreen(props) {
     values: ["100", "50", "10", "other"],
   };
   let pickerRef = null;
-  const [errorMessage, setErrorMessage] = useState("");
-  const [amountErrMsg, setAmountErrMsg] = useState("");
 
   useEffect(() => {
     if (amount === "other") {
@@ -46,24 +40,13 @@ export default function GiftScreen(props) {
     }
   }, [amount]);
 
-  useEffect(() => {
-    if (amountErrMsg !== "" && !flag) {
-      setAmountErrMsg("");
-    }
-  }, [flag]);
-
   const handleCancel = () => {
-    setAmountErrMsg("");
     setAmount("");
     setEmail("");
     setFlag(false);
   };
 
   const handleSend = async () => {
-    if (amount === "" || amount === "other") {
-      setAmountErrMsg("Enter the Amount");
-      return;
-    }
     // alert("sending...");
 
     // checking if the user balance is less than the gift balance
@@ -76,14 +59,13 @@ export default function GiftScreen(props) {
       alert("You don't have enough balance!");
       setAmount("");
     } else {
-      let send = firebase.functions().httpsCallable("sendGift");
-      let response = await send({
-        email,
-        giftBalance: parseInt(amount),
-        uid: firebase.auth().currentUser.uid,
-        displayName: firebase.auth().currentUser.displayName,
-      });
-      console.log("dsfsdfdsfsfsadfadsf", response);
+      // let send = firebase.functions().httpsCallable("sendGift");
+      // let response = await send({
+      //   email,
+      //   giftBalance: parseInt(amount),
+      //   uid: firebase.auth().currentUser.uid,
+      //   displayName: firebase.auth().currentUser.displayName,
+      // });
       setModal(true);
     }
   };
@@ -110,17 +92,13 @@ export default function GiftScreen(props) {
   const handleNext = () => {
     if (email !== "") {
       if (emailValidity()) {
-        if (email === firebase.auth().currentUser.email) {
-          setErrorMessage("Cannot use your own email");
-          return;
-        } else {
-          setView("second");
-        }
+        setView("second");
       } else {
-        setErrorMessage("Not a valid email address");
+        alert("Not a valid email address");
       }
     } else {
-      setErrorMessage("Enter Your Email");
+      alert("Enter Email");
+      return;
     }
   };
 
@@ -128,37 +106,15 @@ export default function GiftScreen(props) {
     setAmount("");
     setFlag(false);
     setView("first");
-    setErrorMessage("");
   };
 
-  useEffect(() => {
-    if (amount !== "" || amount === "other") {
-      setAmountErrMsg("");
-    }
-  }, [amount]);
-
-  useEffect(() => {
-    if (email === "") {
-      setErrorMessage("");
-    } else {
-      if (errorMessage !== "") {
-        setErrorMessage("");
-      }
-    }
-  }, [email]);
-  //aminehmollazehi@gmail.com
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS == "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+    <KeyboardAvoidingView style={styles.container}>
       <View style={{ flex: 1 }}>
-        <View
-          //elevation={2}
+        <Card
+          elevation={2}
           style={{
             width: "100%",
-            backgroundColor: "white",
             flex: 1,
             borderWidth: 1,
             borderTopWidth: 0,
@@ -168,7 +124,7 @@ export default function GiftScreen(props) {
           {view === "first" ? (
             <View
               style={{
-                justifyContent: "center",
+                // justifyContent: "space-around",
                 alignItems: "center",
                 // backgroundColor: "red",
                 flex: 1.5,
@@ -177,26 +133,25 @@ export default function GiftScreen(props) {
               onPress={handleCancel}
             >
               <View
-                width={Dimensions.get("window").width / 1.5}
                 style={{
                   // backgroundColor: "white",
                   alignItems: "center",
+
                   flexDirection: "row",
-                  // paddingLeft: 6,
-                  // width: "60%",
-                  // borderColor: "black",
-                  // borderWidth: 1,
-                  // borderRadius: 10,
-                  // marginBottom: 10,
+                  paddingLeft: 6,
+                  width: "60%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  marginBottom: 10,
                 }}
               >
-                {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-                <Input
-                  placeholder="Receiver@email.com"
+                <MaterialCommunityIcons name="email" size={20} color="gray" />
+                <TextInput
+                  style={{ height: 40, width: "80%", paddingLeft: 6 }}
+                  placeholder="receiver@email.com"
                   value={email}
-                  onChangeText={(email) => setEmail(email.toLowerCase())}
-                  errorMessage={errorMessage}
-                  errorStyle={{ color: "red", fontWeight: "bold" }}
+                  onChangeText={setEmail}
                 />
               </View>
             </View>
@@ -227,9 +182,6 @@ export default function GiftScreen(props) {
                     />
                   ))}
                 </Picker>
-                <Text style={{ color: "red", fontWeight: "bold" }}>
-                  {amountErrMsg}
-                </Text>
               </View>
             ) : (
               <View>
@@ -306,87 +258,76 @@ export default function GiftScreen(props) {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                flex: 4,
+                // flex: 0.5,
                 // backgroundColor: "blue",
               }}
             >
               <View
                 style={{
-                  flex: 0.5,
+                  flex: 0.4,
                   marginTop: "10%",
                   // backgroundColor: "green",
                   // justifyContent: "flex-end",
                   alignItems: "center",
-                  flexDirection: "row",
                   // alignItems: "flex-end",
                 }}
               >
                 <View
                   style={{
-                    flex: 0.8,
-
-                    // backgroundColor: "red",
-                    // alignItems: "center",
-                    // flexDirection: "row",
+                    // backgroundColor: "white",
+                    alignItems: "center",
+                    flexDirection: "row",
                     // paddingLeft: 6,
 
-                    // width: "80%",
-                    // borderColor: "black",
-                    // borderBottomWidth: 2,
-                    // borderRadius: 10,
+                    // width: "60%",
+                    borderColor: "black",
+                    borderBottomWidth: 2,
+                    borderRadius: 10,
                     // marginBottom: 20,
                   }}
                 >
-                  {/* <MaterialCommunityIcons name="cash" size={30} color="gray" /> */}
-                  <Input
+                  <MaterialCommunityIcons name="cash" size={30} color="gray" />
+                  <TextInput
                     style={{ width: "80%", paddingLeft: 6 }}
                     placeholder="Enter Amount"
                     onChangeText={setAmount}
                     keyboardType="numeric"
                   />
-                  <Text style={{ color: "red", fontWeight: "bold" }}>
-                    {amountErrMsg}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 0.3,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={{
-                      // backgroundColor: "#20365F",
-                      // height: 40,
-                      // width: "60%",
-                      alignSelf: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      // marginStart: "2%",
-                      // marginEnd: "2%",
-                      // borderRadius: 30,
-
-                      // marginTop: "8%",
-                      // flexDirection: "row",
-
-                      // flex: 0.2,
-                    }}
-                    onPress={handleFlag}
-                  >
-                    <Text
-                      style={{
-                        // textAl
-
-                        // textAlign: "justify",
-                        fontSize: 14,
-                        fontWeight: "bold",
-                        color: "darkred",
-                      }}
-                    >
-                      Cancel
-                    </Text>
-                  </TouchableOpacity>
                 </View>
               </View>
+
+              <TouchableOpacity
+                style={{
+                  // backgroundColor: "#20365F",
+                  height: 40,
+                  // width: "60%",
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginStart: "2%",
+                  // marginEnd: "2%",
+                  // borderRadius: 30,
+
+                  marginTop: "8%",
+                  // flexDirection: "row",
+
+                  flex: 0.2,
+                }}
+                onPress={handleFlag}
+              >
+                <Text
+                  style={{
+                    // textAl
+
+                    // textAlign: "justify",
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: "darkred",
+                  }}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
@@ -523,7 +464,7 @@ export default function GiftScreen(props) {
               </TouchableOpacity>
             </View>
           )}
-        </View>
+        </Card>
       </View>
       <Modal transparent={true} visible={modal}>
         <View style={styles.centeredView}>
@@ -539,35 +480,14 @@ export default function GiftScreen(props) {
             >
               <AntDesign name="close" size={25} style={{ color: "#224229" }} />
             </TouchableOpacity>
-            <TouchableOpacity
+
+            <View
               style={{
-                flex: 4,
-                // backgroundColor: "green",
-
-                // width: "100%",
-                // flexDirection: "row",
-                // justifyContent: "space-around",
-                // alignItems: "center",
+                flex: 5,
+                borderColor: "black",
+                borderBottomWidth: 2,
               }}
-            >
-              <LottieView
-                // width={Dimensions.get("window").width}
-                source={require("../../assets/images/lf20_d7VBaD.json")}
-                autoPlay
-                // loop
-                style={
-                  {
-                    // flex: 1,
-                    // width: "22%",
-                    // height: "100%",
-                    // backgroundColor: "green",
-                    // justifyContent: "space-evenly",
-                    // alignItems: "center",
-                  }
-                }
-              />
-            </TouchableOpacity>
-
+            ></View>
             <View
               style={{
                 flex: 1,
@@ -575,23 +495,10 @@ export default function GiftScreen(props) {
                 // backgroundColor: "red",
                 justifyContent: "center",
               }}
-            >
-              <Text
-                style={{
-                  // marginTop: -15,
-                  textAlign: "center",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#20365F",
-                }}
-              >
-                Gift Was Sent Successfully!
-              </Text>
-            </View>
+            ></View>
           </View>
         </View>
       </Modal>
-      {/* </TouchableWithoutFeedback> */}
     </KeyboardAvoidingView>
   );
 }
@@ -605,8 +512,8 @@ const styles = StyleSheet.create({
     // flexDirection:
     // flex: 1,
     // margin: 20,
-    height: height / 2.8,
-    width: width / 1.6,
+    height: height / 1.5,
+    width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
     shadowRadius: 2,

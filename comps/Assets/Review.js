@@ -105,7 +105,6 @@ export default function Details(props) {
 
   return (
     <View style={styles.container}>
-      {/* {console.log(asset, "-----------")} */}
       {/* <ScrollView> */}
       {/* {console.log('asset return',asset)} */}
       {/* {console.log('startD return',startDateTime)} */}
@@ -116,122 +115,76 @@ export default function Details(props) {
             <View>
               <View
                 style={{
-                  // flexDirection: "row",
+                  flexDirection: "row",
                   marginBottom: 10,
                   backgroundColor: "#f5f5f5",
-
+                  padding: 5,
                   // borderRadius: 5,
                 }}
               >
-                <View style={{ flexDirection: "row", padding: 5 }}>
-                  <View
-                    style={{
-                      width: "25%",
-                      // backgroundColor: "red",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "#20365F",
-                        width: 70,
-                        height: 70,
-                        margin: 5,
-                        alignItems: "center",
-                        flexDirection: "row",
-                        //elevation: 12,
-                        borderWidth: 2,
-                        borderColor: "#20365F",
-                      }}
-                      disabled
-                    >
-                      <View
-                        style={{
-                          height: "100%",
-                          width: "100%",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          alignContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <MaterialCommunityIcons
-                          name="car"
-                          size={30}
-                          color={"white"}
-                        />
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            color: "white",
-                            fontSize: 18,
-                          }}
-                        >
-                          {asset.code}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{ width: "75%", justifyContent: "center" }}>
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                      <Text style={{ fontWeight: "bold" }}>Price: </Text>
-                      <Text>{asset.price} QR</Text>
-                    </View>
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                      <Text style={{ fontWeight: "bold" }}>Description: </Text>
-                      <Text>{asset.description}</Text>
-                    </View>
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                      <Text style={{ fontWeight: "bold" }}>
-                        Average Rating:
-                      </Text>
-                      <Text>{asset.rating ? asset.rating : " N/A"}</Text>
-                      {/* {console.log(
-                        "-------------------------------------------",
-                        asset
-                      )} */}
-                    </View>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  onPress={() => props.handleAddFavorite(asset)}
+                <View
                   style={{
-                    justifyContent: "center",
+                    width: "25%",
+                    // backgroundColor: "red",
                     alignItems: "center",
-                    height: 30,
-                    marginTop: 5,
-                    backgroundColor: "#20365F",
-                    flexDirection: "row",
-                    // padding: 3,
                   }}
                 >
-                  <MaterialCommunityIcons
-                    name="heart"
-                    // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-                    size={18}
-                    color={
-                      props.favoriteAssets.includes(asset.id)
-                        ? "#c44949"
-                        : "white"
-                    }
-                    // onPress={
-                    //   favoriteAssets.includes(l.id)
-                    //     ? null
-                    //     : () => handleAddFavorite(l)
-                    // }
-                    // disabled
-                    // style={{ borderColor: "blue", borderWidth: 1 }}
-                  />
-
-                  {props.favoriteAssets.includes(asset.id) ? (
-                    <Text style={{ color: "white" }}> Favorited</Text>
-                  ) : (
-                    <Text style={{ color: "white" }}> Add to Favorites</Text>
-                  )}
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#20365F",
+                      width: 70,
+                      height: 70,
+                      margin: 5,
+                      alignItems: "center",
+                      flexDirection: "row",
+                      //elevation: 12,
+                      borderWidth: 2,
+                      borderColor: "#20365F",
+                    }}
+                    disabled
+                  >
+                    <View
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        alignContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <MaterialCommunityIcons
+                        name="car"
+                        size={30}
+                        color={"white"}
+                      />
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          color: "white",
+                          fontSize: 18,
+                        }}
+                      >
+                        {asset.code}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ width: "75%", justifyContent: "center" }}>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    <Text style={{ fontWeight: "bold" }}>Price: </Text>
+                    <Text>{asset.price} QR</Text>
+                  </View>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    <Text style={{ fontWeight: "bold" }}>Description: </Text>
+                    <Text>{asset.description}</Text>
+                  </View>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                    <Text style={{ fontWeight: "bold" }}>Average Rating: </Text>
+                    <Text>{asset.rating}</Text>
+                  </View>
+                </View>
               </View>
-
               {/* <Text> {asset.description}</Text> */}
               {/* <Text> Price Per Hour {asset.price}</Text> */}
 
@@ -286,13 +239,13 @@ export default function Details(props) {
                           <View
                             style={{
                               width: "10%",
-                              justifyContent: "flex-end",
+                              justifyContent: "space-evenly",
                               // alignItems: "center",
                               // padding: 5,
                               // marginTop: 10,
                             }}
                           >
-                            {/* <TouchableOpacity
+                            <TouchableOpacity
                               style={{
                                 // width: "70%",
                                 backgroundColor: "#20365F",
@@ -303,13 +256,15 @@ export default function Details(props) {
                               }}
                               onPress={() => setModalAddReview(true)}
                             >
-                              
+                              {/* <Text style={{ fontSize: 12, color: "gray" }}>
+                              +
+                            </Text> */}
                               <MaterialCommunityIcons
                                 name="plus"
                                 size={22}
                                 color={"white"}
                               />
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                             <TouchableOpacity
                               style={{
                                 // width: "70%",
@@ -338,7 +293,7 @@ export default function Details(props) {
                     <View style={{ width: "90%" }}>
                       <Text>No reviews available for this item</Text>
                     </View>
-                    {/* <View
+                    <View
                       style={{
                         // alignItems: "flex-end",
                         // marginTop: 8,
@@ -356,14 +311,16 @@ export default function Details(props) {
                         }}
                         onPress={() => setModalAddReview(true)}
                       >
-                        
+                        {/* <Text style={{ fontSize: 12, color: "gray" }}>
+                              +
+                            </Text> */}
                         <MaterialCommunityIcons
                           name="plus"
                           size={22}
                           color={"white"}
                         />
                       </TouchableOpacity>
-                    </View> */}
+                    </View>
                   </View>
                 )}
               </View>

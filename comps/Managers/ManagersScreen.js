@@ -7,12 +7,12 @@ import { createAppContainer } from "react-navigation";
 import ManagersRequest from "./ManagersRequest";
 import ManagersRequestDetail from "./ManagersRequestDetail";
 
-import ManagersHome from "./ManagersHome";
+import indexM from "./indexM";
 
 const ManagersStack = createAppContainer(
   createStackNavigator(
     {
-      ManagersHome: ManagersHome,
+      indexM: indexM,
       ManagersRequest: ManagersRequest,
       ManagersRequestDetail: ManagersRequestDetail,
     },

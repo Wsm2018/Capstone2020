@@ -11,16 +11,13 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker,
   ImageBackground,
   Dimensions,
 } from "react-native";
-
-import DatePicker from "react-native-datepicker";
-import moment from "moment";
-// import { Divider } from "react-native-elements";
 import { Surface } from "react-native-paper";
-import { Divider, Badge } from "react-native-elements";
+import DatePicker from "react-native-datepicker";
+// import { Card, Divider } from "react-native-elements";
+import { Dividerm, Badge } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
@@ -33,40 +30,19 @@ import Details from "./Details";
 import Review from "./Review";
 
 import { set } from "react-native-reanimated";
-import { Avatar, Card, Title, Paragraph } from "react-native-paper";
+// import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
-  // const [fromFav, setFromFav] = useState(false);
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [tempstartDate, settempStartDate] = useState("");
-  const [tempendDate, settempEndDate] = useState("");
   // const tName = props.navigation.getParam("tName", "failed");
   // const sName = props.navigation.getParam("section", "failed").name;
   // const startDateTime = props.navigation.getParam("startDate", "failed");
   // const endDateTime = props.navigation.getParam("endDate", "failed");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const fav = props.navigation.getParam("flag", false);
-  console.log(fav);
-  useEffect(() => {
-    if (fav) {
-      console.log("hello");
-      // console.log(props.navigation.getParam("startDate", ""));
-      setStartDate(props.navigation.getParam("startDate", ""));
-      setEndDate(props.navigation.getParam("startDate", ""));
-      console.log(props.navigation.getParam("asset", null).type);
-      type = props.navigation.getParam("asset", null).type;
-      tName = props.navigation.getParam("asset", null).tName;
-      console.log(props.navigation.getParam("asset", null).assetSection);
-      setSelectedSection(props.navigation.getParam("asset", null).assetSection);
-      console.log("asset", props.navigation.getParam("asset", null));
-      setSelectedList(props.navigation.getParam("asset", null));
-      setDetailsView(true);
-    }
-  }, []);
 
   useEffect(() => {
     // console.log(
@@ -190,49 +166,30 @@ export default function Sections(props) {
   // };
 
   const [favoriteAssets, setFavoriteAssets] = useState([]);
-  const [favoriteIds, setFavoriteIds] = useState([]);
 
   useEffect(() => {
     getUserFavoriteAssets();
-    // console.log(favoriteAssets);
   }, []);
-
-  // const getUserFavoriteAssets = () => {
-  //   db.collection("users")
-  //     .doc(firebase.auth().currentUser.uid)
-  //     .onSnapshot((querySnap) => {
-  //       const data = querySnap.data();
-  //       const favorites = data.favorite;
-  //       // let assetArr = [];
-  //       // favorites.map(async (item) => {
-  //       //   db.collection("assets")
-  //       //     .doc(item)
-  //       //     .onSnapshot((doc) => {
-  //       //       assetArr.push({ id: doc.id, ...doc.data() });
-  //       //       if (favorites.length === assetArr.length) {
-  //       //         setFavoriteAssets([...assetArr]);
-  //       //       }
-  //       //     });
-  //       // });
-  //       // console.log("------------------------", favorites);
-  //       setFavoriteAssets(favorites);
-  //     });
-  // };
 
   const getUserFavoriteAssets = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .collection("favorites")
       .onSnapshot((querySnap) => {
-        let favorites = [];
-        let favoritesId = [];
-
-        querySnap.forEach((document) => {
-          favorites.push({ id: document.id, ...document.data() });
-          favoritesId.push(document.id);
-        });
-        setFavoriteAssets([...favorites]);
-        setFavoriteIds([...favoritesId]);
+        const data = querySnap.data();
+        const favorites = data.favorite;
+        // let assetArr = [];
+        // favorites.map(async (item) => {
+        //   db.collection("assets")
+        //     .doc(item)
+        //     .onSnapshot((doc) => {
+        //       assetArr.push({ id: doc.id, ...doc.data() });
+        //       if (favorites.length === assetArr.length) {
+        //         setFavoriteAssets([...assetArr]);
+        //       }
+        //     });
+        // });
+        // console.log("------------------------", favorites);
+        setFavoriteAssets(favorites);
       });
   };
 
@@ -241,28 +198,13 @@ export default function Sections(props) {
   const [showSections, setShowSections] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  let type = props.navigation.getParam("type", "failed").id;
-  let tName = props.navigation.getParam("type", "failed").name;
+  const type = props.navigation.getParam("type", "failed").id;
+  const tName = props.navigation.getParam("type", "failed").name;
 
   useEffect(() => {
     //console.log("++++++++++++++++++++++", type);
     getSections();
   }, [type]);
-
-  useEffect(() => {
-    if (tempstartDate) {
-      var dateTime = tempstartDate.split(" ");
-      var update =
-        dateTime[0] +
-        " " +
-        dateTime[1] +
-        " " +
-        dateTime[2].split(":")[0] +
-        ":00 " +
-        dateTime[3];
-      setStartDate(update);
-    }
-  }, [tempstartDate]);
 
   useEffect(() => {
     if (finalAssets.length > 0) {
@@ -282,7 +224,6 @@ export default function Sections(props) {
 
   const getSections = async () => {
     const temp = [];
-    console.log("getSections ", type);
     const sections = await db
       .collection("assetSections")
       .where("assetType", "==", type)
@@ -294,18 +235,18 @@ export default function Sections(props) {
     setAssetSections(temp);
   };
 
-  // const checkFavorites = async (id) => {
-  //   const favorites = await db
-  //     .collection("users")
-  //     .doc(firebase.auth().currentUser.uid)
-  //     .collection("favorites")
-  //     .get();
-  //   const ids = [];
-  //   favorites.forEach((doc) => {
-  //     ids.push(doc.id);
-  //   });
-  //   return ids.includes(id);
-  // };
+  const checkFavorites = async (id) => {
+    const favorites = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("favorites")
+      .get();
+    const ids = [];
+    favorites.forEach((doc) => {
+      ids.push(doc.id);
+    });
+    return ids.includes(id);
+  };
 
   const handleAddFavorite = async (item) => {
     // console.log(item);
@@ -318,7 +259,6 @@ export default function Sections(props) {
     // } else {
     //   alert("Already exists");
     // }
-    // alert("item", item);
 
     const addFavorite = firebase.functions().httpsCallable("addFavorite");
     const response = await addFavorite({
@@ -327,22 +267,9 @@ export default function Sections(props) {
     });
     // console.log(response);
     if (response.data !== "Exists") {
-      alert("Asset Added");
-      // getUserFavoriteAssets();
+      // alert("Asset Added");
     } else {
-      handleDeleteFavorite(item.id);
-    }
-  };
-
-  const handleDeleteFavorite = async (id) => {
-    // console.log(id);
-    const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
-    const response = await deleteFavorite({
-      uid: firebase.auth().currentUser.uid,
-      assetId: id,
-    });
-    if (response.data !== null) {
-      // alert("Asset Deleteted");
+      // alert("Asset added before");
     }
   };
 
@@ -367,19 +294,12 @@ export default function Sections(props) {
         </View>
         <View style={styles.one}>
           <Text style={styles.cardTitle}>Choose Date & Time</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              // backgroundColor: "red",
-              minHeight: 50,
-            }}
-          >
+          <View style={{ flexDirection: "row" }}>
             <View
               style={{
                 width: "45%",
                 alignItems: "center",
                 justifyContent: "center",
-                // borderWidth: 1,
               }}
             >
               <DatePicker
@@ -537,7 +457,6 @@ export default function Sections(props) {
                     width: "20%",
                     alignItems: "center",
                     marginBottom: 15,
-                    // backgroundColor: "red",
                   }}
                 >
                   <TouchableOpacity
@@ -597,26 +516,27 @@ export default function Sections(props) {
                             // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
                             size={18}
                             color={
-                              favoriteIds.includes(l.id) ? "#c44949" : "white"
+                              favoriteAssets.includes(l.id)
+                                ? "#c44949"
+                                : "white"
                             }
-                            // onPress={
-                            //   favoriteAssets.includes(l.id)
-                            //     ? null
-                            //     : () => handleAddFavorite(l)
-                            // }
-                            disabled
+                            onPress={
+                              favoriteAssets.includes(l.id)
+                                ? null
+                                : () => handleAddFavorite(l)
+                            }
                             // style={{ borderColor: "blue", borderWidth: 1 }}
                           />
                         }
                         containerStyle={{
                           position: "absolute",
                           top: -12,
-                          right: -10,
+                          right: -12,
                         }}
                         badgeStyle={{
                           backgroundColor: "#20365F",
-                          width: 25,
-                          height: 25,
+                          width: 22,
+                          height: 22,
                           borderColor: "transparent",
                         }}
                       />
@@ -657,8 +577,6 @@ export default function Sections(props) {
                       // endDateTime={endDate}
                       // type={type}
                       navigation={props.navigation}
-                      handleAddFavorite={handleAddFavorite}
-                      favoriteAssets={favoriteIds}
                     />
 
                     <Details
