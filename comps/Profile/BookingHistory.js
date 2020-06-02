@@ -22,6 +22,7 @@ import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { AsyncStorage } from "react-native";
 import ExtendServices from "./ExtendServices"
+import { getIconType } from "react-native-elements";
 
 export default function BookingHistory(props) {
 
@@ -46,6 +47,10 @@ export default function BookingHistory(props) {
   const [totalAmount, setTotalAmount] = useState(0)
   const [assetBookingTotal, setAssetBookingTotal] = useState(0)
   const [serviceBookingTotal, setServiceBookingTotal] = useState(0)
+  const [assetTypes, setAssetTypes] = useState([])
+  const [assetSections, setAssetSections] = useState([])
+  const [displayServices, setDisplayServices] = useState([])
+  const SB = useRef()
 
   useEffect(() => {
     getBookings()
@@ -93,7 +98,30 @@ export default function BookingHistory(props) {
         })
       });
     });
+
+    db.collection("assetTypes")
+      .onSnapshot((querySnapshot) => {
+        const p = [];
+        querySnapshot.forEach((doc) => {
+          p.push({ id: doc.id, ...doc.data() });
+          //console.log("t", p)
+        });
+        setAssetTypes([...p]);
+      });
+
+    db.collection("assetSections")
+      .onSnapshot((querySnapshot) => {
+        const p = [];
+        querySnapshot.forEach((doc) => {
+          p.push({ id: doc.id, ...doc.data() });
+          //console.log("s", p)
+        });
+        setAssetSections([...p]);
+      });
+
+
   };
+ 
 
   useEffect(() => {
     if (services) {
@@ -114,6 +142,7 @@ export default function BookingHistory(props) {
 
   useEffect(() => {
     if (viewDetails) {
+      
       let bookedServices = []
       let temp = viewDetails
       for (let i = 0; i < serviceBookings.length; i++) {
@@ -125,6 +154,7 @@ export default function BookingHistory(props) {
       }
       temp.bookedServices = bookedServices
       setViewDetails(temp)
+      orderList()
     }
   }, [viewDetails])
 
@@ -154,6 +184,7 @@ export default function BookingHistory(props) {
     else {
       db.collection("users").doc(firebase.auth().currentUser.uid).update({ points: points })
     }
+    back()
   }
 
   const checkExtension = async () => {
@@ -180,8 +211,8 @@ export default function BookingHistory(props) {
     setTypeId(type.data().assetType)
   }
 
-  useEffect(()=>{
-    if(accepted){
+  useEffect(() => {
+    if (accepted) {
       var start = viewDetails.assetBooking.endDateTime
       var end = ""
       if (extension.split(" ")[3] == "PM") {
@@ -190,22 +221,30 @@ export default function BookingHistory(props) {
       else {
         end = extension.split(" ")[0] + " T " + extension.split(" ")[2] + ":00"
       }
+      //console.log("end", end.split("T")[1].split(":")[0].split(""))
+      if (end.split("T")[1].split(":")[0].split("").length == 1) {
+        end = end.split("T")[0] + "T0" + end.split("T")[1]
+      }
+
+      //console.log("start", start.split("T")[1].split(":")[0].split(""))
+
+      if (start.split("T")[1].split(":")[0].split("").length == 2) {
+        start = start.split("T")[0] + "T0" + start.split("T")[1]
+      }
 
       // count days and total
       var s = new Date(start.split(" ").join(''))
       var e = new Date(end.split(" ").join(''))
       var diff = (e.getTime() - s.getTime()) / 1000;
-
       diff /= (60 * 60);
 
       var assetTotal = Math.round(diff * parseInt(viewDetails.assetBooking.asset.price) * 100) / 100
-
       setTotalAmount(assetTotal)
       // total.current = assetTotal
       // assetTotal.current = assetTotal
-      setAssetBookingTotal( assetTotal)
+      setAssetBookingTotal(assetTotal)
     }
-  },[accepted])
+  }, [accepted])
 
   useEffect(() => {
     if (extension) {
@@ -216,22 +255,20 @@ export default function BookingHistory(props) {
     }
   }, [extension])
 
-  useEffect(()=>{
+  useEffect(() => {
     var serviceT = 0
-    console.log("OHA",newServiceBookings)
     if (newServiceBookings.length > 0) {
       for (let i = 0; i < newServiceBookings.length; i++) {
-        console.log("in loop",newServiceBookings[i].service.price )
         serviceT = serviceT + parseInt(newServiceBookings[i].service.price)
       }
       setTotalAmount(totalAmount + serviceT)
-    //total.current= total.current + serviceT
-    //serviceTotal.current = serviceT
-    setServiceBookingTotal(serviceT)
-    //console.log("service booking state", serviceBookingTotal , "Ref ", serviceTotal.current ,"loop", serviceT)
+      //total.current= total.current + serviceT
+      //serviceTotal.current = serviceT
+      setServiceBookingTotal(serviceT)
+      //console.log("service booking state", serviceBookingTotal , "Ref ", serviceTotal.current ,"loop", serviceT)
     }
 
-  },[newServiceBookings])
+  }, [newServiceBookings])
 
   const getServiceBookings = (bookings, show, userdays, updateAvailable) => {
     setNewServiceBookings(bookings)
@@ -239,8 +276,8 @@ export default function BookingHistory(props) {
     //setNewUserDays(userdays)
     setAddServices(false)
     //setUpdateAvailableTimings(updateAvailable)
-    
-    
+
+
   }
 
   const back = () => {
@@ -250,20 +287,26 @@ export default function BookingHistory(props) {
     setExtension()
     setNewShow([])
     setNewServiceBookings([])
+    setAssetBookingTotal()
+    setAccepted(false)
+    setServiceBookingTotal()
+    setTotalAmount()
+    setExtension(false)
   }
 
   const confirm = async () => {
     Alert.alert("Payment", '',
       [
-        { text: 'Pay Now?', onPress: () => console.log("ff") },
-        { text: 'Pay Later', onPress: () => payLater() },
+        { text: 'Pay Now?', onPress: () => pay("now") },
+
+        { text: 'Pay Later', onPress: () => pay("later") },
         { text: 'Cancel', onPress: () => console.log('No Pressed') },
       ],
 
     );
   }
 
-  const payLater = async () => {
+  const pay = async (paymentStat) => {
 
     var u = await db.collection("users").doc(firebase.auth().currentUser.uid).get()
     var user = u.data()
@@ -277,54 +320,180 @@ export default function BookingHistory(props) {
     else {
       endDateTime = extension.split(" ")[0] + " T " + extension.split(" ")[2] + ":00"
     }
+
+
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
     const editBooking = firebase.functions().httpsCallable("editBooking");
     if (viewDetails.status) {
-      const response = await handleBooking({
-        user: user,
-        asset: viewDetails.assetBooking.asset,
-        startDateTime: viewDetails.assetBooking.endDateTime,
-        endDateTime: endDateTime,
-        card: { cardNo: "", expiryDate: "", CVC: "", cardType: "", cardHolder: "" },
-        promotionCode: null,
-        dateTime: moment().format("YYYY-MM-DD T HH:mm"),
-        addCreditCard: false,
-        uid: firebase.auth().currentUser.uid,
-        totalAmount: totalAmount,
-        status: false,
-        serviceBooking: newServiceBookings
-      });
+      if (paymentStat == "later") {
+        const response = await handleBooking({
+          user: user,
+          asset: viewDetails.assetBooking.asset,
+          startDateTime: viewDetails.assetBooking.endDateTime,
+          endDateTime: endDateTime,
+          card: { cardNo: "", expiryDate: "", CVC: "", cardType: "", cardHolder: "" },
+          promotionCode: null,
+          dateTime: moment().format("YYYY-MM-DD T HH:mm"),
+          addCreditCard: false,
+          uid: firebase.auth().currentUser.uid,
+          totalAmount: totalAmount,
+          status: false,
+          serviceBooking: newServiceBookings
+        });
+        back()
+      }
+      else {
+        //navigate to original payment
+        props.navigation.navigate("Payment", {
+          assetBooking:
+          {
+            asset: viewDetails.assetBooking.asset,
+            startDateTime: viewDetails.assetBooking.endDateTime,
+            endDateTime,
+            user
+          }
+          ,
+          serviceBooking: newServiceBookings
+          ,
+          totalAmount: totalAmount
+        })
+      }
+
     }
-    else{
-      const response = await editBooking({
-        paymentId: viewDetails.id, 
-        endDateTime: endDateTime,
-        assetBooking: viewDetails.assetBooking,
-        totalAmount: totalAmount + viewDetails.totalAmount ,
-        status: false,
-        serviceBooking: newServiceBookings
-      });
+    else {
+      if (paymentStat == "later") {
+        const response = await editBooking({
+          paymentId: viewDetails.id,
+          endDateTime: endDateTime,
+          assetBooking: viewDetails.assetBooking,
+          totalAmount: totalAmount + viewDetails.totalAmount,
+          status: false,
+          serviceBooking: newServiceBookings
+        });
+        back()
+      }
+      else {
+        //if not payed and pay now
+        props.navigation.navigate("Payment", {
+          oldPayment: viewDetails,
+          serviceBooking: newServiceBookings,
+          totalAmount: totalAmount + parseInt(viewDetails.totalAmount),
+          assetBooking:
+            { asset: viewDetails.assetBooking.asset, startDateTime: viewDetails.assetBooking.endDateTime, endDateTime: endDateTime, user },
+        })
+      }
     }
 
   }
 
-  return (
-    <View style={{ backgroundColor: "#F0F8FF", height: "100%", paddingTop: 10 }}>
-      {
-        accepted?
-        <View><Text>total : {totalAmount}</Text>
-        <Text>total Asset : {assetBookingTotal}   </Text></View>
-        :
-        null
+  const getType = (s) => {
+    var section = assetSections.filter(o => o.id == s)[0]
+    var type = assetTypes.filter(o => o.id == section.assetType)[0]
+    return type.name
+  }
+
+  const getSection = (s) => {
+    var section = assetSections.filter(o => o.id == s)[0]
+    return section.name
+  }
+
+
+
+  const orderList = () => {
+
+    var newServiceArr = []
+  
+    for (let i = 0; i < services.length; i++) {
+
+      var s = viewDetails.bookedServices.filter(b => b.service.id == services[i].id)
+     
+      if (s.length > 0) {
+        var timings = []
+        for (let k = 0; k < s.length; k++) {
+          timings.push(s[k].dateTime)
+        }
+        newServiceArr.push({ service: services[i].name, timings })
       }
-      
+    }
+
+    var newOrder = []
+
+    for (let i = 0; i < newServiceArr.length; i++) {
+      var min = ""
+      var counter = newServiceArr[i].timings.length
+      var use = newServiceArr[i].timings
+      newOrder.push({ service: newServiceArr[i].service, timings: [] })
+      while (counter > 0) {
+        var min = use[0]
+        for (let k = 0; k < use.length; k++) {
+          if( min.split("T")[1].split(":")[0].split("").length == 1 ){
+            min = min.split("T")[0]+"T0"+min.split("T")[1]
+          }
+          if( use[k].split("T")[1].split(":")[0].split("").length == 1 ){
+            use[k] = use[k].split("T")[0]+"T0"+use[k].split("T")[1]
+          }
+
+          if (new Date(min).getTime() > new Date(use[k]).getTime()) {
+            //console.log("hh")
+            min = use[k]
+            //index = k
+          }
+        }
+        newOrder[i].timings.push(min)
+        //rmeove min from use
+        use = use.filter(m => m != min)
+        counter = counter - 1
+      }
+      //newServiceArr[i].timings = 
+
+    }
+
+    //console.log("pleeeaassseee", newOrder)
+    setDisplayServices(newOrder)
+    SB.current = newOrder
+    //showBookings.current = newServiceArr
+    //setUpdate(true)
+
+  }
+
+  const converte = (hour) =>{
+    if( parseInt(hour.split("T")[1].split(":")[0]) == 0 ){
+      return "12:00 AM"
+    }
+    else if( parseInt(hour.split("T")[1].split(":")[0]) >= 13 ){
+      return parseInt(hour.split("T")[1].split(":")[0]) - 12 +":00 PM"
+    }
+    else{
+      return  parseInt(hour.split("T")[1].split(":")[0])+":00 AM"
+    }
+  }
+
+
+  
+  return (
+    <ScrollView>
+      {
+        accepted && viewDetails ?
+          <View><Text>total : {totalAmount}</Text>
+            <Text>total Asset : {assetBookingTotal}   </Text></View>
+          :
+          null
+      }
+
       {
         payments && !viewDetails ?
           payments.map(p =>
 
-            <TouchableOpacity onPress={() => setViewDetails(p)}><Text>{p.id}</Text>
-              <Text>{p.totalAmount}</Text>
-              <Text>{!p.status ? "Not Payed" : null}</Text>
+            <TouchableOpacity onPress={() => setViewDetails(p)}>
+              <Text>Type {assetSections.length > 0 ? getType(p.assetBooking.asset.assetSection) : "Loading ..."}</Text>
+              <Text>Section {assetSections.length > 0 ? getSection(p.assetBooking.asset.assetSection) : "Loading ..."}</Text>
+              <Text>{p.assetBooking.asset.code}</Text>
+              <Text>{p.assetBooking.startDateTime.split(" ")[0]} {converte(p.assetBooking.startDateTime)}</Text>
+              <Text>{p.assetBooking.endDateTime.split(" ")[0]} {converte(p.assetBooking.endDateTime)}</Text>
+              <Text>{p.totalAmount} QR  {!p.status ? "Not Payed" : "Payed"}</Text>
+              <Text></Text>
+
+              
 
             </TouchableOpacity>
           )
@@ -335,13 +504,43 @@ export default function BookingHistory(props) {
       {
         viewDetails ?
           <View>
-            <Text>{viewDetails.id}</Text>
-            <Text>{viewDetails.assetBooking.startDateTime}</Text>
-            <Text>{viewDetails.assetBooking.endDateTime}</Text>
-            {/* <Button title={"edit"} onPress={}/> */}
-            {/* <Button title={"cancel"} onPress={()=>cancelBooking()}/> */}
+            {/* <Text>{viewDetails.id}</Text> */}
+            <Text>Type {assetSections.length > 0 ? getType(viewDetails.assetBooking.asset.assetSection) : "Loading ..."}</Text>
+            <Text>Section {assetSections.length > 0 ? getSection(viewDetails.assetBooking.asset.assetSection) : "Loading ..."}</Text>
+            <Text>From: {viewDetails.assetBooking.startDateTime}</Text>
+            <Text>To: {viewDetails.assetBooking.endDateTime}</Text>
+            <Text>Total Amount: {viewDetails.totalAmount} QR  {!viewDetails.status ? "Not Payed" : "Payed"}</Text>
+
+            {
+                displayServices.length > 0 ?
+                <View>
+                  <Text>Booked Services</Text>
+                  {
+
+                  displayServices.map((s, index) =>
+                    <View>
+                      <Text>Service: {s.service}</Text>
+                      <Text>Timing/s: </Text>
+                      {
+                        s.timings.map(
+                          h =>
+                            <View style={{ flexDirection: "row" }}>
+                              <Text>{h.split("T")[0]}  {converte(h)}</Text>
+                              {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
+                            </View>
+                        )
+                      }
+
+                    </View>
+                  )}
+                  </View>
+                  :
+                  <Text>No Booked Services</Text>
+              }
+          
+            { new Date().getTime() < new Date(viewDetails.assetBooking.startDateTime.split(" ").join('')).getTime() ? <Button title={"cancel"} onPress={()=>cancelBooking()}/> : null }
             <Button title={"Back"} onPress={() => back()} />
-            <Button title={"extend"} onPress={() => showDateInput(true)} />
+            { new Date().getTime() < new Date(viewDetails.assetBooking.endDateTime.split(" ").join('')).getTime() ? <Button title={"extend"} onPress={() => showDateInput(true)} /> : null}
           </View>
           :
           null
@@ -356,7 +555,7 @@ export default function BookingHistory(props) {
             date={extension}
             mode="datetime"
             placeholder="select a Start date"
-            format="YYYY-MM-DD T h:00 A"
+            format="YYYY-MM-DD T hh:00 A"
             minDate={viewDetails.assetBooking.endDateTime}
             maxDate={moment().add(3, "month")}
             minTime={moment(viewDetails.assetBooking.endDateTime).format()}
@@ -468,7 +667,7 @@ export default function BookingHistory(props) {
 
 
 
-    </View>
+    </ScrollView>
   );
 }
 

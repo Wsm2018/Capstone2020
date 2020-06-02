@@ -7,6 +7,8 @@ import ReferralScreen from "../comps/Profile/ReferralScreen";
 import GiftScreen from "../comps/Profile/GiftScreen";
 import AddCard from "../comps/Profile/AddCardScreen";
 import CardsScreen from "../comps/Profile/CardsScreen";
+import BookingHistory from "../comps/Profile/BookingHistory"
+import Payment  from "../comps/Profile/ExtensionPayment"
 import { Icon } from "react-native-elements";
 const ProfileStack = createStackNavigator(
   {
@@ -16,6 +18,9 @@ const ProfileStack = createStackNavigator(
     GiftScreen: GiftScreen,
     AddCard: AddCard,
     CardsScreen: CardsScreen,
+    BookingHistory:BookingHistory,
+    Payment:Payment
+    
   },
   {
     // headerMode: null,

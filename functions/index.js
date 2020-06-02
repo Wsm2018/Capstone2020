@@ -124,7 +124,7 @@ exports.assetManager = functions.https.onCall(async (data, context) => {
 exports.editBooking = functions.https.onCall(async (data, context) => {
   var newAssetBooking = data.assetBooking
   newAssetBooking.endDateTime = data.endDateTime
-  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount , assetBooking: newAssetBooking})
+  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount , assetBooking: newAssetBooking , status : data.status})
   db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime})
 
   for( let i =0 ; i < data.serviceBooking.length ; i++){

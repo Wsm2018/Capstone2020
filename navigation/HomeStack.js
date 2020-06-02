@@ -7,9 +7,16 @@ import Details from "../comps/Assets/Details"
 import Sections from "../comps/Assets/Sections"
 import List from "../comps/Assets/List"
 import Types from "../comps/Assets/Types"
+import AssetManager from "../comps/Assets/AssetManagement"
+import ServiceManagement from "../comps/Assets/ServiceManagement"
+import BookingHistory from "../comps/Profile/BookingHistory"
+import ExtendServices from "../comps/Profile/ExtendServices"
 
 const HomeStack = createStackNavigator({
-  
+ BookingHistory: BookingHistory,
+//AssetManager: AssetManager,
+  //ExtendServices: ExtendServices,
+  //ServiceManagement:ServiceManagement,
   Types: Types,
   Assets: Assets,
   Home: HomePage,
