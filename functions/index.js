@@ -208,10 +208,12 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       .where("referralCode", "==", request.query.referral)
       .get();
     referralDoc.forEach((doc) => {
-      db.collection("users").doc(doc.id).collection("referrer").doc().set({
-        referrerCode: referralCode,
-        status: false,
-      });
+      if (doc.data().email !== "DELETED") {
+        db.collection("users").doc(doc.id).collection("referrer").doc().set({
+          referrerCode: referralCode,
+          status: false,
+        });
+      }
     });
   }
 
@@ -642,7 +644,17 @@ exports.giftsExpCheck = functions.pubsub
 
 exports.deleteGuestUser = functions.https.onRequest(
   async (request, response) => {
-    db.collection("users").doc(request.query.uid).delete();
+    db.collection("users").doc(request.query.uid).update({
+      displayName: "DELETED",
+      email: "DELETED",
+      phone: "DELETED",
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      location: null,
+      qrCode: "",
+    });
     await admin.auth().deleteUser(request.query.uid);
 
     response.send("All done");

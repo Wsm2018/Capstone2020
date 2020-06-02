@@ -26,6 +26,7 @@ export default function Users() {
   const [editMode, setEditMode] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
+  const [modal2, setModal2] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -38,7 +39,8 @@ export default function Users() {
     db.collection("users").onSnapshot((snap) => {
       let users = [];
       snap.forEach((doc) => {
-        users.push({ id: doc.id, ...doc.data() });
+        if (doc.data().email !== "DELETED")
+          users.push({ id: doc.id, ...doc.data() });
       });
       setUsers(users);
     });
@@ -134,6 +136,15 @@ export default function Users() {
     });
   };
 
+  // ---------------------------------DELETE---------------------------------
+  const handleDelete = async () => {
+    // ---------------------------------
+    setUser(null);
+    const response = await fetch(
+      `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${user.id}`
+    );
+  };
+
   // ------------------------------------------------------------------
   useEffect(() => {
     if (user) {
@@ -154,25 +165,6 @@ export default function Users() {
       setUser(tempUser[0]);
     }
   }, [users]);
-
-  // const getUser = async () => {
-  //   if (user) {
-  //     // db.collection("users")
-  //     //   .doc(user.id)
-  //     //   .onSnapshot((query) => {
-  //     //     console.log(query.data());
-  //     //     setUser({ id: query.id, ...query.data() });
-  //     //   });
-  //     let index = users.indexOf(user);
-  //     console.log(users[index]);
-  //     setUser(users[index]);
-
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getUser();
-  // }, [!editMode]);
 
   return user ? (
     <View style={styles.container}>
@@ -238,7 +230,7 @@ export default function Users() {
                 flexDirection: "row",
               }}
             >
-              {/* ---------------------------------CONFIRM--------------------------------- */}
+              {/* -------------------------CONFIRM RESET PASS------------------------- */}
               <TouchableOpacity
                 style={{
                   borderWidth: 1,
@@ -252,7 +244,7 @@ export default function Users() {
               >
                 <Text>CONFIRM</Text>
               </TouchableOpacity>
-              {/* ---------------------------------CANCEL--------------------------------- */}
+              {/* -------------------------CANCEL RESET PASS-------------------------- */}
               <TouchableOpacity
                 style={{
                   borderWidth: 1,
@@ -262,6 +254,86 @@ export default function Users() {
                   alignItems: "center",
                 }}
                 onPress={() => setModal(false)}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/* ---------------------------------MODAL2--------------------------------- */}
+      <Modal transparent={true} visible={modal2} animationType="slide">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            // alignItems: "center",
+            alignSelf: "center",
+            marginTop: 22,
+            // ---This is for Width---
+            width: "80%",
+          }}
+        >
+          <View
+            style={{
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              justifyContent: "center",
+              // ---This is for Height---
+              height: "50%",
+            }}
+          >
+            <Text>
+              Are you sure you want to DELETE {user.displayName}'s account?
+            </Text>
+            <Text></Text>
+            <Text>This action can't be undone!</Text>
+            <Text></Text>
+            <Text></Text>
+            <View
+              style={{
+                //   borderWidth: 1,
+                width: "100%",
+                height: "10%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* -----------------------------CONFIRM DELETE------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={handleDelete}
+              >
+                <Text>CONFIRM</Text>
+              </TouchableOpacity>
+              {/* -----------------------------CANCEL DELETE------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => setModal2(false)}
               >
                 <Text>Cancel</Text>
               </TouchableOpacity>
@@ -289,6 +361,14 @@ export default function Users() {
           onPress={() => setEditMode(true)}
         >
           <Text>Edit</Text>
+        </TouchableOpacity>
+        <Text> | </Text>
+        {/* ---------------------------------RESET PASSWORD--------------------------------- */}
+        <TouchableOpacity
+          style={{ borderWidth: 1 }}
+          onPress={() => setModal2(true)}
+        >
+          <Text>Delete</Text>
         </TouchableOpacity>
       </View>
       <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
