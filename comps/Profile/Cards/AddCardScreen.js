@@ -133,11 +133,12 @@ export default function AddCard(props) {
     <View
       style={{
         flex: 1,
+        backgroundColor: "lightgray",
         // flexDirection: "column",
         // flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: "5%",
+        // marginTop: "5%",
         // marginBottom: "10%",
       }}
     >
@@ -161,19 +162,25 @@ export default function AddCard(props) {
         }}
       >
         <CreditCardInput
+          elevation={5}
           labels={labels}
           requiresName={true}
           onChange={handleCard}
           allowScroll={true}
-          labelStyle={{ textAlign: "center" }}
+          // labelStyle={{ textAlign: "center" }}
           inputStyle={{
-            borderBottomWidth: 2,
-            borderRadius: 5,
-            textAlign: "center",
+            borderWidth: 1,
+            backgroundColor: "white",
+            height: 50,
+            // marginStart: 2,
+            // borderRadius: 5,
+            // textAlign: "center",
           }}
-          inputContainerStyle={{
-            marginTop: 60,
-          }}
+          inputContainerStyle={
+            {
+              // marginTop: 60,
+            }
+          }
           labelStyle={{ color: "gray" }}
           cardImageFront={require("../../../assets/images/dark1.jpg")}
           cardImageBack={require("../../../assets/images/dark2.png")}

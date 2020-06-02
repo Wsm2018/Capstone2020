@@ -11,16 +11,28 @@ import LottieView from "lottie-react-native";
 import { BarChart, Grid, YAxis, XAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
 export default function Statistics(props) {
-  // --------------------------------------- STATE VARIABLES -----------------------------------------
+  // --------------------------------------- STATE VARIABLES -------------------------
 
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [allAssetTypes, setAllAssetTypes] = useState([]);
+  // --------------------------------------- USER STATES -----------------------------
+
+  const [totalUsers, setTotalUsers] = useState([]);
+  const [userChart, setUserChart] = useState(null);
+
+  // --------------------------------------- ASSETS STATES --------------------------
+
   const [allAssetBookings, setAllAssetBookings] = useState([]);
   const [allAssetSections, setAllAssetSections] = useState([]);
   const [assetChartData, setAssetChartData] = useState([]);
+
+  // ----------------------------------------- SERVICE STATES  -----------------------
+
   const [serviceBookings, setServiceBookings] = useState([]);
   const [serviceChartData, setServiceChartData] = useState([]);
-  const screenWidth = Dimensions.get("window").width;
+
+  // ---------------------------- CHART CONFIG ---------------------------------------
+
+  const screenWidth = Dimensions.get("screen").width;
+  const screenHeight = Dimensions.get("screen").height;
   const chartConfig = {
     backgroundColor: "white",
     backgroundGradientFrom: "white",
@@ -33,184 +45,26 @@ export default function Statistics(props) {
     useShadowColorFromDataset: false,
   };
 
-  const data = {
-    labels: [
-      "parking 01",
-      "parking 02",
-      "parking 03",
-      "parking 04",
-      "parking 05",
-      "parking 06",
-      "parking 07",
-      "parking 08",
-      "parking 09",
-      "parking 10",
-      "parking 11",
-    ],
-    datasets: [
-      {
-        data: [3, 2, 0, 0, 3, 0, 0, 1, 3, 0, 1],
-      },
-    ],
-  };
-
   // ---------------------------------------- FUNCTIONS ----------------------------------------------
 
   const getTotalUsers = () => {
     db.collection("users").onSnapshot((querySnap) => {
-      setTotalUsers(querySnap.docs.length);
-    });
-  };
-
-  const getAllAssetTypes = async () => {
-    db.collection("assetTypes").onSnapshot((assetTypeSnap) => {
-      const assetTypeArr = [];
-      assetTypeSnap.forEach((assetType) => {
-        assetTypeArr.push({ id: assetType.id, ...assetType.data() });
+      let users = [];
+      querySnap.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
       });
-      setAllAssetTypes([...assetTypeArr]);
+      setTotalUsers([...users]);
     });
   };
 
-  const getAllAssetSections = async () => {
-    const assetSectionRef = await db.collection("assetSections").get();
-    const assetSections = [];
-    assetSectionRef.forEach((doc) => {
-      assetSections.push({ id: doc.id, ...doc.data() });
-    });
-    return assetSections;
-  };
-
-  const getAllAssetBookings = () => {
-    db.collection("assetTypes").onSnapshot((assetTypeSnapshot) => {
-      let count = 0;
-      let assetBookings = [];
-      assetTypeSnapshot.forEach((assetType) => {
-        db.collection("assetSections")
-          .where("assetType", "==", assetType.id)
-          .onSnapshot((assetSectionSnapshot) => {
-            assetSectionSnapshot.forEach((assetSection) => {
-              db.collection("assets")
-                .where("assetSection", "==", assetSection.id)
-                .onSnapshot((assetSnapshot) => {
-                  count += assetSnapshot.docs.length;
-                  assetSnapshot.forEach((asset) => {
-                    db.collection("assets")
-                      .doc(asset.id)
-                      .collection("assetBookings")
-                      .onSnapshot((assetBookingSnapshot) => {
-                        assetBookings.push({
-                          bookings: assetBookingSnapshot.docs.length,
-                          asset: asset.data().name,
-                          assetSection: assetSection.data().name,
-                          color: assetSection.data().color,
-                        });
-                        if (count === assetBookings.length) {
-                          setAllAssetBookings([...assetBookings]);
-                          setCharData(assetBookings);
-                        }
-                        // console.log("count ", count);
-                        // console.log("booking", assetBookings.length);
-                        // console.log(
-                        //   `${asset.data().name} ${assetSection.data().name} ${
-                        //     assetBookingSnapshot.docs.length
-                        //   }`
-                        // );
-                      });
-
-                    // console.log("asset", assetSnapshot.docs.length);
-                  });
-                });
-            });
-          });
+  const getAllAssetSections = () => {
+    db.collection("assetSections").onSnapshot((snapShot) => {
+      let assetSection = [];
+      snapShot.forEach((document) => {
+        assetSection.push({ id: document.id, ...document.data() });
       });
+      setAllAssetSections([...assetSection]);
     });
-    // db.collection("assetTypes").onSnapshot((assetTypeSnap) => {
-    //   let count = 0;
-    //   let assets = [];
-    //   let assetBookings = [];
-    //   let assetSections = [];
-    //   assetTypeSnap.forEach((at) => {
-    //     db.collection("assetSections")
-    //       .where("assetType", "==", at.id)
-    //       .onSnapshot((assetSectionSnap) => {
-    //         assetSectionSnap.forEach((as) => {
-    //           assetSections.push({ id: as.id, ...as.data() });
-    //           db.collection("assets")
-    //             .where("assetSection", "==", as.id)
-    //             .onSnapshot((assetSnap) => {
-    //               assetSnap.forEach((a) => {
-    //                 assets.push({ id: a.id, ...a.data() });
-    //                 count++;
-    //                 db.collection("assets")
-    //                   .doc(a.id)
-    //                   .collection("assetBookings")
-    //                   .onSnapshot((assetBookingSnap) => {
-    //                     assetBookingSnap.forEach((ab) => {
-    //                       assetBookings.push({
-    //                         assetBooking: ab.data(),
-    //                         asset: a.id,
-    //                         assetSection: as.id,
-    //                         assetType: at.id,
-    //                       });
-    //                       console.log(2222, count);
-    //                       console.log(1111, assetBookings.length);
-    //                       if (count === assetBookings.length) {
-    //                         // setAllAssetBookings([...assetBookings]);
-    //                         // setAllAssetSections([...assetSections]);
-    //                         // setAllAssets([...assets]);
-    //                         // fixData(assetBookings);
-    //                       }
-    //                     });
-    //                   });
-    //               });
-    //             });
-    //         });
-    //       });
-    //   });
-    // });
-    // db.collection("assets").onSnapshot((querySnapshot) => {
-    //   let bookings = [];
-    //   let count = 0;
-    //   querySnapshot.forEach((document) => {
-    //     db.collection("assets")
-    //       .doc(document.id)
-    //       .collection("assetBookings")
-    //       .onSnapshot((query) => {
-    //         count++;
-    //         query.forEach((doc) => {
-    //           bookings.push({ id: doc.id, ...doc.data() });
-    //         });
-    //         if (count === querySnapshot.docs.length) {
-    //           setAllBookings([...bookings]);
-    //         }
-    //       });
-    //   });
-    // });
-  };
-
-  const setCharData = async (assetBookings) => {
-    const assetSection = await getAllAssetSections();
-    // console.log("assetsections ", assetSection);
-    // console.log("assetBookings", assetBookings);
-    let result = [];
-    assetSection.map((item) => {
-      // let count = 0;
-      assetBookings.map((ab) => {
-        // if (item.name === ab.assetSection) {
-        //   count++;
-        // }
-        console.log("aslkdnllkmdslkmansdlm", ab);
-      });
-      // result.push({
-      //   name: item.name,
-      //   booking: count,
-      //   color: item.color,
-      //   legendFontColor: "#7F7F7F",
-      //   legendFontSize: 15,
-      // });
-    });
-    console.log(result);
   };
 
   const getAllServiceBookings = () => {
@@ -227,7 +81,6 @@ export default function Statistics(props) {
             query.forEach((document) => {
               serviceBooking.push({ id: document.id, ...document.data() });
             });
-            // let color = await generateRandomColor();
             chartData.push({
               name: doc.data().name,
               booking: query.docs.length,
@@ -251,16 +104,64 @@ export default function Statistics(props) {
       const random = Math.floor(Math.random() * 256);
       res += `${random},`;
     }
-    // console.log(res);
     const color = `rgb(${res.substring(0, res.length - 1)})`;
-    console.log("color", color);
-    // return color;
+    alert(`color ${color}`);
   };
 
-  const fetchAllData = async () => {
-    getAllAssetTypes();
-    getAllAssetBookings();
-    getAllServiceBookings();
+  const getAllAssetBookings = () => {
+    db.collection("assets").onSnapshot((querySnapshot) => {
+      const assets = [];
+      let count = 0;
+      querySnapshot.forEach((doc) => {
+        count++;
+        db.collection("assets")
+          .doc(doc.id)
+          .collection("assetBookings")
+          .onSnapshot((query) => {
+            assets.push({
+              id: doc.id,
+              ...doc.data(),
+              bookings: query.docs.length,
+            });
+            if (assets.length === count) {
+              setAllAssetBookings([...assets]);
+            }
+          });
+      });
+    });
+  };
+
+  const getAssetChartData = () => {
+    const result = [];
+    allAssetSections.map((assetSection) => {
+      allAssetBookings.map((assetBooking) => {
+        if (assetBooking.assetSection === assetSection.id) {
+          const bookingCount = getBookingCount(assetSection.id);
+          result.push({
+            name: assetSection.name,
+            booking: bookingCount,
+            color: assetSection.color,
+            legendFontColor: "#7F7F7F",
+            legendFontSize: 15,
+          });
+        }
+      });
+    });
+
+    const unique = [];
+    result.map((x) =>
+      unique.filter((a) => a.name === x.name).length > 0 ? null : unique.push(x)
+    );
+    setAssetChartData([...unique]);
+  };
+
+  const getBookingCount = (assetSectionId) => {
+    const assetBookings = allAssetBookings.filter(
+      (item) => item.assetSection === assetSectionId
+    );
+    let bookingCount = 0;
+    assetBookings.map((item) => (bookingCount += item.bookings));
+    return bookingCount;
   };
 
   {
@@ -351,8 +252,22 @@ export default function Statistics(props) {
 
   useEffect(() => {
     getTotalUsers();
-    fetchAllData();
+    getAllServiceBookings();
+    getAllAssetSections();
+    getAllAssetBookings();
   }, []);
+
+  useEffect(() => {
+    if (allAssetSections && allAssetBookings) {
+      getAssetChartData();
+    }
+  }, [allAssetSections, allAssetBookings]);
+
+  useEffect(() => {
+    if (totalUsers) {
+      getUserChart();
+    }
+  }, [totalUsers]);
 
   // ----------------------------------------- VIEW -------------------------------------------------
 
@@ -466,7 +381,10 @@ export default function Statistics(props) {
         </View>
       )}
 
-      <Button title="get color" onPress={() => generateRandomColor()} />
+      <Button
+        title="GENERATE RANDOM COLOR"
+        onPress={() => generateRandomColor()}
+      />
     </ScrollView>
   );
 }

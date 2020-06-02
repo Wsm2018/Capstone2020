@@ -6,7 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
+// import { Octicons } from "@expo/vector-icons";
+import firebase from "firebase";
+import "firebase/auth";
+import "firebase/functions";
 import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
 import { Divider, Card as Cards } from "react-native-elements";
@@ -14,6 +19,29 @@ import { Octicons } from "@expo/vector-icons";
 // import { ScrollView } from "react-native-gesture-handler";
 
 export default function Car({ car }) {
+  const handleConfirmation = () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to remove this car? ",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => handleRemoveCar() },
+      ],
+      { cancelable: false }
+    );
+  };
+  const handleRemoveCar = async () => {
+    const deleteCar = firebase.functions().httpsCallable("deleteCar");
+    const response = await deleteCar({
+      uid: firebase.auth().currentUser.uid,
+      carId: car.id,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Cards containerStyle={styles.card}>
@@ -21,6 +49,7 @@ export default function Car({ car }) {
           width={Dimensions.get("window").width / 1.5}
           source={require("../../../assets/images/Qatar.png")}
         />
+
         <View
           style={{
             flex: 1,
@@ -34,7 +63,30 @@ export default function Car({ car }) {
             marginTop: "10%",
           }}
         >
-          <Text style={styles.plate}> {car.plate}</Text>
+          <View
+            width={Dimensions.get("window").width / 1.41}
+            height={Dimensions.get("window").height / 10}
+            style={{
+              flex: 1,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: "center",
+              alignItems: "flex-end",
+              // marginTop: "-12%",
+              // marginEnd: "-3%",
+            }}
+          >
+            <TouchableOpacity onPress={handleConfirmation}>
+              {/* <Text style={styles.notes}>X</Text> */}
+              <Octicons name="trashcan" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View>
+            <Text style={styles.plate}> {car.plate}</Text>
+          </View>
         </View>
       </Cards>
     </View>
