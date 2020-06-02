@@ -21,6 +21,7 @@
     "expo-file-system": "^8.1.0",
     "expo-firebase-recaptcha": "^1.1.0",
     "expo-image-picker": "^8.1.0",
+    "expo-linking": "^1.0.1",
     "expo-print": "~8.1.0",
     "expo-sms": "~8.1.0",
     "firebase": "7.9.0",
