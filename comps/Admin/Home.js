@@ -9,6 +9,13 @@ export default function Home(props) {
   const handleLogout = () => {
     firebase.auth().signOut();
   };
+
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
+
   return (
     <View style={styles.container}>
       <Text>Admin Home</Text>
@@ -31,6 +38,10 @@ export default function Home(props) {
 
       <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
         <Text>Booking</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleChangeRole()}>
+        <Text>Change Role</Text>
       </TouchableOpacity>
     </View>
   );
