@@ -275,53 +275,47 @@ export default function Statistics(props) {
 
       <View style={{ alignItems: "center", flex: 1 }}>
         <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
-        <PieChart
-          data={assetChartData}
-          width={screenWidth}
-          height={220}
-          chartConfig={chartConfig}
-          accessor="booking"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
-        />
-        {/* <BarChart
-          // style={{ backgroundColor: "white" }}
-          data={data}
-          width={screenWidth}
-          height={400}
-          withInnerLines={false}
-          // yAxisLabel="Bookings"
-          chartConfig={{
-            backgroundColor: "white",
-            backgroundGradientFrom: "white",
-            // backgroundGradientFromOpacity: 0,
-            backgroundGradientTo: "white",
-            // backgroundGradientToOpacity: 0.5,
-            barPercentage: 1,
-            color: () => `rgba(250,0,0,0.6)`,
-            style: {
-              borderRadius: 16,
-            },
-          }}
-          verticalLabelRotation={90}
-          fromZero
-        /> */}
+        {assetChartData.length !== 0 ? (
+          <PieChart
+            data={assetChartData}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            accessor="booking"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Text>Loading</Text>
+          </View>
+        )}
       </View>
 
       <View style={{ alignItems: "center" }}>
         <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
 
-        <PieChart
-          data={serviceChartData}
-          width={screenWidth}
-          height={220}
-          chartConfig={chartConfig}
-          accessor="booking"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
-        />
+        {serviceChartData.length !== 0 ? (
+          <PieChart
+            data={serviceChartData}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            accessor="booking"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        ) : (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Text>Loading</Text>
+          </View>
+        )}
       </View>
 
       <Button
