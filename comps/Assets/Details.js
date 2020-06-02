@@ -112,20 +112,7 @@ export default function Details(props) {
   //   //increaseViewer(props.asset)
   // });
 
-  const increaseViewer = async (a) => {
-    const moreViewers = firebase.functions().httpsCallable("moreViewers");
-    const result = await moreViewers({ 
-      asset:a
-     });
-  }
-
-  useEffect(() => {
-    if (props.navigation.isFocused()) {
-      console.log("asset is focussed from details");
-      //increaseViewer(props.asset)
-    }
-  },[asset])
-
+  
   // const timeListener = () => {
   //   let timerId = setInterval(() => {
   //     if (!props.navigation.isFocused()) {

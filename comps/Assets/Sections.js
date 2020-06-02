@@ -229,9 +229,8 @@ export default function Sections(props) {
     const lessViewers = firebase.functions().httpsCallable("lessViewers");
     const result = await lessViewers({ 
       asset:a
-     });
+    });
   }
-
 
 
   // const subscribe = props.navigation.addListener("didFocus", () => {
@@ -241,9 +240,9 @@ export default function Sections(props) {
 
   const timeListener = () => {
     let timerId = setInterval(() => {
-      if (!props.navigation.isFocused() || flag) {
+      if (!props.navigation.isFocused()) {
         console.log("adios");
-        //reduceViewer(props.asset);
+        reduceViewer(selectedList);
         clearInterval(timerId);
         flag = false;
       }
@@ -256,6 +255,27 @@ export default function Sections(props) {
   },[])
 
 
+  const increaseViewer = async (a) => {
+    const moreViewers = firebase.functions().httpsCallable("moreViewers");
+    const result = await moreViewers({ 
+      asset:a
+     });
+  }
+
+  const assetFocus = (a) =>{
+    if (selectedList === a) {
+      return
+    }else{
+      if(selectedList != ""){
+        console.log(`asset ${selectedList.code} is unfocussed now`);
+        reduceViewer(selectedList);
+      }
+      console.log(`asset ${a.code} is focussed from details`);
+      increaseViewer(a)
+      setSelectedList(a)
+    }
+    
+  }
 
   
 
@@ -546,7 +566,8 @@ export default function Sections(props) {
                     //     type,
                     //   })
                     // }
-                    onPress={() => setSelectedList(l) || setDetailsView(true)}
+                    onPress={() => assetFocus(l) || setDetailsView(true)}
+                    // onFocus={() => }
                     key={i}
                     style={{
                       backgroundColor:

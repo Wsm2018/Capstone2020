@@ -660,9 +660,23 @@ const db = admin.firestore();
 exports.updateAssetSecurity = functions.https.onCall(async (data, context) => {
   console.log("updateAssetSecurity asset data", data.asset);
   console.log("updateAssetSecurity asset lock data", data.asset.lock);
-
   await db.collection("assets").doc(data.asset.id).update({
         lock: !data.asset.lock,
       });
- 
+});
+
+exports.moreViewers = functions.https.onCall(async (data, context) => {
+  console.log("moreViewers asset data", data.asset);
+  let viewers = data.asset.viewers + 1;
+  await db.collection("assets").doc(data.asset.id).update({
+        viewers: viewers,
+  });
+});
+
+exports.lessViewers = functions.https.onCall(async (data, context) => {
+  console.log("lessViewers asset data", data.asset);
+  let viewers = data.asset.viewers - 1;
+  await db.collection("assets").doc(data.asset.id).update({
+        viewers: viewers,
+  });
 });
