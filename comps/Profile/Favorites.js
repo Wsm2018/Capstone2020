@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
-  SafeAreaView,
   Button,
   Dimensions,
   SafeAreaView
