@@ -104,7 +104,6 @@ export default function BookingHistory(props) {
         const p = [];
         querySnapshot.forEach((doc) => {
           p.push({ id: doc.id, ...doc.data() });
-          //console.log("t", p)
         });
         setAssetTypes([...p]);
       });
@@ -114,7 +113,6 @@ export default function BookingHistory(props) {
         const p = [];
         querySnapshot.forEach((doc) => {
           p.push({ id: doc.id, ...doc.data() });
-          //console.log("s", p)
         });
         setAssetSections([...p]);
       });
@@ -188,7 +186,7 @@ export default function BookingHistory(props) {
   }
 
   const checkExtension = async () => {
-    //console.log("start", viewDetails.assetBooking.endDateTime , "end", extension)
+    
     let bookingTemp = [];
     let bookings = await db.collection('assets').doc(viewDetails.assetBooking.asset.id).collection('assetBookings').get()
     if (bookings) {
@@ -196,7 +194,6 @@ export default function BookingHistory(props) {
         bookingTemp.push(b.data())
       })
     }
-    //console.log(" bookings", viewDetails.assetBooking.asset.id)
 
     var check = bookingTemp.filter((assetBooking) =>
       (viewDetails.assetBooking.endDateTime <= assetBooking.startDateTime &&
@@ -221,12 +218,9 @@ export default function BookingHistory(props) {
       else {
         end = extension.split(" ")[0] + " T " + extension.split(" ")[2] + ":00"
       }
-      //console.log("end", end.split("T")[1].split(":")[0].split(""))
       if (end.split("T")[1].split(":")[0].split("").length == 1) {
         end = end.split("T")[0] + "T0" + end.split("T")[1]
       }
-
-      //console.log("start", start.split("T")[1].split(":")[0].split(""))
 
       if (start.split("T")[1].split(":")[0].split("").length == 2) {
         start = start.split("T")[0] + "T0" + start.split("T")[1]
@@ -262,11 +256,8 @@ export default function BookingHistory(props) {
         serviceT = serviceT + parseInt(newServiceBookings[i].service.price)
       }
       setTotalAmount(totalAmount + serviceT)
-      //total.current= total.current + serviceT
-      //serviceTotal.current = serviceT
       setServiceBookingTotal(serviceT)
-      //console.log("service booking state", serviceBookingTotal , "Ref ", serviceTotal.current ,"loop", serviceT)
-    }
+      }
 
   }, [newServiceBookings])
 
@@ -275,9 +266,6 @@ export default function BookingHistory(props) {
     setNewShow(show)
     //setNewUserDays(userdays)
     setAddServices(false)
-    //setUpdateAvailableTimings(updateAvailable)
-
-
   }
 
   const back = () => {
@@ -434,25 +422,20 @@ export default function BookingHistory(props) {
           }
 
           if (new Date(min).getTime() > new Date(use[k]).getTime()) {
-            //console.log("hh")
             min = use[k]
             //index = k
           }
         }
         newOrder[i].timings.push(min)
-        //rmeove min from use
+
         use = use.filter(m => m != min)
         counter = counter - 1
       }
-      //newServiceArr[i].timings = 
+
 
     }
-
-    //console.log("pleeeaassseee", newOrder)
     setDisplayServices(newOrder)
     SB.current = newOrder
-    //showBookings.current = newServiceArr
-    //setUpdate(true)
 
   }
 
