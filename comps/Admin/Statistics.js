@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, Dimensions } from "react-native";
+import { View, Text, Button, Dimensions, StyleSheet } from "react-native";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import db from "../../db";
-import { PieChart, BarChart } from "react-native-chart-kit";
+import { PieChart } from "react-native-chart-kit";
 import { ScrollView } from "react-native-gesture-handler";
-
+import AnimatedLoader from "react-native-animated-loader";
+import LottieView from "lottie-react-native";
+import { BarChart, Grid, YAxis, XAxis } from "react-native-svg-charts";
+import * as scale from "d3-scale";
 export default function Statistics(props) {
   // --------------------------------------- STATE VARIABLES -----------------------------------------
 
@@ -260,6 +263,90 @@ export default function Statistics(props) {
     getAllServiceBookings();
   };
 
+  {
+    /* 
+    "admin"
+    "manager"
+    "user handler"
+    "asset handler"
+    "customer support"
+    "services employee"
+    "customer"
+  */
+  }
+  const getUserChart = () => {
+    const tempUsers = [...totalUsers];
+    const admins = tempUsers.filter((user) => user.role === "admin");
+    const customers = tempUsers.filter((user) => user.role === "customer");
+    const managers = tempUsers.filter((user) => user.role === "manager");
+    const userHandlers = tempUsers.filter(
+      (user) => user.role === "user handler"
+    );
+    const assetHandler = tempUsers.filter(
+      (user) => user.role === "asset handler"
+    );
+    const customerSupport = tempUsers.filter(
+      (user) => user.role === "customer support"
+    );
+    const serviceEmployee = tempUsers.filter(
+      (user) => user.role === "services employee"
+    );
+
+    // const result = {
+    //   labels: [
+    //     "admin",
+    //     "customer",
+    //     "manager",
+    //     "user handler",
+    //     "asset handler",
+    //     "customer support",
+    //     "services employee",
+    //   ],
+    //   datasets: [
+    //     {
+    //       data: [
+    //         admins.length,
+    //         customers.length,
+    //         managers.length,
+    //         userHandlers.length,
+    //         assetHandler.length,
+    //         customerSupport.length,
+    //         serviceEmployee.length,
+    //       ],
+    //     },
+    //   ],
+    // };
+    const data = [
+      {
+        value: admins.length,
+        label: "Admins",
+      },
+      {
+        value: customers.length,
+        label: "Customers",
+      },
+      {
+        value: userHandlers.length,
+        label: "User Handlers",
+      },
+      {
+        value: managers.length,
+        label: "Managers",
+      },
+      {
+        value: customerSupport.length,
+        label: "Customer Support",
+      },
+      {
+        value: serviceEmployee.length,
+        label: "Services Employee",
+      },
+    ];
+
+    // console.log(result);
+
+    setUserChart(data);
+  };
   // --------------------------------------- USE EFFECTS --------------------------------------------
 
   useEffect(() => {
@@ -270,55 +357,123 @@ export default function Statistics(props) {
   // ----------------------------------------- VIEW -------------------------------------------------
 
   return (
-    <ScrollView style={{ flex: 1 }}>
-      <Text>Total Users</Text>
-      <Text>{totalUsers}</Text>
+    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
+      {userChart ? (
+        <View style={{ alignItems: "center", flex: 3 }}>
+          <Text style={{ fontSize: 30 }}>Total Users</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              height: 200,
+              paddingVertical: 16,
+              width: Dimensions.get("window").width / 1.5,
+            }}
+          >
+            <YAxis
+              data={userChart}
+              yAccessor={({ index }) => index}
+              // scale={scale.scaleBand}
+              contentInset={{ top: 10, bottom: 10 }}
+              spacing={0.2}
+              formatLabel={(item, index) => index}
+            />
+            <BarChart
+              style={{ flex: 1, marginLeft: 8 }}
+              data={userChart}
+              // horizontal={true}
+              yAccessor={({ item }) => item.value}
+              svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
+              contentInset={{ top: 10, bottom: 10 }}
+              spacing={0.2}
+              gridMin={0}
+            >
+              <Grid direction={Grid.Direction.VERTICAL} />
+            </BarChart>
+          </View>
+        </View>
+      ) : (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <LottieView
+            width={Dimensions.get("window").width / 3}
+            source={require("../../assets/loadingAnimations/5437-loading.json")}
+            autoPlay
+            loop
+            style={{
+              position: "relative",
+              width: "100%",
+            }}
+          />
+        </View>
+      )}
+
+      {/* <Text>{totalUsers}</Text> */}
 
       {/* <Text>All Asset Bookings</Text>
       <Text>{allBookings.length}</Text> */}
 
-      <View style={{ alignItems: "center", flex: 1 }}>
-        <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
-        {/* <BarChart
-          // style={{ backgroundColor: "white" }}
-          data={data}
-          width={screenWidth}
-          height={400}
-          withInnerLines={false}
-          // yAxisLabel="Bookings"
-          chartConfig={{
-            backgroundColor: "white",
-            backgroundGradientFrom: "white",
-            // backgroundGradientFromOpacity: 0,
-            backgroundGradientTo: "white",
-            // backgroundGradientToOpacity: 0.5,
-            barPercentage: 1,
-            color: () => `rgba(250,0,0,0.6)`,
-            style: {
-              borderRadius: 16,
-            },
-          }}
-          verticalLabelRotation={90}
-          fromZero
-        /> */}
-      </View>
+      {assetChartData.length !== 0 ? (
+        <View style={{ alignItems: "center", flex: 1 }}>
+          <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
+          <PieChart
+            data={assetChartData}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            accessor="booking"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        </View>
+      ) : (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <LottieView
+            width={Dimensions.get("window").width / 3}
+            source={require("../../assets/loadingAnimations/5437-loading.json")}
+            autoPlay
+            loop
+            style={{
+              position: "relative",
+              width: "100%",
+            }}
+          />
+        </View>
+      )}
 
-      <View style={{ alignItems: "center", backgroundColor: "white" }}>
-        <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
-
-        <PieChart
-          data={serviceChartData}
-          width={screenWidth}
-          height={220}
-          chartConfig={chartConfig}
-          accessor="booking"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
-        />
-      </View>
+      {serviceChartData.length !== 0 ? (
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
+          <PieChart
+            data={serviceChartData}
+            width={screenWidth}
+            height={220}
+            chartConfig={chartConfig}
+            accessor="booking"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+        </View>
+      ) : (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text>Loading</Text>
+        </View>
+      )}
 
       <Button title="get color" onPress={() => generateRandomColor()} />
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  lottie: {
+    width: 100,
+    height: 100,
+  },
+});

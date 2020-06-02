@@ -192,6 +192,17 @@ export default function App(props) {
               <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
+          {user.role === "admin" ||
+          user.role === "manager" ||
+          user.role === "user handler" ||
+          user.role === "asset handler" ||
+          user.role === "customer" ? (
+            <View>
+              <TouchableOpacity onPress={handleChangeRole}>
+                <Text>Change Role {user && user.displayName}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </SafeAreaView>
       ),
     }
@@ -227,6 +238,12 @@ export default function App(props) {
       console.log("falseeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(false);
     }
+  };
+
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
   };
 
   useEffect(() => {
