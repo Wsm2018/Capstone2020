@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Component } from "react";
 import { View, Text, Button, Dimensions, StyleSheet } from "react-native";
 import firebase from "firebase";
 import "firebase/auth";
@@ -10,6 +10,7 @@ import AnimatedLoader from "react-native-animated-loader";
 import LottieView from "lottie-react-native";
 import { BarChart, Grid, YAxis, XAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
+import Swiper from "react-native-swiper";
 export default function Statistics(props) {
   // --------------------------------------- STATE VARIABLES -------------------------
 
@@ -272,120 +273,150 @@ export default function Statistics(props) {
   // ----------------------------------------- VIEW -------------------------------------------------
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
-      {userChart ? (
-        <View style={{ alignItems: "center", flex: 3 }}>
-          <Text style={{ fontSize: 30 }}>Total Users</Text>
+    // <View style={{ flex: 1, backgroundColor: "white" }}>
+    <Swiper style={styles.wrapper} showsButtons={true}>
+      <View style={styles.slide1}>
+        {userChart ? (
+          <View
+            style={{ alignItems: "center", flex: 3, justifyContent: "center" }}
+          >
+            <Text style={{ fontSize: 30 }}>Total Users</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                height: 200,
+                paddingVertical: 16,
+                width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <YAxis
+                data={userChart}
+                yAccessor={({ index }) => index}
+                // scale={scale.scaleBand}
+                contentInset={{ top: 10, bottom: 10 }}
+                spacing={0.2}
+                formatLabel={(item, index) => index}
+              />
+              <BarChart
+                style={{ flex: 1, marginLeft: 8 }}
+                data={userChart}
+                // horizontal={true}
+                yAccessor={({ item }) => item.value}
+                svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
+                contentInset={{ top: 10, bottom: 10 }}
+                spacing={0.2}
+                gridMin={0}
+              >
+                <Grid direction={Grid.Direction.VERTICAL} />
+              </BarChart>
+            </View>
+          </View>
+        ) : (
           <View
             style={{
-              flexDirection: "row",
-              height: 200,
-              paddingVertical: 16,
-              width: Dimensions.get("window").width / 1.5,
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <YAxis
-              data={userChart}
-              yAccessor={({ index }) => index}
-              // scale={scale.scaleBand}
-              contentInset={{ top: 10, bottom: 10 }}
-              spacing={0.2}
-              formatLabel={(item, index) => index}
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
             />
-            <BarChart
-              style={{ flex: 1, marginLeft: 8 }}
-              data={userChart}
-              // horizontal={true}
-              yAccessor={({ item }) => item.value}
-              svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
-              contentInset={{ top: 10, bottom: 10 }}
-              spacing={0.2}
-              gridMin={0}
-            >
-              <Grid direction={Grid.Direction.VERTICAL} />
-            </BarChart>
           </View>
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <LottieView
-            width={Dimensions.get("window").width / 3}
-            source={require("../../assets/loadingAnimations/5437-loading.json")}
-            autoPlay
-            loop
+        )}
+      </View>
+      <View style={styles.slide2}>
+        {/* <Text style={styles.text}>Beautiful</Text> */}
+
+        {assetChartData.length !== 0 ? (
+          <View
+            style={{ alignItems: "center", flex: 1, justifyContent: "center" }}
+          >
+            <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
+            <PieChart
+              data={assetChartData}
+              width={screenWidth}
+              height={220}
+              chartConfig={chartConfig}
+              accessor="booking"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+          </View>
+        ) : (
+          <View
             style={{
-              position: "relative",
-              width: "100%",
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
-        </View>
-      )}
+          >
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View style={styles.slide3}>
+        {/* <Text style={styles.text}>And simple</Text> */}
 
-      {/* <Text>{totalUsers}</Text> */}
-
-      {/* <Text>All Asset Bookings</Text>
-      <Text>{allBookings.length}</Text> */}
-
-      {assetChartData.length !== 0 ? (
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
-          <PieChart
-            data={assetChartData}
-            width={screenWidth}
-            height={220}
-            chartConfig={chartConfig}
-            accessor="booking"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <LottieView
-            width={Dimensions.get("window").width / 3}
-            source={require("../../assets/loadingAnimations/5437-loading.json")}
-            autoPlay
-            loop
+        {serviceChartData.length !== 0 ? (
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
+            <PieChart
+              data={serviceChartData}
+              width={screenWidth}
+              height={220}
+              chartConfig={chartConfig}
+              accessor="booking"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+          </View>
+        ) : (
+          <View
             style={{
-              position: "relative",
-              width: "100%",
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
-        </View>
-      )}
-
-      {serviceChartData.length !== 0 ? (
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
-          <PieChart
-            data={serviceChartData}
-            width={screenWidth}
-            height={220}
-            chartConfig={chartConfig}
-            accessor="booking"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text>Loading</Text>
-        </View>
-      )}
-
-      <Button
+          >
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
+          </View>
+        )}
+      </View>
+      {/* <Button
         title="GENERATE RANDOM COLOR"
         onPress={() => generateRandomColor()}
-      />
-    </ScrollView>
+      /> */}
+    </Swiper>
+
+    // </View>
   );
 }
 
@@ -393,5 +424,24 @@ const styles = StyleSheet.create({
   lottie: {
     width: 100,
     height: 100,
+  },
+  wrapper: {},
+  slide1: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "#9DD6EB",
+  },
+  slide2: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "#97CAE5",
+  },
+  slide3: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "#92BBD9",
   },
 });
