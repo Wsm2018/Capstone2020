@@ -47,7 +47,7 @@ export default function Users() {
   }, []);
 
   const roles = [
-    "user",
+    "customer",
     "asset handler",
     "customer support",
     "manager",

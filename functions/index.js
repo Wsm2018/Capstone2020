@@ -180,7 +180,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         request.query.role === "guest" ? accessDoc.data().giftBalance : 0,
       email:
         request.query.role === "guest" ? accessDoc.data().email : result.email,
-      role: request.query.role === "guest" ? "guest" : "user",
+      role: request.query.role === "guest" ? "guest" : "customer",
       qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
