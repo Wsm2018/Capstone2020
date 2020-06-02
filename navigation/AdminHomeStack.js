@@ -12,6 +12,7 @@ import Details from "../comps/Assets/Details";
 import Sections from "../comps/Assets/Sections";
 import List from "../comps/Assets/List";
 import Types from "../comps/Assets/Types";
+import Promotion from "../comps/Admin/Promotion";
 const AdminHomeStack = createStackNavigator({
   Home: AdminHome,
   Users: Users,
@@ -19,12 +20,12 @@ const AdminHomeStack = createStackNavigator({
   Statistics: Statistiscs,
   Types: Types,
   Assets: Assets,
-  // Home: HomePage,
   Sections: Sections,
   List: List,
   Details: Details,
   Payment: Payment,
   CheckOut: CheckOut,
+  Promotion: Promotion,
 });
 
 export default AdminHomeStack;

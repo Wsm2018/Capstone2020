@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Button, Dimensions, StyleSheet } from "react-native";
 import firebase from "firebase";
 import "firebase/auth";
