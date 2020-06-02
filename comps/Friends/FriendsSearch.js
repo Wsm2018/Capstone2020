@@ -117,6 +117,14 @@ export default function FriendsList(props) {
     allUsers[index].loading = false;
   };
 
+  // -------------------------------REMOVE-----------------------------------
+  // Removes your pending request
+  const remove = async (user) => {
+    const rem = firebase.functions().httpsCallable("removeFriend");
+    const response = await rem({ user: currentUser, friend: user });
+    console.log("response", response);
+  };
+
   // ---------------------------------SEARCH---------------------------------
   // Searches for a user by displayName
   const handleSearch = (query) => {

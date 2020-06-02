@@ -2,3 +2,5 @@ node_modules
 .expo/
 package-lock.json
 yarn.lock
+comps/Friends/Test.js
+comps/UserHandler/test.js
