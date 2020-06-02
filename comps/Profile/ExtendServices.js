@@ -140,7 +140,7 @@ export default function ExtendServices(props) {
       setServices(services)
       });
 
-    db.collection("users").where("role", "==", "worker").onSnapshot((snapshot) => {
+    db.collection("users").where("role", "==", "service worker").onSnapshot((snapshot) => {
       var worker = ""
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }

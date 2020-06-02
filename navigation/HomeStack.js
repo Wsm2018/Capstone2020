@@ -13,10 +13,10 @@ import BookingHistory from "../comps/Profile/BookingHistory"
 import ExtendServices from "../comps/Profile/ExtendServices"
 
 const HomeStack = createStackNavigator({
- BookingHistory: BookingHistory,
-//AssetManager: AssetManager,
+// BookingHistory: BookingHistory,
+AssetManager: AssetManager,
   //ExtendServices: ExtendServices,
-  //ServiceManagement:ServiceManagement,
+  ServiceManagement:ServiceManagement,
   Types: Types,
   Assets: Assets,
   Home: HomePage,

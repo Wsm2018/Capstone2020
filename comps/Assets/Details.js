@@ -126,11 +126,11 @@ export default function Details(props) {
       setServices(services)
     });
 
-    db.collection("users").where("role", "==", "worker").onSnapshot((snapshot) => {
+    db.collection("users").where("role", "==", "service worker").onSnapshot((snapshot) => {
       var worker = ""
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }
-        if( worker.id != firebase.auth().currentUser.uid){
+       // if( worker.id != firebase.auth().currentUser.uid){
         var workerId = doc.id
         db.collection("users").doc(doc.id).collection("schedules").onSnapshot((snapshot) => {
           const schedules = [];
@@ -141,7 +141,7 @@ export default function Details(props) {
           temp.push({ worker, schedules })
           setAllWorkers(temp)
         })
-      }
+     // }
       });
     });
   }

@@ -147,7 +147,9 @@ export default function CheckOut(props) {
     const payLater = async () => {
 
         const handleBooking = firebase.functions().httpsCallable("handleBooking");
-        const user = await db.collection("users").doc(firebase.auth().currentUser.uid).get()
+        var user = await db.collection("users").doc(firebase.auth().currentUser.uid).get()
+        var u = user.data()
+        u.id = firebase.auth().currentUser.uid
         //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
 
         const response = await handleBooking({

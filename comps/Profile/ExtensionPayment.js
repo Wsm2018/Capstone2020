@@ -32,6 +32,7 @@ export default function Payment(props) {
     "serviceBooking",
     "some default value"
   );
+  const partial = props.navigation.getParam("partial", "not found");
   const extension = props.navigation.getParam("oldPayment", "not found");
   const total = props.navigation.getParam("totalAmount", "some default value");
   //const [serviceBooking, setServiceBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
@@ -148,6 +149,7 @@ export default function Payment(props) {
     console.log("154")
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
     const editBooking = firebase.functions().httpsCallable("editBooking");
+    const assetManager = firebase.functions().httpsCallable("assetManager");
     var user = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -166,12 +168,28 @@ export default function Payment(props) {
     } else {
       c = card;
     }
-    console.log("174",addCreditCard, totalAmount,usedBalance , firebase.auth().currentUser.uid)
+    //console.log("174",addCreditCard, totalAmount,usedBalance , firebase.auth().currentUser.uid)
     let u = user.data()
     u.id = firebase.auth().currentUser.uid;
     u.balance = u.balance - usedBalance;
-    if( extension != "not found"){
-      console.log("ehhee",extension.id ,assetBooking.endDateTime, c , total , u )
+    console.log("175")
+    if( partial != "not found" ){
+      console.log("177")
+      var toUpd = partial
+      toUpd.status = true
+      toUpd.card = c
+      console.log("ehhee",toUpd.status ,partial.id, toUpd.card , total , u )
+      const response = await assetManager({
+        doc: partial.id,
+        type: "update", 
+        collection:"payments",
+        obj: toUpd
+      });
+      console.log("188")
+    }
+    else if( extension != "not found"){
+      console.log("191")
+      //console.log("ehhee",extension.id ,assetBooking.endDateTime, c , total , u )
       const response = await editBooking({
         paymentId: extension.id,
         card: c, 
@@ -182,9 +200,10 @@ export default function Payment(props) {
         serviceBooking: serviceBooking,
         user: u
       });
+      console.log("203")
     }
     else{
-      //console.log()
+      console.log("206")
       const response = await handleBooking({
         user: u,
         asset: assetBooking.asset,
@@ -200,10 +219,11 @@ export default function Payment(props) {
         status: true,
         serviceBooking,
       });
+      console.log("222")
       //props.navigation.navigate("Home");
     }
     
-    console.log("192")
+    console.log("126")
     props.navigation.navigate("Home");
   };
   const handleCardSelect = (card) => {
