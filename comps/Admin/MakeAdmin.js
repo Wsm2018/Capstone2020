@@ -16,7 +16,7 @@ import db from "../../db";
 import LottieView from "lottie-react-native";
 
 export default function MakeAdmin(props) {
-    // -------------------------------------- STATE -----------------------------------
+  // -------------------------------------- STATE -----------------------------------
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState([]);
   const [err, setErr] = useState("");
@@ -40,8 +40,6 @@ export default function MakeAdmin(props) {
       setShowErr(false);
     }
   }, [email]);
-
-
 
   // -------------------------------------- FUNCTIONS -----------------------------------
 
@@ -89,7 +87,7 @@ export default function MakeAdmin(props) {
         }}
       >
         <LottieView
-          width={Dimensions.get("window").width / 1.2}
+          width={Dimensions.get("window").width / 1.3}
           source={require("../../assets/admin.json")}
           autoPlay
           loop
@@ -103,12 +101,24 @@ export default function MakeAdmin(props) {
       <View
         style={{
           alignItems: "center",
-          flex: 1,
+          flex: 1.5,
           // backgroundColor: "red",
           justifyContent: "flex-start",
           // marginTop: 10,
         }}
       >
+        <View style={{ marginTop: 15, marginBottom: 5 }}>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 15,
+              color: "#808080",
+              // fontWeight: "bold",
+            }}
+          >
+            Enter an email to give admin privileges.
+          </Text>
+        </View>
         <TextInput
           width={Dimensions.get("window").width / 1.2}
           style={{
@@ -128,28 +138,17 @@ export default function MakeAdmin(props) {
             setShowErr(false);
           }}
         />
-      {showErr ? (
-        <Text style={showErr ? { color: "red" } : { color: "transparent" }}>
-          {err}
-        </Text>
-        ) : null}
-        <View style={{ marginBottom: 10 }}>
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 16,
-              color: "gray",
-              // fontWeight: "bold",
-            }}
-          >
-            Enter an email to give admin privileges.
+        {showErr ? (
+          <Text style={showErr ? { color: "red" } : { color: "transparent" }}>
+            {err}
           </Text>
-        </View>
+        ) : null}
         <View
           style={{
-            flex: 4,
+            // flex: 1,
             // backgroundColor: "red",
-            // justifyContent: "space-between",
+            marginTop: 5,
+            justifyContent: "center",
             alignItems: "center",
             flexDirection: "row-reverse",
           }}
@@ -182,16 +181,19 @@ export default function MakeAdmin(props) {
             </Text>
           </TouchableOpacity>
         </View>
-        
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e3e3e3",
+    // position: "absolute",
+    backgroundColor: "#ebe8e8",
   },
 });
+MakeAdmin.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};

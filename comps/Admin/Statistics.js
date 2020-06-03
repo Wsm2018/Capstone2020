@@ -273,20 +273,40 @@ export default function Statistics(props) {
   // ----------------------------------------- VIEW -------------------------------------------------
 
   return (
-    // <View style={{ flex: 1, backgroundColor: "white" }}>
-    <Swiper style={styles.wrapper} showsButtons={true}>
+    <Swiper showsButtons={false}>
       <View style={styles.slide1}>
         {userChart ? (
           <View
-            style={{ alignItems: "center", flex: 3, justifyContent: "center" }}
+            style={{
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
+              // backgroundColor: "red",
+            }}
           >
-            <Text style={{ fontSize: 30 }}>Total Users</Text>
             <View
               style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                Total Users
+              </Text>
+            </View>
+            <View
+              style={{
+                // backgroundColor: "red",
+                // flex: 2,
                 flexDirection: "row",
-                height: 200,
-                paddingVertical: 16,
-                width: Dimensions.get("window").width / 1.5,
+                height: 250,
+                // paddingVertical: 50,
+                width: Dimensions.get("window").width / 1.3,
               }}
             >
               <YAxis
@@ -294,18 +314,33 @@ export default function Statistics(props) {
                 yAccessor={({ index }) => index}
                 // scale={scale.scaleBand}
                 contentInset={{ top: 10, bottom: 10 }}
-                spacing={0.2}
+                spacingInner={0}
+                spacingOuter={0}
                 formatLabel={(item, index) => index}
               />
               <BarChart
-                style={{ flex: 1, marginLeft: 8 }}
+                style={{
+                  flex: 1,
+                  // borderBottomColor: "lightgray",
+                  // borderBottomWidth: 2,
+                }}
                 data={userChart}
                 // horizontal={true}
                 yAccessor={({ item }) => item.value}
-                svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
-                contentInset={{ top: 10, bottom: 10 }}
-                spacing={0.2}
-                gridMin={0}
+                svg={{
+                  fill: "#800020",
+                  stroke: "#450011",
+                  strokeWidth: 1,
+                  // width: 50,
+                  // originY: 0,
+                  // borderWidth: 0,
+                }}
+                // svg={{ fontSize: 10, fill: 'black' }}
+                contentInset={{ top: 0, bottom: 0 }}
+                spacingInner={0}
+                spacingOuter={0}
+                // gridMin={5}
+                // bandwidth={false}
               >
                 <Grid direction={Grid.Direction.VERTICAL} />
               </BarChart>
@@ -337,19 +372,39 @@ export default function Statistics(props) {
 
         {assetChartData.length !== 0 ? (
           <View
-            style={{ alignItems: "center", flex: 1, justifyContent: "center" }}
+            style={{
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
+            }}
           >
-            <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
-            <PieChart
-              data={assetChartData}
-              width={screenWidth}
-              height={220}
-              chartConfig={chartConfig}
-              accessor="booking"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute
-            />
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                All Assets Bookings
+              </Text>
+            </View>
+            <View>
+              <PieChart
+                data={assetChartData}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="booking"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
+            </View>
           </View>
         ) : (
           <View
@@ -376,18 +431,40 @@ export default function Statistics(props) {
         {/* <Text style={styles.text}>And simple</Text> */}
 
         {serviceChartData.length !== 0 ? (
-          <View style={{ alignItems: "center" }}>
-            <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
-            <PieChart
-              data={serviceChartData}
-              width={screenWidth}
-              height={220}
-              chartConfig={chartConfig}
-              accessor="booking"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute
-            />
+          <View
+            style={{
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
+            }}
+          >
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                All Services Bookings
+              </Text>
+            </View>
+            <View>
+              <PieChart
+                data={serviceChartData}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="booking"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
+            </View>
           </View>
         ) : (
           <View
@@ -425,23 +502,29 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
-  wrapper: {},
+  wrapper: {
+    // color: "red",
+  },
   slide1: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#9DD6EB",
+    backgroundColor: "#ebe8e8",
   },
   slide2: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#97CAE5",
+    backgroundColor: "#ebe8e8",
   },
   slide3: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#92BBD9",
+    backgroundColor: "#ebe8e8",
   },
 });
+Statistics.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};
