@@ -1,6 +1,6 @@
 //@refresh reset
 import { Button } from "react-native-elements"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useRef } from "react";
 import { createStackNavigator } from 'react-navigation-stack';
 
 import {
@@ -12,7 +12,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Picker
+  Picker,
+  Modal
 } from "react-native";
 
 import DatePicker from 'react-native-datepicker'
@@ -29,31 +30,105 @@ export default function Sections(props) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showSections , setShowSections] = useState(false)
-  const [tempstartDate, settempStartDate] = useState('');
-  const [tempendDate, settempEndDate] = useState('');
+
+  /////////////////////////new
+  const [ startTime , setStartTime] = useState()
+  const [ endTime , setEndTime] = useState()
   const type = props.navigation.getParam("type", 'failed').id;
   const tName = props.navigation.getParam("type", 'failed').name
+  const [startTimeModal , setStartTimeModal] = useState(false)
+  const [endTimeModal , setEndTimeModal] = useState(false)
+  const [tempStartDate, setTempStartDate] = useState();
+  const [tempEndDate, setTempEndDate] = useState();
+  const displayList = useRef()
+ 
+  const [timesList , setTimesList] = useState([
+    "12:00 AM",
+    "1:00 AM",
+    "2:00 AM",
+    "3:00 AM",
+    "4:00 AM",
+    "5:00 AM",
+    "6:00 AM",
+    "7:00 AM",
+    "8:00 AM",
+    "9:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "1:00 PM",
+    "2:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
+    "6:00 PM",
+    "7:00 PM",
+    "8:00 PM",
+    "9:00 PM",
+    "10:00 PM",
+    "11:00 PM",
+  ])
 
   useEffect(() => {
     getSections();
   }, [type]);
 
   useEffect(() => { 
-    if(tempstartDate){
-      var dateTime = tempstartDate.split(" ")
-      var update = dateTime[0]+" "+dateTime[1]+" "+dateTime[2].split(":")[0]+":00 "+dateTime[3]
-      setStartDate(update)
+    if(tempStartDate){
+      var temp =[]
+      var found = false
+      for( let i=0 ; i < timesList.length ; i++){
+        if( found ){
+          temp.push(timesList[i])
+        }
+        if( timesList[i] == moment().format("H:00 A")){
+          found = true
+        }
+      }
+      displayList.current = temp
+      setStartTimeModal(true)
     } 
-  }, [tempstartDate]);
+  }, [tempStartDate]);
 
-  useEffect(() => {
-    if(tempendDate){
-      var dateTime = tempendDate.split(" ")
-      var update = dateTime[0]+" "+dateTime[1]+" "+dateTime[2].split(":")[0]+":00 "+dateTime[3]
-      setEndDate(update)
+  useEffect(() => { 
+    if(tempEndDate){
+      var temp =[]
+      var found = false
+      console.log("started",startDate.split(" ")[2])
+      if( tempEndDate.split(" ")[0] === startDate.split(" ")[0]){
+        var s = startDate.split(" ")[2] + " "+startDate.split(" ")[3]
+        for( let i=0 ; i < timesList.length ; i++){
+          if( found ){
+            temp.push(timesList[i])
+          }
+          if( timesList[i] == s){
+            found = true
+            console.log("here")
+          }
+        }
+        displayList.current = temp
+      }
+      else{
+        displayList.current = timesList
+      }
+      
+      
+      setEndTimeModal(true)
+    } 
+  }, [tempEndDate]);
+
+  useEffect(()=>{
+    if(startTime ){
+      setStartDate(tempStartDate.split(" ")[0] + " T "+ startTime)
+      setEndDate()
     }
-    
-  }, [tempendDate]);
+  },[startTime])
+
+  useEffect(()=>{
+    if(endTime){
+      setEndDate(tempEndDate.split(" ")[0] + " T "+ endTime)
+    }
+  },[endTime])
 
   const getSections = async () => {
     const temp = [];
@@ -77,7 +152,7 @@ export default function Sections(props) {
               style={{ width: 200 }}
               //is24Hour
               date={startDate}
-              mode="datetime"
+              mode="date"
               placeholder="select a Start date"
               format="YYYY-MM-DD T h:mm A"
               minDate={moment()}
@@ -96,7 +171,7 @@ export default function Sections(props) {
                 }
                 // ... You can check the source to find the other keys.
               }}
-              onDateChange={settempStartDate}
+              onDateChange={setTempStartDate}
             />
             
             {
@@ -107,11 +182,12 @@ export default function Sections(props) {
                 :
                 null
             }
+            
 
             <DatePicker
               style={{ width: 200 }}
               date={endDate}
-              mode="datetime"
+              mode="date"
               placeholder="select an end date"
               format="YYYY-MM-DD T h:mm A"
               minDate={startDate}
@@ -130,7 +206,7 @@ export default function Sections(props) {
                 }
                 // ... You can check the source to find the other keys.
               }}
-              onDateChange={settempEndDate}
+              onDateChange={setTempEndDate}
               disabled={!startDate}
             />
 
@@ -150,6 +226,38 @@ export default function Sections(props) {
 
       }
 
+{
+        startTimeModal || endTimeModal ?
+          <Modal
+            animationType="slide"
+            transparent={true}
+            //visible={addServices}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                {
+                  displayList.current.length > 0?
+
+                  displayList.current.map( t =>
+                    
+                  <TouchableOpacity onPress={()=> 
+                    startTimeModal? setStartTime(t) || setStartTimeModal(false): setEndTime(t) || setEndTimeModal(false)
+                  }><Text>{t}</Text></TouchableOpacity>
+                    )
+                  :
+                  <Button title="Exit" onPress={()=> setStartTimeModal(false) || setEndTimeModal(false)}/>
+                }
+              </View>
+            </View>
+          </Modal>
+
+          :
+          null
+      }
+
 
 
 
@@ -165,41 +273,6 @@ Sections.navigationOptions = (props) => ({
   headerTintColor: "black",
   headerTintStyle: { fontWeight: "bold" }
 })
-
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
-
-    return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use
-        useful development tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
-    );
-  }
-}
-
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync(
-    "https://docs.expo.io/versions/latest/workflow/development-mode/"
-  );
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    "https://docs.expo.io/versions/latest/workflow/up-and-running/#cant-see-your-changes"
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -287,5 +360,32 @@ const styles = StyleSheet.create({
   helpLinkText: {
     fontSize: 14,
     color: "#2e78b7"
-  }
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
 });

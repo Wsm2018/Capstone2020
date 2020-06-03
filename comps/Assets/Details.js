@@ -45,7 +45,7 @@ export default function Details(props) {
   const [schedules, setSchedules] = useState([])
   const [userDays, setUserDays] = useState([])
   const [timesList, setTimesList] = useState([
-    { book: false, show: "12:00 AM", time: "00:00:00"  },
+    { book: false, show: "12:00 AM", time: "00:00:00" },
     { book: false, show: "1:00 AM", time: "1:00:00" },
     { book: false, show: "2:00 AM", time: "2:00:00" },
     { book: false, show: "3:00 AM", time: "3:00:00" },
@@ -126,11 +126,11 @@ export default function Details(props) {
       setServices(services)
     });
 
-    db.collection("users").where("role", "==", "service worker").onSnapshot((snapshot) => {
+    db.collection("users").where("role", "==", "service employee").onSnapshot((snapshot) => {
       var worker = ""
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }
-       // if( worker.id != firebase.auth().currentUser.uid){
+        // if( worker.id != firebase.auth().currentUser.uid){
         var workerId = doc.id
         db.collection("users").doc(doc.id).collection("schedules").onSnapshot((snapshot) => {
           const schedules = [];
@@ -141,7 +141,7 @@ export default function Details(props) {
           temp.push({ worker, schedules })
           setAllWorkers(temp)
         })
-     // }
+        // }
       });
     });
   }
@@ -300,9 +300,9 @@ export default function Details(props) {
       }
     }
     else {
-  
+
       var index = serviceBooking.findIndex(i => i.day == userDays[day].day && i.time == userDays[day].timesList[time].time)
-      
+
       var updateWorkers = allWorkers
       for (let i = 0; i < updateWorkers.length; i++) {
         if (updateWorkers[i].worker.id == serviceBooking[index].worker) {
@@ -323,15 +323,15 @@ export default function Details(props) {
       var temp = []
       for (let i = 0; i < serviceBooking.length; i++) {
         if (i !== index) {
-          temp.push(serviceBooking[i])  
+          temp.push(serviceBooking[i])
         }
       }
       SB.current = temp
 
       setServiceBooking([...temp])
-    
+
     }
-    
+
     orderList()
     getAvailableTimings()
 
@@ -355,7 +355,7 @@ export default function Details(props) {
   const orderList = () => {
     setUpdate(false)
     var newServiceArr = []
-    
+
     for (let i = 0; i < SB.current.length; i++) {
       newServiceArr = newServiceArr.filter(s => s.service !== SB.current[i].service)
       var bookedhours = SB.current.filter(s => s.service == SB.current[i].service)
@@ -389,25 +389,25 @@ export default function Details(props) {
               index = k
             }
           }
-           var show = ""
-          
-          for( let j=0 ; j< timesList.length ; j++){
+          var show = ""
+
+          for (let j = 0; j < timesList.length; j++) {
             var test = use[index].split("T")[1]
-            if( test[0] == "0"){
-              var test = test[1] +test[2] +test[3] +test[4] +test[5] +test[6] +test[7] 
-              if(timesList[j].time == test){
+            if (test[0] == "0") {
+              var test = test[1] + test[2] + test[3] + test[4] + test[5] + test[6] + test[7]
+              if (timesList[j].time == test) {
                 show = timesList[j].show
               }
             }
-            else{
-              if(timesList[j].time == use[index].split("T")[1]){
+            else {
+              if (timesList[j].time == use[index].split("T")[1]) {
                 show = timesList[j].show
               }
             }
-           
-            
+
+
           }
-          arranged.push(use[index].split("T")[0]+" " + show)
+          arranged.push(use[index].split("T")[0] + " " + show)
 
           use = use.filter((t, i) => i != index)
           counter = counter - 1
@@ -415,18 +415,77 @@ export default function Details(props) {
       }
       newServiceArr[i].hours = arranged
 
-      
+
 
     }
-    
+
     setDisplayServices(newServiceArr)
     showBookings.current = newServiceArr
     setUpdate(true)
   }
 
+  const checkToDelete = (timing, service) => {
+    console.log("ohass",timing, service.id)
+    var t =""
+    if( timing.split(" ").length >= 3 ){
+     
+      t = timing.split(" ")[1] + " " + timing.split(" ")[2]
+    }
+    else{
+      t= timing
+    }
+    //console.log(" ehh",t)
+    var index = SB.current.findIndex(s => s.service == service && s.show == t)
+    var updateWorkers = allWorkers
+    for (let i = 0; i < updateWorkers.length; i++) {
+      if (updateWorkers[i].worker.id == SB.current[index].worker) {
+        var newSchedule = updateWorkers[i].schedules.filter(t => t.dateTime != SB.current[index].day + "T" + SB.current[index].time)
+        updateWorkers[i].schedules = newSchedule
+        var ud = userDays
+        for (let k = 0; k < userDays.length; k++) {
+          if (userDays[k].day == SB.current[index].day) {
+            ud[k].bookings = userDays[k].bookings - 1
+            setUserDays(ud)
+          }
+        }
+        setAllWorkers(updateWorkers)
+        break;
+      }
+    }
+    var temp = []
+    for (let i = 0; i < SB.current.length; i++) {
+      //console.log("??????????????" , index , i)
+      if (i !== index) {
+       // console.log("added")
+        temp.push(SB.current[i])
+      }
+    }
+   // console.log("temp",temp)
+    SB.current = temp
+    setServiceBooking([...temp])
+    orderList()
+    getAvailableTimings()
+    //console.log("SB.CURRENT",SB.current)
+  }
+
+  const deleteAll = (service) => {
+    //loop through all 
+    //check date and time
+    //send to book one by one
+    var toDelete = serviceBooking.filter( s => s.service === service)
+    for( let i=0 ; i < toDelete.length ; i++ ){
+
+      console.log(" i",i,toDelete[i].show ,service.id)
+      checkToDelete( toDelete[i].show ,service)
+      
+    }
+
+
+  }
+
 
   return (
-    <View style={styles.container}>
+    <ScrollView>
       <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime: start.current, endDateTime: end.current }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
         <Text >CheckOut</Text>
       </TouchableOpacity>
@@ -507,11 +566,13 @@ export default function Details(props) {
             <View>
               <Text>Service: {s.service.name}</Text>
               <Text>Timing/s: </Text>
+              <TouchableOpacity onPress={() => deleteAll(s.service)}><Text> Delete All</Text></TouchableOpacity>
               {
                 s.hours.map(
                   h =>
                     <View style={{ flexDirection: "row" }}>
-                      <Text>{h}</Text>
+                      <Text>{h} </Text>
+                      <TouchableOpacity onPress={() => checkToDelete(h, s.service)}><Text>    x</Text></TouchableOpacity>
                       {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
                     </View>
                 )
@@ -525,7 +586,7 @@ export default function Details(props) {
 
 
 
-    </View>
+    </ScrollView>
   )
 }
 
