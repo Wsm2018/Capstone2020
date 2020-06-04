@@ -13,38 +13,62 @@ export default function SubscriptionsScreen(props) {
   const [valueText, setValueText] = useState("")
   const [userSubscription, setUserSubscription] = useState()
   const subscriptionLevel = ["gold", "sliver", "bronze"]
+  const [flag, setFlag] = useState(true);
   console.log("user from referrel ", userSubscription);
 
   useEffect(() =>{
-    getSubscription()
+    db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("subscription")
+      .onSnapshot((snap) => {
+        snap.forEach((doc) => {
+          const endDate = doc.data().endDate.toDate();
+          if (endDate > new Date()) {
+            setUserSubscription({ id: doc.id, ...doc.data() });
+          }
+        });
+      });
   },[])
 
-  const getSubscription = async() =>{
-      let sub = await db.collection("users").doc(firebase.auth().currentUser.uid).collection('subscription')
-      .orderBy("endDate",'desc').limit(1).get()
-      sub.forEach(doc =>{
-          setUserSubscription(doc.data())
-      })
-  }
-  const subscribe = (type) =>{
-    if(type === "new"){
+
+
+  
+  const subscribe = async(type) =>{
     let sub = {
-        gold:{
-          type: "gold",
-          startDate: new Date(),
-          endDate: new Date(moment().add(1,'month').calendar())
-        },
-        sliver:{
-          type: "sliver",
-          startDate: new Date(),
-          endDate: new Date(moment().add(1,'month').calendar())
-        },
-        bronze:{
-          type: "bronze",
-          startDate: new Date(),
-          endDate: new Date(moment().add(1,'month').calendar())
-        }
-    };
+      gold:{
+        type: "gold",
+        startDate: new Date(),
+        endDate: new Date(moment().add(1,'month').calendar())
+      },
+      sliver:{
+        type: "sliver",
+        startDate: new Date(),
+        endDate: new Date(moment().add(1,'month').calendar())
+      },
+      bronze:{
+        type: "bronze",
+        startDate: new Date(),
+        endDate: new Date(moment().add(1,'month').calendar())
+      }
+  };
+    if(type === "updateSub"){
+        db.collection("users").doc(firebase.auth().currentUser.uid).collection('subscription').doc(userSubscription.id).update({
+          endDate: new Date()
+      })
+      console.log(valueText)
+      if(valueText === 'gold'){
+      db.collection("users").doc(firebase.auth().currentUser.uid).collection("subscription").add(sub.gold)
+      }
+      else if(valueText === 'sliver'){
+        db.collection("users").doc(firebase.auth().currentUser.uid).collection("subscription").add(sub.sliver)
+      }
+      else if(valueText === 'bronze'){
+        db.collection("users").doc(firebase.auth().currentUser.uid).collection("subscription").add(sub.bronze)
+      }
+    }
+    if(type === "new"){
+    
     if(valueText === 'gold'){
         db.collection("users").doc(firebase.auth().currentUser.uid).collection("subscription").add(sub.gold)
     }
@@ -53,10 +77,10 @@ export default function SubscriptionsScreen(props) {
     }
     else if(valueText === 'bronze'){
         db.collection("users").doc(firebase.auth().currentUser.uid).collection("subscription").add(sub.bronze)
-    }
-    console.log('done')}
+    }}
     else if(type === "update"){
       setUserSubscription(undefined)
+      setFlag(!flag)
     }
   }
   return (
@@ -75,9 +99,7 @@ export default function SubscriptionsScreen(props) {
             {userSubscription === undefined ?
             <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
             <ScrollView >
-                <Text>no subscription</Text>
                 <View >
-                    
                     <Text>Selected Level: {valueText}</Text>
                     {Platform.OS === "ios" ? 
                     <View>
@@ -101,11 +123,10 @@ export default function SubscriptionsScreen(props) {
                     console.log("Cancelled")
                     }}
                     onValueChange={(valueText, index) => {
-                    console.log("value: ", valueText)
-                    console.log("index: ", index)
                     setValueText(valueText)
                     }}
-                /> </View>
+                    /> 
+                    </View>
                     : 
 
                     <Picker
@@ -116,7 +137,6 @@ export default function SubscriptionsScreen(props) {
                     {subscriptionLevel.map((item, index) =>
                       <Picker.Item key={index} label={item} value={item} />
                     )}
-                    
                     </Picker>
                     
                     }
@@ -125,16 +145,28 @@ export default function SubscriptionsScreen(props) {
                     :valueText === "sliver" ?<Text>this level will gives you: 5</Text>
                     :valueText === "gold" ?<Text>this level will gives you: 10</Text>
                     : null}
-                </View>
-                <TouchableOpacity
-                        style={{
-                        paddingVertical: 10,
-                        }}
-                        onPress={() => {
-                        subscribe("new")
-                        }}>
-                        <Text>subscribe now</Text>
+              </View>
+                    {flag === true ? 
+                    <TouchableOpacity
+                    style={{
+                    paddingVertical: 10,
+                    }}
+                    onPress={() => {
+                    subscribe("new")
+                    }}>
+                    <Text>subscribe now</Text>
+                    </TouchableOpacity>: 
+                    <TouchableOpacity
+                      style={{
+                      paddingVertical: 10,
+                      }}
+                      onPress={() => {
+                      subscribe("updateSub")
+                      }}>
+                      <Text>subscribe now</Text>
                     </TouchableOpacity>
+
+                  }  
             </ScrollView>
             </View>
             : 
