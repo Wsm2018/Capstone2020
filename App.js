@@ -34,6 +34,7 @@ import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
+import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 
@@ -82,6 +83,7 @@ export default function App(props) {
       Home: HomeStack,
 
       News: NewsStack,
+      Advertisments: AdvertismentsStack,
 
       Profile: ProfileStack,
     },
