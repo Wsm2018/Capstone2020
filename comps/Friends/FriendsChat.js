@@ -66,10 +66,10 @@ export default function FriendsList(props) {
         // update into read using their id
         let unread = tempFrom.filter((message) => message.status === "unread");
         if (unread.length > 0) {
-          const update = firebase.functions().httpsCallable("updateToRead");
-          const response = await update({ messages: unread });
+          unread.forEach((message) =>
+            db.collection("chats").doc(message.id).update({ status: "read" })
+          );
         }
-        // console.log(response);
 
         setTo(tempFrom);
       });
@@ -87,14 +87,13 @@ export default function FriendsList(props) {
 
   // --------------------------------SEND----------------------------------
   const send = async () => {
-    const message = firebase.functions().httpsCallable("sendMessage");
-    const response = await message({
+    db.collection("chats").add({
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
+      status: "unread",
       dateTime: new Date(),
     });
-    console.log("response", response);
 
     setText("");
   };

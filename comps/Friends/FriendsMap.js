@@ -57,7 +57,6 @@ export default function FriendsMap() {
           let tempFriends = [];
 
           queryBySnapshot.forEach((doc) => {
-            console.log(doc.data().privacy);
             if (doc.data().privacy.locationP === true) {
               tempFriends.push({ id: doc.id, ...doc.data() });
             }
@@ -68,7 +67,7 @@ export default function FriendsMap() {
       unsubFriends.current = unsubscribe;
     } else {
       setFriends([]);
-      unsub.current = null;
+      unsubFriends.current = null;
     }
   };
 
@@ -98,7 +97,9 @@ export default function FriendsMap() {
     getCurrentLocation();
 
     return () => {
-      unsubFriends.current();
+      if (unsubFriends.current !== null) {
+        unsubFriends.current();
+      }
     };
   }, []);
 

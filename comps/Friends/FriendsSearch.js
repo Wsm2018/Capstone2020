@@ -113,19 +113,41 @@ export default function FriendsList(props) {
   // -------------------------------ADD-----------------------------------
   // Sends a friend request to a user
   const addFriend = async (user, index) => {
-    allUsers[index].loading = true;
-    const add = firebase.functions().httpsCallable("addFriend");
-    const response = await add({ user: currentUser, friend: user });
-    console.log("response", response);
-    allUsers[index].loading = false;
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .set({
+        displayName: user.displayName,
+        status: "pending",
+        photoURL: user.photoURL,
+      });
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .set({
+        displayName: currentUser.displayName,
+        status: "requested",
+        photoURL: currentUser.photoURL,
+      });
   };
 
   // -------------------------------REMOVE-----------------------------------
   // Removes your pending request
   const remove = async (user) => {
-    const rem = firebase.functions().httpsCallable("removeFriend");
-    const response = await rem({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
   };
 
   // ---------------------------------SEARCH---------------------------------
@@ -301,7 +323,7 @@ export default function FriendsList(props) {
                             minWidth: "27%",
                             maxWidth: "27%",
                           }}
-                          disabled={true}
+                          onPress={() => remove(item)}
                         >
                           <Feather name="loader" size={18} color="white" />
                           <Text

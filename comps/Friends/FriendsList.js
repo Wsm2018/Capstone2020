@@ -40,7 +40,7 @@ export default function FriendsList(props) {
 
   const [search, setSearch] = useState("");
 
-  const unsubUsers = useRef(null);
+  const unsubUsers = useRef();
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
     const doc = await db
@@ -108,6 +108,7 @@ export default function FriendsList(props) {
       unsubUsers.current = unsub;
     } else {
       setUsers([]);
+      unsubUsers.current = null;
     }
   };
 
@@ -240,7 +241,9 @@ export default function FriendsList(props) {
     if (allFriends) {
       handleUsers();
       return () => {
-        unsubUsers.current();
+        if (unsubUsers.current !== null) {
+          unsubUsers.current();
+        }
       };
     }
   }, [allFriends]);
@@ -280,9 +283,17 @@ export default function FriendsList(props) {
 
   // -------------------------------REMOVE-----------------------------------
   const removeFriend = async (user) => {
-    const dec = firebase.functions().httpsCallable("removeFriend");
-    const response = await dec({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
   };
 
   return !friends ? (
