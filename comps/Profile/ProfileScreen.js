@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  AsyncStorage,
 } from "react-native";
 // import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
@@ -211,13 +212,22 @@ export default function ProfileScreen(props) {
 
   const [marginVal, setMargin] = useState(0);
   /////////////////////////////////////////////////////////////////////////////////////
+  const [theme, setTheme] = useState();
+  const getTheme = async () => {
+    const theme = await AsyncStorage.getItem("theme");
+    setTheme(theme);
+  };
+
+  useEffect(() => {
+    getTheme();
+  }, []);
 
   return (
     user && (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
           style={[
-            styles.container,
+            theme === "light" ? styles.container : styles.container2,
             { marginTop: !Platform.isPad && marginVal },
           ]}
         >
@@ -647,6 +657,14 @@ export default function ProfileScreen(props) {
 }
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    //"#f5f0f0"
+    backgroundColor: "#f5f0f0",
+    // alignItems: "center",
+    // width: Math.round(Dimensions.get("window").width),
+    // height: Math.round(Dimensions.get("window").height),
+  },
+  container2: {
     flex: 1,
     //"#f5f0f0"
     backgroundColor: "#f5f0f0",
