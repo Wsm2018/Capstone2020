@@ -23,10 +23,14 @@ import db from "../../db.js";
 import { ceil } from "react-native-reanimated";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
+import { ColorPicker, TriangleColorPicker } from 'react-native-color-picker'
+import SketchPicker from "react-color"
+import { ColorWheel } from 'react-native-color-wheel';
 require("firebase/firestore");
 
 export default function AssetManagement(props) {
     const [latLong, setLatLong] = useState("");
+    const [color, setColor] = useState()
     const [code, setCode] = useState("");
     const [types, setTypes] = useState([])
     const [sections, setSectinos] = useState([])
@@ -55,7 +59,11 @@ export default function AssetManagement(props) {
     const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
     const [photoURL, setPhotoURL] = useState("");
     const [showInMap, setShowInMap] = useState(false);
-    const [update , setUpdate] = useState(false)
+    const [update, setUpdate] = useState(false)
+    const [title, setTitle] = useState()
+    const [long, setLong] = useState(0.0)
+    const [lat, setLat] = useState(0.0)
+    const [showColorPicker, setShowColorPicker] = useState(false)
 
     const icons = [
         "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
@@ -69,11 +77,17 @@ export default function AssetManagement(props) {
         "forklift", "garage-open", "gift", "golf", "hammer", "home", "home-group", "lamp", "lock", "map-marker", "medal", "pac-man", "palette-outline",
         "parking", "phone", "percent", "piano", "pill", "pipe-leak", "printer", "radio", "roller-skate", "room-service-outline", "scissors-cutting",
         "settings-outline", "shower", "shower-head", "smoking", "smoking-off", "star", "stocking", "toilet", "tooth", "tower-fire", "trash-can", "water",
-        "xbox-controller", "account", "car-key", "doctor","human-female","human","image-filter-drama","mailbox","map-outline","motorbike","needle",
-        "numeric-1","numeric-2","numeric-3","numeric-4","numeric-5","numeric-6",
-        "numeric-7","numeric-8","numeric-9","package-variant-closed","phone-classic","pier-crane",
-        "pier","power-plug","pulse","puzzle","radiobox-blank","react",
-        "screw-flat-top","script-text","local-gas-station"
+        "xbox-controller", "account", "car-key", "doctor", "human-female", "human", "image-filter-drama", "mailbox", "map-outline", "motorbike", "needle",
+        "numeric-1", "numeric-2", "numeric-3", "numeric-4", "numeric-5", "numeric-6",
+        "numeric-7", "numeric-8", "numeric-9", "package-variant-closed", "phone-classic", "pier-crane",
+        "pier", "power-plug", "pulse", "puzzle", "radiobox-blank", "react",
+        "screw-flat-top", "script-text", "local-gas-station"
+    ]
+
+    const colors = [
+        "B40404", "B43104", "FF3333", "B45104", "FF8D04", "FFD904", "F0FF04", "BBFF04", "82FF04", "04C822",
+        "047B16", "02FA6C", "02FAAF", "02FAE3", "02D8FA", "029CFA", "0255FA", "020DFA", "6F02FA", "9C02FA",
+        "FA02F2", "FA02AB", "FA0267", "FA022F", "030001", "FEFEFE", "CBCBCB", "767474"
     ]
 
     const askPermission = async () => {
@@ -136,9 +150,7 @@ export default function AssetManagement(props) {
             getUrl(docId)
         }
         else {
-            //obj.image = photoURL
             db.collection("assetTypes").doc(selectedType.id).update(obj)
-            //db.collection("assetTypes").doc(selectedType.id).update({image : photoURL})
             getUrl(selectedType.id)
         }
         cancelAll()
@@ -227,13 +239,16 @@ export default function AssetManagement(props) {
         setNumOfPeople(0)
         setSectionIcon()
         setAssetIcon()
+        setTitle()
+        setColor()
+        setLong(0.0)
+        setLat(0.0)
     }
 
     return (
         <ScrollView>
+
             <Text>Asset Managment</Text>
-
-
             {
                 types && !selectedType ?
                     <View>{
@@ -244,7 +259,8 @@ export default function AssetManagement(props) {
                                 setName(t.name) ||
                                 setAssetIcon(t.assetIcon) ||
                                 setSectionIcon(t.sectionIcon) ||
-                                setShowInMap(t.showInMap)
+                                setShowInMap(t.showInMap) ||
+                                setTitle(t.title)
                             }><Text>{t.name}</Text></TouchableOpacity>
                         )
                     }
@@ -262,7 +278,6 @@ export default function AssetManagement(props) {
                                     <TouchableOpacity onPress={() => setSelectedSection(t) || setName()}><Text>{t.name}</Text></TouchableOpacity>
                                     :
                                     null
-
                             )}
                         {
                             !selectedSection ?
@@ -357,7 +372,7 @@ export default function AssetManagement(props) {
                                             />
                                             <TextInput
                                                 onChangeText={setDescription}
-                                                placeholder="Name"
+                                                placeholder="Description"
                                                 value={description}
                                             />
 
@@ -376,7 +391,6 @@ export default function AssetManagement(props) {
                                             }, selectedAsset.id)
 
                                             } />
-
                                             <Button title="Cancel" onPress={() => setShowEditAsset(false) || cancelAll()} />
                                         </View>
 
@@ -384,11 +398,15 @@ export default function AssetManagement(props) {
                                         <View>
                                             <Text>{selectedAsset.name ? selectedAsset.name : null}</Text>
                                             <Text>{selectedAsset.price ? selectedAsset.price : null}</Text>
-                                            {/* <Text>{selectedAsset.location? selectedAsset.location: null}</Text> */}
-                                            <Text>{selectedAsset.type ? selectedAsset.type : null}</Text>
+                                            {selectedAsset.location? 
+                                            <View>
+                                            <Text>{selectedAsset.location.longitude}</Text>
+                                            <Text>{selectedAsset.location.latitude}</Text>
+                                            </View>
+                                             : null}
+                                            <Text>{ selectedType.name }</Text>
                                             <Text>{selectedAsset.numOfPeople ? selectedAsset.numOfPeople : null}</Text>
                                             <Text>{selectedAsset.description ? selectedAsset.description : null}</Text>
-
 
                                             <TouchableOpacity onPress={() => setShowEditAsset(true) ||
                                                 setName(selectedAsset.name) ||
@@ -430,11 +448,29 @@ export default function AssetManagement(props) {
                                     placeholder="Name"
                                     value={name}
                                 />
+                                <TextInput
+                                    onChangeText={setTitle}
+                                    placeholder="Name"
+                                    value={title}
+                                />
 
                                 <Text>Show In Map</Text>
                                 <CheckBox
                                     value={showInMap}
                                     onValueChange={() => setShowInMap(!showInMap)}
+                                />
+                                <Text>Location</Text>
+                                <Text>Longitude</Text>
+                                <TextInput
+                                    onChangeText={setLong}
+                                    placeholder="Longitude"
+                                    value={long}
+                                />
+                                <Text>Latitude</Text>
+                                <TextInput
+                                    onChangeText={setLat}
+                                    placeholder="Latitude"
+                                    value={lat}
                                 />
 
                                 <TouchableOpacity onPress={() => setOpenSectionIcon(true)}>
@@ -460,7 +496,7 @@ export default function AssetManagement(props) {
                                 >
                                     <Button title="Pick Image" onPress={handlePickImage} />
                                 </View>
-                                <TouchableOpacity onPress={() => handleType({ name, sectionIcon, assetIcon , showInMap })} disabled={!name || !sectionIcon  || !uri || !assetIcon}><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleType({ name, sectionIcon, assetIcon, showInMap, title })} disabled={!name || !sectionIcon || !uri || !assetIcon}><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity>
                                 <TouchableOpacity onPress={() => setShowInMap(false) || setShowAddType(false) || setShowEditType(false) || setName()}><Text>Cancel</Text></TouchableOpacity>
                             </View>
                         </View>
@@ -489,9 +525,37 @@ export default function AssetManagement(props) {
                                     placeholder="Name"
                                     value={name}
                                 />
+                                <Text>Location</Text>
+                                <Text>Longitude</Text>
+                                <TextInput
+                                    onChangeText={setLong}
+                                    placeholder="Longitude"
+                                    value={long}
+                                />
+                                <Text>Latitude</Text>
+                                <TextInput
+                                    onChangeText={setLat}
+                                    placeholder="Latitude"
+                                    value={lat}
+                                />
+
+                                <TouchableOpacity
+                                    style={{
+                                        width: "20%",
+                                        height: "20%",
+                                        alignItems: "center",
+                                        marginBottom: 15,
+                                        borderColor: color ? `#${color}` : "black",
+                                        borderWidth: 1,
+                                        backgroundColor: color ? `#${color}` : "white"
+                                    }}
+                                    onPress={() => setShowColorPicker(true)}
+                                >
+                                    <Text>Section Color</Text>
+                                </TouchableOpacity>
 
                                 <Button title={showAddSection ? "Add" : "Edit"} onPress={() =>
-                                    showAddSection ? handleAdd("assetSections", { assetType: selectedType.id, name })
+                                    showAddSection ? handleAdd("assetSections", { assetType: selectedType.id, name, color, location: { Latitude: lat, Longitude: long } })
                                         :
                                         handleEdit("assetSections", { name, assetType: selectedType.id }, selectedSection.id)} disabled={!name} />
                                 <Button title="Cancel" onPress={() => setShowAddSection(false) || setShowEditSection(false) || cancelAll()} />
@@ -539,14 +603,22 @@ export default function AssetManagement(props) {
                                     placeholder="Number of people"
                                     value={numOfPeople}
                                 />
+                                <Text>Location</Text>
+                                <Text>Longitude</Text>
                                 <TextInput
-                                    onChangeText={setLocation}
-                                    placeholder="Name"
-                                    value={location}
+                                    onChangeText={setLong}
+                                    placeholder="Longitude"
+                                    value={long}
+                                />
+                                <Text>Latitude</Text>
+                                <TextInput
+                                    onChangeText={setLat}
+                                    placeholder="Latitude"
+                                    value={lat}
                                 />
                                 <TextInput
                                     onChangeText={setDescription}
-                                    placeholder="Name"
+                                    placeholder="Description"
                                     value={description}
                                 />
 
@@ -559,7 +631,7 @@ export default function AssetManagement(props) {
                                     status: false,
                                     lock: false,
                                     numOfPeople,
-                                    location,
+                                    location: { Latitude: lat, Longitude: long },
                                     description,
                                     type
                                 })} disabled={!name || !code || !price || !description} />
@@ -617,6 +689,51 @@ export default function AssetManagement(props) {
                     :
                     null
             }
+
+            {
+                showColorPicker ?
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        //visible={}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <ScrollView>
+                            <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <View style={{
+                                        width: "100%", flexDirection: "row",
+                                        flexWrap: "wrap"
+                                    }}>
+                                        {
+                                            colors.map((i, index) =>
+                                                <TouchableOpacity
+                                                    style={{
+                                                        width: "20%",
+                                                        height: "20%",
+                                                        alignItems: "center",
+                                                        marginBottom: 15,
+                                                        backgroundColor: `#${i}`
+                                                    }}
+                                                    onPress={() => setColor(i) || setShowColorPicker(false)}
+                                                >
+
+                                                    <Text></Text>
+                                                </TouchableOpacity>
+
+                                            )}
+                                    </View>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </Modal>
+                    :
+
+                    null
+            }
+
 
 
 

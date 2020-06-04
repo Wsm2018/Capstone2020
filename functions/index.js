@@ -104,18 +104,18 @@ exports.sendMail = functions.https.onRequest((request, response) => {
 });
 
 exports.assetManager = functions.https.onCall(async (data, context) => {
-  
-  if(data.type === "add"){
+
+  if (data.type === "add") {
     db.collection(data.collection).add(
       data.obj
-  );
+    );
   }
-  else if( data.type === "update"){
+  else if (data.type === "update") {
     db.collection(data.collection).doc(data.doc).set(
       data.obj
-  );
+    );
   }
-  else{
+  else {
     db.collection(data.collection).doc(data.doc).delete()
   }
 
@@ -124,28 +124,28 @@ exports.assetManager = functions.https.onCall(async (data, context) => {
 exports.editBooking = functions.https.onCall(async (data, context) => {
   var newAssetBooking = data.assetBooking
   newAssetBooking.endDateTime = data.endDateTime
-  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount , assetBooking: newAssetBooking , status : data.status})
-  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime})
+  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount, assetBooking: newAssetBooking, status: data.status })
+  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime })
 
-  for( let i =0 ; i < data.serviceBooking.length ; i++){
+  for (let i = 0; i < data.serviceBooking.length; i++) {
     var serviceBooking = {
-      service:data.serviceBooking[i].service,
-    assetBooking: newAssetBooking,
-    dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
-    worker:data.serviceBooking[i].worker,
-    completed: false
+      service: data.serviceBooking[i].service,
+      assetBooking: newAssetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false
     }
 
-    var sId= ""
-    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef => 
+    var sId = ""
+    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef =>
       sId = docRef.id
     )
     serviceBooking.id = sId
 
     db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
       serviceBooking,
-      dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
-      worker:data.serviceBooking[i].worker,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
       completed: false
     })
   }
@@ -153,59 +153,114 @@ exports.editBooking = functions.https.onCall(async (data, context) => {
 
 });
 
+exports.manageServices = functions.https.onCall(async (data, context) => {
+
+  if (data.status === "add") {
+    var sId = ""
+    let add = await db.collection("services").add(data.obj).then((docRef) =>
+      (sId = docRef.id)
+    )
+    for (let i = 0; i < data.weekDays.length; i++) {
+      if (data.weekDays[i].hours.length > 0) {
+        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays.day).set({ hours: data.weekDays[i].hours })
+      }
+    }
+
+  }
+
+  if (data.status === "update") {
+    db.collection("services").doc(data.selectedService.service.id).update(data.obj)
+
+    for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
+      if (data.serviceWorkHoursDays[i].service === data.selectedService.service) {
+        for (let k = 0; k < data.serviceWorkHoursDays[i].workingDays.length; k++) {
+          if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
+            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).set(
+              { hours: data.serviceWorkHoursDays[i].workingDays[k].hours })
+          }
+          else {
+            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).delete()
+
+          }
+        }
+
+      }
+    }
+  }
+
+})
+
+exports.manageServiceWorkers = functions.https.onCall(async (data, context) => {
+
+  db.collection("users").doc(data.user.id).update(data.user)
+
+})
+
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  console.log(" in functions")
+  console.log(" in functions");
   var assetBooking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
     endDateTime: data.endDateTime,
-  }
-  var bId= ""
-  var getId = await db.collection("assets").doc(data.asset.id).collection("assetBookings").add(assetBooking).then(docRef => 
-    bId = docRef.id
-  )
-  assetBooking.id = bId
- console.log("booking added")
-  for( let i =0 ; i < data.serviceBooking.length ; i++){
-    console.log("add service")
+  };
+  var bId = "";
+  var getId = await db
+    .collection("assets")
+    .doc(data.asset.id)
+    .collection("assetBookings")
+    .add(assetBooking)
+    .then((docRef) => (bId = docRef.id));
+  assetBooking.id = bId;
+  console.log("booking added");
+  for (let i = 0; i < data.serviceBooking.length; i++) {
+    console.log("add service");
     var serviceBooking = {
-      service:data.serviceBooking[i].service,
-    assetBooking: assetBooking,
-    dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
-    worker:data.serviceBooking[i].worker,
-    completed: false
-    }
+      service: data.serviceBooking[i].service,
+      assetBooking: assetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false,
+    };
     //add service booking
-    var sId= ""
-    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef => 
-      sId = docRef.id
-    )
-    serviceBooking.id = sId
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
     //update worker schedule
-    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
-      serviceBooking,
-      dateTime: data.serviceBooking[i].day+"T"+data.serviceBooking[i].time,
-      worker:data.serviceBooking[i].worker,
-      completed: false
-    })
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
   }
-console.log("payment")
-  db.collection("payments")
-        .add({
-          user: data.user,
-          card:data.card,
-          assetBooking:assetBooking,
-          serviceBooking: null,
-          totalAmount: data.totalAmount,
-          dateTime: data.dateTime,
-          status: data.status,
-          promotionCode: null,
-        });
+  console.log("payment");
+  db.collection("payments").add({
+    user: data.user,
+    card: data.card,
+    assetBooking: assetBooking,
+    serviceBooking: null,
+    totalAmount: data.totalAmount,
+    dateTime: data.dateTime,
+    status: data.status,
+    promotionCode: null,
+  });
+  // var u = data.user;
+  // u.points = u.points + 10;
+  db.collection("users").doc(data.user.id).update(data.user);
 
-  if( data.addCreditCard){
-    db.collection("users").doc(data.uid).collection("cards").add(data.card)
+  if (data.addCreditCard) {
+    db.collection("users").doc(data.uid).collection("cards").add(data.card);
   }
 });

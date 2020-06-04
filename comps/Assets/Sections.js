@@ -21,6 +21,7 @@ import moment from "moment"
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db.js";
+import TimePicker from "react-native-navybits-date-time-picker"
 require("firebase/firestore");
 
 
@@ -30,7 +31,7 @@ export default function Sections(props) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showSections , setShowSections] = useState(false)
-
+  
   /////////////////////////new
   const [ startTime , setStartTime] = useState()
   const [ endTime , setEndTime] = useState()
@@ -41,6 +42,7 @@ export default function Sections(props) {
   const [tempStartDate, setTempStartDate] = useState();
   const [tempEndDate, setTempEndDate] = useState();
   const displayList = useRef()
+  const start = useRef()
  
   const [timesList , setTimesList] = useState([
     "12:00 AM",
@@ -70,6 +72,7 @@ export default function Sections(props) {
   ])
 
   useEffect(() => {
+    
     getSections();
   }, [type]);
 
@@ -77,15 +80,26 @@ export default function Sections(props) {
     if(tempStartDate){
       var temp =[]
       var found = false
-      for( let i=0 ; i < timesList.length ; i++){
-        if( found ){
-          temp.push(timesList[i])
+      // console.log("temp Start" , moment() )
+       //console.log("oha",moment("2020-03-03T00:00:00"))
+      // if( tempStartDate)
+      if( tempStartDate.split(" ")[0] === moment().format("YYYY-MM-DD")){
+        for( let i=0 ; i < timesList.length ; i++){
+          if( found ){
+            temp.push(timesList[i])
+          }
+          console.log( timesList[i] , moment().format("h:00 A"))
+          if( timesList[i] == moment().format("h:00 A")){
+            found = true
+            console.log("here", moment().format("h:00 A"))
+          }
         }
-        if( timesList[i] == moment().format("H:00 A")){
-          found = true
-        }
+        displayList.current = temp
       }
-      displayList.current = temp
+      else{
+        displayList.current = timesList
+      }
+      
       setStartTimeModal(true)
     } 
   }, [tempStartDate]);
@@ -95,6 +109,7 @@ export default function Sections(props) {
       var temp =[]
       var found = false
       console.log("started",startDate.split(" ")[2])
+      
       if( tempEndDate.split(" ")[0] === startDate.split(" ")[0]){
         var s = startDate.split(" ")[2] + " "+startDate.split(" ")[3]
         for( let i=0 ; i < timesList.length ; i++){
@@ -116,6 +131,7 @@ export default function Sections(props) {
       setEndTimeModal(true)
     } 
   }, [tempEndDate]);
+  
 
   useEffect(()=>{
     if(startTime ){
@@ -138,9 +154,13 @@ export default function Sections(props) {
 
       temp.push({ id: doc.id, ...doc.data() })
     });
-    console.log(temp)
+    
     setAssetSections(temp);
   }
+
+  useEffect(() =>{
+    console.log(" yeeeeeeeeaaaahh")
+  },[start])
 
   return (
     <View style={styles.container}>
@@ -148,6 +168,7 @@ export default function Sections(props) {
         !showSections ?
           <View>
             <Text>Choose a start date and time</Text>
+            
             <DatePicker
               style={{ width: 200 }}
               //is24Hour
@@ -172,13 +193,15 @@ export default function Sections(props) {
                 // ... You can check the source to find the other keys.
               }}
               onDateChange={setTempStartDate}
+              //onCloseModal={()=>updateitplease}
+              //onConfirm={start.current = true}
             />
             
             {
               startDate ?
                 <Text>
                   Your start date and time is {startDate} now choose an end date
-        </Text>
+                </Text>
                 :
                 null
             }
@@ -190,7 +213,7 @@ export default function Sections(props) {
               mode="date"
               placeholder="select an end date"
               format="YYYY-MM-DD T h:mm A"
-              minDate={startDate}
+              minDate={startTime == "11:00 PM" ? moment(startDate.split(" ")[0]+"T00:00:00").add(1,"day").format() : startDate}
               //maxDate={moment(startDate).add(2,"day")}
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
@@ -248,7 +271,10 @@ export default function Sections(props) {
                   }><Text>{t}</Text></TouchableOpacity>
                     )
                   :
+                  <View>
+                    <Text>No Available Hours For Today</Text>
                   <Button title="Exit" onPress={()=> setStartTimeModal(false) || setEndTimeModal(false)}/>
+                  </View>
                 }
               </View>
             </View>

@@ -425,7 +425,6 @@ export default function Details(props) {
   }
 
   const checkToDelete = (timing, service) => {
-    console.log("ohass",timing, service.id)
     var t =""
     if( timing.split(" ").length >= 3 ){
      
@@ -434,7 +433,7 @@ export default function Details(props) {
     else{
       t= timing
     }
-    //console.log(" ehh",t)
+
     var index = SB.current.findIndex(s => s.service == service && s.show == t)
     var updateWorkers = allWorkers
     for (let i = 0; i < updateWorkers.length; i++) {
@@ -454,33 +453,21 @@ export default function Details(props) {
     }
     var temp = []
     for (let i = 0; i < SB.current.length; i++) {
-      //console.log("??????????????" , index , i)
       if (i !== index) {
-       // console.log("added")
         temp.push(SB.current[i])
       }
     }
-   // console.log("temp",temp)
     SB.current = temp
     setServiceBooking([...temp])
     orderList()
     getAvailableTimings()
-    //console.log("SB.CURRENT",SB.current)
   }
 
   const deleteAll = (service) => {
-    //loop through all 
-    //check date and time
-    //send to book one by one
     var toDelete = serviceBooking.filter( s => s.service === service)
     for( let i=0 ; i < toDelete.length ; i++ ){
-
-      console.log(" i",i,toDelete[i].show ,service.id)
-      checkToDelete( toDelete[i].show ,service)
-      
+      checkToDelete( toDelete[i].show ,service)   
     }
-
-
   }
 
 
