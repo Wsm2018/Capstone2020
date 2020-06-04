@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
-  Alert
+  Alert,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -53,7 +53,10 @@ export default function FriendsList(props) {
       let tempUsers = [];
 
       queryBySnapshot.forEach((doc) => {
-        if (doc.id !== firebase.auth().currentUser.uid) {
+        if (
+          doc.id !== firebase.auth().currentUser.uid &&
+          doc.data().email !== "DELETED"
+        ) {
           tempUsers.push({
             id: doc.id,
             ...doc.data(),
@@ -243,9 +246,9 @@ export default function FriendsList(props) {
           color="#fff"
           onPress={() => props.navigation.goBack()}
         />
-         <TouchableOpacity onPress={() => setScan(true)}>
-        <Icon name="qrcode-scan" type="material-community" size={28} />
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => setScan(true)}>
+          <Icon name="qrcode-scan" type="material-community" size={28} />
+        </TouchableOpacity>
       </View>
       {/* <View
         style={{

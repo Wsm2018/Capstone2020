@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 
 export const config = {
-  apiKey: "AIzaSyBLdt-1iHho-6QGiq30plqoBz4Sjox4_hA",
+  apiKey: "AIzaSyCNgNO3plGbuqqepOxMbldcI_k-sHStZ0c",
   authDomain: "capstone2020-b64fd.firebaseapp.com",
   databaseURL: "https://capstone2020-b64fd.firebaseio.com",
   projectId: "capstone2020-b64fd",

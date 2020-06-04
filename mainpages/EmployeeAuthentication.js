@@ -95,29 +95,18 @@ export default function EmployeeHandlerCreate(props) {
   // --------------------------------CREATE----------------------------------
   const handleCreate = async () => {
     if (await validated()) {
+      let temp = JSON.parse(JSON.stringify(props.user));
+      temp.role = temp.role.slice(0, temp.role.length - 13);
+      props.setUser(temp);
       let set = firebase.functions().httpsCallable("setEmployeeAuthentication");
       let response = await set({
         user: currentUser,
         password: password.text,
         phone: phone.text,
       });
+
+      console.log(temp);
       console.log("response", response.data);
-      // let page = `<View><Text>Email:${
-      //   email.text + company
-      // }</Text><Text>Password:${response.data.password}</Text></View>`;
-      // let pdf = await Print.printToFileAsync({ html: page });
-      // let uri = pdf.uri;
-      // const response2 = await fetch(uri);
-      // const blob = await response2.blob();
-      // const putResult = await firebase
-      //   .storage()
-      //   .ref()
-      //   .child(`pdf/${response.data.id}`)
-      //   .put(blob);
-      // props.navigation.navigate("EmployeesCreateSuccess", {
-      //   id: response.data.id,
-      //   email: email.text + company,
-      // });
     }
   };
 
@@ -126,11 +115,6 @@ export default function EmployeeHandlerCreate(props) {
     handleCurrentuser();
     handleCompany();
   }, []);
-
-  const test = () => {
-    let test = "user handler (incomplete)";
-    console.log(test.slice(0, test.length - 13));
-  };
 
   return (
     <View style={styles.container}>
@@ -195,7 +179,6 @@ export default function EmployeeHandlerCreate(props) {
       >
         <Text>Confirm</Text>
       </TouchableOpacity>
-      <Button title="test" onPress={() => firebase.auth().signOut()} />
     </View>
   );
 }

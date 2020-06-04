@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -23,6 +23,9 @@ export default function FriendsList(props) {
   const [to, setTo] = useState(null);
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
+  const [onPresent, setOnPresent] = useState(true);
+
+  const chatView = useRef();
 
   // const [unsubscribe, setUnsubscribe] = useState(null);
   // const [unsubscribe2, setUnsubscribe2] = useState(null);
@@ -35,13 +38,14 @@ export default function FriendsList(props) {
       .where("to", "==", friend.id)
       .onSnapshot((queryBySnapshot) => {
         let tempFrom = [];
+        tempFrom.fil;
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: true });
         });
         // console.log(tempFrom);
         setFrom(tempFrom);
       });
-    screenListener(unsubscribe);
+    return unsubscribe;
   };
 
   // --------------------------------TO----------------------------------
@@ -69,14 +73,14 @@ export default function FriendsList(props) {
 
         setTo(tempFrom);
       });
-    screenListener(unsubscribe);
+    return unsubscribe;
   };
 
   // -------------------------------CHAT-----------------------------------
   const handleChat = () => {
     let tempChat = from.concat(to);
     tempChat = tempChat.sort(
-      (a, b) => a.dateTime.toDate() - b.dateTime.toDate()
+      (a, b) => b.dateTime.toDate() - a.dateTime.toDate()
     );
     setChats(tempChat);
   };
@@ -118,8 +122,12 @@ export default function FriendsList(props) {
 
   // ------------------------------------------------------------------
   useEffect(() => {
-    handleFrom();
-    handleTo();
+    const unsubscribeFrom = handleFrom();
+    const unsubscribeTo = handleTo();
+    return () => {
+      unsubscribeFrom();
+      unsubscribeTo();
+    };
   }, []);
 
   // ------------------------------------------------------------------
@@ -164,7 +172,25 @@ export default function FriendsList(props) {
         </Text>
       </View>
 
-      <ScrollView>
+      {/* --------------------------------SCROLLVIEW---------------------------------- */}
+      <ScrollView
+        style={{
+          transform: [{ scaleY: -1 }],
+        }}
+        ref={(ref) => (chatView.current = ref)}
+        onScrollToTop={() => console.log("yowhat")}
+        onScroll={(event) => {
+          if (event.nativeEvent.contentOffset.y > 300 && onPresent) {
+            // console.log("true");
+            setOnPresent(false);
+          }
+          if (event.nativeEvent.contentOffset.y < 300 && !onPresent) {
+            // console.log("false");
+            setOnPresent(true);
+          }
+        }}
+        scrollEventThrottle
+      >
         <View style={{ paddingTop: "5%" }}></View>
         {chats &&
           chats.map((chat) => (
@@ -185,6 +211,9 @@ export default function FriendsList(props) {
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        // scaleX: -1,
+                        // scaleY: -1,
+                        transform: [{ scaleY: -1 }],
                       }
                     : {
                         textAlign: "left",
@@ -193,6 +222,9 @@ export default function FriendsList(props) {
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        // scaleX: -1,
+                        // scaleY: -1,
+                        transform: [{ scaleY: -1 }],
                       }
                 }
                 key={chat.id}
@@ -224,6 +256,24 @@ export default function FriendsList(props) {
             </View>
           ))}
       </ScrollView>
+      {!onPresent && (
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            bottom: "25%",
+            right: "0%",
+            borderWidth: 1,
+            width: "15%",
+            height: "10%",
+            justifyContent: "center",
+          }}
+          onPress={() => chatView.current.scrollTo()}
+        >
+          <Text style={{ color: "red", textAlign: "center" }}>
+            Back to Present
+          </Text>
+        </TouchableOpacity>
+      )}
       <View
         style={{
           flexDirection: "row",
