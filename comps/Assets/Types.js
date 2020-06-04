@@ -72,9 +72,9 @@ export default function Types(props) {
   ]);
   const [titles] = useState([
     "Book a Parking",
-    "Book a Parking",
+    // "Book a Parking",
     "Book a Classroom",
-    "Book a Classroom",
+    // "Book a Classroom",
   ]);
   const [bookImage] = useState([
     "https://image.flaticon.com/icons/png/512/1845/1845213.png",

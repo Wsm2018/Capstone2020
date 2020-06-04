@@ -37,6 +37,7 @@ import { set } from "react-native-reanimated";
 import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
+  // const [fromFav, setFromFav] = useState(false);
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
@@ -82,6 +83,24 @@ export default function Sections(props) {
     "10:00 PM",
     "11:00 PM",
   ]);
+  const fav = props.navigation.getParam("flag", false);
+  console.log(fav);
+  useEffect(() => {
+    if (fav) {
+      console.log("hello");
+      // console.log(props.navigation.getParam("startDate", ""));
+      setStartDate(props.navigation.getParam("startDate", ""));
+      setEndDate(props.navigation.getParam("startDate", ""));
+      console.log(props.navigation.getParam("asset", null).type);
+      type = props.navigation.getParam("asset", null).type;
+      tName = props.navigation.getParam("asset", null).tName;
+      console.log(props.navigation.getParam("asset", null).assetSection);
+      setSelectedSection(props.navigation.getParam("asset", null).assetSection);
+      console.log("asset", props.navigation.getParam("asset", null));
+      setSelectedList(props.navigation.getParam("asset", null));
+      setDetailsView(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedSection !== null) {
@@ -265,6 +284,7 @@ export default function Sections(props) {
 
   const getSections = async () => {
     const temp = [];
+    console.log("getSections ", type);
     const sections = await db
       .collection("assetSections")
       .where("assetType", "==", type)
@@ -276,18 +296,18 @@ export default function Sections(props) {
     setAssetSections(temp);
   };
 
-  const checkFavorites = async (id) => {
-    const favorites = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("favorites")
-      .get();
-    const ids = [];
-    favorites.forEach((doc) => {
-      ids.push(doc.id);
-    });
-    return ids.includes(id);
-  };
+  // const checkFavorites = async (id) => {
+  //   const favorites = await db
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .collection("favorites")
+  //     .get();
+  //   const ids = [];
+  //   favorites.forEach((doc) => {
+  //     ids.push(doc.id);
+  //   });
+  //   return ids.includes(id);
+  // };
 
   const handleAddFavorite = async (item) => {
     // console.log(item);
