@@ -17,14 +17,24 @@ import "firebase/auth";
 import "firebase/functions";
 import { Dimensions } from "react-native";
 
-import { isMoment } from "moment";
-
 export default function BalanceScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [codeView, setCodeView] = useState(false);
   const [giftCode, setGiftCode] = useState("");
   const [giftCodeError, setGiftCodeError] = useState("#C7C7CD");
   const [giftErrorCounter, setGiftErrorCounter] = useState(0);
+  // const [flag, setFlag] = useState(false);
+
+  useEffect(() => {
+    if (giftCode !== "") {
+      setGiftCodeError("transparent");
+      // setFlag(false);
+    }
+
+    //   // } else if (!flag) {
+    //   //   setGiftCodeError("transparent");
+    //   // }
+  }, [giftCode]);
 
   const getUser = () => {
     db.collection("users")
@@ -35,6 +45,10 @@ export default function BalanceScreen({ navigation }) {
   };
 
   const handleGiftCode = async () => {
+    // if (giftCode === "") {
+    //   setFlag(true);
+    //   return;
+    // }
     if (giftErrorCounter !== 3) {
       if (giftCode.length !== 8) {
         setGiftCodeError("red");
@@ -46,7 +60,6 @@ export default function BalanceScreen({ navigation }) {
           .where("code", "==", giftCode)
           .where("status", "==", false)
           .get();
-
         if (result.size === 1) {
           result.forEach(async (doc) => {
             const response = await fetch(
@@ -170,7 +183,20 @@ export default function BalanceScreen({ navigation }) {
                 }}
               >
                 <TouchableOpacity
-                  style={{ alignItems: "center" }}
+                  style={{
+                    flex: 0.4,
+                    backgroundColor: "#20365F",
+                    // borderWidth: 4,
+                    height: 40,
+                    // width: "30%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    //marginEnd: "2%",
+                    borderRadius: 15,
+                    //marginBottom: 10,
+                  }}
                   onPress={() => navigation.navigate("Cards", { user: user })}
                 >
                   {/* <Image
@@ -180,18 +206,32 @@ export default function BalanceScreen({ navigation }) {
                   /> */}
                   <Text
                     style={{
-                      // marginTop: -15,
                       textAlign: "center",
                       fontSize: 16,
-                      fontWeight: "bold",
-                      color: "#20365F",
+                      color: "white",
+                      // fontWeight: "bold",
                     }}
                   >
                     Show My Cards
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={{ alignItems: "center" }}
+                  style={{
+                    flex: 0.4,
+
+                    backgroundColor: "#20365F",
+                    height: 40,
+                    // width: "30%",
+                    // borderWidth: 4,
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    //marginEnd: "2%",
+                    borderRadius: 15,
+                    //marginBottom: 10,
+                  }}
+                  // style={{ alignItems: "center" }}
                   onPress={() => setCodeView(true)}
                 >
                   {/* <Image
@@ -201,12 +241,18 @@ export default function BalanceScreen({ navigation }) {
                   /> */}
                   <Text
                     style={{
-                      // marginTop: -15,
                       textAlign: "center",
                       fontSize: 16,
-                      fontWeight: "bold",
-                      color: "#20365F",
+                      color: "white",
+                      // fontWeight: "bold",
                     }}
+                    // style={{
+                    //   // marginTop: -15,
+                    //   textAlign: "center",
+                    //   fontSize: 16,
+                    //   fontWeight: "bold",
+                    //   color: "#20365F",
+                    // }}
                   >
                     Use Gift Code
                   </Text>
@@ -242,6 +288,7 @@ export default function BalanceScreen({ navigation }) {
               <TextInput
                 width={Dimensions.get("window").width / 2}
                 style={{ height: 40, paddingLeft: 6 }}
+                value={giftCode}
                 placeholder={
                   giftErrorCounter === 3
                     ? "* Try again later"
@@ -251,12 +298,35 @@ export default function BalanceScreen({ navigation }) {
                     ? "* Balance Added"
                     : "Enter the code"
                 }
-                value={giftCode}
                 onChangeText={setGiftCode}
                 placeholderTextColor={giftCodeError}
                 editable={giftErrorCounter === 3 ? false : true}
               />
             </View>
+
+            {/* {!flag ? (
+              <Text
+                style={
+                  giftCodeError === "red"
+                    ? { color: "red" }
+                    : giftCodeError === "green"
+                    ? { color: "green" }
+                    : giftErrorCounter === 3
+                    ? { color: "red" }
+                    : null
+                }
+              >
+                {giftErrorCounter === 3
+                  ? "* Try again later"
+                  : giftCodeError === "red"
+                  ? "* Invalid Code"
+                  : giftCodeError === "green"
+                  ? "* Balance Added"
+                  : null}
+              </Text>
+            ) : (
+              <Text style={{ color: "red" }}>* Enter Code</Text>
+            )} */}
             <View
               // width={Dimensions.get("window").width}
               style={{
@@ -269,40 +339,60 @@ export default function BalanceScreen({ navigation }) {
               <TouchableOpacity
                 // width={Dimensions.get("window").width}
                 style={{
-                  // flex: 0.2,
-                  // backgroundColor: "red",
-                  alignItems: "center",
+                  flex: 0.4,
+                  backgroundColor: "#20365F",
+                  // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
+                  // alignSelf: "center",
                   justifyContent: "center",
-                  flexDirection: "row",
-                  // paddingLeft: 6,
-                  // width: "50%",
-                  // borderBottomColor: "black",
-                  // borderBottomWidth: 1,
-                  // borderRadius: 10,
-                  // marginBottom: 10,
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
                 }}
                 onPress={() => setCodeView(false)}
               >
-                <Text style={{ fontSize: 15 }}>Go Back</Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Go Back
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  // flex: 0.2,
-                  // backgroundColor: "red",
-                  alignItems: "center",
+                  flex: 0.4,
+                  backgroundColor: "#20365F",
+                  // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
+                  // alignSelf: "center",
                   justifyContent: "center",
-                  flexDirection: "row",
-                  // paddingLeft: 6,
-                  // width: "50%",
-                  // borderBottomColor: "black",
-                  // borderBottomWidth: 1,
-                  // borderRadius: 10,
-                  // marginBottom: 10,
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  //marginEnd: "2%",
+                  borderRadius: 15,
+                  //marginBottom: 10,
                 }}
                 onPress={handleGiftCode}
                 disabled={giftErrorCounter === 3 ? true : false}
               >
-                <Text style={{ fontSize: 15 }}>Use Code</Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Use Code
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

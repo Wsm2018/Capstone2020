@@ -17,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import "firebase/storage";
 import db from "../db";
 import News from "./News.js";
+import { MaterialIcons } from "@expo/vector-icons";
 export default function NewsPage() {
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [image, setImage] = useState(null);
@@ -109,19 +110,54 @@ export default function NewsPage() {
 
   return createFlag ? (
     <View style={styles.container}>
-      <Text>Header</Text>
-      <TouchableOpacity
-        onPress={() => {
-          setCreateFlag(!createFlag);
-        }}
-      >
-        <Text>Create News</Text>
-      </TouchableOpacity>
-      <ScrollView style={{ width: "100%" }}>
+      {/* <Text>Header</Text> */}
+
+      <ScrollView style={{ flex:1,width:'125%'}} horizontal={false}>
         {news.map((item, i) => (
           <News key={i} item={item} />
         ))}
       </ScrollView>
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#20365F",
+          height: 50,
+          width: "60%",
+          alignItems: "center",
+          alignContent: "center",
+
+          flexDirection: "row",
+          justifyContent: "center",
+          alignSelf: "center",
+          // paddingLeft: 0,
+          marginTop: 10,
+          // marginLeft: "20%",
+          // marginEnd: "20%",
+          borderRadius: 25,
+          marginBottom: 10,
+        }}
+        onPress={() => {
+          setCreateFlag(!createFlag);
+        }}
+      >
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 22,
+            paddingLeft: "5%",
+            paddingBottom: "2%",
+          }}
+        >
+          Create News
+        </Text>
+        <Text
+          style={{
+            paddingBottom: "1%",
+          }}
+        >
+          {"  "}
+          <MaterialIcons name="create" size={25} color="white" />
+        </Text>
+      </TouchableOpacity>
     </View>
   ) : (
     <View style={styles.container}>
@@ -213,8 +249,15 @@ const styles = StyleSheet.create({
 });
 
 NewsPage.navigationOptions = {
-  title: null,
+  title: "News ",
+headerStyle: {
+      backgroundColor: '#20365F',
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+      fontWeight: 'bold',
+  },
   tabBarIcon: () => {
-    <Icon name="news" type="font-awesome" size={24} />;
+    <Icon name="news" type="font-awesome" size={24} color={"black"} />;
   },
 };

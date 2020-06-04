@@ -39,9 +39,9 @@ export default function Types(props) {
   ]);
   const [titles] = useState([
     "Book a Parking",
-    "Book a Parking",
+    // "Book a Parking",
     "Book a Classroom",
-    "Book a Classroom",
+    // "Book a Classroom",
   ]);
   const [bookImage] = useState([
     "https://image.flaticon.com/icons/png/512/1845/1845213.png",
@@ -147,8 +147,10 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "Assets Types",
-  headerStyle: { backgroundColor: "#3771b3" },
+  title: "QuickbookinQ",
+  // headerStyle: { backgroundColor: "#3771b3" },
+  headerStyle: { backgroundColor: "#20365F" },
+
   headerTintColor: "white",
 });
 
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
     //backgroundColor: "blue",
     flexDirection: "row",
-    // flexWrap: "wrap",
+    flexWrap: "wrap",
     // justifyContent: "space-between",
     // alignItems: "flex-start",
     // alignContent: "flex-start",

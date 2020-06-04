@@ -25,6 +25,28 @@ exports.updateUser = functions.https.onCall(async (data, context) => {
   console.log("after set", result);
 });
 
+exports.updatePhoto = functions.https.onCall(async (data, context) => {
+  console.log("updatePhoto data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    photoURL: data.photoURL,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    photoURL: data.photoURL,
+  });
+});
+
+exports.updateDisplayName = functions.https.onCall(async (data, context) => {
+  console.log("updateDisplayName data", data);
+  const result = await admin.auth().updateUser(data.uid, {
+    displayName: data.displayName,
+  });
+
+  await db.collection("users").doc(data.uid).update({
+    displayName: data.displayName,
+  });
+});
+
 exports.sendGift = functions.https.onCall(async (data, context) => {
   const giftBalance = data.giftBalance;
 
@@ -199,7 +221,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       reputation: 0,
       points: 0,
       photoURL:
-        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+        "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
       activeRole: null,
@@ -277,13 +299,21 @@ exports.addFriend = functions.https.onCall(async (data, context) => {
     .doc(data.user.id)
     .collection("friends")
     .doc(data.friend.id)
-    .set({ displayName: data.friend.displayName, status: "pending" });
+    .set({
+      displayName: data.friend.displayName,
+      status: "pending",
+      photoURL: data.friend.photoURL,
+    });
 
   db.collection("users")
     .doc(data.friend.id)
     .collection("friends")
     .doc(data.user.id)
-    .set({ displayName: data.user.displayName, status: "requested" });
+    .set({
+      displayName: data.user.displayName,
+      status: "requested",
+      photoURL: data.user.photoURL,
+    });
 });
 
 exports.acceptFriend = functions.https.onCall((data, context) => {
@@ -323,14 +353,15 @@ exports.sendMessage = functions.https.onCall((data, context) => {
     to: data.to,
     from: data.from,
     text: data.text,
+    status: "unread",
     dateTime: new Date(),
   });
 });
-
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  var booking = {
+  console.log(" in functions");
+  var assetBooking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
@@ -341,27 +372,63 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     .collection("assets")
     .doc(data.asset.id)
     .collection("assetBookings")
-    .add(booking)
+    .add(assetBooking)
     .then((docRef) => (bId = docRef.id));
-
-  booking.id = bId;
-
+  assetBooking.id = bId;
+  console.log("booking added");
+  for (let i = 0; i < data.serviceBooking.length; i++) {
+    console.log("add service");
+    var serviceBooking = {
+      service: data.serviceBooking[i].service,
+      assetBooking: assetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false,
+    };
+    //add service booking
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
+    //update worker schedule
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
+  }
+  console.log("payment");
   db.collection("payments").add({
     user: data.user,
     card: data.card,
-    assetBooking: booking,
+    assetBooking: assetBooking,
     serviceBooking: null,
     totalAmount: data.totalAmount,
     dateTime: data.dateTime,
     status: data.status,
     promotionCode: null,
   });
+  const u = data.user;
+  u.points = u.points + 10;
+  db.collection("users").doc(data.user.id).update(u);
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
   }
 });
 
+exports.handlePointsExchange = functions.https.onCall(async (data, context) => {
+  db.collection("users").doc(data.user.id).update(data.user);
+});
 exports.createEmployee = functions.https.onCall(async (data, context) => {
   // ---------------------------------Referral Code---------------------------------
   // generating a random 6 digit referralCode
@@ -405,6 +472,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
     .collection("users")
     .doc(account.uid)
     .set({
+      activeRole: null,
       firstName: data.firstName,
       lastName: data.lastName,
       country: data.country,
@@ -613,11 +681,21 @@ exports.getAdmin = functions.https.onCall(async (data, context) => {
   });
 });
 
+exports.makeAdmin = functions.https.onCall(async (data, context) => {
+  const email = data.email;
+  console.log(email);
+  return grantAdminRole(email).then(async () => {
+    const user = await admin.auth().getUserByEmail(email);
+    console.log("user", user);
+    return {
+      result: user.customClaims,
+    };
+  });
+});
+
 async function grantAdminRole(email) {
   const user = await admin.auth().getUserByEmail(email);
-  if (user.customClaims.moderator) {
-    return user;
-  }
+
   return admin.auth().setCustomUserClaims(user.uid, {
     moderator: true,
   });
@@ -736,4 +814,21 @@ exports.adminUpdateUser = functions.https.onCall(async (data, context) => {
       tokens: parseInt(data.tokens),
       reputation: parseInt(data.reputation),
     });
+exports.updateToRead = functions.https.onCall(async (data, context) => {
+  console.log("updateToRead data", data);
+  const response = await data.messages.forEach((message) =>
+    db.collection("chats").doc(message.id).update({ status: "read" })
+  );
+  console.log("after update", response);
+});
+
+exports.deleteCar = functions.https.onCall(async (data, context) => {
+  console.log("delete car ", data);
+  const response = await db
+    .collection("users")
+    .doc(data.uid)
+    .collection("cars")
+    .doc(data.carId)
+    .delete();
+  console.log(response);
 });
