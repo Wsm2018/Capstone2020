@@ -378,3 +378,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#20365F",
   },
 });
+
+FriendsList.navigationOptions = {
+  //   title: "News ",
+  // headerStyle: {
+  //       backgroundColor: '#20365F',
+  //   },
+  //   headerTintColor: '#fff',
+  //   headerTitleStyle: {
+  //       fontWeight: 'bold',
+  //   },
+  //   tabBarIcon: () => {
+  //     <Icon name="news" type="font-awesome" size={24} color={"black"} />;
+  //   },
+  header: null,
+  tabBarIcon: () => {
+    <Icon name="news" type="font-awesome" size={24} color={"black"} />;
+  },
+};

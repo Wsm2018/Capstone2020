@@ -42,6 +42,8 @@ import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 
+import Theme from "react-native-themes";
+
 // import AsyncStorage from "@react-native-community/async-storage";
 
 export default function App(props) {
@@ -68,6 +70,29 @@ export default function App(props) {
       firebase.auth().signOut();
     }
   };
+
+  //////////////////////Themes////////////////////////////////////
+  const [theme, setTheme] = useState(null);
+
+  async function getTheme() {
+    let value = await AsyncStorage.getItem("theme");
+    if (value === null) {
+      await AsyncStorage.setItem("theme", "light");
+      value = await AsyncStorage.getItem("theme");
+      setTheme(value);
+      console.log(value, "111111111111111111111");
+    } else {
+      setTheme(value);
+      console.log(value, "222222222222222222222");
+    }
+    // AsyncStorage.clear();
+  }
+
+  // useEffect(() => {
+  //   getTheme();
+  // }, []);
+
+  ///////////////////////////////////////////////////////////////////
 
   const Test = () => {
     return (
@@ -98,7 +123,7 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+        style: { backgroundColor: theme === "light" ? "#20365F" : "black" },
       },
     }
   );
@@ -250,13 +275,13 @@ export default function App(props) {
 
   async function getFirstLaunch() {
     const value = await AsyncStorage.getItem("alreadyLaunched");
-    console.log("valueeeeeeeeeeeee", value);
+    // console.log("valueeeeeeeeeeeee", value);
     if (value === null) {
       await AsyncStorage.setItem("alreadyLaunched", "true");
-      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(true);
     } else {
-      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("falseeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(false);
     }
   }
@@ -269,6 +294,7 @@ export default function App(props) {
 
   useEffect(() => {
     getFirstLaunch();
+    getTheme();
   }, []);
 
   useEffect(() => {
@@ -283,10 +309,20 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const adminTabNav = createBottomTabNavigator({
-    Home: AdminHomeStack,
-    Profile: ProfileStack,
-  });
+  const adminTabNav = createBottomTabNavigator(
+    {
+      Home: AdminHomeStack,
+      Profile: ProfileStack,
+    },
+    {
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#20365F" },
+      },
+    }
+  );
+
   const AdminAppContainer = createAppContainer(adminTabNav);
 
   const guideSkip = () => {
@@ -305,6 +341,7 @@ export default function App(props) {
       // if user info already retrieved
       if (user) {
         // if users first launch show guideView
+        // if (guideView) {
         if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
@@ -363,7 +400,7 @@ export default function App(props) {
                       alignItems: "center",
                     }}
                   >
-                    <Text>WTF THERES A NEW ROLE?</Text>
+                    <Text>THERES A NEW ROLE?</Text>
                   </View>
                 );
             }
