@@ -98,11 +98,11 @@ export default function ReferralScreen(props) {
                 }}
               >
                 <Tooltip
-                  height={100}
+                  height={125}
                   width={355}
                   backgroundColor={"#229277"}
                   popover={
-                    <Text style={{ color: "white", fontSize: 18 }}>
+                    <Text style={{ color: "white", fontSize: 16 }}>
                       You can receive tokens by referring the App to new users!
                       Just click on the ({" "}
                       <Fontisto name="share" size={16} color="white" /> ) icon

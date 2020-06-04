@@ -56,6 +56,14 @@ function Guide(props) {
         "Book Prepay for your spot and get a parking pass instantly via text, email, or the app Book Prepay for your spot and get a parking pass instantly via text",
       //   fullWidth: true,
     },
+    {
+      index: 5,
+      uri:
+        "https://pngriver.com/wp-content/uploads/2018/04/Download-Advertising-PNG-Picture.png",
+      title: "Theme",
+      text: "Change theme",
+      //   fullWidth: true,
+    },
   ]);
   const [view, setView] = useState(0);
 

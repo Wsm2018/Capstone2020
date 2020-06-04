@@ -170,7 +170,7 @@ export default function Details(props) {
       });
 
     db.collection("users")
-      .where("role", "==", "worker")
+      .where("role", "==", "service employee")
       .onSnapshot((snapshot) => {
         var worker = "";
         snapshot.forEach((doc) => {
@@ -192,6 +192,7 @@ export default function Details(props) {
           }
         });
       });
+    // console.log("=======================++++++++++++++", services);
   };
 
   useEffect(() => {
@@ -202,6 +203,7 @@ export default function Details(props) {
       getAvailableTimings();
       setShowTimings(true);
     }
+    // console.log(selectedService);
   }, [selectedService]);
 
   const filterTimings = () => {
@@ -522,10 +524,69 @@ export default function Details(props) {
     return week[new Date(date).getDay()] + ", " + date;
   };
 
+  const checkToDelete = (timing, service) => {
+    var t = "";
+    if (timing.split(" ").length >= 3) {
+      t = timing.split(" ")[1] + " " + timing.split(" ")[2];
+    } else {
+      t = timing;
+    }
+
+    var index = SB.current.findIndex(
+      (s) => s.service == service && s.show == t
+    );
+    var updateWorkers = allWorkers;
+    for (let i = 0; i < updateWorkers.length; i++) {
+      if (updateWorkers[i].worker.id == SB.current[index].worker) {
+        var newSchedule = updateWorkers[i].schedules.filter(
+          (t) =>
+            t.dateTime != SB.current[index].day + "T" + SB.current[index].time
+        );
+        updateWorkers[i].schedules = newSchedule;
+        var ud = userDays;
+        for (let k = 0; k < userDays.length; k++) {
+          if (userDays[k].day == SB.current[index].day) {
+            ud[k].bookings = userDays[k].bookings - 1;
+            setUserDays(ud);
+          }
+        }
+        setAllWorkers(updateWorkers);
+        break;
+      }
+    }
+    var temp = [];
+    for (let i = 0; i < SB.current.length; i++) {
+      if (i !== index) {
+        temp.push(SB.current[i]);
+      }
+    }
+    SB.current = temp;
+    setServiceBooking([...temp]);
+    orderList();
+    getAvailableTimings();
+  };
+
+  const deleteAll = (service) => {
+    var toDelete = serviceBooking.filter((s) => s.service === service);
+    for (let i = 0; i < toDelete.length; i++) {
+      checkToDelete(toDelete[i].show, service);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 15 }}>
-        <Text style={{ color: "gray" }}>Services</Text>
+        <Text
+          style={{
+            // backgroundColor: "red",
+            // width: "100%",
+            // height: 50,
+            color: "#6b6b6b",
+            fontWeight: "bold",
+          }}
+        >
+          Services
+        </Text>
       </View>
 
       <View>
@@ -535,9 +596,10 @@ export default function Details(props) {
           </View>
         ) : null} */}
 
-        {update ? (
+        {update && serviceBooking.length > 0 ? (
           showBookings.current.map((s, index) => (
             <View>
+              {/* {console.log(s, "mmmmmmmmmmmmmmmmmmmmmmmm")} */}
               <View
                 style={{
                   backgroundColor: "#f5f5f5",
@@ -586,7 +648,7 @@ export default function Details(props) {
                       }}
                     >
                       <MaterialCommunityIcons
-                        name="gas-station"
+                        name={s.service.serviceIcon}
                         size={30}
                         color={"white"}
                       />
@@ -602,15 +664,33 @@ export default function Details(props) {
                     </View>
                   </TouchableOpacity>
                 </View>
-                <View style={{ width: "75%", padding: 10 }}>
+
+                <View style={{ width: "70%", padding: 10 }}>
                   <Text style={{ fontWeight: "bold" }}>Timing(s): </Text>
                   {s.hours.map((h) => (
-                    <View style={{ flexDirection: "row" }}>
-                      <Text style={{ fontSize: 12 }}>{h}</Text>
-                      {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text style={{ fontSize: 12 }}>{h} </Text>
+                      {/* <TouchableOpacity
+                        onPress={() => checkToDelete(h, s.service)}
+                      > */}
+                      <Text
+                        onPress={() => checkToDelete(h, s.service)}
+                        style={{ fontSize: 10 }}
+                      >
+                        {" "}
+                        x
+                      </Text>
+                      {/* </TouchableOpacity> */}
                     </View>
                   ))}
                   {/* <Text style={{ fontSize: 20 }}>{s.service.name}</Text> */}
+                </View>
+                <View style={{ alignItems: "center", width: "5%" }}>
+                  <TouchableOpacity onPress={() => deleteBooking(index)}>
+                    <Text>x</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -723,8 +803,8 @@ export default function Details(props) {
                             alignItems: "center",
                           }}
                         >
-                          <MaterialIcons
-                            name="local-gas-station"
+                          <MaterialCommunityIcons
+                            name={s.serviceIcon}
                             size={25}
                             color="#20365F"
                           />
