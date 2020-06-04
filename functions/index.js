@@ -737,6 +737,136 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+//-------------Ticket---------------//
+exports.sendSupportMessage = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  db.collection("customerSupport")
+    .doc(data.ticket.id)
+    .collection("liveChat")
+    .add({
+      from: data.user.id,
+      name: data.user.displayName,
+      text: data.text,
+      dateTime: new Date(),
+    });
+});
+exports.addTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  const response = await db.collection("customerSupport").add({
+    userId: data.user.id,
+    title: data.title,
+    description: data.description,
+    dateOpen: new Date(),
+    dateClose: "",
+    target: data.selectedValue,
+    status: "pending",
+    state: "onView",
+    supportAgentUid: "",
+    agentsContributed: [],
+    extraInfo: data.other,
+    priority: data.priority,
+  });
+  response.collection("liveChat").add({
+    from: "Auto Reply",
+    name: "Support Bot",
+    text: "Please wait until a Support Agent Joins!",
+    dateTime: new Date(),
+  });
+  return response;
+});
+exports.updateTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "take") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "in Process",
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  } else if (data.query === "Approve") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      reportedUserUid: data.target,
+      dateClose: new Date(),
+      status: "Closed",
+      state: "Approved",
+    });
+  } else if (data.query === "close") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "Closed",
+      dateClose: new Date(),
+      state: "Approved",
+    });
+  } else if (data.query === "transfare") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  }
+});
+//--------------FAQ---------------//
+exports.FAQ = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "update") {
+    db.collection("faq").doc(data.id).update({
+      answer: data.answer,
+      status: "approved",
+    });
+  } else if (data.query === "create") {
+    db.collection("faq").add({
+      date: new Date(),
+      question: data.question,
+      userId: data.user.uid,
+      userDisplayName: data.user.displayName,
+      answer: "",
+      status: "pending",
+    });
+  } else if (data.query === "delete") {
+    db.collection("faq").doc(data.id).delete();
+  }
+});
+//----------Reputation------------//
+exports.ReputationCalculation = functions.pubsub
+  .schedule("every 43800 minutes")
+  .onRun(async (context) => {
+    let users = [];
+    const info = await db.collection("users").get();
+    info.forEach((doc) => {
+      users.push({ id: doc.id, reputation: doc.data().reputation });
+    });
+    console.log("Fetched Users", users);
+    users.forEach(async (user) => {
+      console.log("Fetched User", user);
+      const reports = await db
+        .collectionGroup("customerSupport")
+        .where("reportedUserId", "==", user.id)
+        .where("state", "==", "Approved")
+        .get();
+      console.log("Report Index", reports);
+      if (reports.size !== 0) {
+        reports.forEach(async (report) => {
+          let msDiff =
+            report.dateClosed.toDate().getTime() - new Date().getTime();
+          let calculatedDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+          if (calculatedDiff > -30) {
+            await db
+              .collection("users")
+              .doc(user.id)
+              .update({
+                reputation: user.reputation - 1,
+              });
+          }
+        });
+      } else {
+        await db
+          .collection("users")
+          .doc(user.id)
+          .update({
+            reputation: user.reputation + 1,
+          });
+      }
+    });
+    return null;
+  });
+//--------------------------------//
 
 exports.redeemGiftCode = functions.https.onRequest(
   async (request, response) => {
@@ -811,6 +941,8 @@ exports.adminUpdateUser = functions.https.onCall(async (data, context) => {
       tokens: parseInt(data.tokens),
       reputation: parseInt(data.reputation),
     });
+});
+
 exports.updateToRead = functions.https.onCall(async (data, context) => {
   console.log("updateToRead data", data);
   const response = await data.messages.forEach((message) =>
