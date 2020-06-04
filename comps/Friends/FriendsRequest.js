@@ -65,9 +65,17 @@ export default function FriendsList(props) {
 
   // -------------------------------ACCEPT-----------------------------------
   const accept = async (user) => {
-    const add = firebase.functions().httpsCallable("acceptFriend");
-    const response = await add({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .update({ status: "accepted" });
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .update({ status: "accepted" });
   };
 
   // -------------------------------DECLINE-----------------------------------
@@ -75,6 +83,18 @@ export default function FriendsList(props) {
     const dec = firebase.functions().httpsCallable("removeFriend");
     const response = await dec({ user: currentUser, friend: user });
     console.log("response", response);
+
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
   };
 
   // ------------------------------------------------------------------
@@ -188,7 +208,7 @@ export default function FriendsList(props) {
         <View
           style={{
             flex: 1,
-          //  paddingTop: "10%",
+            //  paddingTop: "10%",
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
@@ -211,9 +231,9 @@ export default function FriendsList(props) {
               fontWeight: "500",
               fontSize: 26,
               paddingLeft: "3%",
-              paddingTop:'8%',
+              paddingTop: "8%",
               color: "#3062AE",
-              textDecorationLine:'underline'
+              textDecorationLine: "underline",
             }}
           >
             You have no Requests

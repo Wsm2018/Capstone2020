@@ -24,6 +24,8 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 require("firebase/firestore");
 
+
+
 export default function Details(props) {
   ///////////////////Front-End///////////////////////////
   const [modalAddService, setModalAddService] = useState(false);
@@ -170,7 +172,7 @@ export default function Details(props) {
       });
 
     db.collection("users")
-      .where("role", "==", "worker")
+      .where("role", "==", "service employee")
       .onSnapshot((snapshot) => {
         var worker = "";
         snapshot.forEach((doc) => {
