@@ -16,6 +16,7 @@ import "firebase/functions";
 import "firebase/storage";
 import db from "../../db";
 import { TextInput } from "react-native-paper";
+import { Input, Tooltip } from "react-native-elements";
 
 import * as Print from "expo-print";
 import CountryPicker from "react-native-country-picker-modal";
@@ -218,21 +219,48 @@ export default function EmployeeHandlerCreate(props) {
 
       <ScrollView>
         {/* ----------------------------------NAME-------------------------------- */}
+        <View
+          style={{ flexDirection: "row", justifyContent: "space-between" }}
+        ></View>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ width: "47.5%" }}>First Name</Text>
-          <Text style={{ width: "47.5%" }}>Last Name</Text>
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TextInput
+          {/* <TextInput
             onChangeText={(text) => setFirstName({ text, error: false })}
             value={firstName}
             style={{ width: "47.5%" }}
+          /> */}
+          <Input
+            inputContainerStyle={{
+              borderBottomWidth: 0,
+            }}
+            containerStyle={styles.Inputs}
+            placeholder="First Name"
+            onChangeText={(text) => setFirstName({ text, error: false })}
+            value={firstName}
+            placeholderTextColor="#20365F"
+            inputStyle={{
+              color: "#20365F",
+              fontSize: 16,
+            }}
           />
-          <TextInput
+          <Input
+            inputContainerStyle={{
+              borderBottomWidth: 0,
+            }}
+            containerStyle={styles.Inputs}
+            placeholder="First Name"
+            onChangeText={(text) => setLastName({ text, error: false })}
+            value={lastName}
+            placeholderTextColor="#20365F"
+            inputStyle={{
+              color: "#20365F",
+              fontSize: 16,
+            }}
+          />
+          {/* <TextInput
             onChangeText={(text) => setLastName({ text, error: false })}
             value={lastName}
             style={{ width: "47.5%" }}
-          />
+          /> */}
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text
@@ -256,10 +284,20 @@ export default function EmployeeHandlerCreate(props) {
         </View>
 
         {/* ---------------------------------DISPLAY NAME--------------------------------- */}
-        <Text>Display Name</Text>
-        <TextInput
+
+        <Input
+          inputContainerStyle={{
+            borderBottomWidth: 0,
+          }}
+          containerStyle={styles.Inputs}
+          placeholder="Display Name"
           onChangeText={(text) => setDisplayName({ text, error: false })}
-          value={displayName.text}
+          value={displayName}
+          placeholderTextColor="#20365F"
+          inputStyle={{
+            color: "#20365F",
+            fontSize: 16,
+          }}
         />
         <Text
           style={
@@ -270,21 +308,43 @@ export default function EmployeeHandlerCreate(props) {
         </Text>
 
         {/* ----------------------------------EMAIL-------------------------------- */}
-        <Text>Email</Text>
+
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TextInput
+          <Input
+            inputContainerStyle={{
+              borderBottomWidth: 0,
+            }}
+            containerStyle={styles.Inputs}
+            placeholder="Email"
             onChangeText={(text) => setEmail({ text, error: false })}
             value={email.text}
-            style={{ width: "55%" }}
+            placeholderTextColor="#20365F"
+            inputStyle={{
+              color: "#20365F",
+              fontSize: 16,
+            }}
           />
-          <TextInput value={company} style={{ width: "40%" }} disabled />
+          <Input
+            inputContainerStyle={{
+              borderBottomWidth: 0,
+            }}
+            containerStyle={styles.Inputs}
+            placeholder="Company"
+            value={company}
+            placeholderTextColor="#20365F"
+            inputStyle={{
+              color: "#20365F",
+              fontSize: 16,
+            }}
+            disabled
+          />
         </View>
         <Text style={email.error ? { color: "red" } : { color: "transparent" }}>
           * Invalid Email
         </Text>
 
         {/* ---------------------------------ROLE--------------------------------- */}
-        <Text>Role</Text>
+
         <View
           style={{ borderColor: "lightgray", backgroundColor: "lightgray" }}
         >
@@ -310,35 +370,49 @@ export default function EmployeeHandlerCreate(props) {
         </Text>
 
         {/* ---------------------------------COUNTRY--------------------------------- */}
-        <Text>Country</Text>
-        <TouchableOpacity
+        <View
           style={{
-            width: "100%",
-            borderColor: "lightgrey",
-            height: "10%",
-            backgroundColor: "lightgrey",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#20365F",
+            height: 50,
+            width: "80%",
+            alignSelf: "center",
+            opacity: 0.8,
+            marginTop: 20,
+            paddingLeft: 12,
             flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 10,
           }}
-          onPress={() => setCountryPicker(true)}
         >
-          <CountryPicker
-            visible={countryPicker}
-            withFilter
-            withAlphaFilter
-            withCountryNameButton
-            countryCode={countryCode}
-            onSelect={(country) => {
-              setCountry({ value: country.name, error: false });
-              setCountryCode(country.cca2);
+          <TouchableOpacity
+            style={{
+              height: 50,
+              width: "80%",
+              alignSelf: "center",
+              opacity: 0.8,
+              marginTop: 20,
+              paddingLeft: 12,
+              flexDirection: "row",
+              color: "#20365F",
             }}
-            style={{ flex: 1, color: "transparent" }}
-            onClose={() => setCountryPicker(false)}
-          />
-          <Text>▼</Text>
-        </TouchableOpacity>
+            onPress={() => setCountryPicker(true)}
+          >
+            <CountryPicker
+              visible={countryPicker}
+              withFilter
+              withAlphaFilter
+              withCountryNameButton
+              countryCode={countryCode}
+              onSelect={(country) => {
+                setCountry({ value: country.name, error: false });
+                setCountryCode(country.cca2);
+              }}
+              style={{ flex: 1, color: "transparent" }}
+              onClose={() => setCountryPicker(false)}
+            />
+            <Text>▼</Text>
+          </TouchableOpacity>
+        </View>
         <Text
           style={country.error ? { color: "red" } : { color: "transparent" }}
         >
@@ -489,23 +563,30 @@ const styles = StyleSheet.create({
     margin: 20,
     // height: "100%",
   },
+  Inputs: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#20365F",
+    height: 50,
+    width: "50%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 12,
+    marginTop: 20,
+  },
+  payButton: {
+    backgroundColor: "#327876",
+    height: 40,
+    width: "55%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+    marginTop: "5%",
+    //flexDirection: "row",
+  },
 });
-
-// {/* ----------------------------------PASSWORD-------------------------------- */}
-// <Text>Password</Text>
-// <TextInput
-//   onChangeText={(text) => setPassword({ text, error: false })}
-//   value={password}
-// />
-// <Text
-//   style={password.error ? { color: "red" } : { color: "transparent" }}
-// >
-//   * Passwords do not match
-// </Text>
-
-// {/* ----------------------------------CONFIRM PASSWORD-------------------------------- */}
-// <Text>Confirm Password</Text>
-// <TextInput
-//   onChangeText={(text) => setConfirmPassword({ text, error: false })}
-//   value={confirmPassword}
-// />
