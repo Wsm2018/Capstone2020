@@ -249,7 +249,7 @@ export default function Authentication(props) {
       alert(`Error: ${err.message}`);
     }
   };
-
+  // 12.1
   const handleLogin = async () => {
     firebase
       .auth()
