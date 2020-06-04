@@ -417,9 +417,6 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     status: data.status,
     promotionCode: null,
   });
-  const u = data.user;
-  u.points = u.points + 10;
-  db.collection("users").doc(data.user.id).update(u);
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);

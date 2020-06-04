@@ -18,7 +18,6 @@ import { Picker } from "react-native";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 
-
 export default function ChooseRole(props) {
   const [currentUser, setCurrentUser] = useState();
   const role = props.role;

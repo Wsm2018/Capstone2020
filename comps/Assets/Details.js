@@ -170,7 +170,7 @@ export default function Details(props) {
       });
 
     db.collection("users")
-      .where("role", "==", "worker")
+      .where("role", "==", "service employee")
       .onSnapshot((snapshot) => {
         var worker = "";
         snapshot.forEach((doc) => {

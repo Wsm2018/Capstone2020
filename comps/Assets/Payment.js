@@ -1,4 +1,3 @@
-//@refresh reset
 import React, { useState, useEffect, useRef } from "react";
 import {
   Alert,
@@ -33,6 +32,8 @@ export default function Payment(props) {
     "serviceBooking",
     "some default value"
   );
+  const partial = props.navigation.getParam("partial", "not found");
+  const extension = props.navigation.getParam("oldPayment", "not found");
   const total = props.navigation.getParam("totalAmount", "some default value");
   //const [serviceBooking, setServiceBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
   const [card, setCard] = useState({});
@@ -72,8 +73,10 @@ export default function Payment(props) {
   //const [balanceToUse, setBalanceToUse] = useState(0);
   const [usedBalance, setUsedBalance] = useState(0);
   const [useBalance, setUseBalance] = useState(false);
+  const [subscription, setSubscription] = useState(false);
 
   useEffect(() => {
+    console.log("totalllllllllllll", total);
     calculation();
   }, [promotionValid]);
 
@@ -123,14 +126,17 @@ export default function Payment(props) {
       });
   };
   useEffect(() => {
-    // if(assetBooking){
-    //   var s = new Date(assetBooking.startDateTime)
-    //   var e = new Date(assetBooking.endDateTime)
-    //   var diff = (e.getTime() - s.getTime()) / 1000;
-    //   diff /= (60 * 60);
-    //   setTotalAmount(diff * assetBooking.asset.price)
-    // }
-
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("subscription")
+      .onSnapshot((querySnapshot) => {
+        const subscription = [];
+        querySnapshot.forEach((doc) => {
+          subscription.push({ id: doc.id, ...doc.data() });
+        });
+        // console.log(subscription);
+        setSubscription([...subscription]);
+      });
     getUser();
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -152,44 +158,99 @@ export default function Payment(props) {
   }, []);
 
   const pay = async () => {
+    console.log("154");
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
-    const user = await db
+    const editBooking = firebase.functions().httpsCallable("editBooking");
+    const assetManager = firebase.functions().httpsCallable("assetManager");
+    var user = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
-    user.id = firebase.auth().currentUser.uid;
+
     let c = {};
     if (other) {
       c = {
         cardNumber: cardNumber,
         expiryDate: year + "/" + month,
-        cvc,
+        cvc: CVC,
         cardType: cardType,
         holderName: name,
       };
     } else {
       c = card;
     }
+    console.log(
+      "174",
+      addCreditCard,
+      totalAmount,
+      usedBalance,
+      firebase.auth().currentUser.uid
+    );
     let u = user.data();
+    u.id = firebase.auth().currentUser.uid;
     u.balance = u.balance - usedBalance;
-    const response = await handleBooking({
-      user: u,
-      asset: assetBooking.asset,
-      startDateTime: assetBooking.startDateTime,
-      endDateTime: assetBooking.endDateTime,
-      card: c,
-      promotionCode: null,
-      dateTime: moment().format("YYYY-MM-DD T HH:mm"),
-      status: true,
-      addCreditCard: addCreditCard,
-      uid: firebase.auth().currentUser.uid,
-      totalAmount: totalAmount,
-      status: true,
-      serviceBooking,
-    });
+    const subscriptionType =
+      subscription && subscription[0] && subscription[0].type
+        ? subscription[0].type
+        : "none";
 
-    props.navigation.navigate("Home");
+    const points =
+      subscriptionType === "sliver"
+        ? 20
+        : subscriptionType === "gold"
+        ? 25
+        : subscriptionType === "bronze"
+        ? 15
+        : 10;
+    u.points = u.points + points;
+    if (partial != "not found") {
+      console.log("177");
+      var toUpd = partial;
+      toUpd.status = true;
+      toUpd.card = c;
+      console.log("ehhee", toUpd.status, partial.id, toUpd.card, total, u);
+      const response = await assetManager({
+        doc: partial.id,
+        type: "update",
+        collection: "payments",
+        obj: toUpd,
+      });
+      console.log("188");
+    } else if (extension != "not found") {
+      console.log("ehhee", extension.id, assetBooking.endDateTime, c, total, u);
+      const response = await editBooking({
+        paymentId: extension.id,
+        card: c,
+        endDateTime: assetBooking.endDateTime,
+        assetBooking: assetBooking,
+        totalAmount: totalAmount,
+        status: true,
+        serviceBooking: serviceBooking,
+        user: u,
+      });
+    } else {
+      //console.log()
+      const response = await handleBooking({
+        user: u,
+        asset: assetBooking.asset,
+        startDateTime: assetBooking.startDateTime,
+        endDateTime: assetBooking.endDateTime,
+        card: c,
+        promotionCode: null,
+        dateTime: moment().format("YYYY-MM-DD T HH:mm"),
+        status: true,
+        addCreditCard: addCreditCard && other,
+        uid: firebase.auth().currentUser.uid,
+        totalAmount: totalAmount,
+        status: true,
+        serviceBooking,
+      });
+      //props.navigation.navigate("Home");
+    }
+    db.collection("users").doc(user.id).update(u);
+    console.log("192");
+    props.navigation.navigate("Types");
   };
   const handleCardSelect = (card) => {
     setChecked(card.id);
@@ -429,7 +490,8 @@ export default function Payment(props) {
             title="Pay"
             onPress={() => pay()}
             disabled={
-              (name && cardNumber && month && year && CVC) || other === false
+              (name && cardNumber && month && year && CVC) ||
+              (other === false && checked != "")
                 ? false
                 : true
             }

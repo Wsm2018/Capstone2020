@@ -259,7 +259,7 @@ export default function CheckOut(props) {
       serviceBooking,
     });
 
-    props.navigation.navigate("Home");
+    props.navigation.navigate("Types");
   };
 
   return (

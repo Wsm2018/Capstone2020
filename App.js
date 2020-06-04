@@ -34,6 +34,7 @@ import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
+import ScheduleStack from "./navigation/ScheduleStack";
 import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
@@ -53,31 +54,6 @@ export default function App(props) {
   const [admin, setAdmin] = useState(null);
   const [activeRole, setActiveRole] = useState(null);
 
-  const handleLogout = async () => {
-    const userInfo = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get();
-    if (userInfo.data().role === "guest") {
-      await fetch(
-        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
-          firebase.auth().currentUser.uid
-        }`
-      );
-      firebase.auth().signOut();
-    } else {
-      firebase.auth().signOut();
-    }
-  };
-
-  const Test = () => {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Test</Text>
-      </View>
-    );
-  };
-
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
@@ -87,7 +63,6 @@ export default function App(props) {
 
       Profile: ProfileStack,
     },
-    // {
     //   navigationOptions: ({ navigation }) => {
     //     const { routeName } = navigation.state.routes[navigation.state.index];
     //     return {
@@ -291,6 +266,16 @@ export default function App(props) {
   });
   const AdminAppContainer = createAppContainer(adminTabNav);
 
+  const serviceEmployeeTabNav = createBottomTabNavigator({
+    Schedule: ScheduleStack,
+    Home: HomeStack,
+
+    News: NewsStack,
+
+    Profile: ProfileStack,
+  });
+  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+
   const guideSkip = () => {
     // console.log("Skipppped");
     setGuideView(false);
@@ -310,13 +295,15 @@ export default function App(props) {
         if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
-        // --------------------------------CUSTOMER/SERVICES EMPLOYEE----------------------------------
-        // if user is customer or services employee go to <AppContainer/>
-        else if (
-          user.role === "customer" ||
-          user.role === "services employee"
-        ) {
+        // --------------------------------CUSTOMER----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "customer") {
           return <AppContainer />;
+        }
+        // --------------------------------SERVICE EMPLOYEE----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "service employee") {
+          return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
@@ -348,7 +335,7 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "services employee":
+              case "service employee":
                 return <AppContainer />;
 
               case "customer":
