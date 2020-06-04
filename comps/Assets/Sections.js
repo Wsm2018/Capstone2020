@@ -1,5 +1,5 @@
 import { Button } from "react-native-elements";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createStackNavigator } from "react-navigation-stack";
 
 import {
@@ -14,6 +14,7 @@ import {
   Picker,
   ImageBackground,
   Dimensions,
+  Modal,
 } from "react-native";
 
 import DatePicker from "react-native-datepicker";
@@ -36,56 +37,98 @@ import { set } from "react-native-reanimated";
 import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 
 export default function Sections(props) {
+  // const [fromFav, setFromFav] = useState(false);
   const [assetSections, setAssetSections] = useState([]);
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [tempstartDate, settempStartDate] = useState("");
-  const [tempendDate, settempEndDate] = useState("");
-  // const tName = props.navigation.getParam("tName", "failed");
-  // const sName = props.navigation.getParam("section", "failed").name;
-  // const startDateTime = props.navigation.getParam("startDate", "failed");
-  // const endDateTime = props.navigation.getParam("endDate", "failed");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [startTime, setStartTime] = useState();
+  const [endTime, setEndTime] = useState();
+  const [startTimeModal, setStartTimeModal] = useState(false);
+  const [endTimeModal, setEndTimeModal] = useState(false);
+  const [tempStartDate, setTempStartDate] = useState();
+  const [tempEndDate, setTempEndDate] = useState();
+  const displayList = useRef();
+  const [listView, setListView] = useState(false);
+  const [detailsView, setDetailsView] = useState(false);
+  const [selectedList, setSelectedList] = useState("");
+
+  const [favoriteAssets, setFavoriteAssets] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [timesList, setTimesList] = useState([
+    "12:00 AM",
+    "1:00 AM",
+    "2:00 AM",
+    "3:00 AM",
+    "4:00 AM",
+    "5:00 AM",
+    "6:00 AM",
+    "7:00 AM",
+    "8:00 AM",
+    "9:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "1:00 PM",
+    "2:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
+    "6:00 PM",
+    "7:00 PM",
+    "8:00 PM",
+    "9:00 PM",
+    "10:00 PM",
+    "11:00 PM",
+  ]);
+  const fav = props.navigation.getParam("flag", false);
+  console.log(fav);
+  useEffect(() => {
+    if (fav) {
+      console.log("hello");
+      // console.log(props.navigation.getParam("startDate", ""));
+      setStartDate(props.navigation.getParam("startDate", ""));
+      setEndDate(props.navigation.getParam("startDate", ""));
+      console.log(props.navigation.getParam("asset", null).type);
+      type = props.navigation.getParam("asset", null).type;
+      tName = props.navigation.getParam("asset", null).tName;
+      console.log(props.navigation.getParam("asset", null).assetSection);
+      setSelectedSection(props.navigation.getParam("asset", null).assetSection);
+      console.log("asset", props.navigation.getParam("asset", null));
+      setSelectedList(props.navigation.getParam("asset", null));
+      setDetailsView(true);
+    }
+  }, []);
 
   useEffect(() => {
-    // console.log(
-    //   "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii0",
-    //   selectedSection
-    // );
     if (selectedSection !== null) {
       var temp = [];
       setAssetList(temp);
-      // console.log("-----------------", assetList);
       getList();
-      for (let i = 0; i < assetList.length; i++) {
-        console.log(" ppppppppppppppppp", assetList[i].code);
-      }
     }
   }, [selectedSection]);
 
   useEffect(() => {
-    //console.log("asset list is :", assetList.length);
-    //console.log("finalAssets is :", finalAssets.length);
-
-    // console.log(
-    //   " it should work heeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    //   assetList
-    // );
     if (assetList.length > 0) {
       checkTime();
     }
   }, [assetList]);
 
+  useEffect(() => {
+    if (selectedSection) {
+      setSelectedList("");
+    }
+  }, [selectedSection]);
+
   const getList = () => {
     //console.log("section rn", selectedSection);
-    const temp = [];
-
     db.collection("assets")
       .orderBy("code")
       .where("assetSection", "==", selectedSection.id)
       .onSnapshot((snapshot) => {
+        const temp = [];
         snapshot.forEach(async (doc) => {
           //console.log(section)
           let bookingTemp = [];
@@ -103,8 +146,11 @@ export default function Sections(props) {
             });
           }
           temp.push({ id: doc.id, assetBookings: bookingTemp, ...doc.data() });
+          // console.log("temp.length",temp.length)
+          // console.log("snapshot.docs.length",snapshot.docs.length)
           if (temp.length === snapshot.docs.length) {
             //console.log("assets", temp);
+            console.log("Oui Oui");
             setAssetList(temp);
           }
         });
@@ -112,7 +158,6 @@ export default function Sections(props) {
   };
 
   const checkTime = () => {
-    //console.log("hii");
     let assetsToShow = assetList;
 
     assetsToShow = assetsToShow.filter(
@@ -127,78 +172,12 @@ export default function Sections(props) {
         }).length === 0
     );
 
-    //console.log("after checking time", assetsToShow);
     setFinalAssets(assetsToShow);
   };
 
-  //design testing variable
-  const [assetSections2, setAssetSections2] = useState([
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-    { name: "c1" },
-  ]);
-  const [finalAssets2, setFinalAssets2] = useState([
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-    { code: "1" },
-  ]);
-
-  //design view new variables
-  const [listView, setListView] = useState(false);
-  const [detailsView, setDetailsView] = useState(false);
-  const [selectedList, setSelectedList] = useState("");
-
-  // const getDetails = async (l) => {
-  //   setSelectedList(l);
-  //   setDetailsView(true);
-  //   //setSelectedList(l) || setDetailsView(true)
-  // };
-
-  const [favoriteAssets, setFavoriteAssets] = useState([]);
-  const [favoriteIds, setFavoriteIds] = useState([]);
-
   useEffect(() => {
     getUserFavoriteAssets();
-    // console.log(favoriteAssets);
   }, []);
-
-  // const getUserFavoriteAssets = () => {
-  //   db.collection("users")
-  //     .doc(firebase.auth().currentUser.uid)
-  //     .onSnapshot((querySnap) => {
-  //       const data = querySnap.data();
-  //       const favorites = data.favorite;
-  //       // let assetArr = [];
-  //       // favorites.map(async (item) => {
-  //       //   db.collection("assets")
-  //       //     .doc(item)
-  //       //     .onSnapshot((doc) => {
-  //       //       assetArr.push({ id: doc.id, ...doc.data() });
-  //       //       if (favorites.length === assetArr.length) {
-  //       //         setFavoriteAssets([...assetArr]);
-  //       //       }
-  //       //     });
-  //       // });
-  //       // console.log("------------------------", favorites);
-  //       setFavoriteAssets(favorites);
-  //     });
-  // };
 
   const getUserFavoriteAssets = () => {
     db.collection("users")
@@ -224,26 +203,12 @@ export default function Sections(props) {
 
   const type = props.navigation.getParam("type", "failed").id;
   const tName = props.navigation.getParam("type", "failed").name;
+  const sectionIcon = props.navigation.getParam("type", "failed").sectionIcon;
+  const assetIcon = props.navigation.getParam("type", "failed").assetIcon;
 
   useEffect(() => {
-    //console.log("++++++++++++++++++++++", type);
     getSections();
   }, [type]);
-
-  useEffect(() => {
-    if (tempstartDate) {
-      var dateTime = tempstartDate.split(" ");
-      var update =
-        dateTime[0] +
-        " " +
-        dateTime[1] +
-        " " +
-        dateTime[2].split(":")[0] +
-        ":00 " +
-        dateTime[3];
-      setStartDate(update);
-    }
-  }, [tempstartDate]);
 
   useEffect(() => {
     if (finalAssets.length > 0) {
@@ -251,18 +216,75 @@ export default function Sections(props) {
     }
   }, [finalAssets]);
 
+  /////////////Tracker and Security Code/////////////////////////
+
+  const reduceViewer = async (a) => {
+    //console.log('unfocus', a)
+    //console.log("adios",assetList.filter(a => a.id === selectedList.id)[0]);
+    const lessViewers = firebase.functions().httpsCallable("lessViewers");
+    const result = await lessViewers({
+      asset: a,
+    });
+  };
+
+  const timeListener = () => {
+    let timerId = setInterval(() => {
+      if (!props.navigation.isFocused()) {
+        // console.log("timer stoooooooooooooooooooped")
+        //console.log("adiiiiiiiiiiios",assetList.filter(a => a.id === selectedList.id)[0]);
+        reduceViewer(assetList.filter((a) => a.id === selectedList.id)[0]);
+        clearInterval(timerId);
+        // flag = false;
+      }
+    }, 1000);
+  };
+
   useEffect(() => {
-    // console.log(startDate);
-  }, [startDate]);
+    timeListener();
+  }, []);
+
+  const increaseViewer = async (a) => {
+    const moreViewers = firebase.functions().httpsCallable("moreViewers");
+    const result = await moreViewers({
+      asset: a,
+    });
+  };
+
+  const assetFocus = (a) => {
+    if (selectedList === a) {
+      return;
+    } else {
+      console.log("focus", a);
+      if (selectedList !== "") {
+        console.log("selectedlist is", selectedList);
+        reduceViewer(assetList.filter((a) => a.id === selectedList.id)[0]);
+      }
+      console.log(`asset ${a.code} is focussed from details`);
+      increaseViewer(a);
+      setSelectedList(a);
+    }
+  };
+
+  const flipSecurity = async (a) => {
+    const updateAssetSecurity = firebase
+      .functions()
+      .httpsCallable("updateAssetSecurity");
+    const result = await updateAssetSecurity({
+      asset: a,
+    });
+  };
+
+  ////////////////////////////////////////////////////////////////
   useEffect(() => {
-    //Added by design team
-    endDate && setShowSections(true);
-    ////////////////////////////////
-    // console.log(endDate);
-  }, [endDate]);
+    setShowSections(false);
+    setSelectedList("");
+    setAssetList([]);
+    setSelectedSection(null);
+  }, [startDate, endDate]);
 
   const getSections = async () => {
     const temp = [];
+    console.log("getSections ", type);
     const sections = await db
       .collection("assetSections")
       .where("assetType", "==", type)
@@ -270,22 +292,22 @@ export default function Sections(props) {
     sections.forEach((doc) => {
       temp.push({ id: doc.id, ...doc.data() });
     });
-    // console.log(temp);
+
     setAssetSections(temp);
   };
 
-  const checkFavorites = async (id) => {
-    const favorites = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("favorites")
-      .get();
-    const ids = [];
-    favorites.forEach((doc) => {
-      ids.push(doc.id);
-    });
-    return ids.includes(id);
-  };
+  // const checkFavorites = async (id) => {
+  //   const favorites = await db
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .collection("favorites")
+  //     .get();
+  //   const ids = [];
+  //   favorites.forEach((doc) => {
+  //     ids.push(doc.id);
+  //   });
+  //   return ids.includes(id);
+  // };
 
   const handleAddFavorite = async (item) => {
     // console.log(item);
@@ -326,6 +348,80 @@ export default function Sections(props) {
     }
   };
 
+  useEffect(() => {
+    if (tempStartDate) {
+      if (tempStartDate.split(" ")[0] == moment().format("YYYY-MM-DD")) {
+        var temp = [];
+        var found = false;
+        console.log("temp Start", tempStartDate);
+        for (let i = 0; i < timesList.length; i++) {
+          if (found) {
+            temp.push(timesList[i]);
+          }
+          console.log(timesList[i], moment().format("h:00 A"));
+          if (timesList[i] == moment().format("h:00 A")) {
+            found = true;
+            console.log("here", moment().format("h:00 A"));
+          }
+        }
+        displayList.current = temp;
+        setStartTimeModal(true);
+      } else {
+        displayList.current = timesList;
+        setStartTimeModal(true);
+      }
+    }
+  }, [tempStartDate]);
+
+  useEffect(() => {
+    if (tempEndDate) {
+      var temp = [];
+      var found = false;
+      console.log("started", startDate.split(" ")[2]);
+      if (tempEndDate.split(" ")[0] === startDate.split(" ")[0]) {
+        var s = startDate.split(" ")[2] + " " + startDate.split(" ")[3];
+        for (let i = 0; i < timesList.length; i++) {
+          if (found) {
+            temp.push(timesList[i]);
+          }
+          if (timesList[i] == s) {
+            found = true;
+            console.log("here");
+          }
+        }
+        displayList.current = temp;
+      } else {
+        displayList.current = timesList;
+      }
+
+      setEndTimeModal(true);
+    }
+  }, [tempEndDate]);
+
+  useEffect(() => {
+    if (endDate) {
+      setShowSections(true);
+    }
+  }, [endDate]);
+
+  useEffect(() => {
+    if (startTime) {
+      setStartDate(tempStartDate.split(" ")[0] + " T " + startTime);
+      // console.log(
+      //   "whyyyyyyyyyyyyyyyyyyyyyyy",
+      //   moment(startDate).add(1, "hour").format(),
+      //   new Date(startDate)
+      // );
+      setEndDate();
+    }
+  }, [startTime]);
+
+  useEffect(() => {
+    if (endTime) {
+      setEndDate(tempEndDate.split(" ")[0] + " T " + endTime);
+    }
+  }, [endTime]);
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -352,6 +448,7 @@ export default function Sections(props) {
               flexDirection: "row",
               // backgroundColor: "red",
               minHeight: 50,
+              justifyContent: "center",
             }}
           >
             <View
@@ -362,7 +459,38 @@ export default function Sections(props) {
                 // borderWidth: 1,
               }}
             >
+              {/* date */}
+
               <DatePicker
+                style={{ width: "100%" }}
+                //is24Hour
+                date={startDate}
+                mode="date"
+                placeholder="Start Date"
+                format="YYYY-MM-DD T h:mm A"
+                minDate={moment()}
+                maxDate={moment().add(3, "month")}
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                customStyles={{
+                  dateIcon: {
+                    // position: "absolute",
+                    // left: 0,
+                    // top: 4,
+                    // marginLeft: 0,
+                    width: 0,
+                    height: 0,
+                  },
+                  dateInput: {
+                    // marginLeft: 36,
+                    // backgroundColor: "lightgray",
+                    borderWidth: 0,
+                  },
+                  // ... You can check the source to find the other keys.
+                }}
+                onDateChange={setTempStartDate}
+              />
+              {/* <DatePicker
                 style={{ width: "100%" }}
                 date={startDate}
                 mode="datetime"
@@ -389,7 +517,7 @@ export default function Sections(props) {
                   // ... You can check the source to find the other keys.
                 }}
                 onDateChange={setStartDate}
-              />
+              /> */}
             </View>
             <View
               style={{
@@ -411,7 +539,43 @@ export default function Sections(props) {
                 justifyContent: "center",
               }}
             >
+              {/* Date 2 */}
               <DatePicker
+                style={{ width: "100%" }}
+                date={endDate}
+                mode="date"
+                placeholder="End Date"
+                format="YYYY-MM-DD T h:mm A"
+                // minDate={startDate}
+                //maxDate={moment(startDate).add(2,"day")}
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                customStyles={{
+                  dateIcon: {
+                    // position: "absolute",
+                    // left: 0,
+                    // top: 4,
+                    // marginLeft: 0,
+                    width: 0,
+                    height: 0,
+                  },
+                  dateInput: {
+                    // marginLeft: 36,
+                    borderWidth: 0,
+                  },
+                  // ... You can check the source to find the other keys.
+                }}
+                onDateChange={setTempEndDate}
+                disabled={!startDate}
+                minDate={
+                  startTime == "11:00 PM"
+                    ? moment(startDate.split(" ")[0] + "T00:00:00")
+                        .add(1, "day")
+                        .format()
+                    : startDate
+                }
+              />
+              {/* <DatePicker
                 style={{ width: "100%" }}
                 date={endDate}
                 mode="datetime"
@@ -438,10 +602,45 @@ export default function Sections(props) {
                 }}
                 onDateChange={setEndDate}
                 disabled={!startDate}
-              />
+              /> */}
             </View>
           </View>
         </View>
+        {startTimeModal || endTimeModal ? (
+          <Modal
+            animationType="slide"
+            transparent={true}
+            //visible={addServices}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                {displayList.current.length > 0 ? (
+                  displayList.current.map((t) => (
+                    <TouchableOpacity
+                      onPress={() =>
+                        startTimeModal
+                          ? setStartTime(t) || setStartTimeModal(false)
+                          : setEndTime(t) || setEndTimeModal(false)
+                      }
+                    >
+                      <Text>{t}</Text>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Button
+                    title="Exit"
+                    onPress={() =>
+                      setStartTimeModal(false) || setEndTimeModal(false)
+                    }
+                  />
+                )}
+              </View>
+            </View>
+          </Modal>
+        ) : null}
         <View style={styles.two}>
           <Text style={styles.cardTitle}>Sections</Text>
           {showSections === true ? (
@@ -485,7 +684,8 @@ export default function Sections(props) {
                     }}
                   >
                     <MaterialCommunityIcons
-                      name="map-marker"
+                      // name="map-marker"
+                      name={sectionIcon}
                       size={40}
                       color={selectedSection === s ? "white" : "#20365F"}
                     />
@@ -531,11 +731,11 @@ export default function Sections(props) {
                     //     type,
                     //   })
                     // }
-                    onPress={() => setSelectedList(l) || setDetailsView(true)}
+                    onPress={() => assetFocus(l) || setDetailsView(true)}
                     key={i}
                     style={{
                       backgroundColor:
-                        selectedList === l ? "#20365F" : "#e3e3e3",
+                        selectedList.code === l.code ? "#20365F" : "#e3e3e3",
                       width: 60,
                       height: 60,
                       margin: 5,
@@ -557,14 +757,18 @@ export default function Sections(props) {
                       }}
                     >
                       <MaterialCommunityIcons
-                        name="car"
+                        // name="car"
+                        name={assetIcon}
                         size={30}
-                        color={selectedList === l ? "white" : "#20365F"}
+                        color={
+                          selectedList.code === l.code ? "white" : "#20365F"
+                        }
                       />
                       <Text
                         style={{
                           textAlign: "center",
-                          color: selectedList === l ? "white" : "#20365F",
+                          color:
+                            selectedList.code === l.code ? "white" : "#20365F",
                           fontSize: 18,
                         }}
                       >
@@ -639,6 +843,8 @@ export default function Sections(props) {
                       navigation={props.navigation}
                       handleAddFavorite={handleAddFavorite}
                       favoriteAssets={favoriteIds}
+                      assetIcon={assetIcon}
+                      sectionIcon={sectionIcon}
                     />
 
                     <Details
@@ -649,6 +855,8 @@ export default function Sections(props) {
                       endDateTime={endDate}
                       type={type}
                       navigation={props.navigation}
+                      assetIcon={assetIcon}
+                      sectionIcon={sectionIcon}
                     />
                   </View>
                 )}
@@ -737,6 +945,28 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
     width: "100%",
     height: 50,
-    color: "gray",
+    color: "#6b6b6b",
+    fontWeight: "bold",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

@@ -43,6 +43,7 @@ export default function Details(props) {
   ///////////////////Front-End///////////////////////////
   const [modalAddReview, setModalAddReview] = useState(false);
   const [modalViewReview, setModalViewReview] = useState(false);
+  const [avgRating, setAvgRating] = useState(0);
 
   /////////////////////////////////////////////////////////
 
@@ -69,17 +70,26 @@ export default function Details(props) {
 
   const getReviews = async () => {
     const temp = [];
-
+    // const avgRating = [];
     db.collection("assets")
       .doc(asset.id)
       .collection("reviews")
       .onSnapshot((snapshot) => {
         snapshot.forEach((doc) => {
           temp.push({ id: doc.id, ...doc.data() });
+          // avgRating.push(doc.rating);
+          // console.log(doc.rating, "-------------------------");
         });
 
         // console.log(temp);
+        let sum = 0;
+        // console.log(sum, "+");
+        for (let i = 0; i < temp.length; i++) {
+          sum = sum + temp[i].rating;
+          // console.log(sum, "----123---------------------");
+        }
         setReviews(temp);
+        setAvgRating(parseFloat(sum / temp.length));
       });
   };
 
@@ -156,7 +166,8 @@ export default function Details(props) {
                         }}
                       >
                         <MaterialCommunityIcons
-                          name="car"
+                          // name="car"
+                          name={props.assetIcon}
                           size={30}
                           color={"white"}
                         />
@@ -185,7 +196,9 @@ export default function Details(props) {
                       <Text style={{ fontWeight: "bold" }}>
                         Average Rating:
                       </Text>
-                      <Text>{asset.rating ? asset.rating : " N/A"}</Text>
+                      {/* <Text> {asset.rating ? asset.rating : "N/A"}</Text> */}
+                      <Text> {avgRating}</Text>
+
                       {/* {console.log(
                         "-------------------------------------------",
                         asset
@@ -243,7 +256,9 @@ export default function Details(props) {
             )} */}
 
               <View style={{ marginTop: 15, marginBottom: 10 }}>
-                <Text style={{ color: "gray" }}>Latest Review</Text>
+                <Text style={{ color: "#6b6b6b", fontWeight: "bold" }}>
+                  Latest Review
+                </Text>
 
                 {reviews.length > 0 ? (
                   reviews.map(

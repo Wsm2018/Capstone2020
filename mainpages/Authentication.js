@@ -134,17 +134,20 @@ export default function Authentication(props) {
       // checking if Phone No. is 8 digits
       if (phone.length !== 8) {
         setPhoneErr("red");
+        return;
         // return alert("Phone Number is Not Available!");
       } else {
         setPhoneErr("transparent");
       }
     } else {
       setPhoneErr("red");
+      return;
       // return alert("Enter your Phone Number!");
     }
 
     if (displayName === "") {
       setDisplayErr("red");
+      return;
       // return alert("Enter your Display Name!");
     } else {
       setDisplayErr("transparent");
@@ -246,7 +249,7 @@ export default function Authentication(props) {
       alert(`Error: ${err.message}`);
     }
   };
-
+  // 12.1
   const handleLogin = async () => {
     firebase
       .auth()
@@ -549,44 +552,47 @@ export default function Authentication(props) {
                             <Icon name="key" size={20} color="#20365F" />
                           }
                           rightIcon={
-                            <Tooltip
-                              height={180}
-                              width={370}
-                              backgroundColor={"#20365F"}
-                              popover={
-                                <View>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Your password must be between 8 and 30
-                                    characters.
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Password must contain at least one
-                                    uppercase, or capital, letter (ex: A, B,
-                                    etc.)
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - One number digit and at least one special
-                                    character.
-                                  </Text>
-                                </View>
-                              }
-                              containerStyle={{
-                                justifyContent: "center",
-                                alignSelf: "center",
-                              }}
-                            >
-                              <AntDesign
-                                name="exclamationcircleo"
-                                size={22}
-                                color="#20365F"
-                              />
-                            </Tooltip>
+                            marginVal === 0 && (
+                              <Tooltip
+                                // disabled
+                                height={180}
+                                width={370}
+                                backgroundColor={"#20365F"}
+                                popover={
+                                  <View>
+                                    <Text
+                                      style={{ color: "white", fontSize: 18 }}
+                                    >
+                                      - Your password must be between 8 and 30
+                                      characters.
+                                    </Text>
+                                    <Text
+                                      style={{ color: "white", fontSize: 18 }}
+                                    >
+                                      - Password must contain at least one
+                                      uppercase, or capital, letter (ex: A, B,
+                                      etc.)
+                                    </Text>
+                                    <Text
+                                      style={{ color: "white", fontSize: 18 }}
+                                    >
+                                      - One number digit and at least one
+                                      special character.
+                                    </Text>
+                                  </View>
+                                }
+                                containerStyle={{
+                                  justifyContent: "center",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                <AntDesign
+                                  name="exclamationcircleo"
+                                  size={22}
+                                  color="#20365F"
+                                />
+                              </Tooltip>
+                            )
                           }
                           containerStyle={styles.Inputs}
                           onChangeText={setRegisterPassword}
@@ -647,7 +653,7 @@ export default function Authentication(props) {
                         errorStyle={{ color: displayNameError }}
                         renderErrorMessage
                       />
-                      <View
+                      {/* <View
                         style={{
                           flexDirection: "row",
                           justifyContent: "space-evenly",
@@ -722,44 +728,141 @@ export default function Authentication(props) {
                           errorStyle={{ color: phoneError }}
                           renderErrorMessage
                         />
-                      </View>
+                      </View> */}
                       <View
                         style={{
-                          flexDirection: "row",
+                          alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Input
-                          inputStyle={{
-                            fontSize: 16,
-                            // width:'50%'
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            // justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: "#20365F",
+                            height: 50,
+                            marginTop: 25,
+                            width: "80%",
                           }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          leftIcon={
-                            <Icon
-                              name="account-card-details"
-                              size={20}
-                              color="lightgray"
-                            />
-                          }
-                          containerStyle={styles.useCodeInputs}
-                          placeholderTextColor="white"
-                          onChangeText={setReferral}
-                          placeholder="Referral Code"
-                          value={referral}
-                          errorMessage="* Invalid Code"
-                          errorStyle={{ color: refErr }}
-                          renderErrorMessage
-                        />
-
-                        <TouchableOpacity
-                          onPress={checkReferral}
-                          style={styles.useCodeButton}
                         >
-                          <Text style={{ color: "white", fontWeight: "bold" }}>
-                            Use Code
+                          {/* // leftIcon={
+                          //   <Image
+                          //     source={require("../assets/qatarFlag.png")}
+                          //     style={{ width: 20, height: 25 }}
+                          //   /> */}
+
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: "gray",
+                              // width: "25%",
+                              paddingLeft: 10,
+                              // backgroundColor: "red",
+                            }}
+                          >
+                            🇶🇦 +974{" "}
                           </Text>
-                        </TouchableOpacity>
+                          <Input
+                            inputStyle={{
+                              color: "#20365F",
+                              fontSize: 16,
+                              // justifyContent: "center",
+                            }}
+                            inputContainerStyle={{
+                              borderBottomWidth: 0,
+                              // justifyContent: "center",
+                              // fontSize: 18,
+                            }}
+                            // lcon={
+                            //   <Icon
+                            //     name="cellphone-android"
+                            //     size={20}
+                            //     color="#20365F"
+                            //   />
+                            // }
+                            containerStyle={{
+                              // borderRadius: 8,
+                              // borderWidth: 1,
+                              // borderColor: "#20365F",
+                              height: 50,
+                              // backgroundColor: "blue",
+                              width: "80%",
+                              // width: "55%",
+                              // alignSelf: "center",
+                              // opacity: 0.8,
+                              // paddingLeft: 0,
+                              // marginTop: 20,
+                              // marginRight: 25,
+                              paddingTop: 5,
+                              // fontSize: 18,
+                            }}
+                            placeholderTextColor="#20365F"
+                            onChangeText={setPhone}
+                            keyboardType="number-pad"
+                            placeholder="Phone Number"
+                            value={phone}
+                            errorMessage="* Invalid Phone No."
+                            errorStyle={{
+                              color: phoneError,
+                              marginLeft: -75,
+                            }}
+                            renderErrorMessage
+                          />
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            width: "80%",
+                            // alignSelf: "center",
+                            // marginLeft: "1%",
+                          }}
+                        >
+                          <Input
+                            inputStyle={{
+                              fontSize: 16,
+                              paddingLeft: 10,
+                              // width: "50%",
+                            }}
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="account-card-details"
+                                size={20}
+                                color="#20365F"
+                              />
+                            }
+                            containerStyle={styles.useCodeInputs}
+                            placeholderTextColor="#20365F"
+                            onChangeText={setReferral}
+                            placeholder="Referral Code"
+                            value={referral}
+                            errorMessage="* Invalid Code"
+                            errorStyle={{ color: refErr }}
+                            renderErrorMessage
+                          />
+
+                          <TouchableOpacity
+                            onPress={checkReferral}
+                            style={styles.useCodeButton}
+                          >
+                            <Text
+                              style={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Use Code
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
                   )
@@ -1346,7 +1449,7 @@ const styles = StyleSheet.create({
   useCodeButton: {
     backgroundColor: "#20365F",
     height: 50,
-    width: "26%",
+    width: "30%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -1361,12 +1464,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#20365F",
     height: 50,
-    width: "52%",
+    width: "69%",
     alignSelf: "center",
     opacity: 0.8,
     paddingLeft: 10,
     marginTop: 20,
-    marginLeft: 8,
+    marginLeft: 15,
   },
   header: {
     justifyContent: "center",

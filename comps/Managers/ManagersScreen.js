@@ -12,7 +12,7 @@ import ManagersHome from "./ManagersHome";
 const ManagersStack = createAppContainer(
   createStackNavigator(
     {
-      ManagersHome: ManagersHome,
+    //  ManagersHome: ManagersHome,
       ManagersRequest: ManagersRequest,
       ManagersRequestDetail: ManagersRequestDetail,
     },

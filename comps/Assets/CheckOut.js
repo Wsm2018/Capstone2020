@@ -22,6 +22,7 @@ import "firebase/auth";
 import db from "../../db";
 import moment from "moment";
 import { Divider } from "react-native-elements";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function CheckOut(props) {
   const tName = props.navigation.getParam("tName", "failed");
@@ -85,53 +86,18 @@ export default function CheckOut(props) {
 
   useEffect(() => {
     if (assetBooking) {
-      fixTimings();
       countTotal();
       orderList();
     }
   }, []);
 
-  const fixTimings = () => {
-    if (assetBooking.startDateTime.split(" ")[3] == "PM") {
-      setStart(
-        assetBooking.startDateTime.split(" ")[0] +
-          " T " +
-          (parseInt(assetBooking.startDateTime.split(" ")[2].split(":")[0]) +
-            12) +
-          ":00:00"
-      );
-    } else {
-      setStart(
-        assetBooking.startDateTime.split(" ")[0] +
-          " T " +
-          assetBooking.startDateTime.split(" ")[2] +
-          ":00"
-      );
-    }
-    if (assetBooking.endDateTime.split(" ")[3] == "PM") {
-      setEnd(
-        assetBooking.endDateTime.split(" ")[0] +
-          " T " +
-          (parseInt(assetBooking.endDateTime.split(" ")[2].split(":")[0]) +
-            12) +
-          ":00:00"
-      );
-    } else {
-      setEnd(
-        assetBooking.endDateTime.split(" ")[0] +
-          " T " +
-          assetBooking.endDateTime.split(" ")[2] +
-          ":00"
-      );
-    }
-  };
-
   const countTotal = () => {
     var start = assetBooking.startDateTime.split(" ").join("");
     var end = assetBooking.endDateTime.split(" ").join("");
+
     var startHour = "";
     var endHour = "";
-
+    console.log("TIMINGSSSS", start, end);
     if (
       assetBooking.startDateTime.split(" ")[2].split(":")[0].split("").length ==
       1
@@ -140,20 +106,21 @@ export default function CheckOut(props) {
         "0" +
         assetBooking.startDateTime.split(" ")[2].split(":")[0].split("")[0];
       start =
-        assetBooking.startDateTime.split(" ")[0] + " T " + startHour + ":00";
+        assetBooking.startDateTime.split(" ")[0] + "T" + startHour + ":00:00";
     }
     if (
       assetBooking.endDateTime.split(" ")[2].split(":")[0].split("").length == 1
     ) {
       endHour =
         "0" + assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")[0];
-      end = assetBooking.endDateTime.split(" ")[0] + " T " + endHour + ":00";
+      end = assetBooking.endDateTime.split(" ")[0] + "T" + endHour + ":00:00";
     }
-
+    console.log("TIMINGSSSS", start, end);
     // count days and total
     var s = new Date(start);
     var e = new Date(end);
-    console.log(" eeehhhh", start, end);
+    console.log(" new date", s, e);
+
     var diff = (e.getTime() - s.getTime()) / 1000;
 
     diff /= 60 * 60;
@@ -230,15 +197,16 @@ export default function CheckOut(props) {
 
   const payLater = async () => {
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
-    const user = await db
+    var u = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
-
+    user = u.data();
     user.id = firebase.auth().currentUser.uid;
+    user.points = user.points + 10;
     const response = await handleBooking({
-      user: user.data(),
+      user: user,
       asset: assetBooking.asset,
       startDateTime: assetBooking.startDateTime,
       endDateTime: assetBooking.endDateTime,
@@ -298,6 +266,7 @@ export default function CheckOut(props) {
               fontSize: 22,
               color: "#474a47",
               padding: "2%",
+              // textAlign:"center"
             }}
           >
             Booking Summary
@@ -336,11 +305,72 @@ export default function CheckOut(props) {
             </Text>
             <Text style={{ fontSize: 15 }}>{totalAmount} QAR </Text>
           </View>
-          {/* <TouchableOpacity onPress={() => payLater()} style={styles.edit}>
-            <Text style={{ color: "white", fontWeight: "bold" }}>
-              <Feather name="edit-3" size={24} color="#809cb0" />
-            </Text>
-          </TouchableOpacity> */}
+          {/* <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: "#f5f5f5",
+              padding: "2%",
+              margin: "2%",
+            }}
+          >
+            <View style={{ width: "30%" }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#20365F",
+                  width: 70,
+                  height: 70,
+                  margin: 5,
+                  alignItems: "center",
+                  flexDirection: "row",
+                  //elevation: 12,
+                  borderWidth: 2,
+                  borderColor: "#20365F",
+                }}
+                disabled
+              >
+                <View
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="car"
+                    size={30}
+                    color={"white"}
+                  />
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "white",
+                      fontSize: 15,
+                    }}
+                  >
+                    
+                    {tName}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={{ width: "70%" }}>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                <Text style={{ fontWeight: "bold" }}>Price: </Text>
+                <Text></Text>
+              </View>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                <Text style={{ fontWeight: "bold" }}>Description: </Text>
+                <Text></Text>
+              </View>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                <Text style={{ fontWeight: "bold" }}>Average Rating:</Text>
+                <Text></Text>
+              </View>
+            </View>
+          </View> */}
         </View>
         <View style={{ marginBottom: "3%" }}></View>
 
@@ -351,6 +381,7 @@ export default function CheckOut(props) {
               fontSize: 18,
               color: "#474a47",
               padding: "2%",
+              // textAlign: "center",
             }}
           >
             Service(s)
@@ -513,7 +544,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#e3e3e3",
     justifyContent: "flex-start",
     alignItems: "center",
-    height: "17%",
+    // height: "17%",
+    // flex:1
   },
   footer: {
     flex: 0.1,
