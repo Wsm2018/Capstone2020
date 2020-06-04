@@ -254,7 +254,7 @@ export default function FriendsList(props) {
     if (allFriends && chats && users) {
       handleFriendsMessages();
     }
-  }, [allFriends, chats, users]);
+  }, [chats, users]);
 
   // ---------------------------------USE EFFECT---------------------------------
   // Runs when something is entered in the search bar
