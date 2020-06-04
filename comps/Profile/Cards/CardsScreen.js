@@ -15,7 +15,7 @@ import Card from "./Card";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user", "No param");
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState(null);
 
   useEffect(() => {
     getCards();
@@ -56,7 +56,7 @@ export default function CardsScreen(props) {
         </Text>
       </View>
       <ScrollView style={{ flex: 5 }}>
-        {cards.length === 0 ? (
+        {cards && cards.length === 0 ? (
           <Text>No Cards</Text>
         ) : (
           <FlatList
@@ -66,7 +66,7 @@ export default function CardsScreen(props) {
           />
         )}
       </ScrollView>
-      <View
+      {/* <View
         style={{
           flex: 0.2,
           // backgroundColor: "red",
@@ -74,31 +74,38 @@ export default function CardsScreen(props) {
           justifyContent: "flex-end",
           alignItems: "center",
         }}
+      > */}
+      <TouchableOpacity
+        style={{
+          flex: 0.2,
+          // backgroundColor: "red",
+          // height: 50,
+          justifyContent: "flex-end",
+          alignItems: "center",
+        }}
+        // style={{ alignItems: "center", justifyContent: "center" }}
+        onPress={() => props.navigation.navigate("AddCard", { user: user })}
       >
-        <TouchableOpacity
-          // style={{ alignItems: "center", justifyContent: "center" }}
-          onPress={() => props.navigation.navigate("AddCard", { user: user })}
-        >
-          {/* <Image
+        {/* <Image
             source={require("../../../assets/images/addcard.png")}
             style={{ height: 60, width: 60 }}
           /> */}
-          <Text
-            style={{
-              height: 60,
-              // backgroundColor: "red",
-              width: "60%",
-              textAlign: "center",
-              fontSize: 18,
-              fontWeight: "bold",
-              color: "gray",
-            }}
-          >
-            + Add a New Card
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <Text
+          style={{
+            height: 60,
+            // backgroundColor: "red",
+            width: "60%",
+            textAlign: "center",
+            fontSize: 18,
+            fontWeight: "bold",
+            color: "gray",
+          }}
+        >
+          + Add a New Card
+        </Text>
+      </TouchableOpacity>
     </View>
+    // </View>
   );
 }
 CardsScreen.navigationOptions = {

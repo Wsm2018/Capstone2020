@@ -30,30 +30,76 @@ import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 import HomeStack from "./navigation/HomeStack";
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
+import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
+import NewsStack from "./navigation/NewsStack";
+import ScheduleStack from "./navigation/ScheduleStack";
 import db from "./db";
+import AdminHomeStack from "./navigation/AdminHomeStack";
+
+import ManagersStack from "./comps/Managers/ManagersScreen";
+import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
+import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
+import ChooseRole from "./mainpages/ChooseRole";
+
+// import AsyncStorage from "@react-native-community/async-storage";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState(false);
+  const [guideView, setGuideView] = useState(true);
+  const [admin, setAdmin] = useState(null);
+  const [activeRole, setActiveRole] = useState(null);
 
-  const handleLogout = () => {
-    firebase.auth().signOut();
+  const handleLogout = async () => {
+    const userInfo = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    if (userInfo.data().role === "guest") {
+      await fetch(
+        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
+          firebase.auth().currentUser.uid
+        }`
+      );
+      firebase.auth().signOut();
+    } else {
+      firebase.auth().signOut();
+    }
+  };
+
+  const Test = () => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Test</Text>
+      </View>
+    );
   };
 
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
+
+      News: NewsStack,
+
       Profile: ProfileStack,
     },
+    // {
+    //   navigationOptions: ({ navigation }) => {
+    //     const { routeName } = navigation.state.routes[navigation.state.index];
+    //     return {
+    //       headerShown: true,
+    //       headerTitle: routeName,
+    //     };
+    //   },
+    // },
     {
-      navigationOptions: ({ navigation }) => {
-        const { routeName } = navigation.state.routes[navigation.state.index];
-        return {
-          headerShown: true,
-          headerTitle: routeName,
-        };
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#20365F" },
       },
     }
   );
@@ -83,20 +129,27 @@ export default function App(props) {
   const FriendsStk = createStackNavigator(
     { Friends: FriendsStack },
     {
-      // defaultNavigationOptions: ({ navigation }) => {
-      //   return {
-      //     headerLeft: (
-      //       <Icon
-      //         style={{ paddingLeft: 10 }}
-      //         onPress={() => navigation.openDrawer()}
-      //         name="md-menu"
-      //         type="ionicon"
-      //         size={30}
-      //       />
-      //     ),
-      //   };
-      // },
-      headerMode: null,
+      // initialRouteName: "FriendsList",
+
+      defaultNavigationOptions: ({ navigation }) => {
+        return {
+          headerLeft: (
+            <Icon
+              style={{ paddingRight: 10 }}
+              onPress={() => navigation.FriendsList}
+              name="md-menu"
+              type="ionicon"
+              color="white"
+              size={30}
+            />
+          ),
+          headerStyle: {
+            backgroundColor: "#20365F",
+          },
+          headerTitle: "Friends List",
+          headerTintColor: "white",
+        };
+      },
     }
   );
 
@@ -146,9 +199,20 @@ export default function App(props) {
           </ScrollView>
           <View>
             <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout</Text>
+              <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
+          {user.role === "admin" ||
+          user.role === "manager" ||
+          user.role === "user handler" ||
+          user.role === "asset handler" ||
+          user.role === "customer" ? (
+            <View>
+              <TouchableOpacity onPress={handleChangeRole}>
+                <Text>Change Role {user && user.displayName}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </SafeAreaView>
       ),
     }
@@ -159,35 +223,49 @@ export default function App(props) {
   async function getUser() {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .onSnapshot(async (userRef) => {
-        const getAdmin = firebase.functions().httpsCallable("getAdmin");
-        const response = await getAdmin({
-          email: firebase.auth().currentUser.email,
-        });
+      .update({ activeRole: null });
 
-        const admin = response.data.result !== undefined ? true : false;
-
-        const user = { ...userRef.data(), admin };
-        console.log("userROLE", user.role.slice(-12));
-        setUser(user);
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((userRef) => {
+        console.log("userRef", userRef.data().activeRole);
+        setActiveRole(userRef.data().activeRole);
       });
+
+    const userRef = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    const response = await getAdmin({
+      email: firebase.auth().currentUser.email,
+    });
+
+    const admin = response.data.result !== undefined ? true : false;
+
+    const user = { ...userRef.data(), admin };
+    console.log("userRole", user.role);
+    console.log("userActiveRole", user.activeRole);
+    setUser(user);
   }
 
-  const getFirstLaunch = async () => {
-    try {
-      const value = await AsyncStorage.getItem("alreadyLaunched");
-      console.log("valueeeeeeeeeeeee", value);
-      if (!value) {
-        await AsyncStorage.setItem("alreadyLaunched", "true");
-        console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(true);
-      } else {
-        console.log("falseeeeeeeeeeeeeeeeeeeeeee");
-        setFirstLaunch(false);
-      }
-    } catch (err) {
-      console.log(err);
+  async function getFirstLaunch() {
+    const value = await AsyncStorage.getItem("alreadyLaunched");
+    console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      await AsyncStorage.setItem("alreadyLaunched", "true");
+      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(true);
+    } else {
+      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      setFirstLaunch(false);
     }
+  }
+
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
   };
 
   useEffect(() => {
@@ -212,8 +290,18 @@ export default function App(props) {
   });
   const AdminAppContainer = createAppContainer(adminTabNav);
 
+  const serviceEmployeeTabNav = createBottomTabNavigator({
+    Schedule: ScheduleStack,
+    Home: HomeStack,
+
+    News: NewsStack,
+
+    Profile: ProfileStack,
+  });
+  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+
   const guideSkip = () => {
-    console.log("Skipppped");
+    // console.log("Skipppped");
     setGuideView(false);
   };
 
@@ -225,22 +313,83 @@ export default function App(props) {
         </View>
       );
     } else {
-      return (
-        user !== null &&
-        (user.admin ? (
-          <AdminAppContainer />
-        ) : user.role.slice(-12) === "(incomplete)" ? (
-          <EmployeeAuthentication />
-        ) : user.role === "manager" ? (
-          <ManagersStack />
-        ) : user.role === "user handler" ? (
-          <UserHandlerStack />
-        ) : firstLaunch && guideView ? (
-          <Guide guideSkip={guideSkip} />
-        ) : (
-          <AppContainer />
-        ))
-      );
+      // if user info already retrieved
+      if (user) {
+        // if users first launch show guideView
+        if (firstLaunch && guideView) {
+          return <Guide guideSkip={guideSkip} />;
+        }
+        // --------------------------------CUSTOMER----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "customer") {
+          return <AppContainer />;
+        }
+        // --------------------------------SERVICE EMPLOYEE----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "service employee") {
+          return <ServiceEmployeeAppContainer />;
+        }
+        // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
+        // If employee account is incomplete go to employeeAuthenticate
+        else if (user.role.slice(-12) === "(incomplete)") {
+          return <EmployeeAuthentication />;
+        }
+        // If employee is any OTHER role
+        else {
+          // --------------------------------CHOOSE ROLE----------------------------------
+          // if big boi employee with null active roll THEN choose active role
+          if (activeRole === null) {
+            return <ChooseRole role={user.role} />;
+          }
+          // Which activeRole did you choose
+          else {
+            switch (activeRole) {
+              case "admin":
+                return <AdminAppContainer />;
+
+              case "manager":
+                return <ManagersStack />;
+
+              case "user handler":
+                return <UserHandlerStack />;
+
+              case "asset handler":
+                return <AppContainer />;
+
+              case "customer support":
+                return <AppContainer />;
+
+              case "service employee":
+                return <AppContainer />;
+
+              case "customer":
+                return <AppContainer />;
+
+              default:
+                // ---We dun goofed---
+                return (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text>WTF THERES A NEW ROLE?</Text>
+                  </View>
+                );
+            }
+          }
+        }
+      } else {
+        return (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text>Loading...</Text>
+          </View>
+        );
+      }
     }
   } else {
     return (
