@@ -10,8 +10,11 @@ import {
   Modal,
   TextInput,
   Dimensions,
+  Platform,
   ClippingRectangle,
 } from "react-native";
+import DatePicker from "react-native-datepicker";
+import ReactNativePickerModule from "react-native-picker-module";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
@@ -20,13 +23,17 @@ import { Avatar, ListItem } from "react-native-elements";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 
+import moment from "moment";
+
 export default function Users() {
+  let pickerRef = null;
   const [users, setUsers] = useState(null);
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
   const [modal2, setModal2] = useState(false);
+  const [modal3, setModal3] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -34,6 +41,12 @@ export default function Users() {
   const [balance, setBalance] = useState("");
   const [tokens, setTokens] = useState("");
   const [reputation, setReputation] = useState("");
+  const [subscription, setSubscription] = useState(null);
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+  const [loaded, setLoaded] = useState(false);
+  const [valueText, setValueText] = useState();
+  const subscriptionLevel = ["gold", "sliver", "bronze"];
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -134,15 +147,40 @@ export default function Users() {
       tokens,
       reputation,
     });
+    if (subscription) {
+      subscribe("update");
+    }
   };
+
+  let unsub;
 
   // ---------------------------------DELETE---------------------------------
   const handleDelete = async () => {
     // ---------------------------------
     setUser(null);
+    setSubscription(null);
+    unsub();
     const response = await fetch(
       `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${user.id}`
     );
+  };
+
+  const getSubscription = async () => {
+    unsub = db
+      .collection("users")
+      .doc(user.id)
+      .collection("subscription")
+      .onSnapshot((snap) => {
+        snap.forEach((doc) => {
+          const endDate = doc.data().endDate.toDate();
+          if (endDate > new Date()) {
+            setSubscription({ id: doc.id, ...doc.data() });
+            setStartDate(doc.data().startDate.toDate());
+            setEndDate(doc.data().endDate.toDate());
+            setValueText(doc.data().type);
+          }
+        });
+      });
   };
 
   // ------------------------------------------------------------------
@@ -155,6 +193,14 @@ export default function Users() {
       setBalance(String(user.balance));
       setTokens(String(user.tokens));
       setReputation(String(user.reputation));
+      getSubscription();
+    } else {
+      if (loaded) {
+        unsub();
+        setSubscription(null);
+      } else {
+        setLoaded(true);
+      }
     }
   }, [user]);
 
@@ -166,9 +212,67 @@ export default function Users() {
     }
   }, [users]);
 
+  const subscribe = (type) => {
+    if (type === "new") {
+      let sub = {
+        gold: {
+          type: "gold",
+          startDate: new Date(),
+          endDate: new Date(moment().add(1, "month").calendar()),
+        },
+        sliver: {
+          type: "sliver",
+          startDate: new Date(),
+          endDate: new Date(moment().add(1, "month").calendar()),
+        },
+        bronze: {
+          type: "bronze",
+          startDate: new Date(),
+          endDate: new Date(moment().add(1, "month").calendar()),
+        },
+      };
+      if (valueText === "gold") {
+        db.collection("users")
+          .doc(user.id)
+          .collection("subscription")
+          .add(sub.gold);
+      } else if (valueText === "sliver") {
+        db.collection("users")
+          .doc(user.id)
+          .collection("subscription")
+          .add(sub.sliver);
+      } else if (valueText === "bronze") {
+        db.collection("users")
+          .doc(user.id)
+          .collection("subscription")
+          .add(sub.bronze);
+      }
+    } else {
+      db.collection("users")
+        .doc(user.id)
+        .collection("subscription")
+        .doc(subscription.id)
+        .update({ startDate, endDate, type: valueText });
+    }
+  };
+
+  const endSubscription = () => {
+    setModal3(false);
+    setSubscription(null);
+    db.collection("users")
+      .doc(user.id)
+      .collection("subscription")
+      .doc(subscription.id)
+      .update({ endDate: new Date() });
+  };
+
   return user ? (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => setUser(null)}>
+      <TouchableOpacity
+        onPress={() => {
+          setUser(null);
+        }}
+      >
         <Text>Back to Users List</Text>
       </TouchableOpacity>
       <Text>User Details</Text>
@@ -341,219 +445,480 @@ export default function Users() {
           </View>
         </View>
       </Modal>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-end",
-        }}
-      >
-        {/* ---------------------------------RESET PASSWORD--------------------------------- */}
-        <TouchableOpacity
-          style={{ borderWidth: 1 }}
-          onPress={() => setModal(true)}
+      <ScrollView>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+          }}
         >
-          <Text>Reset Password</Text>
-        </TouchableOpacity>
-        <Text> | </Text>
-        {/* ---------------------------------EDIT--------------------------------- */}
-        <TouchableOpacity
-          style={{ borderWidth: 1 }}
-          onPress={() => setEditMode(true)}
-        >
-          <Text>Edit</Text>
-        </TouchableOpacity>
-        <Text> | </Text>
-        {/* ---------------------------------RESET PASSWORD--------------------------------- */}
-        <TouchableOpacity
-          style={{ borderWidth: 1 }}
-          onPress={() => setModal2(true)}
-        >
-          <Text>Delete</Text>
-        </TouchableOpacity>
-      </View>
-      <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
-
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Email:</Text>
-          <TextInput
-            placeholder={"Email"}
-            value={email}
-            onChangeText={setEmail}
-            style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-            width={Dimensions.get("window").width / 2}
-          />
-        </View>
-      ) : (
-        <Text>Email: {user.email}</Text>
-      )}
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Display Name:</Text>
-
-          <TextInput
-            placeholder={"Display Name"}
-            value={displayName}
-            onChangeText={setDisplayName}
-            style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-            width={Dimensions.get("window").width / 2}
-          />
-        </View>
-      ) : (
-        <Text>Display Name: {user.displayName}</Text>
-      )}
-      {/* ---------------------------------PICKER--------------------------------- */}
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Role:</Text>
-
-          <View
-            style={{
-              borderColor: "lightgray",
-              backgroundColor: "lightgray",
-              flex: 1,
-            }}
+          {/* ---------------------------------RESET PASSWORD--------------------------------- */}
+          <TouchableOpacity
+            style={{ borderWidth: 1 }}
+            onPress={() => setModal(true)}
           >
-            <Picker
-              // mode="dropdown"
-              selectedValue={selectedRole}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedRole(itemValue)
-              }
-            >
-              {roles.map((role, index) => (
-                <Picker.Item label={role} value={role} key={index} />
-              ))}
-            </Picker>
-          </View>
+            <Text>Reset Password</Text>
+          </TouchableOpacity>
+          <Text> | </Text>
+          {/* ---------------------------------EDIT--------------------------------- */}
+          <TouchableOpacity
+            style={{ borderWidth: 1 }}
+            onPress={() => setEditMode(true)}
+          >
+            <Text>Edit</Text>
+          </TouchableOpacity>
+          <Text> | </Text>
+          {/* ---------------------------------RESET PASSWORD--------------------------------- */}
+          <TouchableOpacity
+            style={{ borderWidth: 1 }}
+            onPress={() => setModal2(true)}
+          >
+            <Text>Delete</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <Text>Role: {user.role}</Text>
-      )}
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Phone:</Text>
+        <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
 
+        {editMode ? (
           <View style={{ flexDirection: "row" }}>
+            <Text>Email:</Text>
             <TextInput
-              value={"+974"}
-              style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-              editable={false}
-              width={40}
-            />
-            <TextInput
-              placeholder={"Phone No."}
-              value={phone}
-              onChangeText={setPhone}
+              placeholder={"Email"}
+              value={email}
+              onChangeText={setEmail}
               style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
               width={Dimensions.get("window").width / 2}
             />
           </View>
-        </View>
-      ) : (
-        <Text>Phone: {user.phone}</Text>
-      )}
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Balance:</Text>
+        ) : (
+          <Text>Email: {user.email}</Text>
+        )}
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Display Name:</Text>
 
-          <TextInput
-            placeholder={"Balance"}
-            value={balance}
-            onChangeText={setBalance}
-            style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-            width={Dimensions.get("window").width / 2}
-          />
-        </View>
-      ) : (
-        <Text>Balance: {user.balance}</Text>
-      )}
-      <Text>Referral Code: {user.referralCode}</Text>
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Tokens:</Text>
+            <TextInput
+              placeholder={"Display Name"}
+              value={displayName}
+              onChangeText={setDisplayName}
+              style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
+              width={Dimensions.get("window").width / 2}
+            />
+          </View>
+        ) : (
+          <Text>Display Name: {user.displayName}</Text>
+        )}
+        {/* ---------------------------------PICKER--------------------------------- */}
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Role:</Text>
 
-          <TextInput
-            placeholder={"Tokens"}
-            value={tokens}
-            onChangeText={setTokens}
-            style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-            width={Dimensions.get("window").width / 2}
-          />
-        </View>
-      ) : (
-        <Text>Tokens: {user.tokens}</Text>
-      )}
-      {editMode ? (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Reputation:</Text>
+            <View
+              style={{
+                borderColor: "lightgray",
+                backgroundColor: "lightgray",
+                flex: 1,
+              }}
+            >
+              <Picker
+                // mode="dropdown"
+                selectedValue={selectedRole}
+                onValueChange={(itemValue, itemIndex) =>
+                  setSelectedRole(itemValue)
+                }
+              >
+                {roles.map((role, index) => (
+                  <Picker.Item label={role} value={role} key={index} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+        ) : (
+          <Text>Role: {user.role}</Text>
+        )}
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Phone:</Text>
 
-          <TextInput
-            placeholder={"Reputation"}
-            value={reputation}
-            onChangeText={setReputation}
-            style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
-            width={Dimensions.get("window").width / 2}
-          />
-        </View>
-      ) : (
-        <Text>Reputation: {user.reputation}</Text>
-      )}
-      {!editMode && (
-        <View style={{ flexDirection: "row" }}>
-          <Text>Last Location: </Text>
-          {user.location ? (
-            <TouchableOpacity>
-              <Text>Track User</Text>
+            <View style={{ flexDirection: "row" }}>
+              <TextInput
+                value={"+974"}
+                style={{
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                }}
+                editable={false}
+                width={40}
+              />
+              <TextInput
+                placeholder={"Phone No."}
+                value={phone}
+                onChangeText={setPhone}
+                style={{
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                }}
+                width={Dimensions.get("window").width / 2}
+              />
+            </View>
+          </View>
+        ) : (
+          <Text>Phone: {user.phone}</Text>
+        )}
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Balance:</Text>
+
+            <TextInput
+              placeholder={"Balance"}
+              value={balance}
+              onChangeText={setBalance}
+              style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
+              width={Dimensions.get("window").width / 2}
+            />
+          </View>
+        ) : (
+          <Text>Balance: {user.balance}</Text>
+        )}
+        <Text>Referral Code: {user.referralCode}</Text>
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Tokens:</Text>
+
+            <TextInput
+              placeholder={"Tokens"}
+              value={tokens}
+              onChangeText={setTokens}
+              style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
+              width={Dimensions.get("window").width / 2}
+            />
+          </View>
+        ) : (
+          <Text>Tokens: {user.tokens}</Text>
+        )}
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Reputation:</Text>
+
+            <TextInput
+              placeholder={"Reputation"}
+              value={reputation}
+              onChangeText={setReputation}
+              style={{ borderColor: "black", borderWidth: 1, borderRadius: 10 }}
+              width={Dimensions.get("window").width / 2}
+            />
+          </View>
+        ) : (
+          <Text>Reputation: {user.reputation}</Text>
+        )}
+
+        {/* ---------------------------------MODAL3--------------------------------- */}
+        <Modal transparent={true} visible={modal3} animationType="slide">
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              // alignItems: "center",
+              alignSelf: "center",
+              marginTop: 22,
+              // ---This is for Width---
+              width: "80%",
+            }}
+          >
+            <View
+              style={{
+                margin: 20,
+                backgroundColor: "white",
+                borderRadius: 20,
+                padding: 35,
+                alignItems: "center",
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                justifyContent: "center",
+                // ---This is for Height---
+                height: "50%",
+              }}
+            >
+              <Text>
+                Are you sure you want to END {user.displayName}'s Subscription?
+              </Text>
+              <Text></Text>
+              <Text></Text>
+              <View
+                style={{
+                  //   borderWidth: 1,
+                  width: "100%",
+                  height: "10%",
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  flexDirection: "row",
+                }}
+              >
+                {/* -----------------------------CONFIRM DELETE------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    borderWidth: 1,
+                    width: "25%",
+                    height: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => endSubscription()}
+                >
+                  <Text>CONFIRM</Text>
+                </TouchableOpacity>
+                {/* -----------------------------CANCEL DELETE------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    borderWidth: 1,
+                    width: "25%",
+                    height: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => setModal3(false)}
+                >
+                  <Text>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {editMode ? (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Subscription: </Text>
+            {subscription ? (
+              <View>
+                <Text>Selected Level: {valueText}</Text>
+                {Platform.OS === "ios" ? (
+                  <View>
+                    <TouchableOpacity
+                      style={{
+                        paddingVertical: 10,
+                      }}
+                      onPress={() => {
+                        pickerRef.show();
+                      }}
+                    >
+                      <Text>Select subscription level</Text>
+                    </TouchableOpacity>
+                    <ReactNativePickerModule
+                      pickerRef={(e) => (pickerRef = e)}
+                      title={"Select a subscription level"}
+                      items={subscriptionLevel}
+                      onDismiss={() => {
+                        console.log("onDismiss");
+                      }}
+                      onCancel={() => {
+                        console.log("Cancelled");
+                      }}
+                      onValueChange={(valueText, index) => {
+                        console.log("value: ", valueText);
+                        console.log("index: ", index);
+                        setValueText(valueText);
+                      }}
+                    />
+                  </View>
+                ) : (
+                  <Picker
+                    selectedValue={valueText}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(item, itemIndex) => setValueText(item)}
+                  >
+                    {subscriptionLevel.map((item, index) => (
+                      <Picker.Item key={index} label={item} value={item} />
+                    ))}
+                  </Picker>
+                )}
+                <DatePicker
+                  style={{ width: 200 }}
+                  date={startDate}
+                  mode="date"
+                  placeholder="Select Start Date"
+                  format="YYYY-MM-DD"
+                  minDate={moment(new Date()).format("YYYY-MM-DD")}
+                  maxDate={endDate}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      position: "absolute",
+                      left: 0,
+                      top: 4,
+                      marginLeft: 0,
+                    },
+                    dateInput: {
+                      marginLeft: 36,
+                    },
+                  }}
+                  onDateChange={(startDate) => setStartDate(startDate)}
+                />
+                <DatePicker
+                  style={{ width: 200 }}
+                  date={endDate}
+                  mode="date"
+                  placeholder="Select End Date"
+                  format="YYYY-MM-DD"
+                  minDate={startDate}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      position: "absolute",
+                      left: 0,
+                      top: 4,
+                      marginLeft: 0,
+                    },
+                    dateInput: {
+                      marginLeft: 36,
+                    },
+                  }}
+                  onDateChange={(endDate) => setEndDate(endDate)}
+                />
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 10,
+                  }}
+                  onPress={() => {
+                    setModal3(true);
+                  }}
+                >
+                  <Text>End Subscription</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <ScrollView>
+                <View>
+                  <Text>Selected Level: {valueText}</Text>
+                  {Platform.OS === "ios" ? (
+                    <View>
+                      <TouchableOpacity
+                        style={{
+                          paddingVertical: 10,
+                        }}
+                        onPress={() => {
+                          pickerRef.show();
+                        }}
+                      >
+                        <Text>Select subscription level</Text>
+                      </TouchableOpacity>
+                      <ReactNativePickerModule
+                        pickerRef={(e) => (pickerRef = e)}
+                        title={"Select a subscription level"}
+                        items={subscriptionLevel}
+                        onDismiss={() => {
+                          console.log("onDismiss");
+                        }}
+                        onCancel={() => {
+                          console.log("Cancelled");
+                        }}
+                        onValueChange={(valueText, index) => {
+                          console.log("value: ", valueText);
+                          console.log("index: ", index);
+                          setValueText(valueText);
+                        }}
+                      />
+                    </View>
+                  ) : (
+                    <Picker
+                      selectedValue={valueText}
+                      style={{ height: 50, width: 150 }}
+                      onValueChange={(item, itemIndex) => setValueText(item)}
+                    >
+                      {subscriptionLevel.map((item, index) => (
+                        <Picker.Item key={index} label={item} value={item} />
+                      ))}
+                    </Picker>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 10,
+                  }}
+                  onPress={() => {
+                    subscribe("new");
+                  }}
+                >
+                  <Text>Add Subscription</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            )}
+          </View>
+        ) : subscription ? (
+          <View>
+            <Text>Subscription: </Text>
+            <Text>
+              {"   "}Type: {subscription.type}
+            </Text>
+            <Text>
+              {"   "}
+              Start Date:{" "}
+              {moment(subscription.startDate.toDate()).format("MMMM Do YYYY")}
+            </Text>
+            <Text>
+              {"   "}
+              End Date:{" "}
+              {moment(subscription.endDate.toDate()).format("MMMM Do YYYY")}
+            </Text>
+          </View>
+        ) : (
+          <View style={{ flexDirection: "row" }}>
+            <Text>Subscription: </Text>
+            <Text>No Subscription</Text>
+          </View>
+        )}
+
+        <Text></Text>
+
+        {editMode && (
+          <View
+            style={{
+              //   borderWidth: 1,
+              width: "100%",
+              height: "5%",
+              justifyContent: "space-around",
+              alignItems: "center",
+              flexDirection: "row",
+              marginBottom: 20,
+            }}
+          >
+            {/* ---------------------------------SAVE--------------------------------- */}
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                width: "25%",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={handleSave}
+            >
+              <Text>Save</Text>
             </TouchableOpacity>
-          ) : (
-            <Text>Unknown</Text>
-          )}
-        </View>
-      )}
-
-      <Text></Text>
-
-      {editMode && (
-        <View
-          style={{
-            //   borderWidth: 1,
-            width: "100%",
-            height: "5%",
-            justifyContent: "space-around",
-            alignItems: "center",
-            flexDirection: "row",
-            marginBottom: 20,
-          }}
-        >
-          {/* ---------------------------------SAVE--------------------------------- */}
-          <TouchableOpacity
-            style={{
-              borderWidth: 1,
-              width: "25%",
-              height: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={handleSave}
-          >
-            <Text>Save</Text>
-          </TouchableOpacity>
-          {/* ---------------------------------CANCEL--------------------------------- */}
-          <TouchableOpacity
-            style={{
-              borderWidth: 1,
-              width: "25%",
-              height: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={handleCancel}
-          >
-            <Text>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            {/* ---------------------------------CANCEL--------------------------------- */}
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                width: "25%",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={handleCancel}
+            >
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
     </View>
   ) : users ? (
     <ScrollView>

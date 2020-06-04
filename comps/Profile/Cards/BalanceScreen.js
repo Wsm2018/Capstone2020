@@ -46,6 +46,7 @@ export default function BalanceScreen({ navigation }) {
           .where("code", "==", giftCode)
           .where("status", "==", false)
           .get();
+
         if (result.size === 1) {
           result.forEach(async (doc) => {
             const response = await fetch(
@@ -53,10 +54,16 @@ export default function BalanceScreen({ navigation }) {
                 firebase.auth().currentUser.uid
               }&path=${doc.ref.path}`
             );
+            const resultStatus = await response.json();
+            if (resultStatus === "true") {
+              setGiftCodeError("green");
+              setGiftCode("");
+            } else {
+              setGiftCodeError("red");
+              setGiftCode("");
+              setGiftErrorCounter(giftErrorCounter + 1);
+            }
           });
-
-          setGiftCodeError("green");
-          setGiftCode("");
         } else {
           setGiftCodeError("red");
           setGiftCode("");

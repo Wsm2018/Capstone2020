@@ -56,6 +56,7 @@ exports.sendGift = functions.https.onCall(async (data, context) => {
     status: false,
     expiryDate,
     used: false,
+    race: [],
   });
 
   const response = await fetch(
@@ -201,6 +202,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      activeRole: null,
     });
 
   if (request.query.referralStatus === "true") {
@@ -665,21 +667,35 @@ exports.redeemGiftCode = functions.https.onRequest(
   async (request, response) => {
     let path = String(request.query.path);
     path = path.split("/");
-    const giftDoc = await db
+    let giftDoc = await db
       .collection(path[0])
       .doc(path[1])
       .collection(path[2])
       .doc(path[3])
       .get();
-    giftDoc.ref.update({ status: true });
+    await giftDoc.ref.update({
+      status: true,
+      race: admin.firestore.FieldValue.arrayUnion(request.query.uid),
+    });
 
-    const userDoc = await db.collection("users").doc(request.query.uid).get();
-    const increment = admin.firestore.FieldValue.increment(
-      giftDoc.data().giftBalance
-    );
-    userDoc.ref.update({ balance: increment });
+    giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
 
-    response.send("Balance Added");
+    if (giftDoc.data().race[0] === request.query.uid) {
+      const userDoc = await db.collection("users").doc(request.query.uid).get();
+      const increment = admin.firestore.FieldValue.increment(
+        giftDoc.data().giftBalance
+      );
+      userDoc.ref.update({ balance: increment });
+
+      response.send("true");
+    } else {
+      response.send("false");
+    }
   }
 );
 

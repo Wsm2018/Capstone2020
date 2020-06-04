@@ -23,6 +23,10 @@ export default function Home(props) {
         <Text>Statistics</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity onPress={() => props.navigation.navigate("News")}>
+        <Text>News</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity onPress={() => handleLogout()}>
         <Text>Logout</Text>
       </TouchableOpacity>
