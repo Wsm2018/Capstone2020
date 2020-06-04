@@ -134,20 +134,30 @@ export default function Authentication(props) {
       // checking if Phone No. is 8 digits
       if (phone.length !== 8) {
         setPhoneErr("red");
+        return;
         // return alert("Phone Number is Not Available!");
       } else {
         setPhoneErr("transparent");
       }
     } else {
       setPhoneErr("red");
+      return;
       // return alert("Enter your Phone Number!");
     }
 
     if (displayName === "") {
       setDisplayErr("red");
+      return;
       // return alert("Enter your Display Name!");
     } else {
-      setDisplayErr("transparent");
+      const result = allUsers.filter((item) => {
+        return item.displayName == displayName;
+      });
+      if (result.length > 0) {
+        return setDisplayErr("red");
+      } else {
+        setDisplayErr("transparent");
+      }
     }
 
     try {

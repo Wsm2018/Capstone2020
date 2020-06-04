@@ -35,6 +35,8 @@ import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
+import ScheduleStack from "./navigation/ScheduleStack";
+import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 
@@ -75,23 +77,15 @@ export default function App(props) {
     }
   };
 
-  const Test = () => {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Test</Text>
-      </View>
-    );
-  };
-
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
 
       News: NewsStack,
+      Advertisments: AdvertismentsStack,
 
       Profile: ProfileStack,
     },
-    // {
     //   navigationOptions: ({ navigation }) => {
     //     const { routeName } = navigation.state.routes[navigation.state.index];
     //     return {
@@ -207,6 +201,17 @@ export default function App(props) {
               <Text>Logout {user && user.displayName}</Text>
             </TouchableOpacity>
           </View>
+          {user.role === "admin" ||
+          user.role === "manager" ||
+          user.role === "user handler" ||
+          user.role === "asset handler" ||
+          user.role === "customer" ? (
+            <View>
+              <TouchableOpacity onPress={handleChangeRole}>
+                <Text>Change Role {user && user.displayName}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </SafeAreaView>
       ),
     }
@@ -256,6 +261,12 @@ export default function App(props) {
       setFirstLaunch(false);
     }
   }
+
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
 
   useEffect(() => {
     getFirstLaunch();
@@ -352,6 +363,16 @@ export default function App(props) {
   });
   const AdminAppContainer = createAppContainer(adminTabNav);
 
+  const serviceEmployeeTabNav = createBottomTabNavigator({
+    Schedule: ScheduleStack,
+    Home: HomeStack,
+
+    News: NewsStack,
+
+    Profile: ProfileStack,
+  });
+  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+
   const guideSkip = () => {
     // console.log("Skipppped");
     setGuideView(false);
@@ -372,14 +393,14 @@ export default function App(props) {
           return <Guide guideSkip={guideSkip} />;
         }
         // --------------------------------CUSTOMER----------------------------------
-        // if user is customer or services employee go to <AppContainer/>
+        // if user is customer or service employee go to <AppContainer/>
         else if (user.role === "customer") {
           return <AppContainer />;
         }
-        // --------------------------------SERVICES EMPLOYEE----------------------------------
-        // if user is services employee
-        else if (user.role === "services employee") {
-          return <AppContainer />;
+        // --------------------------------SERVICE EMPLOYEE----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "service employee") {
+          return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
@@ -411,8 +432,8 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "services employee":
-                return <AppContainer />;
+              case "service employee":
+                return <ServiceEmployeeAppContainer />;
 
               case "customer":
                 return <AppContainer />;
