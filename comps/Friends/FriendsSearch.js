@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
-  Alert
+  Alert,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -237,15 +237,20 @@ export default function FriendsList(props) {
           onChangeText={setSearch}
           value={search}
         />
-        <MaterialIcons
+        {/* <MaterialIcons
           name="cancel"
           size={25}
           color="#fff"
           onPress={() => props.navigation.goBack()}
-        />
-         <TouchableOpacity onPress={() => setScan(true)}>
-        <Icon name="qrcode-scan" type="material-community" size={28} />
-      </TouchableOpacity>
+        /> */}
+        <TouchableOpacity onPress={() => setScan(true)}>
+          <Icon
+            name="qrcode-scan"
+            type="material-community"
+            size={28}
+            color="#fff"
+          />
+        </TouchableOpacity>
       </View>
       {/* <View
         style={{
@@ -415,6 +420,7 @@ export default function FriendsList(props) {
         flex: 1,
         flexDirection: "column",
         justifyContent: "flex-end",
+        paddingBottom:'10%'
       }}
     >
       <BarCodeScanner
@@ -422,7 +428,8 @@ export default function FriendsList(props) {
         style={StyleSheet.absoluteFillObject}
       />
 
-      <Button title="Cancel" bonPress={() => setScan(false)} />
+     
+      <Button title="Cancel" onPress={() => setScan(false)} />
     </View>
   );
 }

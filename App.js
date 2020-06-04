@@ -36,7 +36,7 @@ import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
-
+import BookingHistory from "./comps/Profile/BookingHistory";
 import ManagersStack from "./comps/Managers/ManagersScreen";
 import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
@@ -82,7 +82,7 @@ export default function App(props) {
       Home: HomeStack,
 
       News: NewsStack,
-
+      BookingHistory: BookingHistory,
       Profile: ProfileStack,
     },
     // {
@@ -326,7 +326,8 @@ export default function App(props) {
           // --------------------------------CHOOSE ROLE----------------------------------
           // if big boi employee with null active roll THEN choose active role
           if (activeRole === null) {
-            return <ChooseRole role={user.role} />;
+             return <ChooseRole role={user.role} />;
+            // return <ManagersStack />;
           }
           // Which activeRole did you choose
           else {
