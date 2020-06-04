@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon } from "react-native-elements";
+import AdminHome from "../comps/Admin/HomeScreen";
 
 export default function HomePage(props) {
   const handleLogout = () => {
@@ -20,6 +21,7 @@ export default function HomePage(props) {
         <Text>Logout !</Text>
 
       </TouchableOpacity>
+      
       
     </View>
   );

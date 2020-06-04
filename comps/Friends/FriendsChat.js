@@ -13,6 +13,8 @@ import {
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { Divider } from "react-native-elements";
 
 export default function FriendsList(props) {
   const friend = props.navigation.getParam("friend");
@@ -22,8 +24,13 @@ export default function FriendsList(props) {
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
 
+  // const [unsubscribe, setUnsubscribe] = useState(null);
+  // const [unsubscribe2, setUnsubscribe2] = useState(null);
+
+  // -------------------------------FROM-----------------------------------
   const handleFrom = () => {
-    db.collection("chats")
+    const unsubscribe = db
+      .collection("chats")
       .where("from", "==", firebase.auth().currentUser.uid)
       .where("to", "==", friend.id)
       .onSnapshot((queryBySnapshot) => {
@@ -31,23 +38,41 @@ export default function FriendsList(props) {
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: true });
         });
+        // console.log(tempFrom);
         setFrom(tempFrom);
       });
+    screenListener(unsubscribe);
   };
 
+  // --------------------------------TO----------------------------------
   const handleTo = () => {
-    db.collection("chats")
+    console.log("yo we in to");
+    const unsubscribe = db
+      .collection("chats")
       .where("from", "==", friend.id)
       .where("to", "==", firebase.auth().currentUser.uid)
-      .onSnapshot((queryBySnapshot) => {
+      .onSnapshot(async (queryBySnapshot) => {
+        console.log("we in this?");
         let tempFrom = [];
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: false });
         });
+        // get all of this shit
+        // filter only unread messages
+        // update into read using their id
+        let unread = tempFrom.filter((message) => message.status === "unread");
+        if (unread.length > 0) {
+          const update = firebase.functions().httpsCallable("updateToRead");
+          const response = await update({ messages: unread });
+        }
+        // console.log(response);
+
         setTo(tempFrom);
       });
+    screenListener(unsubscribe);
   };
 
+  // -------------------------------CHAT-----------------------------------
   const handleChat = () => {
     let tempChat = from.concat(to);
     tempChat = tempChat.sort(
@@ -56,15 +81,21 @@ export default function FriendsList(props) {
     setChats(tempChat);
   };
 
-  const send = () => {
-    db.collection("chats").add({
+  // --------------------------------SEND----------------------------------
+  const send = async () => {
+    const message = firebase.functions().httpsCallable("sendMessage");
+    const response = await message({
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
       dateTime: new Date(),
     });
+    console.log("response", response);
+
+    setText("");
   };
 
+  // --------------------------------DELETE ALL----------------------------------
   const deleteAll = async () => {
     const getQuery = await db.collection("chats").get();
     getQuery.forEach((doc) => {
@@ -72,46 +103,165 @@ export default function FriendsList(props) {
     });
   };
 
+  // --------------------------------SCREEN LISTENER----------------------------------
+  const screenListener = (unsubscribe) => {
+    let timerId = setInterval(() => {
+      if (!props.navigation.isFocused()) {
+        console.log("we stopping it");
+        unsubscribe();
+        clearInterval(timerId);
+      } else {
+        // console.log("scrnlistener running");
+      }
+    }, 1000);
+  };
+
+  // ------------------------------------------------------------------
   useEffect(() => {
     handleFrom();
     handleTo();
   }, []);
 
+  // ------------------------------------------------------------------
   useEffect(() => {
     if (from && to) {
       handleChat();
     }
   }, [from, to]);
 
+  // ------------------------------------------------------------------
+  // useEffect(() => {
+  //   if (unsubscribe && unsubscribe2) {
+  //     screenListener();
+  //   }
+  // }, [unsubscribe && unsubscribe2]);
+
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : null}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
+      enabled={true}
     >
-      <Text>Friends Chat</Text>
-      <Button title="Delete All" onPress={deleteAll} />
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          //  marginBottom: 20,
+          height: "8%",
+          maxHeight: "8%",
+          backgroundColor: "#20365F",
+          justifyContent: "flex-start",
+          flex: 1,
+          flexWrap: "wrap",
+          paddingLeft: "4%",
+        }}
+      >
+        <Ionicons name="ios-arrow-back" size={35} color="white" />
+        <Text style={{ color: "white", fontSize: 24, paddingLeft: "3%" }}>
+          {" "}
+          {friend.displayName}
+        </Text>
+      </View>
 
-      <Text>To: {friend.displayName}</Text>
       <ScrollView>
+        <View style={{ paddingTop: "5%" }}></View>
         {chats &&
           chats.map((chat) => (
-            <Text
-              style={chat.from ? { textAlign: "right" } : { textAlign: "left" }}
-              key={chat.id}
+            // <TouchableOpacity style={{alignContent:'flex-end'}}>
+
+            // </TouchableOpacity>
+            <View
+              style={{ borderRadius: 20, width: "90%", alignSelf: "center" }}
             >
-              {chat.text}
-            </Text>
+              <TouchableOpacity
+                disabled={true}
+                style={
+                  chat.from
+                    ? {
+                        textAlign: "right",
+                        backgroundColor: "#49679F",
+                        alignSelf: "flex-end",
+                        maxWidth: "85%",
+                        minWidth: "20%",
+                        borderRadius: 20,
+                      }
+                    : {
+                        textAlign: "left",
+                        backgroundColor: "white",
+                        alignSelf: "flex-start",
+                        maxWidth: "85%",
+                        minWidth: "20%",
+                        borderRadius: 20,
+                      }
+                }
+                key={chat.id}
+              >
+                <Text
+                  style={
+                    chat.from
+                      ? {
+                          textAlign: "left",
+                          paddingLeft: "4%",
+                          paddingRight: "4%",
+                          fontSize: 20,
+                          color: "white",
+                        }
+                      : {
+                          textAlign: "left",
+                          paddingLeft: "4%",
+                          paddingRight: "4%",
+                          fontSize: 20,
+                          color: "#20365F",
+                        }
+                  }
+                  key={chat.id}
+                >
+                  {chat.text}
+                </Text>
+              </TouchableOpacity>
+              <Text>{"\n"}</Text>
+            </View>
           ))}
       </ScrollView>
-
-      <TextInput
-        style={{ borderWidth: 1 }}
-        placeholder="Type here"
-        onChangeText={setText}
-      />
-      <TouchableOpacity style={{ borderWidth: 1, height: 30 }} onPress={send}>
-        <Text>Send</Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          marginBottom: 20,
+          // height: "8%",
+          minHeight: "12%",
+          maxHeight: "8%",
+          backgroundColor: "#20365F",
+          justifyContent: "space-evenly",
+          flex: 1,
+          flexWrap: "wrap",
+          paddingTop: "1%",
+          //position:'relative'
+        }}
+      >
+        <TextInput
+          style={{
+            borderWidth: 1,
+            minHeight: "50%",
+            maxHeight: "100%",
+            width: "80%",
+            paddingLeft: "4%",
+            backgroundColor: "white",
+            borderRadius: 30,
+          }}
+          numberOfLines={10}
+          multiline={true}
+          placeholder="Type here"
+          placeholderTextColor="black"
+          onChangeText={setText}
+          value={text}
+        />
+        <TouchableOpacity onPress={send}>
+          <MaterialIcons name="send" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -119,6 +269,8 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    //  alignContent:'center',
+    //  justifyContent: "space-e",
+    backgroundColor: "#E7E8EA",
   },
 });

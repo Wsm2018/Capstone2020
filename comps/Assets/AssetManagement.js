@@ -275,22 +275,14 @@ export default function AssetManagement(props) {
                         {
                             sections.map(t =>
                                 t.assetType == selectedType.id ?
-                                    <TouchableOpacity onPress={() => setSelectedSection(t) || setName()}><Text>{t.name}</Text></TouchableOpacity>
+                                    <TouchableOpacity onPress={() => setSelectedSection(t) }><Text>{t.name}</Text></TouchableOpacity>
                                     :
                                     null
-                            )}
-                        {
-                            !selectedSection ?
-                                <View>
-                                    <Button title={"Edit " + selectedType.name} onPress={() => setShowEditType(true)} />
-                                    <Button title={"Delete " + selectedType.name} onPress={() => handleDelete("assetTypes", selectedType.id)} />
-                                    <Button title="Add Section" onPress={() => setShowAddSection(true) || setName()} />
-                                    <Button title="Manage Services" onPress={() => props.navigation.navigate("ServiceManagement", { assetType: selectedType })} />
 
-                                </View>
-                                :
-                                null
-                        }
+                            )}
+
+                <Button title="Add Section" onPress={() => setShowAddSection(true)} />
+                <Button title="Manage Services" onPress={() => props.navigation.navigate("ServiceManagement", {assetType: selectedType})} />
 
                     </View>
                     :

@@ -1,0 +1,231 @@
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Button,
+  SafeAreaView,
+  FlatList,
+  ScrollView,
+} from "react-native";
+
+import firebase from "firebase/app";
+import "firebase/auth";
+import db from "../../db";
+import "firebase/functions";
+import { ListItem } from "react-native-elements";
+import {
+  AntDesign,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
+export default function FriendsList(props) {
+  const [friends, setFriends] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // ------------------------------CURRENT USER------------------------------------
+  const handleCurrentuser = async () => {
+    const doc = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+
+    setCurrentUser({ id: doc.id, ...doc.data() });
+  };
+
+  // --------------------------------FRIENDS----------------------------------
+  const handleFriends = async () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("friends")
+      .onSnapshot((queryBySnapshot) => {
+        // console.log(queryBySnapshot.size);
+        if (queryBySnapshot.size > 0) {
+          let tempFriends = [];
+          queryBySnapshot.forEach((doc) => {
+            if (doc.data().status === "requested") {
+              tempFriends.push({ id: doc.id, ...doc.data() });
+            }
+          });
+          tempFriends = tempFriends.sort((a, b) =>
+            a.displayName
+              .toLowerCase()
+              .localeCompare(b.displayName.toLowerCase())
+          );
+
+          // console.log(tempFriends);
+          setFriends(tempFriends);
+        } else {
+          setFriends([]);
+        }
+      });
+  };
+
+  // -------------------------------ACCEPT-----------------------------------
+  const accept = async (user) => {
+    const add = firebase.functions().httpsCallable("acceptFriend");
+    const response = await add({ user: currentUser, friend: user });
+    console.log("response", response);
+  };
+
+  // -------------------------------DECLINE-----------------------------------
+  const decline = async (user) => {
+    const dec = firebase.functions().httpsCallable("removeFriend");
+    const response = await dec({ user: currentUser, friend: user });
+    console.log("response", response);
+  };
+
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    handleCurrentuser();
+    handleFriends();
+  }, []);
+
+  return !friends ? (
+    <View>
+      <Text>LOADING...</Text>
+    </View>
+  ) : (
+    <View style={styles.container}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#20365F",
+          borderTopColor: "#20365F",
+          //paddingTop:'2%',
+        }}
+      >
+        <Ionicons
+          name="md-arrow-round-back"
+          size={26}
+          color="#fff"
+          onPress={() => props.navigation.goBack()}
+        />
+        <Text
+          style={{
+            color: "white",
+            fontSize: 26,
+            paddingLeft: "3%",
+            fontWeight: "600",
+            marginLeft: 10,
+            marginRight: 10,
+            paddingTop: "3%",
+            paddingBottom: "3%",
+          }}
+        >
+          Friends Request
+        </Text>
+      </View>
+
+      {friends.length > 0 ? (
+        <SafeAreaView style={{ paddingTop: "2%" }}>
+          <ScrollView>
+            <FlatList
+              data={friends}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item, index }) => (
+                <ListItem
+                  key={item.id}
+                  //leftAvatar={{ source: { uri: item.photoURL } }}
+                  leftAvatar={
+                    <AntDesign name="adduser" size={35} color="#20365F" />
+                  }
+                  rightIcon={
+                    <TouchableOpacity
+                      style={{
+                        borderWidth: 1,
+                        borderColor: "#20365F",
+                        backgroundColor: "#344C7A",
+                        padding: "2%",
+                        borderRadius: 8,
+                        alignItems: "center",
+                        minWidth: "20%",
+                        maxWidth: "20%",
+                      }}
+                      onPress={() => accept(item)}
+                    >
+                      <Text style={{ color: "white", fontWeight: "600" }}>
+                        Accept
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                  rightElement={
+                    <TouchableOpacity
+                      style={{
+                        borderWidth: 1,
+                        borderColor: "#344C7A",
+                        backgroundColor: "#9AA5B6",
+                        padding: "2%",
+                        borderRadius: 8,
+                        alignItems: "center",
+                        minWidth: "20%",
+                        maxWidth: "20%",
+                      }}
+                      onPress={() => decline(item)}
+                    >
+                      <Text style={{ color: "white", fontWeight: "600" }}>
+                        Decline
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                  title={item.displayName}
+                  titleStyle={{ fontSize: 18 }}
+                  subtitle={item.status}
+                  //subtitle={item.status + " to add you"}
+                  subtitleStyle={{ fontSize: 12, color: "grey" }}
+                  bottomDivider
+                />
+              )}
+            />
+          </ScrollView>
+        </SafeAreaView>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+          //  paddingTop: "10%",
+            alignContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <LottieView
+            source={require("../../assets/10000-empty-box.json")}
+            autoPlay
+            duration={2000}
+            // loop
+            style={{
+              position: "relative",
+              width: "100%",
+              paddingTop: "13%",
+              paddingLeft: "6%",
+            }}
+          />
+          <Text
+            style={{
+              fontWeight: "500",
+              fontSize: 26,
+              paddingLeft: "3%",
+              paddingTop:'8%',
+              color: "#3062AE",
+              textDecorationLine:'underline'
+            }}
+          >
+            You have no Requests
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
