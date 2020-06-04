@@ -1057,3 +1057,19 @@ exports.deleteCar = functions.https.onCall(async (data, context) => {
     .delete();
   console.log(response);
 });
+
+exports.addPromotion = functions.https.onCall(async (data, context) => {
+  console.log("addPromotion", data);
+  const response = await db.collection("promotionCodes").add({
+    code: data.code,
+    expiryDate: new Date(data.expiry),
+    percentage: data.percentage,
+  });
+  return response;
+});
+
+exports.deletePromotion = functions.https.onCall(async (data, context) => {
+  console.log("delete promotion ", data);
+  const response = await db.collection("promotionCodes").doc(data.id).delete();
+  return response;
+});
