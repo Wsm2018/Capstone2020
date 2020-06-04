@@ -150,7 +150,14 @@ export default function Authentication(props) {
       return;
       // return alert("Enter your Display Name!");
     } else {
-      setDisplayErr("transparent");
+      const result = allUsers.filter((item) => {
+        return item.displayName == displayName;
+      });
+      if (result.length > 0) {
+        return setDisplayErr("red");
+      } else {
+        setDisplayErr("transparent");
+      }
     }
 
     try {

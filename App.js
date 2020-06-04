@@ -35,6 +35,7 @@ import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import ScheduleStack from "./navigation/ScheduleStack";
+import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 
@@ -53,40 +54,15 @@ export default function App(props) {
   const [admin, setAdmin] = useState(null);
   const [activeRole, setActiveRole] = useState(null);
 
-  const handleLogout = async () => {
-    const userInfo = await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get();
-    if (userInfo.data().role === "guest") {
-      await fetch(
-        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
-          firebase.auth().currentUser.uid
-        }`
-      );
-      firebase.auth().signOut();
-    } else {
-      firebase.auth().signOut();
-    }
-  };
-
-  const Test = () => {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Test</Text>
-      </View>
-    );
-  };
-
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
 
       News: NewsStack,
+      Advertisments: AdvertismentsStack,
 
       Profile: ProfileStack,
     },
-    // {
     //   navigationOptions: ({ navigation }) => {
     //     const { routeName } = navigation.state.routes[navigation.state.index];
     //     return {
