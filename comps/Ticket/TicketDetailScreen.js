@@ -24,6 +24,9 @@ export default function TicketDetailScreen(props) {
 
   useEffect(() => {
     Check();
+    var msDiff = ticket.dateOpen.toDate().getTime() - new Date().getTime();
+    var daysTill30June2035 = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+    console.log("count in ", daysTill30June2035);
   }, []);
 
   const Check = async () => {
@@ -66,6 +69,19 @@ export default function TicketDetailScreen(props) {
     });
   };
 
+  const temp = async () => {
+    let users = [];
+    const info = await db.collection("users").get();
+    info.forEach((doc) => {
+      users.push({ id: doc.id, reputation: doc.data().reputation });
+    });
+    users.forEach(async (user) => {
+      await db.collection("users").doc(user.id).update({
+        reputation: 0,
+      });
+    });
+  };
+
   return (
     <View>
       <Text>Ticket {ticket.title}</Text>
@@ -80,7 +96,7 @@ export default function TicketDetailScreen(props) {
           <Button title="Take" onPress={() => TakeTicket()} />
         ) : null}
       </View>
-      {user.role == "customer support" &&
+      {user.ActiveRole == "customer support" &&
       ticket.status != "Closed" &&
       ticket.supportAgentUid == user.id ? (
         <>
@@ -103,6 +119,7 @@ export default function TicketDetailScreen(props) {
           </Picker>
         </>
       ) : null}
+      <Button title="reset" onPress={temp} />
     </View>
   );
 }

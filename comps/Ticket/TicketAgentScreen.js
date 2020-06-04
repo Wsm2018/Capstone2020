@@ -14,21 +14,18 @@ import { Input } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-import { ScrollView } from "react-native-gesture-handler";
+import { set } from "react-native-reanimated";
 
 // Main Method
 export default function TicketAgentScreen(props) {
   //UseState
   const [user, setUser] = useState(null);
-  const [servicesList, setServicesList] = useState(null);
-  const [selectedValue, setSelectedValue] = useState("projecter");
   const [agentList, setAgentList] = useState([]);
-
-  const [title, setTitle] = useState(null);
-  const [description, setDescription] = useState(null);
-  const [view, setView] = useState("home");
   const [ticketList, setTicketList] = useState(null);
-  const [other, setOther] = useState("");
+  const [view, setView] = useState("home");
+  const [num, setNum] = useState();
+  const [searchResult, setSearchResult] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
 
   //UseEffect
   useEffect(() => {
@@ -70,38 +67,102 @@ export default function TicketAgentScreen(props) {
     let agentsTemp = [];
     const info2 = await db
       .collection("users")
-      .where("role", "==", "customer support")
+      .where("activeRole", "==", "customer support")
       .get();
     info2.forEach((doc) => agentsTemp.push({ id: doc.id, ...doc.data() }));
     setAgentList(agentsTemp);
   };
 
+  const searchCar = async () => {
+    const result = await db
+      .collectionGroup("cars")
+      .where("plate", "==", num)
+      .get();
+    let temp;
+    result.forEach((doc) => {
+      temp = doc.ref.path.split("/");
+    });
+    const path = temp;
+    if (path) {
+      const user = await db.collection("users").doc(path[1]).get();
+      setSearchResult(user.data());
+    } else {
+      setSearchResult(false);
+    }
+  };
+
+  const ApproveReport = async () => {
+    const add = firebase.functions().httpsCallable("updateTicket");
+    const response = await add({
+      user,
+      ticket: selectedValue,
+
+      query: "Approve",
+    });
+  };
+
   // Render
   return user ? (
     <View>
-      {ticketList
-        ? ticketList.map((item, index) =>
-            item.supportAgentUid == firebase.auth().currentUser.uid ||
-            item.status == "pending" ? (
-              <View key={index} style={{ borderWidth: 1, padding: 10 }}>
-                <Text>Title:</Text>
-                <Text>{item.title}</Text>
-                <Text>Status</Text>
-                <Text>{item.status}</Text>
-                <Button
-                  title="Details"
-                  onPress={() =>
-                    props.navigation.navigate("Details", {
-                      ticket: item,
-                      user,
-                      agentList,
-                    })
-                  }
-                />
-              </View>
-            ) : null
-          )
-        : null}
+      {view == "home" ? (
+        <View>
+          {ticketList
+            ? ticketList.map((item, index) =>
+                item.supportAgentUid == firebase.auth().currentUser.uid ||
+                item.status == "pending" ? (
+                  <View key={index} style={{ borderWidth: 1, padding: 10 }}>
+                    <Text>Title:</Text>
+                    <Text>{item.title}</Text>
+                    <Text>Status</Text>
+                    <Text>{item.status}</Text>
+                    <Button
+                      title="Details"
+                      onPress={() =>
+                        props.navigation.navigate("Details", {
+                          ticket: item,
+                          user,
+                          agentList,
+                        })
+                      }
+                    />
+                  </View>
+                ) : null
+              )
+            : null}
+          <Button title="User List" onPress={() => setView("userList")} />
+        </View>
+      ) : view == "userList" ? (
+        <View>
+          <TextInput onChangeText={setNum} />
+          <Button title="search" onPress={searchCar} />
+          {searchResult ? (
+            <View style={{ borderWidth: 1 }}>
+              <Text>User : {searchResult.displayName}</Text>
+              <Picker
+                selectedValue={selectedValue}
+                style={{ height: 50, width: 150 }}
+                onValueChange={(itemValue, itemIndex) =>
+                  setSelectedValue(itemValue)
+                }
+              >
+                {ticketList ? (
+                  ticketList.map((item, index) => (
+                    <Picker.Item label={item.id} value={item.id} />
+                  ))
+                ) : (
+                  <Picker.Item label="Loading" value="Loading" />
+                )}
+              </Picker>
+              <Button title="Approve" onPress={ApproveReport} />
+            </View>
+          ) : (
+            <Text>Not Found</Text>
+          )}
+          <Button title="Ticket List" onPress={() => setView("home")} />
+        </View>
+      ) : (
+        <Text>Something Went wrong??</Text>
+      )}
     </View>
   ) : (
     <Text>Loading...</Text>

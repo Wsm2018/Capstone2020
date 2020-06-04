@@ -23,7 +23,6 @@ const TicketStack = createAppContainer(
     {
       Agent: TicketAgentScreen,
       Customer: TicketCustomerScreen,
-
       Chat: SupportChat,
       Details: TicketDetailScreen,
     },

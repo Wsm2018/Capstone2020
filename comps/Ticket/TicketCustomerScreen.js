@@ -15,6 +15,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
 import { ScrollView } from "react-native-gesture-handler";
+import * as ImagePicker from "expo-image-picker";
 
 // Main Method
 export default function TicketScreen(props) {
@@ -28,6 +29,9 @@ export default function TicketScreen(props) {
   const [view, setView] = useState("home");
   const [ticketList, setTicketList] = useState(null);
   const [other, setOther] = useState("");
+  const [priority, setPriority] = useState("normal");
+
+  const [image, setImage] = useState(null);
 
   //UseEffect
   useEffect(() => {
@@ -41,7 +45,6 @@ export default function TicketScreen(props) {
         let temp = [];
         Snap.forEach((doc) => {
           temp.push({ id: doc.id, ...doc.data() });
-          console.log(doc.id, "==>", doc.data());
         }),
           setTicketList(temp);
       });
@@ -54,16 +57,59 @@ export default function TicketScreen(props) {
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
+
+    const info2 = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("subscription")
+      .get();
+    if (info2.size > 0) {
+      info2.forEach((doc) => {
+        let subTime =
+          doc.data().endDate.toDate() - doc.data().startDate.toDate();
+        if (subTime > 0) {
+          if (doc.data().type === "silver") {
+            setPriority("medium");
+          } else if (doc.data().type === "gold") {
+            setPriority("high");
+          } else if (doc.data().type === "platinum") {
+            setPriority("very high");
+          }
+        }
+      });
+    } else {
+      console.log("user is not a sub");
+    }
+
     tempUser = { id: info.id, ...info.data() };
-    console.log(tempUser);
     setUser(tempUser);
-    console.log("user", user);
+
+    let tempServ = [];
+    const info3 = await db.collection("services").get();
+    info3.forEach((doc) => {
+      tempServ.push({ id: doc.id, ...doc.data() });
+    });
+    setServicesList(tempServ);
   };
 
+  const _pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        setImage(result.uri);
+      }
+    } catch (E) {
+      console.log(E);
+    }
+  };
   //Submiting a ticket
   const addTicket = async () => {
     if (description != "" && title != "") {
-      console.log("user", user);
       const add = firebase.functions().httpsCallable("addTicket");
       const response = await add({
         user,
@@ -71,9 +117,17 @@ export default function TicketScreen(props) {
         title,
         selectedValue,
         other,
+        priority,
       });
-      console.log("response", response);
-      setView("home");
+      console.log("start uploading");
+      const response1 = await fetch(image);
+      const blob = await response1.blob();
+      const upload = await firebase
+        .storage()
+        .ref()
+        .child("customerSupport/" + response.data._path.segments[1])
+        .put(blob);
+      //setView("home");
     } else {
       alert("Please fill the required fields");
     }
@@ -119,6 +173,7 @@ export default function TicketScreen(props) {
               onChangeText={(text) => setOther(text)}
             />
           ) : null}
+          <Button title="Attachment Image" onPress={_pickImage} />
           <Button title="Submit" onPress={() => addTicket()} />
           <Button title="back" onPress={() => setView("home")} />
         </View>

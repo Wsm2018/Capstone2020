@@ -38,29 +38,17 @@ export default function SupportChat(props) {
       });
   }, []);
 
-  useEffect(() => {
-    Check();
-  }, []);
-
-  const Check = async () => {
-    const c = await db
-      .collection("customerSupport")
-      .doc(ticket.id + "")
-      .collection("liveChat")
-      .get();
-    console.log("---------------------", c.size);
-    if (c.size == 0) {
-      addLiveChatRoom();
-    }
-  };
-
-  // -------------------------------ADD-----------------------------------
-  // Create a live chat room between agents and users
-  const addLiveChatRoom = async () => {
-    const add = firebase.functions().httpsCallable("addLiveChatRoom");
-    const response = await add({ ticket });
-    console.log("response", response);
-  };
+  // const Check = async () => {
+  //   const c = await db
+  //     .collection("customerSupport")
+  //     .doc(ticket.id + "")
+  //     .collection("liveChat")
+  //     .get();
+  //   console.log("---------------------", c.size);
+  //   if (c.size == 0) {
+  //     addLiveChatRoom();
+  //   }
+  // };
 
   const sendSupportMessage = async () => {
     const send = firebase.functions().httpsCallable("sendSupportMessage");
