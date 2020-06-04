@@ -9,6 +9,7 @@ import FriendsList from "./FriendsList";
 import FriendsSearch from "./FriendsSearch";
 import FriendsChat from "./FriendsChat";
 import FriendsRequest from "./FriendsRequest";
+import FriendsMap from "./FriendsMap";
 
 const FriendsStack = createAppContainer(
   createStackNavigator(
@@ -17,6 +18,7 @@ const FriendsStack = createAppContainer(
       FriendsSearch: FriendsSearch,
       FriendsChat: FriendsChat,
       FriendsRequest: FriendsRequest,
+      FriendsMap: FriendsMap,
     },
     {
       // headerMode: null,

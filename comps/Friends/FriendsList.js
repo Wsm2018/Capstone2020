@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   Button,
   ScrollView,
   FlatList,
+  TextInput,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -24,8 +25,11 @@ import { SafeAreaView } from "react-navigation";
 import { ListItem } from "react-native-elements";
 import moment from "moment";
 export default function FriendsList(props) {
+  const [users, setUsers] = useState(null);
+
   const [friends, setFriends] = useState(null);
   const [allFriends, setAllFriends] = useState(null);
+  const [friendsNoQuery, setFriendsNoQuery] = useState(null);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [messages, setMessages] = useState(null);
@@ -34,6 +38,9 @@ export default function FriendsList(props) {
   const [to, setTo] = useState(null);
   const [chats, setChats] = useState(null);
 
+  const [search, setSearch] = useState("");
+
+  const unsubUsers = useRef();
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
     const doc = await db
@@ -45,8 +52,9 @@ export default function FriendsList(props) {
   };
 
   // --------------------------------FRIENDS----------------------------------
-  const handleFriends = async () => {
-    db.collection("users")
+  const handleFriends = () => {
+    const unsub = db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("friends")
       .onSnapshot((queryBySnapshot) => {
@@ -60,6 +68,7 @@ export default function FriendsList(props) {
                 ...doc.data(),
                 notifications: 0,
                 dateTime: new Date(0),
+                status: "offline",
               });
             }
           });
@@ -74,11 +83,39 @@ export default function FriendsList(props) {
           setAllFriends([]);
         }
       });
+    return unsub;
+  };
+
+  // --------------------------------USERS----------------------------------
+  // Run when friends !== null and friends.length > 0
+  const handleUsers = () => {
+    if (allFriends.length > 0) {
+      let tempFriendsId = allFriends.map((friend) => {
+        return (friend = friend.id);
+      });
+
+      const unsub = db
+        .collection("users")
+        .where(firebase.firestore.FieldPath.documentId(), "in", tempFriendsId)
+        .onSnapshot((queryBySnapshot) => {
+          let tempUsers = [];
+          queryBySnapshot.forEach((doc) =>
+            tempUsers.push({ id: doc.id, ...doc.data() })
+          );
+          // console.log(tempUsers);
+          setUsers(tempUsers);
+        });
+      unsubUsers.current = unsub;
+    } else {
+      setUsers([]);
+      unsubUsers.current = null;
+    }
   };
 
   // -------------------------------FROM-----------------------------------
   const handleFrom = () => {
-    db.collection("chats")
+    const unsub = db
+      .collection("chats")
       .where("from", "==", firebase.auth().currentUser.uid)
       .onSnapshot((queryBySnapshot) => {
         let tempFrom = [];
@@ -87,11 +124,13 @@ export default function FriendsList(props) {
         });
         setFrom(tempFrom);
       });
+    return unsub;
   };
 
   // --------------------------------TO----------------------------------
   const handleTo = () => {
-    db.collection("chats")
+    const unsub = db
+      .collection("chats")
       .where("to", "==", firebase.auth().currentUser.uid)
       .onSnapshot((queryBySnapshot) => {
         let tempFrom = [];
@@ -100,6 +139,7 @@ export default function FriendsList(props) {
         });
         setTo(tempFrom);
       });
+    return unsub;
   };
 
   // -------------------------------CHAT-----------------------------------
@@ -111,9 +151,21 @@ export default function FriendsList(props) {
     setChats(tempChat);
   };
 
-  // -------------------------------NOTIFICATIONS-----------------------------------
+  // -------------------------------NOTIFICATIONS AND STATUS-----------------------------------
   const handleFriendsMessages = () => {
     let tempFriends = JSON.parse(JSON.stringify(allFriends));
+
+    if (users.length > 0) {
+      tempFriends = tempFriends.map((friend, index) => {
+        let user = users.filter((user) => user.id === friend.id)[0];
+        if (user.status !== undefined) {
+          friend.status = user.status;
+        }
+
+        return friend;
+      });
+    }
+
     if (chats.length > 0) {
       tempFriends = tempFriends.map((friend, index) => {
         let from = chats.filter((chat) => chat.from === friend.id);
@@ -139,46 +191,86 @@ export default function FriendsList(props) {
     }
 
     tempFriends = tempFriends.sort((a, b) => b.dateTime - a.dateTime);
-    setFriends(tempFriends);
+    // console.log(tempFriends);
+    setFriendsNoQuery(tempFriends);
   };
 
-  // ------------------------------------------------------------------
+  // ---------------------------------SEARCH---------------------------------
+  // Searches for a user by displayName
+  const handleSearch = (query) => {
+    if (query.length > 0) {
+      setSearch(query);
+      let tempUsers = [...friendsNoQuery];
+      let result = tempUsers.filter((user) =>
+        user.displayName.toLowerCase().match(query.toLowerCase())
+      );
+
+      setFriends(result);
+    } else {
+      setSearch(query);
+      setFriends(friendsNoQuery);
+    }
+  };
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs at the beginning
   useEffect(() => {
     handleCurrentuser();
-    handleFriends();
-    handleFrom();
-    handleTo();
+    const unsubFriends = handleFriends();
+    const unsubFrom = handleFrom();
+    const unsubTo = handleTo();
+
+    return () => {
+      unsubFriends();
+      unsubFrom();
+      unsubTo();
+    };
   }, []);
 
-  // ------------------------------------------------------------------
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when all from and to messages of the user has been retrieved
   useEffect(() => {
     if (from && to) {
       handleChat();
     }
   }, [from, to]);
 
-  // ------------------------------------------------------------------
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when all friends have been retrieved
   useEffect(() => {
-    if (allFriends && chats) {
-      if (allFriends.length > 0) {
-        handleFriendsMessages();
-      } else {
-        setFriends([]);
-      }
+    if (allFriends) {
+      handleUsers();
+      return () => {
+        if (unsubUsers.current !== null) {
+          unsubUsers.current();
+        }
+      };
     }
-  }, [allFriends, chats]);
+  }, [allFriends]);
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when there are changes to the friends and chat
+  useEffect(() => {
+    if (allFriends && chats && users) {
+      handleFriendsMessages();
+    }
+  }, [allFriends, chats, users]);
+
+  // ---------------------------------USE EFFECT---------------------------------
+  // Runs when something is entered in the search bar
+  useEffect(() => {
+    handleSearch(search);
+  }, [friendsNoQuery, search]);
 
   // -------------------------------DELETE-----------------------------------
   const deleteAll = async () => {
     const userQuery = await db.collection("users").get();
-
     userQuery.forEach(async (user) => {
       const friendQuery = await db
         .collection("users")
         .doc(user.id)
         .collection("friends")
         .get();
-
       friendQuery.forEach((friend) => {
         db.collection("users")
           .doc(user.id)
@@ -191,9 +283,17 @@ export default function FriendsList(props) {
 
   // -------------------------------REMOVE-----------------------------------
   const removeFriend = async (user) => {
-    const dec = firebase.functions().httpsCallable("removeFriend");
-    const response = await dec({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
   };
 
   return !friends ? (
@@ -224,9 +324,19 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
+      <Button
+        title="Map"
+        onPress={() => props.navigation.navigate("FriendsMap")}
+      />
       {/* <Text>Friends List</Text> */}
       {/* <Button title="TEST" onPress={() => props.navigation.navigate("Test")} /> */}
       {/* <Button title="Delete All" onPress={deleteAll} /> */}
+      <TextInput
+        style={{ borderWidth: 1, borderColor: "white" }}
+        placeholder="Search here..."
+        onChangeText={setSearch}
+        value={search}
+      />
       {friends.length > 0 ? (
         <SafeAreaView
           style={{
@@ -285,7 +395,7 @@ export default function FriendsList(props) {
                     </TouchableOpacity>
                     // <FontAwesome5 name="rocketchat" size={24} color="black" />
                   }
-                  title={item.displayName}
+                  title={item.displayName + " " + item.notifications}
                   titleStyle={{ fontSize: 20 }}
                   subtitle={item.status}
                   //subtitle={item.status + " to add you"}
