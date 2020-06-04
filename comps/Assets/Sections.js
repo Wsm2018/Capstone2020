@@ -1,3 +1,4 @@
+//@refresh-rest
 import { Button } from "react-native-elements";
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "react-navigation-stack";
@@ -28,6 +29,8 @@ import { Snackbar } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
+import {Marker} from 'react-native-maps';
+import MapView from 'react-native-maps';
 
 import Details from "./Details";
 import { set } from "react-native-reanimated";
@@ -39,6 +42,9 @@ export default function Sections(props) {
   const [selectedSection, setSelectedSection] = useState(null);
   const [tempstartDate, settempStartDate] = useState("");
   const [tempendDate, settempEndDate] = useState("");
+  const [focus,setFocus] = useState(false);
+  const [mapGridFlag, setMapGridFlag] = useState(true)
+  const [showInMap, setShowInMap] = useState(false);
   // const tName = props.navigation.getParam("tName", "failed");
   // const sName = props.navigation.getParam("section", "failed").name;
   // const startDateTime = props.navigation.getParam("startDate", "failed");
@@ -262,6 +268,18 @@ export default function Sections(props) {
     }
   };
 
+  const selectAndCheck = async(s) =>{
+    console.log("joined")
+    setSelectedSection(s)
+    let checkInfo = await db.collection("assetTypes").doc(s.assetType).get()
+    if(checkInfo.data().showInMap === true){
+      setShowInMap(true)
+    }else{
+      setShowInMap(false)
+    }
+    console.log(checkInfo.data().showInMap)
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -371,7 +389,7 @@ export default function Sections(props) {
                 <TouchableOpacity
                   onPress={
                     // (
-                    () => setSelectedSection(s)
+                    () => selectAndCheck(s)
                     //,
                     // () =>
                     //   props.navigation.navigate("List", {
@@ -422,11 +440,14 @@ export default function Sections(props) {
             <Text>Please choose a date to continue</Text>
           )}
         </View>
-
         <View style={styles.three}>
-          <Text style={styles.cardTitle}>List</Text>
+          <TouchableOpacity style={styles.cardTitle}
+          onPress={() => setMapGridFlag(!mapGridFlag) }>
+          <Text>List</Text>
+          </TouchableOpacity>
           {listView === true ? (
             finalAssets.length > 0 ? (
+              mapGridFlag === true ? (
               finalAssets.map((l, i) => (
                 <View style={{ width: "20%", alignItems: "center" }} key={i}>
                   <TouchableOpacity
@@ -481,8 +502,39 @@ export default function Sections(props) {
                     <Text>Add to Favorite</Text>
                   </TouchableOpacity>
                 </View>
+              ))) : showInMap === true ?
+              <MapView
+        style={{height:250, width: 300}}
+        showsUserLocation={true}
+        followsUserLocation={focus}
+        region={{
+          latitude: selectedSection.location.latitude,
+          longitude: selectedSection.location.longitude,
+          latitudeDelta:0.0020,
+          longitudeDelta:0.0020
+        }}
+        mapType={'satellite'}
+        
+      >
+        <TouchableOpacity onPress={() => setFocus(!focus)}><Text style={{color:'white'}}>Focus is {focus?'On':'Off'}</Text></TouchableOpacity>
+            {finalAssets.length > 0 ? (
+              finalAssets.map((l, i) => (
+                <Marker
+                onPress={() => setSelectedList(l) || setDetailsView(true)}
+                key={i}
+                style={{width:20,height:20}}
+                image={l.status === true ? require('../../assets/images/green.jpg')
+                :require('../../assets/images/red.jpg')}
+                coordinate={l.location}
+                title={`parking No.${l.name}`}
+                description={`Press here to reserve parking number ${l.description}`}
+                />
               ))
             ) : (
+              <Text>Loading</Text>
+            )}
+            </MapView>
+            : <Text>there is no map for this item</Text>) : (
               <Text>Loading</Text>
             )
           ) : (
