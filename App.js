@@ -309,10 +309,20 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const adminTabNav = createBottomTabNavigator({
-    Home: AdminHomeStack,
-    Profile: ProfileStack,
-  });
+  const adminTabNav = createBottomTabNavigator(
+    {
+      Home: AdminHomeStack,
+      Profile: ProfileStack,
+    },
+    {
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#20365F" },
+      },
+    }
+  );
+
   const AdminAppContainer = createAppContainer(adminTabNav);
 
   const guideSkip = () => {
