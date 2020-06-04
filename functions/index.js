@@ -78,6 +78,7 @@ exports.sendGift = functions.https.onCall(async (data, context) => {
     status: false,
     expiryDate,
     used: false,
+    race: [],
   });
 
   const response = await fetch(
@@ -202,7 +203,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         request.query.role === "guest" ? accessDoc.data().giftBalance : 0,
       email:
         request.query.role === "guest" ? accessDoc.data().email : result.email,
-      role: request.query.role === "guest" ? "guest" : "user",
+      role: request.query.role === "guest" ? "guest" : "customer",
       qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
@@ -223,6 +224,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      activeRole: null,
     });
 
   if (request.query.referralStatus === "true") {
@@ -230,10 +232,12 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       .where("referralCode", "==", request.query.referral)
       .get();
     referralDoc.forEach((doc) => {
-      db.collection("users").doc(doc.id).collection("referrer").doc().set({
-        referrerCode: referralCode,
-        status: false,
-      });
+      if (doc.data().email !== "DELETED") {
+        db.collection("users").doc(doc.id).collection("referrer").doc().set({
+          referrerCode: referralCode,
+          status: false,
+        });
+      }
     });
   }
 
@@ -697,7 +701,7 @@ async function grantAdminRole(email) {
   });
 }
 exports.giftsExpCheck = functions.pubsub
-  .schedule("46 10 * * *")
+  .schedule("0 0 * * *")
   .timeZone("Asia/Qatar")
   .onRun(async (context) => {
     const result = await db
@@ -720,13 +724,96 @@ exports.giftsExpCheck = functions.pubsub
 
 exports.deleteGuestUser = functions.https.onRequest(
   async (request, response) => {
-    db.collection("users").doc(request.query.uid).delete();
+    db.collection("users").doc(request.query.uid).update({
+      displayName: "DELETED",
+      email: "DELETED",
+      phone: "DELETED",
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      location: null,
+      qrCode: "",
+    });
     await admin.auth().deleteUser(request.query.uid);
 
     response.send("All done");
   }
 );
 
+exports.redeemGiftCode = functions.https.onRequest(
+  async (request, response) => {
+    let path = String(request.query.path);
+    path = path.split("/");
+    let giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+    await giftDoc.ref.update({
+      status: true,
+      race: admin.firestore.FieldValue.arrayUnion(request.query.uid),
+    });
+
+    giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+
+    if (giftDoc.data().race[0] === request.query.uid) {
+      const userDoc = await db.collection("users").doc(request.query.uid).get();
+      const increment = admin.firestore.FieldValue.increment(
+        giftDoc.data().giftBalance
+      );
+      userDoc.ref.update({ balance: increment });
+
+      response.send("true");
+    } else {
+      response.send("false");
+    }
+  }
+);
+
+exports.resetUserPassword = functions.https.onCall(async (data, context) => {
+  const result = await admin.auth().updateUser(data.user.id, {
+    password: data.password,
+  });
+
+  return { result };
+});
+
+exports.adminUpdateUser = functions.https.onCall(async (data, context) => {
+  if (data.user.email !== data.email) {
+    await admin.auth().updateUser(data.user.id, {
+      email: data.email,
+      emailVerified: true,
+    });
+  }
+  if (data.user.displayName !== data.displayName) {
+    await admin.auth().updateUser(data.user.id, {
+      displayName: data.displayName,
+    });
+  }
+  if (data.user.phone !== data.phone) {
+    await admin.auth().updateUser(data.user.id, {
+      phoneNumber: "+974" + data.phone,
+    });
+  }
+
+  db.collection("users")
+    .doc(data.user.id)
+    .update({
+      role: data.selectedRole,
+      email: data.email,
+      displayName: data.displayName,
+      phone: "+974" + data.phone,
+      balance: parseInt(data.balance),
+      tokens: parseInt(data.tokens),
+      reputation: parseInt(data.reputation),
+    });
 exports.updateToRead = functions.https.onCall(async (data, context) => {
   console.log("updateToRead data", data);
   const response = await data.messages.forEach((message) =>
