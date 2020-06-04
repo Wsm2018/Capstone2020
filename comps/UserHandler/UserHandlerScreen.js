@@ -6,27 +6,30 @@ import { createAppContainer } from "react-navigation";
 
 import EmployeesCreate from "./EmployeesCreate";
 import EmployeesCreateSuccess from "./EmployeesCreateSuccess";
-import UsersIndex from "./UsersIndex";
 import EmployeesIndex from "./EmployeesIndex";
 import EmployeesDetail from "./EmployeesDetail";
 import EmployeesPending from "./EmployeesPending";
 import EmployeesAllowed from "./EmployeesAllowed";
 
-import indexUH from "./indexUH";
-//import test from "./test";
+import CustomersIndex from "./CustomersIndex";
+import CustomersDetail from "./CustomersDetail";
+
+import UserHandlerHome from "./UserHandlerHome";
 
 const EmployeeHandlerStack = createAppContainer(
   createStackNavigator(
     {
-      indexUH: indexUH,
+      UserHandlerHome: UserHandlerHome,
+
       EmployeesIndex: EmployeesIndex,
-      UsersIndex: UsersIndex,
       EmployeesCreate: EmployeesCreate,
       EmployeesCreateSuccess: EmployeesCreateSuccess,
       EmployeesDetail: EmployeesDetail,
       EmployeesPending: EmployeesPending,
       EmployeesAllowed: EmployeesAllowed,
-      //test: test,
+
+      CustomersIndex: CustomersIndex,
+      CustomersDetail: CustomersDetail,
     },
     {
       // initialRouteName: "FriendsList",
