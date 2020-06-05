@@ -24,6 +24,8 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 require("firebase/firestore");
 
+
+
 export default function Details(props) {
   ///////////////////Front-End///////////////////////////
   const [modalAddService, setModalAddService] = useState(false);

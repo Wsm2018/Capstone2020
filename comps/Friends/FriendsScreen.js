@@ -9,6 +9,7 @@ import FriendsList from "./FriendsList";
 import FriendsSearch from "./FriendsSearch";
 import FriendsChat from "./FriendsChat";
 import FriendsRequest from "./FriendsRequest";
+import FriendsMap from "./FriendsMap";
 
 const FriendsStack = createAppContainer(
   createStackNavigator(
@@ -17,25 +18,26 @@ const FriendsStack = createAppContainer(
       FriendsSearch: FriendsSearch,
       FriendsChat: FriendsChat,
       FriendsRequest: FriendsRequest,
+      FriendsMap: FriendsMap,
     },
     {
-      // headerMode: null,
-      defaultNavigationOptions: ({ navigation }) => {
-        if (navigation.state.routeName === "FriendsList") {
-          return {
-            headerLeft: () => (
-              <Icon
-                style={{ paddingLeft: 10 }}
-                onPress={() => navigation.openDrawer()}
-                name="md-menu"
-                color="black"
-                type="ionicon"
-                size={30}
-              />
-            ),
-          };
-        }
-      },
+      headerMode: null,
+      // defaultNavigationOptions: ({ navigation }) => {
+      //   if (navigation.state.routeName === "FriendsList") {
+      //     return {
+      //       headerLeft: () => (
+      //         <Icon
+      //           style={{ paddingLeft: 10 }}
+      //           onPress={() => navigation.openDrawer()}
+      //           name="md-menu"
+      //           color="black"
+      //           type="ionicon"
+      //           size={30}
+      //         />
+      //       ),
+      //     };
+      //   }
+      // },
     }
   )
 );

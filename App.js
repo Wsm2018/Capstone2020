@@ -9,6 +9,7 @@ import {
   ScrollView,
   Image,
   AsyncStorage,
+  AppState,
 } from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
@@ -34,6 +35,8 @@ import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
+import ScheduleStack from "./navigation/ScheduleStack";
+import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 import BookingHistory from "./comps/Profile/BookingHistory";
@@ -42,7 +45,7 @@ import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 
-import Theme from "react-native-themes";
+import * as Location from "expo-location";
 
 // import AsyncStorage from "@react-native-community/async-storage";
 
@@ -67,6 +70,9 @@ export default function App(props) {
       );
       firebase.auth().signOut();
     } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
       firebase.auth().signOut();
     }
   };
@@ -108,9 +114,10 @@ export default function App(props) {
 
       News: NewsStack,
       BookingHistory: BookingHistory,
+      Advertisments: AdvertismentsStack,
+
       Profile: ProfileStack,
     },
-    // {
     //   navigationOptions: ({ navigation }) => {
     //     const { routeName } = navigation.state.routes[navigation.state.index];
     //     return {
@@ -245,7 +252,8 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    db.collection("users")
+    await db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .update({ activeRole: null });
 
@@ -297,9 +305,82 @@ export default function App(props) {
     getTheme();
   }, []);
 
+  const handleAppState = (nextAppState) => {
+    if (nextAppState === "active") {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+    } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+    console.log(location);
+  };
+
+  const updateLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      });
+  };
+
+  // --------------------------------LOCATION TRACKER----------------------------------
+  // User Location gets updated when logged in then every 10 seconds while logged in
+  const locationTracker = () => {
+    const timerId = setInterval(async () => {
+      // code here
+      let location = await Location.getCurrentPositionAsync({});
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+          location: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        });
+      console.log("update location");
+    }, 1000 * 10);
+    return timerId;
+  };
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when user logs in or out
+  // Adds user status listener
+  // Adds location tracker
   useEffect(() => {
     if (loggedIn) {
+      AppState.addEventListener("change", handleAppState);
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+
+      updateLocation();
       getUser();
+      // const trackerId = locationTracker();
+
+      return () => {
+        // clearInterval(trackerId);
+        AppState.removeEventListener("change", handleAppState);
+        setUser(null);
+        setActiveRole(null);
+        console.log("Logging Out");
+      };
     }
   }, [loggedIn]);
 
@@ -325,6 +406,16 @@ export default function App(props) {
 
   const AdminAppContainer = createAppContainer(adminTabNav);
 
+  const serviceEmployeeTabNav = createBottomTabNavigator({
+    Schedule: ScheduleStack,
+    Home: HomeStack,
+
+    News: NewsStack,
+
+    Profile: ProfileStack,
+  });
+  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+
   const guideSkip = () => {
     // console.log("Skipppped");
     setGuideView(false);
@@ -345,18 +436,20 @@ export default function App(props) {
         if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
-        // --------------------------------CUSTOMER/SERVICES EMPLOYEE----------------------------------
-        // if user is customer or services employee go to <AppContainer/>
-        else if (
-          user.role === "customer" ||
-          user.role === "services employee"
-        ) {
+        // --------------------------------CUSTOMER----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "customer") {
           return <AppContainer />;
+        }
+        // --------------------------------SERVICE EMPLOYEE----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "service employee") {
+          return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
         else if (user.role.slice(-12) === "(incomplete)") {
-          return <EmployeeAuthentication />;
+          return <EmployeeAuthentication user={user} setUser={setUser} />;
         }
         // If employee is any OTHER role
         else {
@@ -384,8 +477,8 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "services employee":
-                return <AppContainer />;
+              case "service employee":
+                return <ServiceEmployeeAppContainer />;
 
               case "customer":
                 return <AppContainer />;

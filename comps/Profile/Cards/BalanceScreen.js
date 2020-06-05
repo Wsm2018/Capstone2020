@@ -67,10 +67,16 @@ export default function BalanceScreen({ navigation }) {
                 firebase.auth().currentUser.uid
               }&path=${doc.ref.path}`
             );
+            const resultStatus = await response.json();
+            if (resultStatus === "true") {
+              setGiftCodeError("green");
+              setGiftCode("");
+            } else {
+              setGiftCodeError("red");
+              setGiftCode("");
+              setGiftErrorCounter(giftErrorCounter + 1);
+            }
           });
-
-          setGiftCodeError("green");
-          setGiftCode("");
         } else {
           setGiftCodeError("red");
           setGiftCode("");

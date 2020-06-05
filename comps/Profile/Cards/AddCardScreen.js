@@ -62,11 +62,6 @@ export default function AddCard(props) {
     if (cardNumber === "") {
       alert("Enter Card Number");
       return false;
-    } else {
-      if (cardNumber.length < 16) {
-        alert("Enter a valid card number");
-        return false;
-      }
     }
 
     if (holderName === "") {
@@ -104,12 +99,17 @@ export default function AddCard(props) {
   };
 
   const handleAddCard = async () => {
+    console.log(cardNumber, holderName, cardType, expiryDate, cvc);
     if (validateForm()) {
       const addCard = firebase.functions().httpsCallable("addCard");
       const response = await addCard({
         uid: firebase.auth().currentUser.uid,
         cardInfo: { cardNumber, holderName, cardType, expiryDate, cvc },
       });
+      if (response.data !== null) {
+        alert("Card Added");
+        props.navigation.goBack();
+      }
     }
   };
 
