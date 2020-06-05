@@ -26,10 +26,18 @@ export default function ReferralScreen(props) {
   const user = props.user;
   const [phoneModal, setPhoneModal] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
+  const [showPhoneErr, setShowPhoneErr] = useState(false);
 
   const handleSendSMS = async () => {
     if (phone === "") {
-      alert("Enter Phone Number");
+      setPhoneErr("* Enter the phone number");
+      setShowPhoneErr(true);
+      return;
+    }
+    if (phone.length < 8) {
+      setPhoneErr("* Invalid phone number");
+      setShowPhoneErr(true);
       return;
     }
     const isAvailable = await SMS.isAvailableAsync();
@@ -100,7 +108,7 @@ export default function ReferralScreen(props) {
                 <Tooltip
                   height={125}
                   width={355}
-                  backgroundColor={"#229277"}
+                  backgroundColor={"#2E9E9B"}
                   popover={
                     <Text style={{ color: "white", fontSize: 16 }}>
                       You can receive tokens by referring the App to new users!
@@ -129,7 +137,7 @@ export default function ReferralScreen(props) {
                     <AntDesign
                       name="questioncircle"
                       size={20}
-                      color="darkred"
+                      color="#8C0919"
                     />
                   </View>
                 </Tooltip>
@@ -199,7 +207,7 @@ export default function ReferralScreen(props) {
                       </Text>
                       <View style={{ justifyContent: "center" }}>
                         <TouchableOpacity onPress={() => setPhoneModal(true)}>
-                          <Fontisto name="share" size={23} color="black" />
+                          <Fontisto name="share" size={23} color="#216380" />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -298,7 +306,6 @@ export default function ReferralScreen(props) {
                       // width: "100%",
                     }}
                   />
-
                   <Text
                     style={{
                       // paddingTop: "10%",
@@ -334,13 +341,28 @@ export default function ReferralScreen(props) {
                       </Text>
                       <TextInput
                         placeholder="1234 5678"
-                        onChangeText={setPhone}
+                        onChangeText={(phn) => {
+                          setPhone(phn);
+                          setPhoneErr("");
+                          setShowPhoneErr(false);
+                        }}
                         keyboardType="phone-pad"
                         maxLength={8}
                         fontSize={20}
                       />
                     </View>
                   </View>
+                  {showPhoneErr ? (
+                    <Text
+                      style={
+                        showPhoneErr
+                          ? { color: "red" }
+                          : { color: "transparent" }
+                      }
+                    >
+                      {phoneErr}
+                    </Text>
+                  ) : null}
                 </View>
 
                 <View

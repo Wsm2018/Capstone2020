@@ -10,7 +10,9 @@ import {
   Image,
   AsyncStorage,
   AppState,
+  Dimensions,
 } from "react-native";
+import LottieView from "lottie-react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
@@ -399,7 +401,7 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+        style: { backgroundColor: "#005c9d" },
       },
     }
   );
@@ -502,17 +504,45 @@ export default function App(props) {
       } else {
         return (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <Text>Loading...</Text>
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("./assets/loadingAnimations/load.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
           </View>
         );
       }
     }
   } else {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <LottieView
+          width={Dimensions.get("window").width / 3}
+          source={require("./assets/loadingAnimations/load.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "100%",
+          }}
+        />
       </View>
     );
   }

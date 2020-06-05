@@ -34,16 +34,16 @@ const ProfileStack = createStackNavigator(
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
-      if (navigation.state.routeName === "FriendsList") {
+      if (navigation.state.routeName === "Profile") {
         return {
           headerLeft: () => (
             <Icon
               style={{ paddingLeft: 10 }}
               onPress={() => navigation.openDrawer()}
-              name="md-menu"
+              name="menuunfold"
               color="white"
-              type="ionicon"
-              size={30}
+              type="antdesign"
+              size={28}
             />
           ),
         };

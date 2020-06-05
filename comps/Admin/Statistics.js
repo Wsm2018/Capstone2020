@@ -313,7 +313,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{
@@ -373,7 +373,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{
@@ -433,7 +433,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{

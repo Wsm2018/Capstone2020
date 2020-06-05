@@ -81,19 +81,6 @@ export default function Favorites({
     }
   };
 
-  // const getAssetBookings = () => {
-  //   db.collection("asset")
-  //     .doc(selectedAsset.id)
-  //     .collection("assetBookings")
-  //     .onSnapshot((querySnap) => {
-  //       let bookings = [];
-  //       querySnap.forEach((doc) => {
-  //         bookings.push({ id: doc.id, ...doc.data() });
-  //       });
-  //       setAllBookings([...bookings]);
-  //     });
-  // };
-
   const handleBooking = () => {
     if (selectedAsset.assetBookings.length === 0) {
       setAssetModal(false);
@@ -120,28 +107,12 @@ export default function Favorites({
     getUserFavoriteAssets();
   }, []);
 
-  // useEffect(() => {
-  //   if (selectedAsset) {
-  //     getAssetBookings();
-  //   }
-  // }, [selectedAsset]);
-
   // ----------------------------------------- RETURN ---------------------------------------------
 
   return (
     <Modal visible={favoritesModal} transparent={true}>
-      {/* <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <TouchableOpacity onPress={() => setFavoritesModal(false)}>
-            <Text>X</Text>
-          </TouchableOpacity> */}
-
       <View style={styles.centeredView2}>
         <View elevation={5} style={styles.modalView2}>
-          {/* <TouchableOpacity onPress={() => setAssetModal(false)}>
-                <Text>X</Text>
-              </TouchableOpacity> */}
-
           <TouchableOpacity
             style={{
               justifyContent: "center",
@@ -155,26 +126,18 @@ export default function Favorites({
           </TouchableOpacity>
 
           <View style={{ flex: 10, alignItems: "center" }}>
-            <Text
-              style={{
-                // paddingTop: "15%",
-
-                fontSize: 20,
-                color: "darkred",
-                fontWeight: "bold",
-              }}
-            >
-              My Favorites
-            </Text>
             {favoriteAssets.length === 0 ? (
               <View style={styles.header}>
                 <LottieView
-                  source={require("../../assets/872-empty-list.json")}
+                  source={require("../../assets/17723-waitting.json")}
                   autoPlay
                   loop
                   style={{
                     position: "relative",
-                    width: "100%",
+                    width: "80%",
+                    justifyContent: "center",
+                    alignSelf: "center",
+                    // paddingTop: "30%",
                   }}
                 />
                 <Text
@@ -199,16 +162,11 @@ export default function Favorites({
                   <TouchableOpacity
                     style={{
                       backgroundColor: "#20365F",
-                      // borderWidth: 4,
                       height: 40,
                       width: "40%",
-                      // alignSelf: "center",
                       justifyContent: "center",
                       alignItems: "center",
-                      //marginStart: "2%",
-                      //marginEnd: "2%",
                       borderRadius: 15,
-                      //marginBottom: 10,
                     }}
                     onPress={() => {
                       setFavoritesModal(false);
@@ -233,140 +191,153 @@ export default function Favorites({
                 </View>
               </View>
             ) : (
-              favoriteAssets.map((item, index) => (
-                <View
-                  width={Dimensions.get("window").width / 1.2}
+              <View>
+                <Text
                   style={{
-                    flex: 0.1,
-                    marginTop: "5%",
-                    // backgroundColor: "red",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "row",
+                    // paddingTop: "15%",
+
+                    fontSize: 20,
+                    color: "#229277",
+                    fontWeight: "bold",
                   }}
-                  key={index}
                 >
-                  {/* <TouchableOpacity
+                  My Favorites
+                </Text>
+                {favoriteAssets.map((item, index) => (
+                  <View
+                    width={Dimensions.get("window").width / 1.2}
+                    style={{
+                      flex: 0.1,
+                      marginTop: "5%",
+                      // backgroundColor: "red",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row",
+                    }}
+                    key={index}
+                  >
+                    {/* <TouchableOpacity
                     onPress={() => handleDeleteAlert(item.asset.id)}
                   >
                     <Text>X</Text>
                   </TouchableOpacity> */}
 
-                  {/* ================== */}
+                    {/* ================== */}
 
-                  <Card
-                    elevation={2}
-                    style={{
-                      // flex: 2,
-                      height: 50,
-                      // marginTop: "-1.5%",
-                      width: "95%",
-                      borderWidth: 0.5,
-                      justifyContent: "center",
-                      borderColor: "lightgray",
-                      // flex: 0.95,
-                    }}
-                  >
-                    {/* ============================================== */}
-                    <View
+                    <Card
+                      elevation={2}
                       style={{
-                        // flex: 1,
-                        justifyContent: "space-between",
-                        alignItems: "stretch",
-                        flexDirection: "row-reverse",
-                        // // marginEnd: 15,
-                        // backgroundColor: "yellow",
-
-                        // marginTop: 15,
+                        // flex: 2,
+                        height: 50,
+                        // marginTop: "-1.5%",
+                        width: "95%",
+                        borderWidth: 0.5,
+                        justifyContent: "center",
+                        borderColor: "lightgray",
+                        // flex: 0.95,
                       }}
                     >
+                      {/* ============================================== */}
                       <View
                         style={{
-                          flex: 1,
+                          // flex: 1,
+                          justifyContent: "space-between",
+                          alignItems: "stretch",
                           flexDirection: "row-reverse",
+                          // // marginEnd: 15,
+                          // backgroundColor: "yellow",
+
+                          // marginTop: 15,
                         }}
                       >
-                        <TouchableOpacity
+                        <View
                           style={{
-                            flex: 0.2,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            // marginEnd: 15,
-                            // backgroundColor: "yellow",
-
-                            // marginTop: 15,
+                            flex: 1,
+                            flexDirection: "row-reverse",
                           }}
-                          onPress={() => handleDeleteAlert(item.asset.id)}
                         >
-                          <FontAwesome
-                            name="remove"
-                            size={24}
-                            color="darkgray"
-                          />
-                        </TouchableOpacity>
-                        {/* <Button
+                          <TouchableOpacity
+                            style={{
+                              flex: 0.2,
+                              justifyContent: "center",
+                              alignItems: "center",
+                              // marginEnd: 15,
+                              // backgroundColor: "yellow",
+
+                              // marginTop: 15,
+                            }}
+                            onPress={() => handleDeleteAlert(item.asset.id)}
+                          >
+                            <FontAwesome
+                              name="remove"
+                              size={24}
+                              color="darkgray"
+                            />
+                          </TouchableOpacity>
+                          {/* <Button
                     title="Book This"
                     onPress={() => {
                       setAssetModal(true);
                       setSelectedAsset(item.asset);
                     }}
                   /> */}
-                        {/* -------------- */}
-                        <TouchableOpacity
-                          onPress={() => {
-                            setAssetModal(true);
-                            setSelectedAsset(item.asset);
-                          }}
-                          style={{
-                            flex: 0.4,
+                          {/* -------------- */}
+                          <TouchableOpacity
+                            onPress={() => {
+                              setAssetModal(true);
+                              setSelectedAsset(item.asset);
+                            }}
+                            style={{
+                              flex: 0.4,
 
-                            // position: "relative",
-                            // width: "100%",
-                            // flex: 1,
-                            // height: "100%",
+                              // position: "relative",
+                              // width: "100%",
+                              // flex: 1,
+                              // height: "100%",
+                              // backgroundColor: "blue",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Image
+                              width={Dimensions.get("window").width / 5}
+                              source={require("../../assets/images/bookit2.png")}
+                              autoPlay
+                              // onPress={() => setCarsModal(true)}
+                              // loop
+                              style={
+                                {
+                                  // position: "relative",
+                                  // width: "70%",
+                                  // height: "75%",
+                                  // flex: 1,
+                                  // backgroundColor: "blue",
+                                  // justifyContent: "center",
+                                  // alignItems: "center",
+                                  // paddingTop: "5%",
+                                }
+                              }
+                            />
+                          </TouchableOpacity>
+                        </View>
+                        <Text
+                          style={{
+                            fontSize: 20,
+                            paddingStart: 10,
+                            fontWeight: "bold",
+                            color: "#20365F",
+                            // fontVariant: 4,
+                            // backgroundColor: "green",
                             // backgroundColor: "blue",
-                            justifyContent: "center",
-                            alignItems: "center",
                           }}
                         >
-                          <Image
-                            width={Dimensions.get("window").width / 5}
-                            source={require("../../assets/images/bookit2.png")}
-                            autoPlay
-                            // onPress={() => setCarsModal(true)}
-                            // loop
-                            style={
-                              {
-                                // position: "relative",
-                                // width: "70%",
-                                // height: "75%",
-                                // flex: 1,
-                                // backgroundColor: "blue",
-                                // justifyContent: "center",
-                                // alignItems: "center",
-                                // paddingTop: "5%",
-                              }
-                            }
-                          />
-                        </TouchableOpacity>
+                          {item.asset.name}
+                        </Text>
                       </View>
-                      <Text
-                        style={{
-                          fontSize: 20,
-                          paddingStart: 10,
-                          fontWeight: "bold",
-                          color: "#20365F",
-                          // fontVariant: 4,
-                          // backgroundColor: "green",
-                          // backgroundColor: "blue",
-                        }}
-                      >
-                        {item.asset.name}
-                      </Text>
-                    </View>
-                  </Card>
-                </View>
-              ))
+                    </Card>
+                  </View>
+                ))}
+              </View>
             )}
           </View>
         </View>

@@ -102,7 +102,7 @@ export default function BalanceScreen({ navigation }) {
         }}
       >
         <View style={{ flex: 0.5 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0D2C6A" }}>
+          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#2E9E9B" }}>
             Current Balance
           </Text>
 

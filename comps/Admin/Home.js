@@ -225,6 +225,6 @@ const styles = StyleSheet.create({
   },
 });
 Home.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#005c9d" },
   headerTintColor: "white",
 };
