@@ -152,19 +152,19 @@ export default function Home(props) {
           <Text style={{ color: "#e3e3e3", fontSize: 18, fontWeight: "bold" }}>
             Roles
           </Text>
-          <Text>Promotion Code</Text>
+          {/* <Text>Promotion Code</Text> */}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => props.navigation.navigate("News")}>
+        {/* <TouchableOpacity onPress={() => props.navigation.navigate("News")}>
           <Text>News</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => handleLogout()}>
           <Text>Logout</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
-      <View
+      {/* <View
         style={{
           flex: 0.5,
           flexDirection: "row",
@@ -181,7 +181,7 @@ export default function Home(props) {
         <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
           <Text>Booking</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* <View
         style={{

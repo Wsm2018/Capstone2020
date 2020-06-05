@@ -456,7 +456,7 @@ export default function App(props) {
           // --------------------------------CHOOSE ROLE----------------------------------
           // if big boi employee with null active roll THEN choose active role
           if (activeRole === null) {
-             return <ChooseRole role={user.role} />;
+            return <ChooseRole role={user.role} />;
             // return <ManagersStack />;
           }
           // Which activeRole did you choose

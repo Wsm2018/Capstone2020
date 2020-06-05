@@ -765,6 +765,7 @@ export default function ProfileScreen(props) {
                       justifyContent: "center",
                       alignItems: "center",
                     }}
+                    onPress={() => props.navigation.navigate("Subscription")}
                   >
                     <Image
                       width={Dimensions.get("window").width / 4}

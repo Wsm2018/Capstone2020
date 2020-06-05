@@ -12,7 +12,9 @@ import Details from "../comps/Assets/Details";
 import Sections from "../comps/Assets/Sections";
 import List from "../comps/Assets/List";
 import Types from "../comps/Assets/Types";
-import Promotion from "../comps/Admin/Promotion";
+import Promotion from "../comps/Admin/Promotion/PromotionList";
+import AddPromotion from "../comps/Admin/Promotion/AddPromotion";
+
 import NewsPage from "../comps/NewsPage";
 const AdminHomeStack = createStackNavigator({
   Home: AdminHome,
@@ -27,6 +29,7 @@ const AdminHomeStack = createStackNavigator({
   Payment: Payment,
   CheckOut: CheckOut,
   Promotion: Promotion,
+  AddPromotion: AddPromotion,
   News: NewsPage,
 });
 
