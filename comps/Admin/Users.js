@@ -1121,7 +1121,7 @@ export default function Users() {
         justifyContent: "center",
       }}
     >
-      {/* <LottieView
+      <LottieView
         width={Dimensions.get("window").width / 3}
         source={require("../../assets/loadingAnimations/load.json")}
         autoPlay
@@ -1130,8 +1130,8 @@ export default function Users() {
           position: "relative",
           width: "100%",
         }}
-      /> */}
-      <Text>NANI</Text>
+      />
+      {/* <Text>NANI</Text> */}
     </View>
   );
 }
