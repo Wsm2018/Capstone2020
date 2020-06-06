@@ -25,15 +25,15 @@ require("firebase/firestore");
 
 
 export default function ExtendServices(props) {
-  const tName = props.tName
-  const sName = props.sName
+//   const tName = props.tName
+//   const sName = props.sName
   const asset = props.asset
   const [displayServices, setDisplayServices] = useState([])
   const showBookings = useRef()
   const [serviceBooking, setServiceBooking] = useState([])
   const SB = useRef()
   const [selectedService, setSelectedService] = useState()
-  const assetTypeId = props.assetTypeId
+  const assetTypeId = props.type
   const startDateTime = props.startDateTime
   const endDateTime = props.endDateTime
   const start = useRef()
@@ -45,7 +45,7 @@ export default function ExtendServices(props) {
   const [schedules, setSchedules] = useState([])
   const [userDays, setUserDays] = useState([])
   const [timesList, setTimesList] = useState([
-    { book: false, show: "12:00 AM", time: "00:00:00"  },
+    { book: false, show: "12:00 AM", time: "00:00:00" },
     { book: false, show: "1:00 AM", time: "1:00:00" },
     { book: false, show: "2:00 AM", time: "2:00:00" },
     { book: false, show: "3:00 AM", time: "3:00:00" },
@@ -76,7 +76,21 @@ export default function ExtendServices(props) {
 
 
   useEffect(() => {
-    getServices()
+    // if( props.oldSb != []){
+    //   console.log(props.oldSb)
+    //   setServiceBooking(props.oldSb)
+    //   setUserDays(props.oldDays)
+    //   showBookings.current = props.oldSh
+    //   SB.current = serviceBooking
+    //   setUpdateAvailableTimings(props.oldAvailable)
+    //   console.log("old available is", props.oldAvailable)
+    //   setUpdate(true)
+    // }
+    // if( props.oldSh != []){
+    //   setDisplayServices(props.oldSh)
+    // }
+    
+   getServices()
   }, []);
 
   useEffect(() => {
@@ -113,24 +127,24 @@ export default function ExtendServices(props) {
         end.current = endDateTime.split(" ")[0] + " T " + endDateTime.split(" ")[2] + ":00"
       }
       filterTimings()
-      getAvailableTimings()
+      getAvailableTimings() 
     }
   }, [schedules])
 
   const getServices = async () => {
-    db.collection('services').where("assetType", "==", assetTypeId).onSnapshot((snapshot) => {
+   db.collection('services').where("assetType", "==", assetTypeId).onSnapshot((snapshot) => {
       const services = [];
       snapshot.forEach((doc) => {
         services.push({ id: doc.id, ...doc.data() });
       });
       setServices(services)
-    });
+      });
 
-    db.collection("users").where("role", "==", "worker").onSnapshot((snapshot) => {
+    db.collection("users").where("role", "==", "service worker").onSnapshot((snapshot) => {
       var worker = ""
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }
-        if( worker.id != firebase.auth().currentUser.uid){
+       // if( worker.id != firebase.auth().currentUser.uid){
         var workerId = doc.id
         db.collection("users").doc(doc.id).collection("schedules").onSnapshot((snapshot) => {
           const schedules = [];
@@ -141,7 +155,7 @@ export default function ExtendServices(props) {
           temp.push({ worker, schedules })
           setAllWorkers(temp)
         })
-      }
+      //}
       });
     });
   }
@@ -226,7 +240,10 @@ export default function ExtendServices(props) {
         days[i].timesList = temp
       }
     }
-    setUserDays(days)
+      
+      setUserDays(days)
+    
+    
   }
 
   const getAvailableTimings = () => {
@@ -422,40 +439,35 @@ export default function ExtendServices(props) {
     setDisplayServices(newServiceArr)
     showBookings.current = newServiceArr
     setUpdate(true)
+    
   }
+
+  const done = () =>{
+    console.log(" what the f is wrong" , serviceBooking)
+    props.serviceBookingArr(SB.current , displayServices , userDays , updateAvailableTimings)
+  }
+  
 
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => props.navigation.navigate("CheckOut", { tName: tName, sName: sName, assetBooking: { asset, startDateTime: start.current, endDateTime: end.current }, serviceBooking })} style={{ alignItems: "center", borderRadius: 50, height: 20, width: 200, margin: 5, backgroundColor: 'pink' }}>
-        <Text >CheckOut</Text>
-      </TouchableOpacity>
-      {asset ?
-        <View>
-          <Text >{asset.code}</Text>
-          <Text>{asset.price}</Text>
-          <Text>{startDateTime}</Text>
-          <Text>{endDateTime}</Text>
-          <Text>{start.current}</Text>
-          <Text>{end.current}</Text>
-
-        </View>
-
-        :
-        <Text>Loading</Text>
-      }
+    <ScrollView>
+ 
       {
         services ?
-
+<View>
+  <Text>Services</Text>
+  {
           services.map(s =>
-            <View>
+            
 
               <TouchableOpacity onPress={() => setSelectedService(s)}>
                 <Text >{s.name}</Text>
 
               </TouchableOpacity>
-            </View>
+            
           )
+}
+          </View>
           :
           <Text>No Available Services</Text>
       }
@@ -523,9 +535,11 @@ export default function ExtendServices(props) {
           null
       }
 
+<Button title={"Cancel"} onPress={()=>console.log("")}/>
+            <Button title={"OK"} onPress={()=>done()}/>
 
 
-    </View>
+    </ScrollView>
   )
 }
 

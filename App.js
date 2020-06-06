@@ -9,7 +9,10 @@ import {
   ScrollView,
   Image,
   AsyncStorage,
+  AppState,
+  Dimensions,
 } from "react-native";
+import LottieView from "lottie-react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
@@ -34,6 +37,8 @@ import Guide from "./mainpages/Guide";
 import { Icon } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
+import ScheduleStack from "./navigation/ScheduleStack";
+import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
 import BookingHistory from "./comps/Profile/BookingHistory";
@@ -42,7 +47,7 @@ import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 
-import Theme from "react-native-themes";
+import * as Location from "expo-location";
 
 // import AsyncStorage from "@react-native-community/async-storage";
 
@@ -67,6 +72,9 @@ export default function App(props) {
       );
       firebase.auth().signOut();
     } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
       firebase.auth().signOut();
     }
   };
@@ -108,9 +116,10 @@ export default function App(props) {
 
       News: NewsStack,
       BookingHistory: BookingHistory,
+      Advertisments: AdvertismentsStack,
+
       Profile: ProfileStack,
     },
-    // {
     //   navigationOptions: ({ navigation }) => {
     //     const { routeName } = navigation.state.routes[navigation.state.index];
     //     return {
@@ -123,7 +132,7 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: theme === "light" ? "#20365F" : "black" },
+        style: { backgroundColor: theme === "light" ? "#185a9d" : "black" },
       },
     }
   );
@@ -245,7 +254,8 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    db.collection("users")
+    await db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .update({ activeRole: null });
 
@@ -297,9 +307,82 @@ export default function App(props) {
     getTheme();
   }, []);
 
+  const handleAppState = (nextAppState) => {
+    if (nextAppState === "active") {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+    } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+    console.log(location);
+  };
+
+  const updateLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      });
+  };
+
+  // --------------------------------LOCATION TRACKER----------------------------------
+  // User Location gets updated when logged in then every 10 seconds while logged in
+  const locationTracker = () => {
+    const timerId = setInterval(async () => {
+      // code here
+      let location = await Location.getCurrentPositionAsync({});
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+          location: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        });
+      console.log("update location");
+    }, 1000 * 10);
+    return timerId;
+  };
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when user logs in or out
+  // Adds user status listener
+  // Adds location tracker
   useEffect(() => {
     if (loggedIn) {
+      AppState.addEventListener("change", handleAppState);
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+
+      updateLocation();
       getUser();
+      // const trackerId = locationTracker();
+
+      return () => {
+        // clearInterval(trackerId);
+        AppState.removeEventListener("change", handleAppState);
+        setUser(null);
+        setActiveRole(null);
+        console.log("Logging Out");
+      };
     }
   }, [loggedIn]);
 
@@ -318,12 +401,22 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+        style: { backgroundColor: "#005c9d" },
       },
     }
   );
 
   const AdminAppContainer = createAppContainer(adminTabNav);
+
+  const serviceEmployeeTabNav = createBottomTabNavigator({
+    Schedule: ScheduleStack,
+    Home: HomeStack,
+
+    News: NewsStack,
+
+    Profile: ProfileStack,
+  });
+  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
 
   const guideSkip = () => {
     // console.log("Skipppped");
@@ -345,25 +438,27 @@ export default function App(props) {
         if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
-        // --------------------------------CUSTOMER/SERVICES EMPLOYEE----------------------------------
-        // if user is customer or services employee go to <AppContainer/>
-        else if (
-          user.role === "customer" ||
-          user.role === "services employee"
-        ) {
+        // --------------------------------CUSTOMER----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "customer") {
           return <AppContainer />;
+        }
+        // --------------------------------SERVICE EMPLOYEE----------------------------------
+        // if user is customer or service employee go to <AppContainer/>
+        else if (user.role === "service employee") {
+          return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
         else if (user.role.slice(-12) === "(incomplete)") {
-          return <EmployeeAuthentication />;
+          return <EmployeeAuthentication user={user} setUser={setUser} />;
         }
         // If employee is any OTHER role
         else {
           // --------------------------------CHOOSE ROLE----------------------------------
           // if big boi employee with null active roll THEN choose active role
           if (activeRole === null) {
-             return <ChooseRole role={user.role} />;
+            return <ChooseRole role={user.role} />;
             // return <ManagersStack />;
           }
           // Which activeRole did you choose
@@ -384,8 +479,8 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "services employee":
-                return <AppContainer />;
+              case "service employee":
+                return <ServiceEmployeeAppContainer />;
 
               case "customer":
                 return <AppContainer />;
@@ -409,17 +504,45 @@ export default function App(props) {
       } else {
         return (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <Text>Loading...</Text>
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("./assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
           </View>
         );
       }
     }
   } else {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <LottieView
+          width={Dimensions.get("window").width / 3}
+          source={require("./assets/loadingAnimations/890-loading-animation.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "100%",
+          }}
+        />
       </View>
     );
   }

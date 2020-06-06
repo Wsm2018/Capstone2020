@@ -1,3 +1,4 @@
+//@refresh-rest
 import { Button } from "react-native-elements";
 import React, { useState, useEffect, useRef } from "react";
 import { createStackNavigator } from "react-navigation-stack";
@@ -29,6 +30,8 @@ import { Snackbar } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import List from "./List";
 require("firebase/firestore");
+import { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 
 import Details from "./Details";
 import Review from "./Review";
@@ -42,6 +45,18 @@ export default function Sections(props) {
   const [assetList, setAssetList] = useState([]);
   const [finalAssets, setFinalAssets] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
+
+  ////////////check with amal & fahd
+  // const [tempstartDate, settempStartDate] = useState("");
+  // const [tempendDate, settempEndDate] = useState("");
+
+  const [focus, setFocus] = useState(false);
+  const [mapGridFlag, setMapGridFlag] = useState(false);
+  const [showInMap, setShowInMap] = useState(false);
+  // const tName = props.navigation.getParam("tName", "failed");
+  // const sName = props.navigation.getParam("section", "failed").name;
+  // const startDateTime = props.navigation.getParam("startDate", "failed");
+  // const endDateTime = props.navigation.getParam("endDate", "failed");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState();
@@ -421,6 +436,17 @@ export default function Sections(props) {
       setEndDate(tempEndDate.split(" ")[0] + " T " + endTime);
     }
   }, [endTime]);
+  const selectAndCheck = async (s) => {
+    console.log("joined");
+    setSelectedSection(s);
+    let checkInfo = await db.collection("assetTypes").doc(s.assetType).get();
+    if (checkInfo.data().showInMap === true) {
+      setShowInMap(true);
+    } else {
+      setShowInMap(false);
+    }
+    console.log(checkInfo.data().showInMap);
+  };
 
   return (
     <View style={styles.container}>
@@ -466,7 +492,7 @@ export default function Sections(props) {
                 //is24Hour
                 date={startDate}
                 mode="date"
-                placeholder="Start Date"
+                placeholder="Choose A Start Date"
                 format="YYYY-MM-DD T h:mm A"
                 minDate={moment()}
                 maxDate={moment().add(3, "month")}
@@ -483,8 +509,10 @@ export default function Sections(props) {
                   },
                   dateInput: {
                     // marginLeft: 36,
-                    // backgroundColor: "lightgray",
+                    // backgroundColor: "#185a9d",
                     borderWidth: 0,
+                    borderColor: "#185a9d",
+                    // color: "white",
                   },
                   // ... You can check the source to find the other keys.
                 }}
@@ -529,7 +557,7 @@ export default function Sections(props) {
               <MaterialCommunityIcons
                 name="arrow-right"
                 size={20}
-                color="#20365F"
+                color="#3ea3a3"
               />
             </View>
             <View
@@ -544,7 +572,7 @@ export default function Sections(props) {
                 style={{ width: "100%" }}
                 date={endDate}
                 mode="date"
-                placeholder="End Date"
+                placeholder="Choose An End Date"
                 format="YYYY-MM-DD T h:mm A"
                 // minDate={startDate}
                 //maxDate={moment(startDate).add(2,"day")}
@@ -562,6 +590,7 @@ export default function Sections(props) {
                   dateInput: {
                     // marginLeft: 36,
                     borderWidth: 0,
+                    borderColor: "#185a9d",
                   },
                   // ... You can check the source to find the other keys.
                 }}
@@ -611,32 +640,109 @@ export default function Sections(props) {
             animationType="slide"
             transparent={true}
             //visible={addServices}
-            onRequestClose={() => {
-              Alert.alert("Modal has been closed.");
-            }}
+            // onRequestClose={() => {
+            //   Alert.alert("Modal has been closed.");
+            // }}
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                {displayList.current.length > 0 ? (
-                  displayList.current.map((t) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        startTimeModal
-                          ? setStartTime(t) || setStartTimeModal(false)
-                          : setEndTime(t) || setEndTimeModal(false)
-                      }
+                <View
+                  style={{
+                    // backgroundColor: "yellow",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    padding: 5,
+                  }}
+                >
+                  {displayList.current.length > 0 ? (
+                    displayList.current.map((t) => (
+                      <View
+                        style={{
+                          // backgroundColor: "red",
+                          width: "25%",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() =>
+                            startTimeModal
+                              ? setStartTime(t) || setStartTimeModal(false)
+                              : setEndTime(t) || setEndTimeModal(false)
+                          }
+                          style={{
+                            margin: 3,
+                            // backgroundColor: "green",
+                            borderWidth: 2,
+                            borderColor: "#20365F",
+                            backgroundColor: "white",
+                            width: "90%",
+                            aspectRatio: 2 / 1,
+                            borderRadius: 5,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#20365F",
+                              fontSize: 13,
+                              textAlign: "center",
+                            }}
+                          >
+                            {t}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))
+                  ) : (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "80%",
+                      }}
                     >
-                      <Text>{t}</Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Button
-                    title="Exit"
-                    onPress={() =>
-                      setStartTimeModal(false) || setEndTimeModal(false)
-                    }
-                  />
-                )}
+                      <Text>
+                        Sorry, there are no timings available for the chosen
+                        date
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setStartTimeModal(false) || setEndTimeModal(false)
+                        }
+                        style={{
+                          marginTop: 30,
+                          // backgroundColor: "green",
+                          borderWidth: 2,
+                          borderColor: "#20365F",
+                          backgroundColor: "#20365F",
+                          width: "25%",
+                          aspectRatio: 2 / 1,
+                          borderRadius: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            // fontSize: 13,
+                            textAlign: "center",
+                          }}
+                        >
+                          Back
+                        </Text>
+                      </TouchableOpacity>
+                      {/* <Button
+                      title="Exit"
+                      onPress={() =>
+                        setStartTimeModal(false) || setEndTimeModal(false)
+                      }
+                    /> */}
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </Modal>
@@ -649,7 +755,7 @@ export default function Sections(props) {
                 <TouchableOpacity
                   onPress={
                     // (
-                    () => setSelectedSection(s)
+                    () => selectAndCheck(s)
                     //,
                     // () =>
                     //   props.navigation.navigate("List", {
@@ -694,6 +800,7 @@ export default function Sections(props) {
                         textAlign: "center",
                         color: selectedSection === s ? "white" : "#20365F",
                         fontSize: 20,
+                        textTransform: "capitalize",
                       }}
                     >
                       {s.name}
@@ -706,114 +813,184 @@ export default function Sections(props) {
             <Text>Please choose a date to continue</Text>
           )}
         </View>
-
         <View style={styles.three}>
-          <Text style={styles.cardTitle}>List</Text>
+          {showInMap ? (
+            <View style={{ flexDirection: "row", width: "100%" }}>
+              <TouchableOpacity
+                // style={styles.cardTitle}
+                onPress={() => setMapGridFlag(false)}
+              >
+                <Text
+                  style={
+                    !mapGridFlag ? styles.cardTitle : styles.cardTitleInactive
+                  }
+                >
+                  List
+                </Text>
+              </TouchableOpacity>
+              <Text style={{ fontSize: 18, color: "lightgray" }}> | </Text>
+              <TouchableOpacity
+                // style={styles.cardTitle}
+                onPress={() => setMapGridFlag(true)}
+              >
+                <Text
+                  style={
+                    mapGridFlag ? styles.cardTitle : styles.cardTitleInactive
+                  }
+                >
+                  Map
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <Text style={styles.cardTitle}>List</Text>
+          )}
+
           {listView === true ? (
             finalAssets.length > 0 ? (
-              finalAssets.map((l, i) => (
-                <View
-                  style={{
-                    width: "20%",
-                    alignItems: "center",
-                    marginBottom: 15,
-                    // backgroundColor: "red",
-                  }}
-                >
-                  <TouchableOpacity
-                    // onPress={() =>
-                    //   props.navigation.navigate("Details", {
-                    //     sName: selectedSection.name,
-                    //     tName: tName,
-                    //     asset: l,
-                    //     startDateTime: startDate,
-                    //     endDateTime: endDate,
-                    //     type,
-                    //   })
-                    // }
-                    onPress={() => assetFocus(l) || setDetailsView(true)}
-                    key={i}
+              mapGridFlag === false ? (
+                finalAssets.map((l, i) => (
+                  <View
                     style={{
-                      backgroundColor:
-                        selectedList.code === l.code ? "#20365F" : "#e3e3e3",
-                      width: 60,
-                      height: 60,
-                      margin: 5,
+                      width: "20%",
                       alignItems: "center",
-                      flexDirection: "row",
-                      //elevation: 12,
-                      borderWidth: 2,
-                      borderColor: "#20365F",
+                      marginBottom: 15,
+                      // backgroundColor: "red",
                     }}
                   >
-                    <View
+                    <TouchableOpacity
+                      // onPress={() =>
+                      //   props.navigation.navigate("Details", {
+                      //     sName: selectedSection.name,
+                      //     tName: tName,
+                      //     asset: l,
+                      //     startDateTime: startDate,
+                      //     endDateTime: endDate,
+                      //     type,
+                      //   })
+                      // }
+                      onPress={() => setSelectedList(l) || setDetailsView(true)}
+                      key={i}
                       style={{
-                        height: "100%",
-                        width: "100%",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        alignContent: "center",
+                        backgroundColor:
+                          selectedList === l ? "#20365F" : "#e3e3e3",
+                        width: 60,
+                        height: 60,
+                        margin: 5,
                         alignItems: "center",
+                        flexDirection: "row",
+                        //elevation: 12,
+                        borderWidth: 2,
+                        borderColor: "#20365F",
                       }}
                     >
-                      <MaterialCommunityIcons
-                        // name="car"
-                        name={assetIcon}
-                        size={30}
-                        color={
-                          selectedList.code === l.code ? "white" : "#20365F"
-                        }
-                      />
-                      <Text
+                      <View
                         style={{
+                          height: "100%",
+                          width: "100%",
+                          justifyContent: "center",
                           textAlign: "center",
-                          color:
-                            selectedList.code === l.code ? "white" : "#20365F",
-                          fontSize: 18,
+                          alignContent: "center",
+                          alignItems: "center",
                         }}
                       >
-                        {l.code}
-                      </Text>
-                      <Badge
-                        value={
-                          <MaterialCommunityIcons
-                            name="heart"
-                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-                            size={18}
-                            color={
-                              favoriteIds.includes(l.id) ? "#c44949" : "white"
-                            }
-                            // onPress={
-                            //   favoriteAssets.includes(l.id)
-                            //     ? null
-                            //     : () => handleAddFavorite(l)
-                            // }
-                            disabled
-                            // style={{ borderColor: "blue", borderWidth: 1 }}
-                          />
-                        }
-                        containerStyle={{
-                          position: "absolute",
-                          top: -12,
-                          right: -10,
-                        }}
-                        badgeStyle={{
-                          backgroundColor: "#20365F",
-                          width: 25,
-                          height: 25,
-                          borderColor: "transparent",
-                        }}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                  {/* <Text>
+                        <MaterialCommunityIcons
+                          name="car"
+                          size={30}
+                          color={selectedList === l ? "white" : "#20365F"}
+                        />
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            color: selectedList === l ? "white" : "#20365F",
+                            fontSize: 18,
+                          }}
+                        >
+                          {l.code}
+                        </Text>
+                        <Badge
+                          value={
+                            <MaterialCommunityIcons
+                              name="heart"
+                              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                              size={18}
+                              color={
+                                favoriteIds.includes(l.id) ? "#c44949" : "white"
+                              }
+                              // onPress={
+                              //   favoriteAssets.includes(l.id)
+                              //     ? null
+                              //     : () => handleAddFavorite(l)
+                              // }
+                              disabled
+                              // style={{ borderColor: "blue", borderWidth: 1 }}
+                            />
+                          }
+                          containerStyle={{
+                            position: "absolute",
+                            top: -12,
+                            right: -10,
+                          }}
+                          badgeStyle={{
+                            backgroundColor: "#20365F",
+                            width: 25,
+                            height: 25,
+                            borderColor: "transparent",
+                          }}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                    {/* <Text>
                     {l.price} QR
                   </Text> */}
-                  {/* <TouchableOpacity onPress={() => handleAddFavorite(l)}>
+                    {/* <TouchableOpacity onPress={() => handleAddFavorite(l)}>
                     <Text>Add to Favorite</Text>
                   </TouchableOpacity> */}
-                </View>
-              ))
+                  </View>
+                ))
+              ) : showInMap === true ? (
+                <MapView
+                  style={{ height: 250, width: "100%" }}
+                  showsUserLocation={true}
+                  followsUserLocation={focus}
+                  region={{
+                    latitude: selectedSection.location.latitude,
+                    longitude: selectedSection.location.longitude,
+                    latitudeDelta: 0.002,
+                    longitudeDelta: 0.002,
+                  }}
+                  mapType={"satellite"}
+                >
+                  <TouchableOpacity onPress={() => setFocus(!focus)}>
+                    <Text style={{ color: "white" }}>
+                      Focus is {focus ? "On" : "Off"}
+                    </Text>
+                  </TouchableOpacity>
+                  {finalAssets.length > 0 ? (
+                    finalAssets.map((l, i) => (
+                      <Marker
+                        onPress={() =>
+                          setSelectedList(l) || setDetailsView(true)
+                        }
+                        key={i}
+                        style={{ width: 20, height: 20 }}
+                        image={
+                          l.status === true
+                            ? require("../../assets/images/green.jpg")
+                            : require("../../assets/images/red.jpg")
+                        }
+                        coordinate={l.location}
+                        title={`parking No.${l.name}`}
+                        description={`Press here to reserve parking number ${l.description}`}
+                      />
+                    ))
+                  ) : (
+                    <Text>Loading</Text>
+                  )}
+                </MapView>
+              ) : (
+                <Text>there is no map for this item</Text>
+              )
             ) : (
               <Text>Loading</Text>
             )
@@ -887,7 +1064,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e3e3e3",
-    width: Math.round(Dimensions.get("window").width),
+    width: Dimensions.get("window").width,
     // height: Math.round(Dimensions.get("window").height),
   },
   header: {
@@ -945,8 +1122,16 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
     width: "100%",
     height: 50,
-    color: "#6b6b6b",
+    color: "#185a9d",
     fontWeight: "bold",
+  },
+  cardTitleInactive: {
+    fontSize: 18,
+    // backgroundColor: "red",
+    width: "100%",
+    height: 50,
+    color: "#6b6b6b",
+    // fontWeight: "bold",
   },
   centeredView: {
     flex: 1,
@@ -958,7 +1143,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 20,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {

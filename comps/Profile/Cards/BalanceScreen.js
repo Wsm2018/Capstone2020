@@ -67,10 +67,16 @@ export default function BalanceScreen({ navigation }) {
                 firebase.auth().currentUser.uid
               }&path=${doc.ref.path}`
             );
+            const resultStatus = await response.json();
+            if (resultStatus === "true") {
+              setGiftCodeError("green");
+              setGiftCode("");
+            } else {
+              setGiftCodeError("red");
+              setGiftCode("");
+              setGiftErrorCounter(giftErrorCounter + 1);
+            }
           });
-
-          setGiftCodeError("green");
-          setGiftCode("");
         } else {
           setGiftCodeError("red");
           setGiftCode("");
@@ -96,7 +102,7 @@ export default function BalanceScreen({ navigation }) {
         }}
       >
         <View style={{ flex: 0.5 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0D2C6A" }}>
+          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#2E9E9B" }}>
             Current Balance
           </Text>
 

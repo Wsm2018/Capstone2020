@@ -11,20 +11,21 @@ import {
   TouchableOpacity,
   View,
   Picker,
-  Dimensions,
 } from "react-native";
-import { Card } from "react-native-paper";
-import { FontAwesome, Feather } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
 import "firebase/functions";
 import "firebase/auth";
 import db from "../../db";
+import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { Divider } from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { CheckBox } from "react-native-elements";
+import LottieView from "lottie-react-native";
+import { Card } from "react-native-paper";
 
 export default function CheckOut(props) {
+  const [disable, setDisable] = useState(false);
   const tName = props.navigation.getParam("tName", "failed");
   const sName = props.navigation.getParam("sName", "failed");
   const assetBooking = props.navigation.getParam(
@@ -35,69 +36,61 @@ export default function CheckOut(props) {
     "serviceBooking",
     "some default value"
   );
-  //const [displayServices, setDisplayServices] = useState([]);
+  const [displayServices, setDisplayServices] = useState([]);
   //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
   const [start, setStart] = useState();
   const [end, setEnd] = useState();
-  //const [totalAmount, setTotalAmount] = useState(0);
-
-  ////////////////////////////Front-End////////////////////////////////////////////
-  const [displayServices, setDisplayServices] = useState([]);
-
-  const [displayServices2, setDisplayServices2] = useState([
-    {
-      ServiceName: "Name #1",
-      Service: "Petrol",
-      PricePerHour: 10,
-      Total: 100,
-      hours: "12:30 AM",
-    },
-  ]);
-  const [displayServices3, setDisplayServices3] = useState([
-    {
-      ServiceNo: "Service Name #1",
-      Service: "Petrol",
-      PricePerHour: 10,
-      Total: 10,
-      hours: "8:30 AM",
-    },
-    {
-      ServiceNo: "Service Name #2",
-      Service: "Car wash",
-      PricePerHour: 10,
-      Total: 100,
-      hours: "9:30",
-    },
-    {
-      ServiceNo: "Service Name #3",
-      Service: "Valet",
-      PricePerHour: 10,
-      Total: 10,
-      hours: "10:30 AM",
-    },
-  ]);
-
-  const [subtotal, setSubTotal] = useState(0);
-
-  /////////////////////////////////////////////////////////////////////////////////////////////
-
-  //const [assetBooking, setAssetBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00" })
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     if (assetBooking) {
+      fixTimings();
       countTotal();
       orderList();
     }
   }, []);
 
+  const fixTimings = () => {
+    if (assetBooking.startDateTime.split(" ")[3] == "PM") {
+      setStart(
+        assetBooking.startDateTime.split(" ")[0] +
+          " T " +
+          (parseInt(assetBooking.startDateTime.split(" ")[2].split(":")[0]) +
+            12) +
+          ":00:00"
+      );
+    } else {
+      setStart(
+        assetBooking.startDateTime.split(" ")[0] +
+          " T " +
+          assetBooking.startDateTime.split(" ")[2] +
+          ":00"
+      );
+    }
+    if (assetBooking.endDateTime.split(" ")[3] == "PM") {
+      setEnd(
+        assetBooking.endDateTime.split(" ")[0] +
+          " T " +
+          (parseInt(assetBooking.endDateTime.split(" ")[2].split(":")[0]) +
+            12) +
+          ":00:00"
+      );
+    } else {
+      setEnd(
+        assetBooking.endDateTime.split(" ")[0] +
+          " T " +
+          assetBooking.endDateTime.split(" ")[2] +
+          ":00"
+      );
+    }
+  };
+
   const countTotal = () => {
     var start = assetBooking.startDateTime.split(" ").join("");
     var end = assetBooking.endDateTime.split(" ").join("");
-
     var startHour = "";
     var endHour = "";
-    console.log("TIMINGSSSS", start, end);
+
     if (
       assetBooking.startDateTime.split(" ")[2].split(":")[0].split("").length ==
       1
@@ -115,12 +108,10 @@ export default function CheckOut(props) {
         "0" + assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")[0];
       end = assetBooking.endDateTime.split(" ")[0] + "T" + endHour + ":00:00";
     }
-    console.log("TIMINGSSSS", start, end);
+
     // count days and total
     var s = new Date(start);
     var e = new Date(end);
-    console.log(" new date", s, e);
-
     var diff = (e.getTime() - s.getTime()) / 1000;
 
     diff /= 60 * 60;
@@ -134,7 +125,6 @@ export default function CheckOut(props) {
         serviceTotal = serviceTotal + parseInt(serviceBooking[i].service.price);
       }
     }
-    console.log(" total", assetTotal, serviceTotal);
     setTotalAmount(assetTotal + serviceTotal);
   };
 
@@ -194,19 +184,51 @@ export default function CheckOut(props) {
     }
     setDisplayServices(newServiceArr);
   };
+  ////////////////curremt change////////////////
+  // const payLater = async () => {
+  //   const handleBooking = firebase.functions().httpsCallable("handleBooking");
+  //   var u = await db
+  //     .collection("users")
+  //     .doc(firebase.auth().currentUser.uid)
+  //     .get();
+  //   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
+  //   user = u.data();
+  //   user.id = firebase.auth().currentUser.uid;
+  //   user.points = user.points + 10;
+  //   const response = await handleBooking({
+  //     user: user,
+  //     asset: assetBooking.asset,
+  //     startDateTime: assetBooking.startDateTime,
+  //     endDateTime: assetBooking.endDateTime,
+  //     card: {
+  //       cardNo: "",
+  //       expiryDate: "",
+  //       CVC: "",
+  //       cardType: "",
+  //       cardHolder: "",
+  //     },
+  //     promotionCode: null,
+  //     dateTime: moment().format("YYYY-MM-DD T HH:mm"),
+  //     status: true,
+  //     addCreditCard: false,
+  //     uid: firebase.auth().currentUser.uid,
+  //     totalAmount: totalAmount,
+  //     status: false,
+  //     serviceBooking,
+  //   });
 
   const payLater = async () => {
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
-    var u = await db
+    var user = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
+    var u = user.data();
+    u.id = firebase.auth().currentUser.uid;
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
-    user = u.data();
-    user.id = firebase.auth().currentUser.uid;
-    user.points = user.points + 10;
+
     const response = await handleBooking({
-      user: user,
+      user: user.data(),
       asset: assetBooking.asset,
       startDateTime: assetBooking.startDateTime,
       endDateTime: assetBooking.endDateTime,
@@ -229,7 +251,6 @@ export default function CheckOut(props) {
 
     props.navigation.navigate("Home");
   };
-
   return (
     <ScrollView style={styles.container}>
       {/* {console.log(
@@ -456,7 +477,7 @@ export default function CheckOut(props) {
               Subtotal
             </Text>
             <Text style={{ fontSize: 15, marginTop: "3%" }}>
-              {subtotal} QAR (Backend code needed)
+              {/* {subtotal} QAR (Backend code needed) */}
             </Text>
           </View>
           <View style={styles.text}>

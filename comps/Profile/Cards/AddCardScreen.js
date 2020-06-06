@@ -62,11 +62,6 @@ export default function AddCard(props) {
     if (cardNumber === "") {
       alert("Enter Card Number");
       return false;
-    } else {
-      if (cardNumber.length < 16) {
-        alert("Enter a valid card number");
-        return false;
-      }
     }
 
     if (holderName === "") {
@@ -104,12 +99,17 @@ export default function AddCard(props) {
   };
 
   const handleAddCard = async () => {
+    console.log(cardNumber, holderName, cardType, expiryDate, cvc);
     if (validateForm()) {
       const addCard = firebase.functions().httpsCallable("addCard");
       const response = await addCard({
         uid: firebase.auth().currentUser.uid,
         cardInfo: { cardNumber, holderName, cardType, expiryDate, cvc },
       });
+      if (response.data !== null) {
+        alert("Card Added");
+        props.navigation.goBack();
+      }
     }
   };
 
@@ -133,7 +133,7 @@ export default function AddCard(props) {
     <View
       style={{
         flex: 1,
-        backgroundColor: "lightgray",
+        // backgroundColor: "lightgray",
         // flexDirection: "column",
         // flexWrap: "wrap",
         alignItems: "center",
@@ -142,27 +142,16 @@ export default function AddCard(props) {
         // marginBottom: "10%",
       }}
     >
-      <Text
-        style={{
-          // fontSize: 20,
-          fontSize: 25,
-          fontWeight: "bold",
-        }}
-      >
-        Add a Credit Card
-      </Text>
       <View
         style={{
           flex: 3,
-          marginTop: "15%",
+          marginTop: "35%",
 
-          // borderWidth: 1,
-          // backgroundColor: "red",
           width: "90%",
         }}
       >
         <CreditCardInput
-          elevation={5}
+          // elevation={5}
           labels={labels}
           requiresName={true}
           onChange={handleCard}
@@ -174,7 +163,7 @@ export default function AddCard(props) {
             height: 50,
             // marginStart: 2,
             // borderRadius: 5,
-            // textAlign: "center",
+            textAlign: "center",
           }}
           inputContainerStyle={
             {
@@ -185,35 +174,31 @@ export default function AddCard(props) {
           cardImageFront={require("../../../assets/images/dark1.jpg")}
           cardImageBack={require("../../../assets/images/dark2.png")}
         />
-
-        {/* <Button onPress={handleAddCard} title="Add Card" /> */}
       </View>
+
       <TouchableOpacity
         style={{
-          flex: 0.2,
-          borderWidth: 3,
-          borderRadius: 20,
-          // backgroundColor: "red",
-          // height: 50,
+          backgroundColor: "#20365F",
+          height: 40,
           width: "30%",
-
+          alignSelf: "center",
           justifyContent: "center",
           alignItems: "center",
+
+          borderRadius: 10,
+          marginBottom: 10,
         }}
         onPress={handleAddCard}
       >
         <Text
           style={{
-            // height: 60,
-            // backgroundColor: "red",
-            // width: "80%",
             textAlign: "center",
-            fontSize: 20,
-            fontWeight: "bold",
-            color: "#20365F",
+            fontSize: 18,
+            // fontWeight: "bold",
+            color: "white",
           }}
         >
-          Save!
+          Save
         </Text>
       </TouchableOpacity>
     </View>

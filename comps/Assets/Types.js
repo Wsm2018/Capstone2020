@@ -132,7 +132,7 @@ export default function Types(props) {
             <TimedSlideshow
               items={items}
               progressBarDirection="middle"
-              progressBarColor="#20365F"
+              progressBarColor="#185a9d"
               // renderCloseIcon=
               // onPress={() => console.log("Close Clickedddddd")}
               // renderCloseIcon={null}
@@ -168,11 +168,11 @@ export default function Types(props) {
               What would you like to book?
             </Text>
           </View> */}
-          <View>
+          {/* <View>
             <Button title="theme dark" onPress={() => changeTheme("dark")} />
             <Button title="theme light" onPress={() => changeTheme("light")} />
-            {/* <Button title="theme other" onPress={() => changeTheme("other")} /> */}
-          </View>
+            <Button title="theme other" onPress={() => changeTheme("other")} />
+          </View> */}
           <View
             style={{
               // backgroundColor: "yellow",
@@ -200,14 +200,14 @@ export default function Types(props) {
                   }
                   key={i}
                   style={{
-                    backgroundColor: "#20365F",
+                    backgroundColor: "white",
                     width: "95%",
                     // height: "50%",
                     // height: Dimensions.get("window").height / 4,
                     justifyContent: "center",
                     alignItems: "center",
                     borderWidth: 4,
-                    borderColor: "#20365F",
+                    borderColor: "#185a9d",
                     aspectRatio: 1 / 1,
                   }}
                 >
@@ -237,9 +237,9 @@ export default function Types(props) {
 
                   <View
                     style={{
-                      height: "15%",
+                      height: "16%",
                       width: "100%",
-                      backgroundColor: "#e3e3e3",
+                      backgroundColor: "#185a9d",
                       justifyContent: "center",
                       alignItems: "center",
                     }}
@@ -247,12 +247,14 @@ export default function Types(props) {
                     <Text
                       style={{
                         fontSize: 18,
-                        color: "#20365F",
+                        color: "white",
                         // marginBottom: "5%",
                         // backgroundColor: "gray",
                         // width: "100%",
                         textAlign: "center",
+                        fontWeight: "bold",
                         // height: "20%",
+                        textTransform: "capitalize",
                       }}
                     >
                       {/* Book a
@@ -281,7 +283,7 @@ export default function Types(props) {
 Types.navigationOptions = (props) => ({
   title: "QuickbookinQ",
   // headerStyle: { backgroundColor: "#3771b3" },
-  headerStyle: { backgroundColor: theme2 === "light" ? "#20365F" : "black" },
+  headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
   headerTintColor: "white",
 });
 

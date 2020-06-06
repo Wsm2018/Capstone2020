@@ -17,7 +17,15 @@ export default function Statistics(props) {
   // --------------------------------------- USER STATES -----------------------------
 
   const [totalUsers, setTotalUsers] = useState([]);
-  const [userChart, setUserChart] = useState(null);
+  const [userChart, setUserChart] = useState([]);
+  const [labels, setLabels] = useState([
+    "Admins",
+    "Customers",
+    "User Handlers",
+    "Managers",
+    "Customer Support",
+    "Services Employee",
+  ]);
 
   // --------------------------------------- ASSETS STATES --------------------------
 
@@ -179,8 +187,10 @@ export default function Statistics(props) {
   const getUserChart = () => {
     const tempUsers = [...totalUsers];
     const admins = tempUsers.filter((user) => user.role === "admin");
+
     const customers = tempUsers.filter((user) => user.role === "customer");
     const managers = tempUsers.filter((user) => user.role === "manager");
+    console.log(managers);
     const userHandlers = tempUsers.filter(
       (user) => user.role === "user handler"
     );
@@ -194,60 +204,26 @@ export default function Statistics(props) {
       (user) => user.role === "services employee"
     );
 
-    // const result = {
-    //   labels: [
-    //     "admin",
-    //     "customer",
-    //     "manager",
-    //     "user handler",
-    //     "asset handler",
-    //     "customer support",
-    //     "services employee",
-    //   ],
-    //   datasets: [
-    //     {
-    //       data: [
-    //         admins.length,
-    //         customers.length,
-    //         managers.length,
-    //         userHandlers.length,
-    //         assetHandler.length,
-    //         customerSupport.length,
-    //         serviceEmployee.length,
-    //       ],
-    //     },
-    //   ],
-    // };
     const data = [
-      {
-        value: admins.length,
-        label: "Admins",
-      },
-      {
-        value: customers.length,
-        label: "Customers",
-      },
-      {
-        value: userHandlers.length,
-        label: "User Handlers",
-      },
-      {
-        value: managers.length,
-        label: "Managers",
-      },
-      {
-        value: customerSupport.length,
-        label: "Customer Support",
-      },
-      {
-        value: serviceEmployee.length,
-        label: "Services Employee",
-      },
+      admins.length,
+      customers.length,
+      userHandlers.length,
+      managers.length,
+      customerSupport.length,
+      serviceEmployee.length,
+    ];
+    const label = [
+      "Admins",
+      "Customers",
+      "User Handlers",
+      "Managers",
+      "Customer Support",
+      "Services Employee",
     ];
 
-    // console.log(result);
-
-    setUserChart(data);
+    console.log(data);
+    setLabels([...label]);
+    setUserChart([...data]);
   };
   // --------------------------------------- USE EFFECTS --------------------------------------------
 
@@ -275,7 +251,7 @@ export default function Statistics(props) {
   return (
     <Swiper showsButtons={false}>
       <View style={styles.slide1}>
-        {userChart ? (
+        {userChart.length !== 0 ? (
           <View
             style={{
               alignItems: "center",
@@ -301,49 +277,30 @@ export default function Statistics(props) {
             </View>
             <View
               style={{
-                // backgroundColor: "red",
-                // flex: 2,
                 flexDirection: "row",
-                height: 250,
-                // paddingVertical: 50,
+                height: "50%",
                 width: Dimensions.get("window").width / 1.3,
               }}
             >
-              <YAxis
-                data={userChart}
-                yAccessor={({ index }) => index}
-                // scale={scale.scaleBand}
-                contentInset={{ top: 10, bottom: 10 }}
-                spacingInner={0}
-                spacingOuter={0}
-                formatLabel={(item, index) => index}
-              />
               <BarChart
-                style={{
-                  flex: 1,
-                  // borderBottomColor: "lightgray",
-                  // borderBottomWidth: 2,
-                }}
-                data={userChart}
-                // horizontal={true}
-                yAccessor={({ item }) => item.value}
                 svg={{
                   fill: "#800020",
                   stroke: "#450011",
                   strokeWidth: 1,
-                  // width: 50,
-                  // originY: 0,
-                  // borderWidth: 0,
                 }}
-                // svg={{ fontSize: 10, fill: 'black' }}
-                contentInset={{ top: 0, bottom: 0 }}
+                contentInset={{ top: 30, bottom: 30 }}
                 spacingInner={0}
                 spacingOuter={0}
-                // gridMin={5}
-                // bandwidth={false}
-              >
-                <Grid direction={Grid.Direction.VERTICAL} />
-              </BarChart>
+                style={{ flex: 1, height: "100%" }}
+                data={userChart}
+              />
+
+              <XAxis
+                style={{ marginHorizontal: -10, marginTop: 15 }}
+                data={labels}
+                formatLabel={(value, index) => index}
+                contentInset={{ left: 30, right: 30 }}
+              />
             </View>
           </View>
         ) : (
@@ -356,7 +313,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{
@@ -416,7 +373,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{
@@ -476,7 +433,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              source={require("../../assets/loadingAnimations/load.json")}
               autoPlay
               loop
               style={{

@@ -12,6 +12,7 @@ import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import Card from "./Card";
+import LottieView from "lottie-react-native";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user", "No param");
@@ -37,73 +38,85 @@ export default function CardsScreen(props) {
   // 5190767138616175
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f5f0f0" }}>
+    <View style={{ flex: 1, backgroundColor: "#e3e3e3" }}>
       <View
         style={{
           alignItems: "center",
           justifyContent: "center",
-          // backgroundColor: "red",
-          flex: 0.1,
+          flex: 0.2,
         }}
-      >
-        <Text
-          style={{
-            fontSize: 22,
-            fontWeight: "bold",
-          }}
-        >
-          My Cards
-        </Text>
+      ></View>
+      <View style={{ flex: 5 }}>
+        <ScrollView>
+          {cards && cards.length === 0 ? (
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <LottieView
+                source={require("../../../assets/17723-waitting.json")}
+                autoPlay
+                loop
+                style={{
+                  position: "relative",
+                  width: "100%",
+                }}
+              />
+              <Text
+                style={{
+                  // paddingTop: "15%",
+                  fontSize: 20,
+                  color: "gray",
+                  fontWeight: "bold",
+                }}
+              >
+                No Cards
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={cards}
+              renderItem={({ item }) => <Card card={item} />}
+              keyExtractor={(item) => item.id}
+            />
+          )}
+        </ScrollView>
       </View>
-      <ScrollView style={{ flex: 5 }}>
-        {cards && cards.length === 0 ? (
-          <Text>No Cards</Text>
-        ) : (
-          <FlatList
-            data={cards}
-            renderItem={({ item }) => <Card card={item} />}
-            keyExtractor={(item) => item.id}
-          />
-        )}
-      </ScrollView>
-      {/* <View
+      <View
         style={{
-          flex: 0.2,
-          // backgroundColor: "red",
-          // height: 50,
-          justifyContent: "flex-end",
+          flex: 1,
           alignItems: "center",
-        }}
-      > */}
-      <TouchableOpacity
-        style={{
-          flex: 0.2,
           // backgroundColor: "red",
-          // height: 50,
-          justifyContent: "flex-end",
-          alignItems: "center",
+          justifyContent: "center",
         }}
-        // style={{ alignItems: "center", justifyContent: "center" }}
-        onPress={() => props.navigation.navigate("AddCard", { user: user })}
       >
-        {/* <Image
-            source={require("../../../assets/images/addcard.png")}
-            style={{ height: 60, width: 60 }}
-          /> */}
-        <Text
+        <TouchableOpacity
           style={{
-            height: 60,
-            // backgroundColor: "red",
-            width: "60%",
-            textAlign: "center",
-            fontSize: 18,
-            fontWeight: "bold",
-            color: "gray",
+            // flex: 0.2,
+            backgroundColor: "#20365F",
+            height: 40,
+            width: "50%",
+            alignSelf: "center",
+            justifyContent: "center",
+            alignItems: "center",
+
+            borderRadius: 10,
+            marginBottom: 10,
           }}
+          onPress={() => props.navigation.navigate("AddCard", { user: user })}
         >
-          + Add a New Card
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={{
+              // height: 60,
+              // backgroundColor: "red",
+              // width: "60%",
+              textAlign: "center",
+              fontSize: 18,
+              // fontWeight: "bold",
+              color: "white",
+            }}
+          >
+            + Add a New Card
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
     // </View>
   );

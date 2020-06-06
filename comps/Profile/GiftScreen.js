@@ -61,7 +61,11 @@ export default function GiftScreen(props) {
 
   const handleSend = async () => {
     if (amount === "" || amount === "other") {
-      setAmountErrMsg("Enter the Amount");
+      setAmountErrMsg("* Enter the Amount");
+      return;
+    }
+    if (parseInt(amount) === 0) {
+      setAmountErrMsg("* The amount cannot be 0");
       return;
     }
     // alert("sending...");
@@ -227,9 +231,7 @@ export default function GiftScreen(props) {
                     />
                   ))}
                 </Picker>
-                <Text style={{ color: "red", fontWeight: "bold" }}>
-                  {amountErrMsg}
-                </Text>
+                <Text style={{ color: "red" }}>{amountErrMsg}</Text>
               </View>
             ) : (
               <View>
@@ -310,82 +312,78 @@ export default function GiftScreen(props) {
                 // backgroundColor: "blue",
               }}
             >
+              {/* <View style={{ flex: 0.5 }}> */}
               <View
                 style={{
                   flex: 0.5,
-                  marginTop: "10%",
-                  // backgroundColor: "green",
-                  // justifyContent: "flex-end",
+                  backgroundColor: "white",
                   alignItems: "center",
+
                   flexDirection: "row",
-                  // alignItems: "flex-end",
+                  paddingLeft: 6,
+                  // width: "40%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  // marginBottom: 10,
                 }}
               >
-                <View
+                {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
+                {/* <View
+                    style={{
+                      flex: 2,
+                      flexDirection: "row",
+                    }}
+                  > */}
+                <TextInput
                   style={{
-                    flex: 0.8,
-
+                    height: 40,
+                    width: "80%",
+                    paddingLeft: 6,
                     // backgroundColor: "red",
-                    // alignItems: "center",
-                    // flexDirection: "row",
-                    // paddingLeft: 6,
-
-                    // width: "80%",
-                    // borderColor: "black",
-                    // borderBottomWidth: 2,
-                    // borderRadius: 10,
-                    // marginBottom: 20,
+                  }}
+                  placeholder={
+                    amountErrMsg !== ""
+                      ? amountErrMsg
+                      : amount !== "other"
+                      ? null
+                      : "Enter Amount"
+                  }
+                  placeholderTextColor={amountErrMsg !== "" ? "red" : "gray"}
+                  onChangeText={(amt) => {
+                    setAmount(amt);
+                    setAmountErrMsg("");
+                  }}
+                  // value={amount}
+                  keyboardType="numeric"
+                />
+                {/* </View> */}
+                {/* </View> */}
+                {/* <View
+                  style={{
+                    flex: 1,
                   }}
                 >
-                  {/* <MaterialCommunityIcons name="cash" size={30} color="gray" /> */}
-                  <Input
-                    style={{ width: "80%", paddingLeft: 6 }}
-                    placeholder="Enter Amount"
-                    onChangeText={setAmount}
-                    keyboardType="numeric"
-                  />
                   <Text style={{ color: "red", fontWeight: "bold" }}>
                     {amountErrMsg}
                   </Text>
-                </View>
-                <View
+                </View> */}
+              </View>
+              <View style={{ flex: 0.1 }}>
+                <TouchableOpacity
                   style={{
-                    flex: 0.3,
+                    alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
+                  onPress={handleFlag}
                 >
-                  <TouchableOpacity
-                    style={{
-                      // backgroundColor: "#20365F",
-                      // height: 40,
-                      // width: "60%",
-                      alignSelf: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      // marginStart: "2%",
-                      // marginEnd: "2%",
-                      // borderRadius: 30,
-
-                      // marginTop: "8%",
-                      // flexDirection: "row",
-
-                      // flex: 0.2,
-                    }}
-                    onPress={handleFlag}
-                  >
-                    <Text
-                      style={{
-                        // textAl
-
-                        // textAlign: "justify",
-                        fontSize: 14,
-                        fontWeight: "bold",
-                        color: "darkred",
-                      }}
-                    >
-                      Cancel
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                  <AntDesign
+                    name="closecircle"
+                    size={25}
+                    style={{ color: "gray" }}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           )}

@@ -78,6 +78,7 @@ exports.sendGift = functions.https.onCall(async (data, context) => {
     status: false,
     expiryDate,
     used: false,
+    race: [],
   });
 
   const response = await fetch(
@@ -202,7 +203,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         request.query.role === "guest" ? accessDoc.data().giftBalance : 0,
       email:
         request.query.role === "guest" ? accessDoc.data().email : result.email,
-      role: request.query.role === "guest" ? "guest" : "user",
+      role: request.query.role === "guest" ? "guest" : "customer",
       qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${request.query.uid}`,
       displayName: request.query.displayName,
       phone: `+974${request.query.phoneNumber}`,
@@ -223,6 +224,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
         "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      activeRole: null,
     });
 
   if (request.query.referralStatus === "true") {
@@ -230,10 +232,12 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       .where("referralCode", "==", request.query.referral)
       .get();
     referralDoc.forEach((doc) => {
-      db.collection("users").doc(doc.id).collection("referrer").doc().set({
-        referrerCode: referralCode,
-        status: false,
-      });
+      if (doc.data().email !== "DELETED") {
+        db.collection("users").doc(doc.id).collection("referrer").doc().set({
+          referrerCode: referralCode,
+          status: false,
+        });
+      }
     });
   }
 
@@ -289,6 +293,98 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.assetManager = functions.https.onCall(async (data, context) => {
+
+  if (data.type === "add") {
+    db.collection(data.collection).add(
+      data.obj
+    );
+  }
+  else if (data.type === "update") {
+    db.collection(data.collection).doc(data.doc).set(
+      data.obj
+    );
+  }
+  else {
+    db.collection(data.collection).doc(data.doc).delete()
+  }
+
+});
+
+exports.editBooking = functions.https.onCall(async (data, context) => {
+  var newAssetBooking = data.assetBooking
+  newAssetBooking.endDateTime = data.endDateTime
+  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount, assetBooking: newAssetBooking, status: data.status })
+  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime })
+
+  for (let i = 0; i < data.serviceBooking.length; i++) {
+    var serviceBooking = {
+      service: data.serviceBooking[i].service,
+      assetBooking: newAssetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false
+    }
+
+    var sId = ""
+    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef =>
+      sId = docRef.id
+    )
+    serviceBooking.id = sId
+
+    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
+      serviceBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false
+    })
+  }
+
+
+});
+
+exports.manageServices = functions.https.onCall(async (data, context) => {
+
+  if (data.status === "add") {
+    var sId = ""
+    let add = await db.collection("services").add(data.obj).then((docRef) =>
+      (sId = docRef.id)
+    )
+    for (let i = 0; i < data.weekDays.length; i++) {
+      if (data.weekDays[i].hours.length > 0) {
+        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays.day).set({ hours: data.weekDays[i].hours })
+      }
+    }
+
+  }
+
+  if (data.status === "update") {
+    db.collection("services").doc(data.selectedService.service.id).update(data.obj)
+
+    for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
+      if (data.serviceWorkHoursDays[i].service === data.selectedService.service) {
+        for (let k = 0; k < data.serviceWorkHoursDays[i].workingDays.length; k++) {
+          if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
+            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).set(
+              { hours: data.serviceWorkHoursDays[i].workingDays[k].hours })
+          }
+          else {
+            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).delete()
+
+          }
+        }
+
+      }
+    }
+  }
+
+})
+
+exports.manageServiceWorkers = functions.https.onCall(async (data, context) => {
+
+  db.collection("users").doc(data.user.id).update(data.user)
+
+})
 exports.addFriend = functions.https.onCall(async (data, context) => {
   console.log("data", data);
   db.collection("users")
@@ -419,6 +515,7 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
+
   }
 });
 
@@ -697,7 +794,7 @@ async function grantAdminRole(email) {
   });
 }
 exports.giftsExpCheck = functions.pubsub
-  .schedule("46 10 * * *")
+  .schedule("0 0 * * *")
   .timeZone("Asia/Qatar")
   .onRun(async (context) => {
     const result = await db
@@ -720,12 +817,227 @@ exports.giftsExpCheck = functions.pubsub
 
 exports.deleteGuestUser = functions.https.onRequest(
   async (request, response) => {
-    db.collection("users").doc(request.query.uid).delete();
+    db.collection("users").doc(request.query.uid).update({
+      displayName: "DELETED",
+      email: "DELETED",
+      phone: "DELETED",
+      photoURL:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+      location: null,
+      qrCode: "",
+    });
     await admin.auth().deleteUser(request.query.uid);
 
     response.send("All done");
   }
 );
+//-------------Ticket---------------//
+exports.sendSupportMessage = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  db.collection("customerSupport")
+    .doc(data.ticket.id)
+    .collection("liveChat")
+    .add({
+      from: data.user.id,
+      name: data.user.displayName,
+      text: data.text,
+      dateTime: new Date(),
+    });
+});
+exports.addTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  const response = await db.collection("customerSupport").add({
+    userId: data.user.id,
+    title: data.title,
+    description: data.description,
+    dateOpen: new Date(),
+    dateClose: "",
+    target: data.selectedValue,
+    status: "pending",
+    state: "onView",
+    supportAgentUid: "",
+    agentsContributed: [],
+    extraInfo: data.other,
+    priority: data.priority,
+  });
+  response.collection("liveChat").add({
+    from: "Auto Reply",
+    name: "Support Bot",
+    text: "Please wait until a Support Agent Joins!",
+    dateTime: new Date(),
+  });
+  return response;
+});
+exports.updateTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "take") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "in Process",
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  } else if (data.query === "Approve") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      reportedUserUid: data.target,
+      dateClose: new Date(),
+      status: "Closed",
+      state: "Approved",
+    });
+  } else if (data.query === "close") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "Closed",
+      dateClose: new Date(),
+      state: "Approved",
+    });
+  } else if (data.query === "transfare") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  }
+});
+//--------------FAQ---------------//
+exports.FAQ = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "update") {
+    db.collection("faq").doc(data.id).update({
+      answer: data.answer,
+      status: "approved",
+    });
+  } else if (data.query === "create") {
+    db.collection("faq").add({
+      date: new Date(),
+      question: data.question,
+      userId: data.user.uid,
+      userDisplayName: data.user.displayName,
+      answer: "",
+      status: "pending",
+    });
+  } else if (data.query === "delete") {
+    db.collection("faq").doc(data.id).delete();
+  }
+});
+//----------Reputation------------//
+exports.ReputationCalculation = functions.pubsub
+  .schedule("every 43800 minutes")
+  .onRun(async (context) => {
+    let users = [];
+    const info = await db.collection("users").get();
+    info.forEach((doc) => {
+      users.push({ id: doc.id, reputation: doc.data().reputation });
+    });
+    console.log("Fetched Users", users);
+    users.forEach(async (user) => {
+      console.log("Fetched User", user);
+      const reports = await db
+        .collectionGroup("customerSupport")
+        .where("reportedUserId", "==", user.id)
+        .where("state", "==", "Approved")
+        .get();
+      console.log("Report Index", reports);
+      if (reports.size !== 0) {
+        reports.forEach(async (report) => {
+          let msDiff =
+            report.dateClosed.toDate().getTime() - new Date().getTime();
+          let calculatedDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+          if (calculatedDiff > -30) {
+            await db
+              .collection("users")
+              .doc(user.id)
+              .update({
+                reputation: user.reputation - 1,
+              });
+          }
+        });
+      } else {
+        await db
+          .collection("users")
+          .doc(user.id)
+          .update({
+            reputation: user.reputation + 1,
+          });
+      }
+    });
+    return null;
+  });
+//--------------------------------//
+
+exports.redeemGiftCode = functions.https.onRequest(
+  async (request, response) => {
+    let path = String(request.query.path);
+    path = path.split("/");
+    let giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+    await giftDoc.ref.update({
+      status: true,
+      race: admin.firestore.FieldValue.arrayUnion(request.query.uid),
+    });
+
+    giftDoc = await db
+      .collection(path[0])
+      .doc(path[1])
+      .collection(path[2])
+      .doc(path[3])
+      .get();
+
+    if (giftDoc.data().race[0] === request.query.uid) {
+      const userDoc = await db.collection("users").doc(request.query.uid).get();
+      const increment = admin.firestore.FieldValue.increment(
+        giftDoc.data().giftBalance
+      );
+      userDoc.ref.update({ balance: increment });
+
+      response.send("true");
+    } else {
+      response.send("false");
+    }
+  }
+);
+
+exports.resetUserPassword = functions.https.onCall(async (data, context) => {
+  const result = await admin.auth().updateUser(data.user.id, {
+    password: data.password,
+  });
+
+  return { result };
+});
+
+exports.adminUpdateUser = functions.https.onCall(async (data, context) => {
+  if (data.user.email !== data.email) {
+    await admin.auth().updateUser(data.user.id, {
+      email: data.email,
+      emailVerified: true,
+    });
+  }
+  if (data.user.displayName !== data.displayName) {
+    await admin.auth().updateUser(data.user.id, {
+      displayName: data.displayName,
+    });
+  }
+  if (data.user.phone !== data.phone) {
+    await admin.auth().updateUser(data.user.id, {
+      phoneNumber: "+974" + data.phone,
+    });
+  }
+
+  db.collection("users")
+    .doc(data.user.id)
+    .update({
+      role: data.selectedRole,
+      email: data.email,
+      displayName: data.displayName,
+      phone: "+974" + data.phone,
+      balance: parseInt(data.balance),
+      tokens: parseInt(data.tokens),
+      reputation: parseInt(data.reputation),
+    });
+});
 
 exports.updateToRead = functions.https.onCall(async (data, context) => {
   console.log("updateToRead data", data);
@@ -744,4 +1056,20 @@ exports.deleteCar = functions.https.onCall(async (data, context) => {
     .doc(data.carId)
     .delete();
   console.log(response);
+});
+
+exports.addPromotion = functions.https.onCall(async (data, context) => {
+  console.log("addPromotion", data);
+  const response = await db.collection("promotionCodes").add({
+    code: data.code,
+    expiryDate: new Date(data.expiry),
+    percentage: data.percentage,
+  });
+  return response;
+});
+
+exports.deletePromotion = functions.https.onCall(async (data, context) => {
+  console.log("delete promotion ", data);
+  const response = await db.collection("promotionCodes").doc(data.id).delete();
+  return response;
 });

@@ -71,31 +71,34 @@ export default function CarsScreen(props) {
           <View
             style={{
               flex: 5,
-              borderColor: "black",
-              borderBottomWidth: 2,
+              // borderColor: "black",
+              // borderBottomWidth: 2,
             }}
           >
             <ScrollView>
               {cars.length === 0 ? (
                 <View style={styles.header}>
                   <LottieView
-                    source={require("../../../assets/872-empty-list.json")}
+                    source={require("../../../assets/17723-waitting.json")}
                     autoPlay
                     loop
                     style={{
                       position: "relative",
-                      width: "100%",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
                     }}
                   />
                   <Text
                     style={{
-                      paddingTop: "15%",
+                      // paddingTop: "15%",
                       fontSize: 20,
-                      color: "darkred",
+                      color: "darkgray",
                       fontWeight: "bold",
                     }}
                   >
-                    No vehicles added
+                    No vehicles
                   </Text>
                 </View>
               ) : (
@@ -119,7 +122,7 @@ export default function CarsScreen(props) {
               justifyContent: "center",
             }}
           >
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{
                 flex: 0.4,
               }}
@@ -133,6 +136,42 @@ export default function CarsScreen(props) {
                 }}
               >
                 + Add a New Vehicle
+              </Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity
+              style={{
+                // flex: 0.2,
+                backgroundColor: "#20365F",
+                height: 40,
+                width: "50%",
+                alignSelf: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                // marginStart: "2%",
+                // marginEnd: "2%",
+                borderRadius: 10,
+                marginBottom: 10,
+              }}
+              // style={{ alignItems: "center", justifyContent: "center" }}
+              onPress={handleNavigate}
+            >
+              {/* <Image
+            source={require("../../../assets/images/addcard.png")}
+            style={{ height: 60, width: 60 }}
+          /> */}
+              <Text
+                style={{
+                  // height: 60,
+                  // backgroundColor: "red",
+                  // width: "60%",
+                  textAlign: "center",
+                  fontSize: 18,
+                  // fontWeight: "bold",
+                  color: "white",
+                }}
+              >
+                + New Vehicle
               </Text>
             </TouchableOpacity>
           </View>
@@ -184,7 +223,7 @@ const styles = StyleSheet.create({
   title: {
     // alignItems: "flex-end",
     fontSize: 20,
-    color: "black",
+    color: "#229277",
     textAlign: "center",
     fontWeight: "bold",
     textTransform: "capitalize",

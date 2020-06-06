@@ -59,100 +59,84 @@ export default function Card(props) {
 
   return (
     <View style={styles.container}>
-      {/* // <View style={styles.container}>
-    //   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}> */}
-      {/* <Cards
-    //       elevation={2}
-    //       style={{
-    //         width: "100%",
-    //         // flex: 1,
-    //         borderWidth: 1,
-    //         // borderTopWidth: 0,
-    //         borderColor: "darkgray",
-    //       }}
-    //     >
-    //       <Text>{cardInfo.cardNumber}</Text>
-    //       <TouchableOpacity onPress={() => handleDelete()}>
-    //         <Text>X</Text>
-    //       </TouchableOpacity>
-    //     </Cards> */}
-      <Cards
-        // height={Dimensions.get("window").height / 4}
-        width={Dimensions.get("window").width / 1.3}
-        containerStyle={styles.card}
-      >
-        <View
-          style={{
-            marginBottom: 10,
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-          }}
+      <View style={styles.two}>
+        <Cards
+          width={Dimensions.get("window").width / 1.3}
+          containerStyle={styles.card}
         >
-          {cardInfo && cardInfo.cardType === "visa" ? (
-            <Image
-              source={images[0]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "master-card" ? (
-            <Image
-              source={images[1]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "amex" ? (
-            <Image
-              source={images[2]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "discover" ? (
-            <Image
-              source={images[3]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "diners" ? (
-            <Image
-              source={images[4]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : (
-            cardInfo &&
-            cardInfo.cardType === "jcb"(<Image source={images[5]} />)
-          )}
+          <View
+            style={{
+              marginBottom: 10,
+              flexDirection: "row-reverse",
+              justifyContent: "space-between",
+            }}
+          >
+            {cardInfo && cardInfo.cardType === "visa" ? (
+              <Image
+                source={images[0]}
+                width={Dimensions.get("window").width / 8}
+              />
+            ) : cardInfo && cardInfo.cardType === "master-card" ? (
+              <Image
+                source={images[1]}
+                width={Dimensions.get("window").width / 8}
+              />
+            ) : cardInfo && cardInfo.cardType === "american-express" ? (
+              <Image
+                source={images[2]}
+                width={Dimensions.get("window").width / 8}
+              />
+            ) : cardInfo && cardInfo.cardType === "discover" ? (
+              <Image
+                source={images[3]}
+                width={Dimensions.get("window").width / 8}
+              />
+            ) : cardInfo && cardInfo.cardType === "diners-club" ? (
+              <Image
+                source={images[4]}
+                width={Dimensions.get("window").width / 8}
+              />
+            ) : cardInfo && cardInfo.cardType === "jcb" ? (
+              <Image source={images[5]} />
+            ) : null}
 
-          <TouchableOpacity onPress={() => handleDeleteAlert()}>
-            {/* <Text style={styles.notes}>X</Text> */}
-            <Octicons name="trashcan" size={20} color="#ede9eb" />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            // flexDirection: "row",
-            justifyContent: "space-between",
-            // alignItems: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <Image
-            width={Dimensions.get("window").width / 9}
-            // style={{ marginTop: 5 }}
-            source={require("../../../assets/images/chip.png")}
-          />
-          <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
-        </View>
+            <TouchableOpacity onPress={() => handleDeleteAlert()}>
+              <Octicons name="trashcan" size={20} color="#ede9eb" />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              // flexDirection: "row",
+              justifyContent: "space-between",
+              // alignItems: "center",
+              alignItems: "flex-start",
+            }}
+          >
+            <Image
+              width={Dimensions.get("window").width / 9}
+              // style={{ marginTop: 5 }}
+              source={require("../../../assets/images/chip.png")}
+            />
+            <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
+          </View>
 
-        <Divider style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }} />
+          <Divider style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }} />
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={styles.notes}>{cardInfo && cardInfo.holderName}</Text>
-          <Text style={styles.notes}>{cardInfo && cardInfo.expiryDate}</Text>
-        </View>
-      </Cards>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text style={styles.notes}>{cardInfo && cardInfo.holderName}</Text>
+            <Text style={styles.notes}>{cardInfo && cardInfo.expiryDate}</Text>
+          </View>
+        </Cards>
+      </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "white",
+    backgroundColor: "#3e3e3e",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -173,6 +157,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     textTransform: "capitalize",
+  },
+  two: {
+    backgroundColor: "red",
+    width: "100%",
+    marginTop: "3%",
+    padding: "5%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+
+    // height: "30%",
   },
 });
 

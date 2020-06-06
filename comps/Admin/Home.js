@@ -152,8 +152,49 @@ export default function Home(props) {
           <Text style={{ color: "#e3e3e3", fontSize: 18, fontWeight: "bold" }}>
             Roles
           </Text>
+          {/* <Text>Promotion Code</Text> */}
         </TouchableOpacity>
+
+        {/* <TouchableOpacity onPress={() => props.navigation.navigate("News")}>
+          <Text>News</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleLogout()}>
+          <Text>Logout</Text>
+        </TouchableOpacity> */}
       </View>
+
+      {/* <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("MakeAdmin")}
+        >
+          <Text>Make Admin</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => props.navigation.navigate("Types")}>
+          <Text>Booking</Text>
+        </TouchableOpacity>
+      </View> */}
+
+      {/* <View
+        style={{
+          flex: 0.5,
+          flexDirection: "row",
+          // flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <TouchableOpacity onPress={() => handleChangeRole()}>
+          <Text>Change Role</Text>
+        </TouchableOpacity>
+      </View> */}
     </View>
   );
 }
@@ -184,6 +225,6 @@ const styles = StyleSheet.create({
   },
 });
 Home.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#005c9d" },
   headerTintColor: "white",
 };
