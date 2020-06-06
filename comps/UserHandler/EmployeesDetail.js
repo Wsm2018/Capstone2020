@@ -18,7 +18,10 @@ import { Card } from "react-native-shadow-cards";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ActionButton from "react-native-action-button";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 import moment from "moment";
@@ -227,7 +230,7 @@ export default function EmployeesRequest(props) {
         </View>
       </View>
 
-      <View style={styles.two}>
+      <View style={styles.two2}>
         <Text style={styles.cardTitle}> Personal Informatioon</Text>
 
         <View style={styles.text}>
@@ -249,57 +252,6 @@ export default function EmployeesRequest(props) {
           <Text style={{ fontSize: 16, color: "black" }}>Nationality</Text>
           <Text style={{ fontSize: 16 }}> {user.country}</Text>
         </View>
-
-        {editMode ? (
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              marginTop: "5%",
-              alignSelf: "center",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              textAlign: "center",
-              marginStart: "6%",
-              marginBottom: "5%",
-            }}
-          >
-            <TouchableOpacity style={styles.payButton} onPress={handleSave}>
-              <Text style={{ color: "white" }}>Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.payButton} onPress={handleCancel}>
-              <Text style={{ color: "white" }}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              marginTop: "5%",
-              marginBottom: "5%",
-              alignSelf: "center",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              textAlign: "center",
-              marginStart: "6%",
-            }}
-          >
-            <TouchableOpacity
-              style={styles.payButton}
-              onPress={() => setModal(true)}
-            >
-              <Text style={{ color: "white" }}>Reset Password</Text>
-            </TouchableOpacity>
-            {/* ---------------------------------EDIT--------------------------------- */}
-            <TouchableOpacity
-              style={styles.payButton}
-              onPress={() => setEditMode(true)}
-            >
-              <Text style={{ color: "white" }}>Edit</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
       <View
         style={{
@@ -403,12 +355,47 @@ export default function EmployeesRequest(props) {
           </View>
         </Modal>
       </View>
+      {editMode ? (
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.payButton} onPress={handleSave}>
+            <Text style={{ color: "white" }}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.payButton} onPress={handleCancel}>
+            <Text style={{ color: "white" }}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ActionButton buttonColor={"#125a61"} size={80}>
+          <ActionButton.Item
+            buttonColor="#9b59b6"
+            title="Reset Password"
+            onPress={() => setModal(true)}
+          >
+            <SimpleLineIcons
+              name="people"
+              size={20}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+          <ActionButton.Item
+            buttonColor="#3498db"
+            title="Edit"
+            onPress={() => setEditMode(true)}
+          >
+            <MaterialCommunityIcons
+              name="logout"
+              size={20}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+        </ActionButton>
+      )}
     </View>
   );
 }
 EmployeesRequest.navigationOptions = (props) => ({
   title: "Employee Details",
-  headerStyle: { backgroundColor: "#3a68ab" },
+  headerStyle: { backgroundColor: "#20365F" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -421,12 +408,20 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     alignItems: "center",
-
     //backgroundColor: "blue",
   },
   body: {
     flex: 0,
     backgroundColor: "#e3e3e3",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    height: 22,
+    width: 22,
   },
   footer: {
     flex: 0,
@@ -455,15 +450,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   payButton: {
-    backgroundColor: "#327876",
+    backgroundColor: "#20365F",
     height: 40,
-    width: "45%",
+    width: "38%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
     marginStart: "2%",
     marginEnd: "2%",
-    borderRadius: 10,
+    borderRadius: 5,
     marginBottom: 10,
 
     //flexDirection: "row",
@@ -505,6 +500,28 @@ const styles = StyleSheet.create({
     // height: "100%",
     borderColor: "lightgray",
   },
+  one2: {
+    backgroundColor: "white",
+    width: "100%",
+    // marginTop: "3%",
+    // padding: "2%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    // height: "100%",
+    borderColor: "lightgray",
+  },
+  buttons: {
+    width: "100%",
+    flexDirection: "row",
+    // marginTop: "5%",
+    alignSelf: "center",
+    justifyContent: "space-evenly",
+    // alignItems: "center",
+    // textAlign: "center",
+    // marginStart: "6%",
+    // marginBottom: "5%",
+    backgroundColor: "white",
+  },
   two: {
     backgroundColor: "white",
     width: "100%",
@@ -516,6 +533,19 @@ const styles = StyleSheet.create({
     // flexDirection: "row",
     //flexWrap: "wrap",
 
+    // justifyContent: "space-between",
+  },
+  two2: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "5%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    // flexDirection: "row",
+    //flexWrap: "wrap",
+    borderBottomColor: "white",
     // justifyContent: "space-between",
   },
   cardTitle: {

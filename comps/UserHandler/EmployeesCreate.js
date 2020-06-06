@@ -17,10 +17,13 @@ import "firebase/storage";
 import db from "../../db";
 import { TextInput } from "react-native-paper";
 import { Input, Tooltip } from "react-native-elements";
+import Spinner from "react-native-loading-spinner-overlay";
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 
 import * as Print from "expo-print";
 import CountryPicker from "react-native-country-picker-modal";
 import DatePicker from "react-native-datepicker";
+import ReactNativePickerModule from "react-native-picker-module";
 
 export default function EmployeeHandlerCreate(props) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -32,12 +35,14 @@ export default function EmployeeHandlerCreate(props) {
   const [lastName, setLastName] = useState({ text: "", error: false });
   const [country, setCountry] = useState({ value: null, error: false });
   const [dateOfBirth, setDateOfBirth] = useState({ value: null, error: false });
-
+  const [spinner, setSpinner] = useState(false);
   const [role, setRole] = useState({ value: "-1", error: false });
+  const [rolepicker, setRolePicker] = useState(null);
+
   const [modal, setModal] = useState(false);
   const [countryPicker, setCountryPicker] = useState(false);
   const [countryCode, setCountryCode] = useState(null);
-
+  let pickerRef = null;
   const roles = [
     "asset handler",
     "customer support",
@@ -45,7 +50,11 @@ export default function EmployeeHandlerCreate(props) {
     "user handler",
     "services employee",
   ];
-
+  const test = () => {
+    setInterval(() => {
+      setSpinner(!spinner);
+    }, 3000);
+  };
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
     const doc = await db
@@ -146,6 +155,9 @@ export default function EmployeeHandlerCreate(props) {
   // --------------------------------CREATE----------------------------------
   const handleCreate = async () => {
     if (await validated()) {
+      // setInterval(() => {
+      //   setSpinner(!spinner);
+      // }, 3000);
       let create = firebase.functions().httpsCallable("createEmployee");
       let response = await create({
         firstName: firstName.text[0].toUpperCase() + firstName.text.slice(1),
@@ -157,10 +169,131 @@ export default function EmployeeHandlerCreate(props) {
         dateOfBirth: dateOfBirth.value,
       });
       console.log("response", response.data);
+      let page = `<!DOCTYPE html>
 
-      let page = `<View><Text>Email:${
-        email.text + company
-      }</Text><Text>Password:${response.data.password}</Text></View>`;
+  <html>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+  
+      .body {
+        background-color: #d2b4de;
+      }
+      * {
+        box-sizing: border-box;
+      }
+  
+      /* Full-width input fields */
+      input[type="email"],
+      input[type="password"] {
+        width: 30%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        display: inline-block;
+        border: none;
+        background: #f1f1f1;
+      }
+  
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        background-color: rgb(194, 194, 194);
+        outline: none;
+      }
+      .already {
+        margin-right: 15%;
+      }
+      hr {
+        border: 1px solid #f1f1f1;
+        margin-bottom: 25px;
+      }
+  
+      /* Set a style for all buttons */
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        opacity: 0.9;
+      }
+  
+      button:hover {
+        opacity: 1;
+      }
+  
+      /* Extra styles for the cancel button */
+      .loginbtn {
+        background-color: #f1f1f1;
+        width: 15%;
+        border: 1px solid green;
+      }
+  
+      /* Float cancel and signup buttons and add an equal width */
+  
+      .signupbtn,
+      .cancelbtn {
+        width: 30%;
+      }
+      .href {
+        color: green;
+        color: white;
+        text-decoration: none;
+      }
+      /* Add padding to container elements */
+      .container {
+        padding: 16px;
+        border: 1px solid;
+        width: 60%;
+        margin-top: 120px;
+        background-color: white;
+      }
+  
+      /* Clear floats */
+      .clearfix::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+      .left {
+        float: left;
+      }
+      .right {
+        float: right;
+      }
+      /* Change styles for cancel button and signup button on extra small screens */
+      @media screen and (max-width: 300px) {
+        .signupbtn {
+          width: 100%;
+        }
+      }
+    </style>
+    <body class="body">
+      <center>
+        <div class="container">
+          <h2>Employess Reset Password PDF File</h2>
+          <p>
+            Email: ${email.text + company}
+          </p>
+          <p>
+            Password:${response.data.password}
+          </p>
+  
+          <div class="clearfix">
+            <a class="href" href="index.html"
+              ><button type="button" class="cancelbtn">Go Back</button></a
+            >
+          </div>
+        </div>
+      </center>
+    </body>
+  </html>
+  `;
+      // let page = `<View><Text>Email:${
+      //   email.text + company
+      // }</Text><Text>Password:${response.data.password}</Text></View>`;
       let pdf = await Print.printToFileAsync({ html: page });
       let uri = pdf.uri;
       const response2 = await fetch(uri);
@@ -180,6 +313,9 @@ export default function EmployeeHandlerCreate(props) {
         });
       }
     }
+    // setInterval(() => {
+    //   setSpinner(!spinner);
+    // }, 3000);
   };
 
   // -------------------------------DELETE-----------------------------------
@@ -216,137 +352,174 @@ export default function EmployeeHandlerCreate(props) {
   return (
     <View style={styles.container}>
       {/* <Text>EmployeeHandlerCreate</Text> */}
-
-      <ScrollView>
-        {/* ----------------------------------NAME-------------------------------- */}
-        <View
-          style={{ flexDirection: "row", justifyContent: "space-between" }}
-        ></View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          {/* <TextInput
+      <Text
+        style={{
+          fontSize: 20,
+          color: "#20365F",
+          justifyContent: "center",
+          alignSelf: "center",
+          marginTop: "5%",
+          fontWeight: "bold",
+        }}
+      >
+        Creating Employee Account
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          //justifyContent: "space-between",
+          justifyContent: "center",
+        }}
+      >
+        {/* <TextInput
             onChangeText={(text) => setFirstName({ text, error: false })}
             value={firstName}
             style={{ width: "47.5%" }}
           /> */}
-          <Input
-            inputContainerStyle={{
-              borderBottomWidth: 0,
-            }}
-            containerStyle={styles.Inputs}
-            placeholder="First Name"
-            onChangeText={(text) => setFirstName({ text, error: false })}
-            value={firstName}
-            placeholderTextColor="#20365F"
-            inputStyle={{
-              color: "#20365F",
-              fontSize: 16,
-            }}
-          />
-          <Input
-            inputContainerStyle={{
-              borderBottomWidth: 0,
-            }}
-            containerStyle={styles.Inputs}
-            placeholder="First Name"
-            onChangeText={(text) => setLastName({ text, error: false })}
-            value={lastName}
-            placeholderTextColor="#20365F"
-            inputStyle={{
-              color: "#20365F",
-              fontSize: 16,
-            }}
-          />
-          {/* <TextInput
-            onChangeText={(text) => setLastName({ text, error: false })}
-            value={lastName}
-            style={{ width: "47.5%" }}
-          /> */}
-        </View>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text
-            style={
-              firstName.error
-                ? { color: "red", width: "47.5%" }
-                : { color: "transparent" }
-            }
-          >
-            * First Name is Required
-          </Text>
-          <Text
-            style={
-              lastName.error
-                ? { color: "red", width: "47.5%" }
-                : { color: "transparent" }
-            }
-          >
-            * Last Name is Required
-          </Text>
-        </View>
-
-        {/* ---------------------------------DISPLAY NAME--------------------------------- */}
-
         <Input
           inputContainerStyle={{
             borderBottomWidth: 0,
           }}
           containerStyle={styles.Inputs}
-          placeholder="Display Name"
-          onChangeText={(text) => setDisplayName({ text, error: false })}
-          value={displayName}
+          placeholder="First Name"
+          onChangeText={(text) => setFirstName({ text, error: false })}
+          value={firstName}
           placeholderTextColor="#20365F"
           inputStyle={{
             color: "#20365F",
             fontSize: 16,
           }}
         />
+        <Input
+          inputContainerStyle={{
+            borderBottomWidth: 0,
+          }}
+          containerStyle={styles.Inputs}
+          placeholder="Last Name"
+          onChangeText={(text) => setLastName({ text, error: false })}
+          value={lastName}
+          placeholderTextColor="#20365F"
+          inputStyle={{
+            color: "#20365F",
+            fontSize: 16,
+          }}
+        />
+        {/* <TextInput
+            onChangeText={(text) => setLastName({ text, error: false })}
+            value={lastName}
+            style={{ width: "47.5%" }}
+          /> */}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={
-            displayName.error ? { color: "red" } : { color: "transparent" }
+            firstName.error
+              ? { color: "red", marginLeft: "9%" }
+              : { color: "transparent" }
           }
         >
-          * Invalid Display Name
+          * First Name is Required
         </Text>
-
-        {/* ----------------------------------EMAIL-------------------------------- */}
-
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Input
-            inputContainerStyle={{
-              borderBottomWidth: 0,
-            }}
-            containerStyle={styles.Inputs}
-            placeholder="Email"
-            onChangeText={(text) => setEmail({ text, error: false })}
-            value={email.text}
-            placeholderTextColor="#20365F"
-            inputStyle={{
-              color: "#20365F",
-              fontSize: 16,
-            }}
-          />
-          <Input
-            inputContainerStyle={{
-              borderBottomWidth: 0,
-            }}
-            containerStyle={styles.Inputs}
-            placeholder="Company"
-            value={company}
-            placeholderTextColor="#20365F"
-            inputStyle={{
-              color: "#20365F",
-              fontSize: 16,
-            }}
-            disabled
-          />
-        </View>
-        <Text style={email.error ? { color: "red" } : { color: "transparent" }}>
-          * Invalid Email
+        <Text
+          style={
+            lastName.error
+              ? {
+                  color: "red",
+                  width: "100%",
+                  justifyContent: "flex-start",
+                  marginLeft: "9%",
+                }
+              : { color: "transparent" }
+          }
+        >
+          * Last Name is Required
         </Text>
+      </View>
 
-        {/* ---------------------------------ROLE--------------------------------- */}
+      {/* ---------------------------------DISPLAY NAME--------------------------------- */}
 
-        <View
-          style={{ borderColor: "lightgray", backgroundColor: "lightgray" }}
+      <Input
+        inputContainerStyle={{
+          borderBottomWidth: 0,
+        }}
+        containerStyle={styles.Inputs2}
+        placeholder="Display Name"
+        onChangeText={(text) => setDisplayName({ text, error: false })}
+        value={displayName}
+        placeholderTextColor="#20365F"
+        inputStyle={{
+          color: "#20365F",
+          fontSize: 16,
+        }}
+      />
+      <Text
+        style={
+          displayName.error
+            ? { color: "red", marginLeft: "10%" }
+            : { color: "transparent" }
+        }
+      >
+        * Invalid Display Name
+      </Text>
+
+      {/* ----------------------------------EMAIL-------------------------------- */}
+
+      <View style={{ flexDirection: "row", justifyContent: "center" }}>
+        <Input
+          inputContainerStyle={{
+            borderBottomWidth: 0,
+          }}
+          containerStyle={styles.Inputs}
+          placeholder="Email"
+          onChangeText={(text) => setEmail({ text, error: false })}
+          value={email.text}
+          placeholderTextColor="#20365F"
+          inputStyle={{
+            color: "#20365F",
+            fontSize: 16,
+          }}
+        />
+        <Input
+          inputContainerStyle={{
+            borderBottomWidth: 0,
+          }}
+          containerStyle={styles.Inputs}
+          placeholder="Company"
+          value={company}
+          placeholderTextColor="#20365F"
+          inputStyle={{
+            color: "#20365F",
+            fontSize: 16,
+          }}
+          disabled
+        />
+      </View>
+      <Text
+        style={
+          email.error
+            ? { color: "red", marginLeft: "10%" }
+            : { color: "transparent" }
+        }
+      >
+        * Invalid Email
+      </Text>
+
+      {/* ---------------------------------ROLE--------------------------------- */}
+
+      {/* <View
+          style={{
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#20365F",
+            height: 50,
+            width: "99%",
+            alignSelf: "center",
+            // opacity: 0.8,
+            paddingLeft: 12,
+            marginTop: 20,
+            // flexDirection: "row-reverse",
+            justifyContent: "space-between",
+          }}
         >
           <Picker
             // mode="dropdown"
@@ -367,69 +540,194 @@ export default function EmployeeHandlerCreate(props) {
         </View>
         <Text style={role.error ? { color: "red" } : { color: "transparent" }}>
           * Select a Role
-        </Text>
+        </Text> */}
 
-        {/* ---------------------------------COUNTRY--------------------------------- */}
+      {/* ---------------------------------COUNTRY--------------------------------- */}
+      <View
+        style={{
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: "#20365F",
+          height: 50,
+          width: "87%",
+          alignSelf: "center",
+          opacity: 0.8,
+          marginTop: 20,
+          paddingLeft: 13,
+          flexDirection: "row",
+          justifyContent: "center",
+          // alignItems: "center",
+          // alignSelf: "center",
+          // alignContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            height: 50,
+            width: "99%",
+            alignSelf: "center",
+            opacity: 0.8,
+            marginTop: 20,
+            // paddingLeft: 12,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            //alignItems: "space-between",
+            // alignSelf: "center",
+            alignContent: "center",
+            //color: "#20365F",
+            color: "red",
+          }}
+          onPress={() => setCountryPicker(true)}
+        >
+          <CountryPicker
+            visible={countryPicker}
+            withFilter
+            withAlphaFilter
+            withCountryNameButton
+            countryCode={countryCode}
+            onSelect={(country) => {
+              setCountry({ value: country.name, error: false });
+              setCountryCode(country.cca2);
+            }}
+            itemStyle={{
+              backgroundColor: "lightgrey",
+              marginLeft: 0,
+              paddingLeft: 15,
+            }}
+            itemTextStyle={{ fontSize: 18, color: "red" }}
+            // style={styles.picker}
+            //    style={{ flex: 1, color: "#445870" }}
+            onClose={() => setCountryPicker(false)}
+          />
+          <Ionicons
+            name="md-arrow-dropdown"
+            size={23}
+            color="#333333"
+            style={{
+              marginRight: "5%",
+            }}
+          />
+        </TouchableOpacity>
+      </View>
+      <Text
+        style={
+          country.error
+            ? { color: "red", marginLeft: "10%" }
+            : { color: "transparent" }
+        }
+      >
+        * Select a Country
+      </Text>
+      {Platform.OS === "android" ? (
         <View
           style={{
             borderRadius: 8,
             borderWidth: 1,
             borderColor: "#20365F",
             height: 50,
-            width: "80%",
+            width: "87%",
             alignSelf: "center",
-            opacity: 0.8,
-            marginTop: 20,
             paddingLeft: 12,
-            flexDirection: "row",
+            marginTop: 20,
+            justifyContent: "space-between",
+          }}
+        >
+          <Picker
+            //mode="dropdown"
+            //itemStyle={{ color: "red" }}
+            selectedValue={role.value}
+            style={styles.picker}
+            onValueChange={(itemValue, itemIndex) =>
+              setRole({ value: itemValue, error: false })
+            }
+            itemStyle={{
+              color: "blue",
+            }}
+          >
+            <Picker.Item
+              label="Select a role"
+              value="-1"
+              itemStyle={{ textAlign: "center" }}
+            />
+            {roles.map((role, index) => (
+              <Picker.Item label={role} value={role} key={index} />
+            ))}
+          </Picker>
+          <Text
+            style={role.error ? { color: "red" } : { color: "transparent" }}
+          >
+            * Select a Role
+          </Text>
+        </View>
+      ) : (
+        <View
+          style={{
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#20365F",
+            height: 50,
+            width: "87%",
+            alignSelf: "center",
+            // opacity: 0.8,
+            paddingLeft: 12,
+            marginTop: 20,
+            // flexDirection: "row-reverse",
+            justifyContent: "space-between",
           }}
         >
           <TouchableOpacity
-            style={{
-              height: 50,
-              width: "80%",
-              alignSelf: "center",
-              opacity: 0.8,
-              marginTop: 20,
-              paddingLeft: 12,
-              flexDirection: "row",
-              color: "#20365F",
+            onPress={() => {
+              pickerRef.show();
             }}
-            onPress={() => setCountryPicker(true)}
           >
-            <CountryPicker
-              visible={countryPicker}
-              withFilter
-              withAlphaFilter
-              withCountryNameButton
-              countryCode={countryCode}
-              onSelect={(country) => {
-                setCountry({ value: country.name, error: false });
-                setCountryCode(country.cca2);
-              }}
-              style={{ flex: 1, color: "transparent" }}
-              onClose={() => setCountryPicker(false)}
-            />
-            <Text>▼</Text>
+            <Text style={{ fontSize: 20 }}>
+              {role.value === null ? "Select role" : role}
+            </Text>
           </TouchableOpacity>
+          <ReactNativePickerModule
+            pickerRef={(e) => (pickerRef = e)}
+            selectedValue={role.value}
+            title={"Select role"}
+            items={roles}
+            onValueChange={(itemValue, itemIndex) =>
+              setRole({ value: itemValue, error: false })
+            }
+          />
+          <Text
+            style={role.error ? { color: "red" } : { color: "transparent" }}
+          >
+            * Select a Role
+          </Text>
         </View>
-        <Text
-          style={country.error ? { color: "red" } : { color: "transparent" }}
-        >
-          * Select a Country
-        </Text>
-
-        {/* ---------------------------------DATE--------------------------------- */}
-        <Text>Date of Birth</Text>
+      )}
+      <Text></Text>
+      {/* ---------------------------------DATE--------------------------------- */}
+      <View
+        style={{
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: "#20365F",
+          height: 50,
+          width: "87%",
+          alignSelf: "center",
+          // opacity: 0.8,
+          paddingLeft: 12,
+          marginTop: 20,
+          // flexDirection: "row-reverse",
+          justifyContent: "space-between",
+        }}
+      >
         <DatePicker
           // style={{ width: 200 }}
           style={{
             width: "100%",
-            // backgroundColor: "lightgray",
+            color: "#667085",
+            justifyContent: "flex-start",
+            //backgroundColor: "lightgray",
           }}
           date={dateOfBirth.value}
           mode="date"
-          placeholder="select date"
+          placeholder="Select a Date"
           format="YYYY-MM-DD"
           // minDate={new Date()}
           maxDate={new Date()}
@@ -437,39 +735,52 @@ export default function EmployeeHandlerCreate(props) {
           cancelBtnText="Cancel"
           customStyles={{
             dateIcon: {
-              position: "absolute",
-              left: 0,
+              width: 0,
+              height: 0,
             },
-            dateInput: {},
+            dateInput: {
+              borderWidth: 0,
+              color: "#667085",
+              // alignItems: "flex-start",
+              fontSize: 12,
+              marginRight: "68%",
+            },
+            placeholderText: {
+              fontSize: 16,
+              color: "#393f4a",
+            },
+            dateText: {
+              fontSize: 15,
+              color: "#393f4a",
+            },
           }}
           onDateChange={(date) => {
             setDateOfBirth({ value: date, error: false });
             // console.log(new Date(date));
           }}
         />
-        <Text
-          style={
-            dateOfBirth.error ? { color: "red" } : { color: "transparent" }
-          }
-        >
-          * Select a Date
-        </Text>
-      </ScrollView>
+      </View>
+      <Text
+        style={
+          dateOfBirth.error
+            ? { color: "red", marginLeft: "10%" }
+            : { color: "transparent" }
+        }
+      >
+        * Select a Date
+      </Text>
+
+      <TouchableOpacity style={styles.payButton} onPress={handleCreate}>
+        <Text style={{ color: "white" }}>Create</Text>
+      </TouchableOpacity>
+      <Spinner
+        visible={spinner}
+        textContent={"Loading..."}
+        textStyle={styles.spinnerTextStyle}
+      />
 
       {/* ---------------------------------SUBMIT--------------------------------- */}
       <Text></Text>
-      <TouchableOpacity
-        style={{
-          borderWidth: 1,
-          width: "100%",
-          height: "10%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        onPress={handleCreate}
-      >
-        <Text>Create</Text>
-      </TouchableOpacity>
 
       {/* ---------------------------------DELETE--------------------------------- */}
       {/* <Text></Text>
@@ -492,8 +803,9 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             flex: 1,
             justifyContent: "center",
-            // alignItems: "center",
+            alignContent: "center",
             alignSelf: "center",
+            alignItems: "center",
             marginTop: 22,
             // ---This is for Width---
             width: "80%",
@@ -515,11 +827,19 @@ export default function EmployeeHandlerCreate(props) {
               shadowRadius: 3.84,
               elevation: 5,
               justifyContent: "center",
+              alignContent: "center",
+              alignSelf: "center",
+              alignItems: "center",
               // ---This is for Height---
-              height: "30%",
+              height: "50%",
             }}
           >
-            <Text>
+            <Text
+              style={{
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
               Request to create {email.text + company} as a {role.value} has
               been sent.
             </Text>
@@ -527,26 +847,20 @@ export default function EmployeeHandlerCreate(props) {
             <Text></Text>
             <View
               style={{
-                //   borderWidth: 1,
                 width: "100%",
-                height: "20%",
-                justifyContent: "space-around",
+                height: "5%",
+                justifyContent: "space-evenly",
                 alignItems: "center",
+                alignSelf: "center",
                 flexDirection: "row",
               }}
             >
               {/* ---------------------------------OK--------------------------------- */}
               <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "30%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                style={styles.payButton}
                 onPress={() => props.navigation.goBack()}
               >
-                <Text>OK</Text>
+                <Text style={{ color: "white" }}>OK</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -555,29 +869,59 @@ export default function EmployeeHandlerCreate(props) {
     </View>
   );
 }
-
+EmployeeHandlerCreate.navigationOptions = (props) => ({
+  title: "Employee Handler Create",
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+});
 const styles = StyleSheet.create({
   container: {
     // borderWidth: 1,
     flex: 1,
-    margin: 20,
-    // height: "100%",
+    //margin: 20,
+    backgroundColor: "#e3e3e3",
+    //height: "100%",
   },
   Inputs: {
-    borderRadius: 8,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: "#20365F",
     height: 50,
-    width: "50%",
+    width: "43%",
     alignSelf: "center",
     opacity: 0.8,
     paddingLeft: 12,
     marginTop: 20,
+    marginLeft: "1%",
+    // justifyContent:"center"
+  },
+  Inputs2: {
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#20365F",
+    height: 50,
+    width: "87%",
+    alignSelf: "center",
+    opacity: 0.8,
+    paddingLeft: 12,
+    marginTop: 20,
+    marginLeft: "1%",
+  },
+  spinnerTextStyle: {
+    color: "#FFF",
+  },
+  picker: {
+    height: 50,
+    width: "99%",
+    borderColor: "black",
+    borderWidth: 1,
+    color: "#667085",
+    borderStyle: "solid",
   },
   payButton: {
     backgroundColor: "#327876",
-    height: 40,
-    width: "55%",
+    height: 55,
+    width: "86%",
     alignSelf: "center",
     justifyContent: "center",
     alignContent: "center",

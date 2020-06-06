@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Button,
   ScrollView,
+  Dimensions,
+  Image,
 } from "react-native";
 
 import firebase from "firebase/app";
@@ -14,13 +16,18 @@ import db from "../../db";
 import { ButtonGroup, ListItem } from "react-native-elements";
 // <Button title="" onPress={() => props.navigation.navigate("")} />
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ActionButton from "react-native-action-button";
+import { FlatGrid } from "react-native-super-grid";
+import Spinner from "react-native-loading-spinner-overlay";
 
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 export default function indexUH(props) {
   const buttons = ["Employees Function", "Customer Function"];
   const [view, setView] = useState(0);
   const [employees, setEmployees] = useState(0);
   const [customers, setCustomers] = useState(0);
+  const [spinner, setSpinner] = useState(false);
+
   const roles = [
     "asset handler",
     "customer support",
@@ -33,6 +40,59 @@ export default function indexUH(props) {
     "user handler (incomplete)",
     "services employee (incomplete)",
   ];
+  const data = [employees, customers];
+  const items = [
+    {
+      name: "Employees Index",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("EmployeesIndex"),
+      image: require("../../assets/images/employee.png"),
+
+      height: 120,
+      width: 200,
+    },
+    {
+      name: "Customers Index",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("CustomersIndex"),
+      image: require("../../assets/images/employee.png"),
+      height: 120,
+      width: 200,
+    },
+
+    {
+      name: "Employees Pending",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("EmployeesPending"),
+      image: require("../../assets/images/pending.png"),
+      height: 120,
+      width: 200,
+    },
+    {
+      name: " Employees Create",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("EmployeesCreate"),
+      image: require("../../assets/images/form.png"),
+      height: 120,
+      width: 200,
+    },
+    {
+      name: "Employees Allowed",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("EmployeesAllowed"),
+      image: require("../../assets/images/emp.png"),
+      height: 120,
+      width: 200,
+    },
+    {
+      name: "Employees Create Success",
+      code: "#20365F",
+      nav: () => props.navigation.navigate("EmployeesCreateSuccess"),
+      image: require("../../assets/images/emp.png"),
+      height: 120,
+      width: 200,
+    },
+  ];
 
   // --------------------------------EMPLOYEES----------------------------------
   const handleEmployees = () => {
@@ -44,8 +104,11 @@ export default function indexUH(props) {
       });
     return unsub;
   };
-
-  // --------------------------------CUSTOMERS----------------------------------
+  useEffect(() => {
+    setInterval(() => {
+      setSpinner(!spinner);
+    }, 3000);
+  }, []); // --------------------------------CUSTOMERS----------------------------------
   const handleCustomers = () => {
     const unsub = db
       .collection("users")
@@ -72,22 +135,67 @@ export default function indexUH(props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.surface}>
+      {/* <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: 25,
+          color: "#20365F",
+          alignSelf: "center",
+        }}
+      >
+        User Handler Panel
+      </Text> */}
+      {items ? (
+        <FlatGrid
+          itemDimension={150}
+          items={items}
+          style={styles.gridView}
+          renderItem={({ item, index }) => (
+            <View
+              style={[styles.itemContainer, { backgroundColor: item.code }]}
+            >
+              <TouchableOpacity onPress={item.nav}>
+                <View style={{ height: "100%", width: "100%" }}>
+                  <Image
+                    source={item.image}
+                    style={{
+                      flex: 1,
+                      height: undefined,
+                      width: undefined,
+                    }}
+                  />
+
+                  <View
+                    style={{
+                      alignItems: "center",
+                      flex: 0.2,
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={styles.itemName}>{item.name}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      ) : (
+        <Spinner
+          visible={spinner}
+          textContent={"Loading..."}
+          textStyle={styles.spinnerTextStyle}
+        />
+      )}
+      {/* <View style={styles.surface}>
           <TouchableOpacity
-            // onPress={() => props.navigation.navigate("Sections", { type: t })}
             style={{
               backgroundColor: "#2EAAAA",
               width: "100%",
               height: "100%",
-              //margin: "1%",
               justifyContent: "center",
               alignItems: "center",
-
-              borderWidth: 0,
-              // borderRadius: 10,
-              //borderColor: "black",
             }}
+            onPress={() => props.navigation.navigate("EmployeesIndex")}
           >
             <MaterialCommunityIcons name="worker" size={50} color="#2e7351" />
             <Text
@@ -107,20 +215,16 @@ export default function indexUH(props) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            // onPress={() => props.navigation.navigate("Sections", { type: t })}
             style={{
-              backgroundColor: "#FE4D3B",
+              backgroundColor: "#E74C3C",
               width: "100%",
-              // margin: "1%",
               height: "100%",
 
               justifyContent: "center",
               alignItems: "center",
 
-              // borderWidth: 0,
-              // borderRadius: 10,
-              //borderColor: "black",
             }}
+            onPress={() => props.navigation.navigate("CustomersIndex")}
           >
             <Feather name="user" size={50} color="#FED8C4" />
             <Text
@@ -139,18 +243,15 @@ export default function indexUH(props) {
               {customers}
             </Text>
           </TouchableOpacity>
-        </View>
-      </View>
+        </View> */}
 
-      <View style={[styles.containerLogin]}>
+      {/* <View style={[styles.containerLogin]}>
         <ScrollView>
           <ButtonGroup
             onPress={(index) => setView(index)}
             selectedIndex={view}
             buttons={buttons}
             containerStyle={{
-              // backgroundColor: "lightgray",
-              // borderWidth: 1,
               width: "102%",
               alignContent: "center",
               alignItems: "center",
@@ -164,7 +265,6 @@ export default function indexUH(props) {
             }}
             selectedTextStyle={{
               color: "black",
-              //fontWeight: "bold",
             }}
             textStyle={{ color: "darkgray", fontSize: 17 }}
           />
@@ -176,7 +276,6 @@ export default function indexUH(props) {
                 }
                 title="Employees Index"
                 titleStyle={{ fontSize: 16, marginLeft: "4%" }}
-                //containerStyle={{ backgroundColor: "#f0eded" }}
                 onPress={() => props.navigation.navigate("EmployeesIndex")}
                 bottomDivider
               />
@@ -185,7 +284,6 @@ export default function indexUH(props) {
                   <Ionicons name="ios-arrow-forward" size={24} color="black" />
                 }
                 titleStyle={{ fontSize: 16, marginLeft: "4%" }}
-                //containerStyle={{ backgroundColor: "#f0eded" }}
                 title="Employees Allowed"
                 onPress={() => props.navigation.navigate("EmployeesAllowed")}
                 bottomDivider
@@ -195,7 +293,6 @@ export default function indexUH(props) {
                   <Ionicons name="ios-arrow-forward" size={24} color="black" />
                 }
                 titleStyle={{ fontSize: 16, marginLeft: "4%" }}
-                //containerStyle={{ backgroundColor: "#f0eded" }}
                 title="Employees Pending"
                 onPress={() => props.navigation.navigate("EmployeesPending")}
                 bottomDivider
@@ -205,14 +302,12 @@ export default function indexUH(props) {
                   <Ionicons name="ios-arrow-forward" size={24} color="black" />
                 }
                 titleStyle={{ fontSize: 16, marginLeft: "4%" }}
-                //containerStyle={{ backgroundColor: "#f0eded" }}
                 title="Employees Create"
                 onPress={() => props.navigation.navigate("EmployeesCreate")}
                 bottomDivider
               />
               <ListItem
                 titleStyle={{ fontSize: 16, marginLeft: "4%" }}
-                //containerStyle={{ backgroundColor: "#f0eded" }}
                 rightAvatar={
                   <Ionicons name="ios-arrow-forward" size={24} color="black" />
                 }
@@ -236,41 +331,40 @@ export default function indexUH(props) {
               />
             </View>
           ) : null}
-          <Text style={{ fontSize: 15, color: "black", marginBottom: "2%" }}>
-            Logins
-          </Text>
-
-          <TouchableOpacity
-            onPress={handleChangeRole}
-            style={
-              {
-                // borderRadius: 10,
-                //borderColor: "black",
-              }
-            }
-          >
-            <Text style={{ fontSize: 15, color: "black", marginBottom: "2%" }}>
-              Change Role
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              firebase.auth().signOut();
-              console.log(firebase.auth().currentUser.uid);
-            }}
-            style={
-              {
-                // borderRadius: 10,
-                //borderColor: "black",
-              }
-            }
-          >
-            <Text style={{ fontSize: 16, color: "black", marginBottom: "2%" }}>
-              Sign Out
-            </Text>
-          </TouchableOpacity>
         </ScrollView>
-      </View>
+      </View> */}
+      <ActionButton
+        buttonColor={"#125a61"}
+        size={80}
+        // position="left"
+        //verticalOrientation="down"
+      >
+        <ActionButton.Item
+          buttonColor="#9b59b6"
+          title="Change Role"
+          onPress={handleChangeRole}
+        >
+          <SimpleLineIcons
+            name="people"
+            size={20}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+        <ActionButton.Item
+          buttonColor="#3498db"
+          title="Logout"
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={20}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+      </ActionButton>
     </View>
   );
 }
@@ -282,7 +376,16 @@ indexUH.navigationOptions = (props) => ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#e3e3e3",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    height: 22,
+    width: 22,
   },
   containerLogin: {
     flex: 0.7,
@@ -299,8 +402,30 @@ const styles = StyleSheet.create({
 
     justifyContent: "flex-start",
   },
+  spinnerTextStyle: {
+    color: "#FFF",
+  },
+  gridView: {
+    marginTop: 20,
+    flex: 1,
+  },
+  itemContainer: {
+    justifyContent: "flex-end",
+    borderRadius: 5,
+    height: 150,
+  },
+  itemName: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  itemCode: {
+    fontWeight: "600",
+    fontSize: 12,
+    color: "#fff",
+  },
   header: {
-    flex: 0.3,
+    flex: 0.25,
     justifyContent: "space-evenly",
     flexDirection: "row",
     alignItems: "center",
