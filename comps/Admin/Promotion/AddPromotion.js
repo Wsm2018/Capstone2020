@@ -89,39 +89,42 @@ export default function AddPromotion(props) {
           style={{
             flex: 1,
             alignItems: "center",
-            justifyContent: "space-evenly",
-            // backgroundColor: "red",
+            justifyContent: "center",
           }}
         >
           <View
             style={{
-              flex: 1,
-              backgroundColor: "blue",
+              flex: 0.5,
+
               alignItems: "center",
-              justifyContent: "space-evenly",
-            }}
-          >
-            <Text>Promotion Create</Text>
-          </View>
-          {/* <View></View> */}
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              // backgroundColor: "red",
               justifyContent: "center",
-              alignItems: "center",
             }}
           >
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#20365F",
+                justifyContent: "center",
+                alignSelf: "center",
+                marginTop: "5%",
+                fontWeight: "bold",
+              }}
+            >
+              Promotion Create
+            </Text>
+          </View>
+          <View style={{ width: "80%" }}>
             <View
               style={{
-                height: 40,
-                flex: 2,
-                paddingLeft: 10,
+                backgroundColor: "white",
+                alignItems: "center",
+                flexDirection: "column",
+                // paddingLeft: 6,
+                // width: "80%",
                 borderColor: "black",
                 borderWidth: 1,
                 borderRadius: 5,
-                justifyContent: "center",
+                marginBottom: "5%",
               }}
             >
               <TextInput
@@ -132,7 +135,7 @@ export default function AddPromotion(props) {
                   setCodeErr("");
                   setShowCodeErr(false);
                 }}
-                placeholder="Enter Code"
+                placeholder="Code"
               />
             </View>
 
@@ -143,59 +146,21 @@ export default function AddPromotion(props) {
                 {codeErr}
               </Text>
             ) : null}
-
-            <View style={{ flex: 1 }}>
-              <DatePicker
-                style={{
-                  height: 40,
-                  width: "90%",
-                  // paddingLeft: 6,
-                  // borderColor: "black",
-                  // borderWidth: 1,
-                  borderRadius: 5,
-                }}
-                date={expiry}
-                mode="date"
-                placeholder=" Expiry Date"
-                format="YYYY-MM-DD"
-                minDate={new Date()}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    position: "absolute",
-                    left: 0,
-                    top: 4,
-                    marginLeft: 0,
-                  },
-                }}
-                onDateChange={(date) => {
-                  setExpiry(date);
-                  setExpiryErr("");
-                  setShowExpiryErr(false);
-                }}
-              />
-              {showExpiryErr ? (
-                <Text
-                  style={
-                    expiryErr ? { color: "red" } : { color: "transparent" }
-                  }
-                >
-                  {expiryErr}
-                </Text>
-              ) : null}
-            </View>
           </View>
+
           <View style={{ width: "80%" }}>
             <View
               style={{
-                height: 40,
+                backgroundColor: "white",
+                alignItems: "center",
 
-                paddingLeft: 6,
+                flexDirection: "column",
+                // paddingLeft: 6,
+                // width: "80%",
                 borderColor: "black",
                 borderWidth: 1,
                 borderRadius: 5,
-                justifyContent: "center",
+                marginBottom: "5%",
               }}
             >
               <TextInput
@@ -221,6 +186,53 @@ export default function AddPromotion(props) {
               </Text>
             ) : null}
           </View>
+          <View style={{ height: 50, width: "80%" }}>
+            <DatePicker
+              style={{
+                width: "100%",
+                borderColor: "darkgray",
+                borderWidth: 0.5,
+                borderRadius: 5,
+                // marginBottom: "5%",
+              }}
+              date={expiry}
+              mode="date"
+              placeholder="Select Expiry Date"
+              format="YYYY-MM-DD"
+              minDate={new Date()}
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  // position: "absolute",
+                  right: 0,
+                  top: 0,
+                  // marginLeft: 0,
+                },
+
+                placeholderText: {
+                  fontSize: 15,
+                  color: "#393f4a",
+                },
+                dateText: {
+                  fontSize: 15,
+                  color: "#393f4a",
+                },
+              }}
+              onDateChange={(date) => {
+                setExpiry(date);
+                setExpiryErr("");
+                setShowExpiryErr(false);
+              }}
+            />
+            {showExpiryErr ? (
+              <Text
+                style={expiryErr ? { color: "red" } : { color: "transparent" }}
+              >
+                {expiryErr}
+              </Text>
+            ) : null}
+          </View>
         </View>
 
         <View
@@ -228,37 +240,16 @@ export default function AddPromotion(props) {
             flex: 0.5,
             justifyContent: "center",
             alignItems: "center",
-
-            width: "90%",
-            // flexDirection: "row",
-            // marginTop: "5%",
-            // marginBottom: "5%",
-            alignSelf: "center",
-            // justifyContent: "space-evenly",
-            // alignItems: "center",
-            textAlign: "center",
-            // marginStart: "6%",
           }}
         >
           <TouchableOpacity
             style={{
-              // backgroundColor: "#20365F",
-              // height: 40,
-              width: "40%",
-              // justifyContent: "center",
-              // alignItems: "center",
-              // borderRadius: 30,
-
-              backgroundColor: "#327876",
+              backgroundColor: "#20365F",
               height: 40,
-              // width: "45%",
-              alignSelf: "center",
+              width: "40%",
               justifyContent: "center",
               alignItems: "center",
-              // marginStart: "2%",
-              // marginEnd: "2%",
-              borderRadius: 10,
-              // marginBottom: 10,
+              borderRadius: 30,
             }}
             onPress={handleSubmit}
           >
