@@ -161,7 +161,7 @@ export default function EmployeesRequest(props) {
                 style={{
                   borderRadius: 8,
                   borderWidth: 1,
-                  borderColor: "#20365F",
+                  borderColor: "#185a9d",
                   height: 40,
                   marginTop: "1%",
                   width: "50%",
@@ -395,7 +395,7 @@ export default function EmployeesRequest(props) {
 }
 EmployeesRequest.navigationOptions = (props) => ({
   title: "Employee Details",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   payButton: {
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
     height: 40,
     width: "38%",
     alignSelf: "center",

@@ -171,126 +171,103 @@ export default function EmployeeHandlerCreate(props) {
       console.log("response", response.data);
       let page = `<!DOCTYPE html>
 
-  <html>
-    <style>
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-      }
-  
-      .body {
-        background-color: #d2b4de;
-      }
-      * {
-        box-sizing: border-box;
-      }
-  
-      /* Full-width input fields */
-      input[type="email"],
-      input[type="password"] {
-        width: 30%;
-        padding: 15px;
-        margin: 5px 0 22px 0;
-        display: inline-block;
-        border: none;
-        background: #f1f1f1;
-      }
-  
-      input[type="email"]:focus,
-      input[type="password"]:focus {
-        background-color: rgb(194, 194, 194);
-        outline: none;
-      }
-      .already {
-        margin-right: 15%;
-      }
-      hr {
-        border: 1px solid #f1f1f1;
-        margin-bottom: 25px;
-      }
-  
-      /* Set a style for all buttons */
-      button {
-        background-color: #4caf50;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-        opacity: 0.9;
-      }
-  
-      button:hover {
-        opacity: 1;
-      }
-  
-      /* Extra styles for the cancel button */
-      .loginbtn {
-        background-color: #f1f1f1;
-        width: 15%;
-        border: 1px solid green;
-      }
-  
-      /* Float cancel and signup buttons and add an equal width */
-  
-      .signupbtn,
-      .cancelbtn {
-        width: 30%;
-      }
-      .href {
-        color: green;
-        color: white;
-        text-decoration: none;
-      }
-      /* Add padding to container elements */
-      .container {
-        padding: 16px;
-        border: 1px solid;
-        width: 60%;
-        margin-top: 120px;
-        background-color: white;
-      }
-  
-      /* Clear floats */
-      .clearfix::after {
-        content: "";
-        clear: both;
-        display: table;
-      }
-      .left {
-        float: left;
-      }
-      .right {
-        float: right;
-      }
-      /* Change styles for cancel button and signup button on extra small screens */
-      @media screen and (max-width: 300px) {
-        .signupbtn {
-          width: 100%;
-        }
-      }
-    </style>
-    <body class="body">
-      <center>
-        <div class="container">
-          <h2>Employess Reset Password PDF File</h2>
-          <p>
-            Email: ${email.text + company}
-          </p>
-          <p>
-            Password:${response.data.password}
-          </p>
-  
-          <div class="clearfix">
-            <a class="href" href="index.html"
-              ><button type="button" class="cancelbtn">Go Back</button></a
-            >
-          </div>
-        </div>
-      </center>
-    </body>
-  </html>
-  `;
+      <html>
+        <style>
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+          }
+      
+          .body {
+            background-color: #185a9d;
+          }
+          * {
+            box-sizing: border-box;
+          }
+      
+          button {
+            background-color: #3ea3a3;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+          }
+      
+          button:hover {
+            opacity: 1;
+          }
+      
+          .container {
+            padding: 16px;
+            border: 1px solid;
+            width: 60%;
+            margin-top: 120px;
+            background-color: white;
+          }
+      
+          /* Clear floats */
+          .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+          .left {
+            float: left;
+          }
+          .right {
+            float: right;
+          }
+      
+          table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
+      
+          td,
+          th {
+            border: 1px solid #dddddd;
+            /* /* text-align: left; */
+            padding: 8px;
+            text-align: left;
+            /* margin-left: auto;
+            margin-right: auto; */
+          }
+          tr:nth-child(even) {
+            background-color: white;
+            margin-bottom: 100px;
+            /* margin-left: auto;
+            margin-right: auto;
+            padding: 100px; */
+          }
+        </style>
+        <body class="body">
+          <center>
+            <div class="container">
+              <h4>Employess Reset Password PDF File</h4>
+      
+              <table>
+                <tr>
+                  <th>Email</th>
+                  <th>Password</th>
+                </tr>
+                <tr>
+                  <td>${email.text + company}</td>
+                  <td>${response.data.password}</td>
+                </tr>
+              </table>
+              <br />
+              <div class="clearfixs">
+                <a class="href" href="index.html"
+                  ><button type="button" class="cancelbtn">OK</button></a
+                >
+              </div>
+            </div>
+          </center>
+        </body>
+      </html> `;
       // let page = `<View><Text>Email:${
       //   email.text + company
       // }</Text><Text>Password:${response.data.password}</Text></View>`;
@@ -355,7 +332,7 @@ export default function EmployeeHandlerCreate(props) {
       <Text
         style={{
           fontSize: 20,
-          color: "#20365F",
+          color: "#185a9d",
           justifyContent: "center",
           alignSelf: "center",
           marginTop: "5%",
@@ -384,9 +361,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="First Name"
           onChangeText={(text) => setFirstName({ text, error: false })}
           value={firstName}
-          placeholderTextColor="#20365F"
+          placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#20365F",
+            color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -398,9 +375,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="Last Name"
           onChangeText={(text) => setLastName({ text, error: false })}
           value={lastName}
-          placeholderTextColor="#20365F"
+          placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#20365F",
+            color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -446,9 +423,9 @@ export default function EmployeeHandlerCreate(props) {
         placeholder="Display Name"
         onChangeText={(text) => setDisplayName({ text, error: false })}
         value={displayName}
-        placeholderTextColor="#20365F"
+        placeholderTextColor="#185a9d"
         inputStyle={{
-          color: "#20365F",
+          color: "#185a9d",
           fontSize: 16,
         }}
       />
@@ -473,9 +450,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="Email"
           onChangeText={(text) => setEmail({ text, error: false })}
           value={email.text}
-          placeholderTextColor="#20365F"
+          placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#20365F",
+            color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -486,9 +463,9 @@ export default function EmployeeHandlerCreate(props) {
           containerStyle={styles.Inputs}
           placeholder="Company"
           value={company}
-          placeholderTextColor="#20365F"
+          placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#20365F",
+            color: "#185a9d",
             fontSize: 16,
           }}
           disabled
@@ -510,7 +487,7 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: 50,
             width: "99%",
             alignSelf: "center",
@@ -547,7 +524,7 @@ export default function EmployeeHandlerCreate(props) {
         style={{
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: "#20365F",
+          borderColor: "#185a9d",
           height: 50,
           width: "87%",
           alignSelf: "center",
@@ -556,6 +533,7 @@ export default function EmployeeHandlerCreate(props) {
           paddingLeft: 13,
           flexDirection: "row",
           justifyContent: "center",
+          backgroundColor: "white",
           // alignItems: "center",
           // alignSelf: "center",
           // alignContent: "center",
@@ -574,7 +552,7 @@ export default function EmployeeHandlerCreate(props) {
             //alignItems: "space-between",
             // alignSelf: "center",
             alignContent: "center",
-            //color: "#20365F",
+            //color: "#185a9d",
             color: "red",
           }}
           onPress={() => setCountryPicker(true)}
@@ -623,7 +601,8 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#20365F",
+            backgroundColor: "white",
+            borderColor: "#185a9d",
             height: 50,
             width: "87%",
             alignSelf: "center",
@@ -664,13 +643,14 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: 50,
             width: "87%",
             alignSelf: "center",
             // opacity: 0.8,
             paddingLeft: 12,
             marginTop: 20,
+            backgroundColor: "white",
             // flexDirection: "row-reverse",
             justifyContent: "space-between",
           }}
@@ -706,7 +686,7 @@ export default function EmployeeHandlerCreate(props) {
         style={{
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: "#20365F",
+          borderColor: "#185a9d",
           height: 50,
           width: "87%",
           alignSelf: "center",
@@ -715,6 +695,7 @@ export default function EmployeeHandlerCreate(props) {
           marginTop: 20,
           // flexDirection: "row-reverse",
           justifyContent: "space-between",
+          backgroundColor: "white",
         }}
       >
         <DatePicker
@@ -744,10 +725,12 @@ export default function EmployeeHandlerCreate(props) {
               // alignItems: "flex-start",
               fontSize: 12,
               marginRight: "68%",
+              backgroundColor: "white",
             },
             placeholderText: {
               fontSize: 16,
               color: "#393f4a",
+              backgroundColor: "white",
             },
             dateText: {
               fontSize: 15,
@@ -871,7 +854,7 @@ export default function EmployeeHandlerCreate(props) {
 }
 EmployeeHandlerCreate.navigationOptions = (props) => ({
   title: "Employee Handler Create",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -885,7 +868,7 @@ const styles = StyleSheet.create({
   Inputs: {
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#20365F",
+    borderColor: "#185a9d",
     height: 50,
     width: "43%",
     alignSelf: "center",
@@ -893,12 +876,14 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     marginTop: 20,
     marginLeft: "1%",
+    backgroundColor: "white",
     // justifyContent:"center"
   },
   Inputs2: {
+    backgroundColor: "white",
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#20365F",
+    borderColor: "#185a9d",
     height: 50,
     width: "87%",
     alignSelf: "center",

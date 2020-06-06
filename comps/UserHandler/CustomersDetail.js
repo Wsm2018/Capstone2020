@@ -218,7 +218,7 @@ export default function EmployeesRequest(props) {
 }
 EmployeesRequest.navigationOptions = (props) => ({
   title: "Customer Details",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({

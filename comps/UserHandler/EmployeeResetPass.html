@@ -62,13 +62,26 @@
         left: -35px;
         content: "✖";
       }
+      div.container4 {
+        height: 10em;
+        position: relative;
+      }
+      div.container4 p {
+        margin: 0;
+        background: yellow;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+      }
     </style>
   </head>
   <body>
     <h3>Password Validation</h3>
     <p>Try to submit the form.</p>
 
-    <div class="container">
+    <div class="container4">
       <form action="/action_page.php">
         <label for="usrname">Username</label>
         <input type="text" id="usrname" name="usrname" required />

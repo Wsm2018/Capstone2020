@@ -44,7 +44,7 @@ export default function indexUH(props) {
   const items = [
     {
       name: "Employees Index",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesIndex"),
       image: require("../../assets/images/employee.png"),
 
@@ -53,7 +53,7 @@ export default function indexUH(props) {
     },
     {
       name: "Customers Index",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("CustomersIndex"),
       image: require("../../assets/images/employee.png"),
       height: 120,
@@ -62,7 +62,7 @@ export default function indexUH(props) {
 
     {
       name: "Employees Pending",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesPending"),
       image: require("../../assets/images/pending.png"),
       height: 120,
@@ -70,7 +70,7 @@ export default function indexUH(props) {
     },
     {
       name: " Employees Create",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesCreate"),
       image: require("../../assets/images/form.png"),
       height: 120,
@@ -78,7 +78,7 @@ export default function indexUH(props) {
     },
     {
       name: "Employees Allowed",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesAllowed"),
       image: require("../../assets/images/emp.png"),
       height: 120,
@@ -86,7 +86,7 @@ export default function indexUH(props) {
     },
     {
       name: "Employees Create Success",
-      code: "#20365F",
+      code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesCreateSuccess"),
       image: require("../../assets/images/emp.png"),
       height: 120,
@@ -139,7 +139,7 @@ export default function indexUH(props) {
         style={{
           fontWeight: "bold",
           fontSize: 25,
-          color: "#20365F",
+          color: "#185a9d",
           alignSelf: "center",
         }}
       >
@@ -334,7 +334,7 @@ export default function indexUH(props) {
         </ScrollView>
       </View> */}
       <ActionButton
-        buttonColor={"#125a61"}
+        buttonColor={"#3ea3a3"}
         size={80}
         // position="left"
         //verticalOrientation="down"
@@ -370,7 +370,7 @@ export default function indexUH(props) {
 }
 indexUH.navigationOptions = (props) => ({
   title: "User Handler Home",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     //justifyContent: "center",
     // marginBottom: "4%",
     //alignSelf: "center",
-    //backgroundColor: "#20365F",
+    //backgroundColor: "#185a9d",
   },
   buttongroup: {
     flex: 0.1,

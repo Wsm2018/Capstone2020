@@ -78,7 +78,7 @@ export default function EmployeeHandlerCreate(props) {
 }
 EmployeeHandlerCreate.navigationOptions = (props) => ({
   title: "Employee Create Success",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   subtitle: { alignSelf: "center", fontSize: 16 },
   payButton: {
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
     height: 40,
     width: "55%",
     alignSelf: "center",

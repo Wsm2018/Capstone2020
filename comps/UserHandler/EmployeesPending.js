@@ -163,7 +163,7 @@ export default function EmployeesRequest(props) {
               }}
             >
               <SearchBar
-                placeholderTextColor="#20365F"
+                placeholderTextColor="#185a9d"
                 placeholder="Search Here"
                 onChangeText={setSearch}
                 lightTheme
@@ -171,9 +171,9 @@ export default function EmployeesRequest(props) {
                 searchIcon={true}
                 value={search}
                 containerStyle={{
-                  backgroundColor: "#20365F",
-                  borderBottomColor: "#20365F",
-                  borderTopColor: "#20365F",
+                  backgroundColor: "#185a9d",
+                  borderBottomColor: "#185a9d",
+                  borderTopColor: "#185a9d",
                   width: "100%",
                   height: "20%",
                 }}
@@ -187,7 +187,7 @@ export default function EmployeesRequest(props) {
                   //backgroundColor: "white",
                   fontSize: 18,
                   paddingLeft: "2%",
-                  // borderColor: "#20365F",
+                  // borderColor: "#185a9d",
                   // borderWidth: 2,
                   width: "85%",
                   height: 50,
@@ -299,7 +299,7 @@ export default function EmployeesRequest(props) {
 }
 EmployeesRequest.navigationOptions = (props) => ({
   title: "Employees Pending",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     backgroundColor: "#e3e3e3",
     // flex: 0.2,
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
   },
   buttongroup: {
     justifyContent: "flex-start",
