@@ -25,6 +25,7 @@ import * as Print from "expo-print";
 import CountryPicker from "react-native-country-picker-modal";
 import DatePicker from "react-native-datepicker";
 import ReactNativePickerModule from "react-native-picker-module";
+import { UserInterfaceIdiom } from "expo-constants";
 
 export default function EmployeeHandlerCreate(props) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -532,82 +533,7 @@ export default function EmployeeHandlerCreate(props) {
         </Text> */}
 
       {/* ---------------------------------COUNTRY--------------------------------- */}
-      <View
-        style={{
-          borderRadius: 8,
-          borderWidth: 1,
-          borderColor: "#185a9d",
-          height: 50,
-          width: "87%",
-          alignSelf: "center",
-          opacity: 0.8,
-          marginTop: 20,
-          paddingLeft: 13,
-          flexDirection: "row",
-          justifyContent: "center",
-          backgroundColor: "white",
-          // alignItems: "center",
-          // alignSelf: "center",
-          // alignContent: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            height: 50,
-            width: "99%",
-            alignSelf: "center",
-            opacity: 0.8,
-            marginTop: 20,
-            // paddingLeft: 12,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            //alignItems: "space-between",
-            // alignSelf: "center",
-            alignContent: "center",
-            //color: "#185a9d",
-            color: "red",
-          }}
-          onPress={() => setCountryPicker(true)}
-        >
-          <CountryPicker
-            visible={countryPicker}
-            withFilter
-            withAlphaFilter
-            withCountryNameButton
-            countryCode={countryCode}
-            onSelect={(country) => {
-              setCountry({ value: country.name, error: false });
-              setCountryCode(country.cca2);
-            }}
-            itemStyle={{
-              backgroundColor: "lightgrey",
-              marginLeft: 0,
-              paddingLeft: 15,
-            }}
-            itemTextStyle={{ fontSize: 18, color: "red" }}
-            // style={styles.picker}
-            //    style={{ flex: 1, color: "#445870" }}
-            onClose={() => setCountryPicker(false)}
-          />
-          <Ionicons
-            name="md-arrow-dropdown"
-            size={23}
-            color="#333333"
-            style={{
-              marginRight: "5%",
-            }}
-          />
-        </TouchableOpacity>
-      </View>
-      <Text
-        style={
-          country.error
-            ? { color: "red", marginLeft: "10%" }
-            : { color: "transparent" }
-        }
-      >
-        * Select a Country
-      </Text>
+
       {Platform.OS === "android" ? (
         <View
           style={{
@@ -632,13 +558,13 @@ export default function EmployeeHandlerCreate(props) {
               setRole({ value: itemValue, error: false })
             }
             itemStyle={{
-              color: "blue",
+              color: "#698eb3",
             }}
           >
             <Picker.Item
               label="Select a role"
               value="-1"
-              itemStyle={{ textAlign: "center" }}
+              itemStyle={{ textAlign: "center", color: "#698eb3" }}
             />
             {roles.map((role, index) => (
               <Picker.Item label={role} value={role} key={index} />
@@ -702,6 +628,85 @@ export default function EmployeeHandlerCreate(props) {
         </View>
       )}
       <Text></Text>
+      <View
+        style={{
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: "#185a9d",
+          height: 50,
+          width: "87%",
+          alignSelf: "center",
+          opacity: 0.8,
+          marginTop: 20,
+          paddingLeft: 13,
+          flexDirection: "row",
+          justifyContent: "center",
+          backgroundColor: "white",
+          color: "#698eb3",
+          // alignItems: "center",
+          // alignSelf: "center",
+          // alignContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            height: 50,
+            width: "99%",
+            alignSelf: "center",
+            opacity: 0.8,
+            marginTop: 20,
+            // paddingLeft: 12,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            //alignItems: "space-between",
+            // alignSelf: "center",
+            alignContent: "center",
+            //color: "#185a9d",
+            color: "#698eb3",
+          }}
+          onPress={() => setCountryPicker(true)}
+        >
+          <CountryPicker
+            visible={countryPicker}
+            withFilter
+            withAlphaFilter
+            withCountryNameButton
+            countryCode={countryCode}
+            onSelect={(country) => {
+              setCountry({ value: country.name, error: false });
+              setCountryCode(country.cca2);
+            }}
+            itemStyle={{
+              backgroundColor: "lightgrey",
+              marginLeft: 0,
+              paddingLeft: 15,
+              color: "#698eb3",
+            }}
+            //itemStyle={{ textAlign: "center", color: "#698eb3" }}
+            itemTextStyle={{ fontSize: 18, color: "#698eb3" }}
+            style={styles.picker}
+            //    style={{ flex: 1, color: "#445870" }}
+            onClose={() => setCountryPicker(false)}
+          />
+          <Ionicons
+            name="md-arrow-dropdown"
+            size={23}
+            color="#333333"
+            style={{
+              marginRight: "5%",
+            }}
+          />
+        </TouchableOpacity>
+      </View>
+      <Text
+        style={
+          country.error
+            ? { color: "red", marginLeft: "10%" }
+            : { color: "transparent" }
+        }
+      >
+        * Select a Country
+      </Text>
       {/* ---------------------------------DATE--------------------------------- */}
       <View
         style={{
@@ -737,12 +742,13 @@ export default function EmployeeHandlerCreate(props) {
           cancelBtnText="Cancel"
           customStyles={{
             dateIcon: {
-              width: 0,
-              height: 0,
+              // // width: 1,
+              // // height: 1,
+              // left: true,
             },
             dateInput: {
               borderWidth: 0,
-              color: "#667085",
+              color: "#698eb3",
               alignItems: "flex-start",
               fontSize: 12,
               // marginRight: "68%",
@@ -750,12 +756,12 @@ export default function EmployeeHandlerCreate(props) {
             },
             placeholderText: {
               fontSize: 16,
-              color: "#393f4a",
+              color: "#698eb3",
               backgroundColor: "white",
             },
             dateText: {
               fontSize: 15,
-              color: "#393f4a",
+              color: "#698eb3",
             },
           }}
           onDateChange={(date) => {
@@ -773,7 +779,7 @@ export default function EmployeeHandlerCreate(props) {
       >
         * Select a Date
       </Text>
-
+      <Text></Text>
       <TouchableOpacity
         style={styles.payButton}
         onPress={async () => {
@@ -782,7 +788,14 @@ export default function EmployeeHandlerCreate(props) {
           }
         }}
       >
-        <Text style={{ color: "white" }}>Create</Text>
+        <Text
+          style={{
+            fontSize: 17,
+            color: "white",
+          }}
+        >
+          Create
+        </Text>
       </TouchableOpacity>
       <Spinner
         visible={spinner}
@@ -809,7 +822,7 @@ export default function EmployeeHandlerCreate(props) {
       </TouchableOpacity> */}
 
       {/* ---------------------------------MODAL--------------------------------- */}
-      <Modal transparent={true} visible={modal} animationType="slide">
+      <Modal transparent={true} visible={true} animationType="slide">
         <View
           style={{
             flex: 1,
@@ -819,7 +832,7 @@ export default function EmployeeHandlerCreate(props) {
             alignItems: "center",
             marginTop: 22,
             // ---This is for Width---
-            width: "90%",
+            width: "80%",
           }}
         >
           <View
@@ -842,7 +855,7 @@ export default function EmployeeHandlerCreate(props) {
               alignSelf: "center",
               alignItems: "center",
               // ---This is for Height---
-              height: "70%",
+              height: "50%",
             }}
           >
             <Text
@@ -884,8 +897,9 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             flex: 1,
             justifyContent: "center",
-            // alignItems: "center",
+            alignContent: "center",
             alignSelf: "center",
+            alignItems: "center",
             marginTop: 22,
             // ---This is for Width---
             width: "80%",
@@ -907,11 +921,19 @@ export default function EmployeeHandlerCreate(props) {
               shadowRadius: 3.84,
               elevation: 5,
               justifyContent: "center",
+              alignContent: "center",
+              alignSelf: "center",
+              alignItems: "center",
               // ---This is for Height---
-              height: "30%",
+              height: "50%",
             }}
           >
-            <Text>
+            <Text
+              style={{
+                fontSize: 16,
+                textAlign: "center",
+              }}
+            >
               Are you sure you want to ALLOW the creation of 's account?
             </Text>
             <Text></Text>
@@ -928,33 +950,21 @@ export default function EmployeeHandlerCreate(props) {
             >
               {/* ---------------------------------CONFIRM--------------------------------- */}
               <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "30%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                style={styles.greenButton}
                 onPress={() => {
                   props.navigation.navigate("Loading");
                   handleCreate();
                   setModal2(false);
                 }}
               >
-                <Text>Confirm</Text>
+                <Text style={{ color: "white" }}>Confirm</Text>
               </TouchableOpacity>
               {/* ---------------------------------CANCEL--------------------------------- */}
               <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                style={styles.redButton}
                 onPress={() => setModal2(false)}
               >
-                <Text>Cancel</Text>
+                <Text style={{ color: "white" }}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -976,6 +986,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#e3e3e3",
     //height: "100%",
   },
+  greenButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+
+    //flexDirection: "row",
+  },
   Inputs: {
     borderRadius: 5,
     borderWidth: 1,
@@ -989,6 +1013,18 @@ const styles = StyleSheet.create({
     marginLeft: "1%",
     backgroundColor: "white",
     // justifyContent:"center"
+  },
+  redButton: {
+    backgroundColor: "#942b1f",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
   },
   Inputs2: {
     backgroundColor: "white",
@@ -1011,22 +1047,20 @@ const styles = StyleSheet.create({
     width: "99%",
     borderColor: "black",
     borderWidth: 1,
-    color: "#667085",
+    color: "#698eb3",
     borderStyle: "solid",
   },
   payButton: {
-    backgroundColor: "#327876",
-    height: 55,
-    width: "86%",
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "50%",
     alignSelf: "center",
     justifyContent: "center",
-    alignContent: "center",
     alignItems: "center",
     marginStart: "2%",
     marginEnd: "2%",
-    borderRadius: 10,
+    borderRadius: 5,
     marginBottom: 10,
-    marginTop: "5%",
     //flexDirection: "row",
   },
 });

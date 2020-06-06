@@ -66,8 +66,106 @@ export default function EmployeesRequest(props) {
     console.log("response", response);
 
     // ---------------------------------
-    let page = `<View><Text>Email:${user.email}</Text>
-    <Text>Password:${response.data.password}</Text></View>`;
+    let page = ` <!DOCTYPE html>
+
+      <html>
+        <style>
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+          }
+      
+          .body {
+            background-color: #185a9d;
+          }
+          * {
+            box-sizing: border-box;
+          }
+      
+          button {
+            background-color: #3ea3a3;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+          }
+      
+          button:hover {
+            opacity: 1;
+          }
+      
+          .container {
+            padding: 16px;
+            border: 1px solid;
+            width: 60%;
+            margin-top: 120px;
+            background-color: white;
+          }
+      
+          /* Clear floats */
+          .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+          .left {
+            float: left;
+          }
+          .right {
+            float: right;
+          }
+      
+          table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
+      
+          td,
+          th {
+            border: 1px solid #dddddd;
+            /* /* text-align: left; */
+            padding: 8px;
+            text-align: left;
+            /* margin-left: auto;
+            margin-right: auto; */
+          }
+          tr:nth-child(even) {
+            background-color: white;
+            margin-bottom: 100px;
+            /* margin-left: auto;
+            margin-right: auto;
+            padding: 100px; */
+          }
+        </style>
+        <body class="body">
+          <center>
+            <div class="container">
+              <h4>Employess Reset Password PDF File</h4>
+      
+              <table>
+                <tr>
+                  <th>Email</th>
+                  <th>Password</th>
+                </tr>
+                <tr>
+                  <td>${user.email}</td>
+                  <td>${response.data.password}</td>
+                </tr>
+              </table>
+              <br />
+              <div class="clearfixs">
+                <a class="href" href="index.html"
+                  ><button type="button" class="cancelbtn">OK</button></a
+                >
+              </div>
+            </div>
+          </center>
+        </body>
+      </html>`;
+
     let pdf = await Print.printToFileAsync({ html: page });
     let uri = pdf.uri;
     const response2 = await fetch(uri);
@@ -363,13 +461,13 @@ export default function EmployeesRequest(props) {
                 {/* ---------------------------------CONFIRM--------------------------------- */}
                 <TouchableOpacity
                   onPress={handleDownload}
-                  style={styles.payButton}
+                  style={styles.greenButton}
                 >
                   <Text style={{ color: "white" }}> Confirm</Text>
                 </TouchableOpacity>
                 {/* ---------------------------------CANCEL--------------------------------- */}
                 <TouchableOpacity
-                  style={styles.payButton}
+                  style={styles.redButton}
                   onPress={() => setModal(false)}
                 >
                   <Text style={{ color: "white" }}>Cancel</Text>
@@ -381,10 +479,10 @@ export default function EmployeesRequest(props) {
       </View>
       {editMode ? (
         <View style={styles.buttons}>
-          <TouchableOpacity style={styles.payButton} onPress={handleSave}>
+          <TouchableOpacity style={styles.greenButton} onPress={handleSave}>
             <Text style={{ color: "white" }}>Save</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.payButton} onPress={handleCancel}>
+          <TouchableOpacity style={styles.redButton} onPress={handleCancel}>
             <Text style={{ color: "white" }}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -522,6 +620,32 @@ const styles = StyleSheet.create({
     height: "85%",
     borderWidth: 1,
     borderColor: "green",
+  },
+  greenButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+
+    //flexDirection: "row",
+  },
+  redButton: {
+    backgroundColor: "#942b1f",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
   },
   one: {
     backgroundColor: "white",

@@ -266,7 +266,7 @@ export default function EmployeesRequest(props) {
                   }}
                 />
                 <Text style={{ color: "grey", fontSize: 20 }}>
-                  User not found
+                  No Employees!
                 </Text>
               </View>
             )}
