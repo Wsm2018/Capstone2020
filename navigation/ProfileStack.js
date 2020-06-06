@@ -38,11 +38,11 @@ const ProfileStack = createStackNavigator(
         return {
           headerLeft: () => (
             <Icon
-              style={{ paddingLeft: 10 }}
+              style={{ marginLeft: 20 }}
               onPress={() => navigation.openDrawer()}
-              name="menuunfold"
+              name="menu"
               color="white"
-              type="antdesign"
+              type="MaterialCommunityIcons"
               size={28}
             />
           ),

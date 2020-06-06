@@ -24,8 +24,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 require("firebase/firestore");
 
-
-
 export default function Details(props) {
   ///////////////////Front-End///////////////////////////
   const [modalAddService, setModalAddService] = useState(false);
@@ -677,21 +675,42 @@ export default function Details(props) {
                       {/* <TouchableOpacity
                         onPress={() => checkToDelete(h, s.service)}
                       > */}
-                      <Text
+                      <TouchableOpacity
+                        onPress={() => checkToDelete(h, s.service)}
+                        style={{}}
+                      >
+                        <MaterialCommunityIcons
+                          name="close"
+                          size={15}
+                          color={"#20365F"}
+                          // onPress={() => setModalAddReview(false)}
+                        />
+                      </TouchableOpacity>
+                      {/* <Text
                         onPress={() => checkToDelete(h, s.service)}
                         style={{ fontSize: 10 }}
                       >
                         {" "}
                         x
-                      </Text>
+                      </Text> */}
                       {/* </TouchableOpacity> */}
                     </View>
                   ))}
                   {/* <Text style={{ fontSize: 20 }}>{s.service.name}</Text> */}
                 </View>
-                <View style={{ alignItems: "center", width: "5%" }}>
-                  <TouchableOpacity onPress={() => deleteBooking(index)}>
-                    <Text>x</Text>
+                <View
+                  style={{ alignItems: "center", width: "5%", marginLeft: -3 }}
+                >
+                  <TouchableOpacity
+                    onPress={() => deleteAll(s.service)}
+                    style={{}}
+                  >
+                    <MaterialCommunityIcons
+                      name="close"
+                      size={20}
+                      color={"#20365F"}
+                      // onPress={() => setModalAddReview(false)}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>

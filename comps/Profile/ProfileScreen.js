@@ -365,6 +365,7 @@ export default function ProfileScreen(props) {
             visible={backgroundEdit}
             animationType="fade"
             transparent={true}
+            onRequestClose={() => setBackgroundEdit(false)}
           >
             <View
               style={{
@@ -410,12 +411,12 @@ export default function ProfileScreen(props) {
                   <TouchableOpacity
                     style={{
                       flex: 0.6,
-                      backgroundColor: "#B4C5CF",
+                      // backgroundColor: "#B4C5CF",
                       // height: 40,
                       justifyContent: "center",
                       width: "100%",
                       borderBottomWidth: 1,
-                      borderBottomColor: "#28456B",
+                      borderBottomColor: "darkgray",
                       // alignItems: "center",
                       // borderRadius: 10,
                     }}
@@ -442,7 +443,7 @@ export default function ProfileScreen(props) {
                   <TouchableOpacity
                     style={{
                       flex: 0.6,
-                      backgroundColor: "#B4C5CF",
+                      // backgroundColor: "#B4C5CF",
                       // height: 40,
                       justifyContent: "center",
                       width: "100%",
@@ -1066,6 +1067,6 @@ const styles = StyleSheet.create({
 });
 
 ProfileScreen.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };
