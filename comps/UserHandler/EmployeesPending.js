@@ -215,9 +215,9 @@ export default function EmployeesRequest(props) {
                 <ScrollView
                   style={{
                     flex: 0.9,
-                    borderRadius: 50,
-                    borderWidth: 1,
-                    borderColor: "#e3e3e3",
+                    // borderRadius: 50,
+                    //borderWidth: 1,
+                    //borderColor: "#e3e3e3",
                   }}
                 >
                   {users.map((user, i) => (

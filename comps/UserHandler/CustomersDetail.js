@@ -79,7 +79,7 @@ export default function EmployeesRequest(props) {
           >
             <View
               style={
-                Platform.OS === "ios" ? styles.avatarIpad : styles.avatarPhone
+                Platform.isPad == true ? styles.avatarIpad : styles.avatarPhone
               }
               //style={Platform.isPad ? styles.avatarIpad : styles.avatarPhone}
             >
@@ -116,7 +116,13 @@ export default function EmployeesRequest(props) {
         </View>
 
         <View style={styles.two}>
-          <Text style={styles.cardTitle}> Employees Details</Text>
+          <Text
+            style={
+              Platform.isPad ? styles.ipadcardTitle : styles.phonecardTitle
+            }
+          >
+            Employees Details
+          </Text>
 
           <View style={styles.text}>
             <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
@@ -136,7 +142,13 @@ export default function EmployeesRequest(props) {
           </View>
         </View>
         <View style={styles.two}>
-          <Text style={styles.cardTitle}> Personal Information</Text>
+          <Text
+            style={
+              Platform.isPad ? styles.ipadcardTitle : styles.phonecardTitle
+            }
+          >
+            Personal Information
+          </Text>
 
           <View style={styles.text}>
             <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
@@ -171,9 +183,23 @@ export default function EmployeesRequest(props) {
           <Collapse>
             <CollapseHeader>
               <View
-                style={Platform.isPad ? styles.arrowIpad : styles.arrowPhone}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  // paddingLeft: 20,
+                  paddingRight: "5%",
+                }}
+                // Platform.isPad ? styles.arrowIpad : styles.arrowPhone
               >
-                <Text style={styles.cardTitle}>QR Code</Text>
+                <Text
+                  style={
+                    Platform.isPad
+                      ? styles.ipadcardTitle
+                      : styles.phonecardTitle
+                  }
+                >
+                  QR Code
+                </Text>
                 <Ionicons name="md-arrow-dropdown" size={30} color="#5c5b5b" />
               </View>
             </CollapseHeader>
@@ -186,9 +212,20 @@ export default function EmployeesRequest(props) {
           <Collapse>
             <CollapseHeader>
               <View
-                style={Platform.isPad ? styles.arrowIpad : styles.arrowPhone}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  // paddingLeft: 20,
+                  paddingRight: "5%",
+                }}
               >
-                <Text style={styles.cardTitle}>
+                <Text
+                  style={
+                    Platform.isPad
+                      ? styles.ipadcardTitle
+                      : styles.phonecardTitle
+                  }
+                >
                   Friends No: {friends && friends.length}
                 </Text>
                 <Ionicons name="md-arrow-dropdown" size={30} color="#5c5b5b" />
@@ -200,7 +237,7 @@ export default function EmployeesRequest(props) {
                   friends.map((friend, i) => (
                     <ListItem
                       key={i}
-                      // leftAvatar={{ source: { uri: l.avatar_url } }}
+                      leftAvatar={{ source: { uri: friend.photoURL } }}
                       title={friend.displayName}
                       subtitle={friend.email}
                       bottomDivider
@@ -260,11 +297,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: 375,
+    borderWidth: 1,
   },
   arrowIpad: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: 10,
+    justifyContent: "space-evenly",
+    width: 100,
+    marginRight: "19%",
+    borderWidth: 1,
   },
   avatarPhone: {
     justifyContent: "center",
@@ -312,14 +352,24 @@ const styles = StyleSheet.create({
 
     // justifyContent: "space-between",
   },
-  cardTitle: {
+  ipadcardTitle: {
     fontSize: 18,
     // backgroundColor: "red",
     width: "100%",
     height: 30,
     color: "black",
     fontWeight: "bold",
-    padding: "1%",
+    padding: "0%",
+    // marginLeft: "2%",
+  },
+  phonecardTitle: {
+    fontSize: 18,
+    // backgroundColor: "red",
+    // width: "100%",
+    height: 30,
+    color: "black",
+    fontWeight: "bold",
+    padding: "0%",
     // marginLeft: "2%",
   },
 });

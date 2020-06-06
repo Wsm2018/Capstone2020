@@ -19,6 +19,7 @@ import { TextInput } from "react-native-paper";
 import { Input, Tooltip } from "react-native-elements";
 import Spinner from "react-native-loading-spinner-overlay";
 import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 import * as Print from "expo-print";
 import CountryPicker from "react-native-country-picker-modal";
@@ -40,6 +41,8 @@ export default function EmployeeHandlerCreate(props) {
   const [rolepicker, setRolePicker] = useState(null);
 
   const [modal, setModal] = useState(false);
+  const [modal2, setModal2] = useState(false);
+
   const [countryPicker, setCountryPicker] = useState(false);
   const [countryCode, setCountryCode] = useState(null);
   let pickerRef = null;
@@ -290,9 +293,6 @@ export default function EmployeeHandlerCreate(props) {
         });
       }
     }
-    // setInterval(() => {
-    //   setSpinner(!spinner);
-    // }, 3000);
   };
 
   // -------------------------------DELETE-----------------------------------
@@ -341,6 +341,7 @@ export default function EmployeeHandlerCreate(props) {
       >
         Creating Employee Account
       </Text>
+      {/* ---------------------------------NAMES--------------------------------- */}
       <View
         style={{
           flexDirection: "row",
@@ -353,6 +354,7 @@ export default function EmployeeHandlerCreate(props) {
             value={firstName}
             style={{ width: "47.5%" }}
           /> */}
+        {/* ---------------------------------FIRST NAME INPUT--------------------------------- */}
         <Input
           inputContainerStyle={{
             borderBottomWidth: 0,
@@ -367,6 +369,8 @@ export default function EmployeeHandlerCreate(props) {
             fontSize: 16,
           }}
         />
+
+        {/* ---------------------------------LAST NAME INPUT--------------------------------- */}
         <Input
           inputContainerStyle={{
             borderBottomWidth: 0,
@@ -387,24 +391,32 @@ export default function EmployeeHandlerCreate(props) {
             style={{ width: "47.5%" }}
           /> */}
       </View>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+
+      {/* ---------------------------------FIRST NAME ERROR--------------------------------- */}
+      <View style={{ flexDirection: "row" }}>
         <Text
           style={
             firstName.error
-              ? { color: "red", marginLeft: "9%" }
+              ? {
+                  color: "red",
+                  width: "43%",
+                  justifyContent: "flex-start",
+                  marginLeft: "9%",
+                }
               : { color: "transparent" }
           }
         >
           * First Name is Required
         </Text>
+
         <Text
           style={
             lastName.error
               ? {
                   color: "red",
-                  width: "100%",
+                  width: "43%",
                   justifyContent: "flex-start",
-                  marginLeft: "9%",
+                  marginLeft: "-3%",
                 }
               : { color: "transparent" }
           }
@@ -652,17 +664,26 @@ export default function EmployeeHandlerCreate(props) {
             marginTop: 20,
             backgroundColor: "white",
             // flexDirection: "row-reverse",
-            justifyContent: "space-between",
+            justifyContent: "center",
           }}
         >
           <TouchableOpacity
             onPress={() => {
               pickerRef.show();
             }}
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 20 }}>
-              {role.value === null ? "Select role" : role}
+            <Text style={{ fontSize: 17, color: "#667085" }}>
+              {role.value === "-1" ? "Select a role" : role.value}
             </Text>
+            <Ionicons
+              name="md-arrow-dropdown"
+              size={23}
+              color="#333333"
+              style={{
+                marginRight: "5%",
+              }}
+            />
           </TouchableOpacity>
           <ReactNativePickerModule
             pickerRef={(e) => (pickerRef = e)}
@@ -691,10 +712,10 @@ export default function EmployeeHandlerCreate(props) {
           width: "87%",
           alignSelf: "center",
           // opacity: 0.8,
-          paddingLeft: 12,
+          paddingLeft: "3%",
           marginTop: 20,
           // flexDirection: "row-reverse",
-          justifyContent: "space-between",
+          // justifyContent: "space-between",
           backgroundColor: "white",
         }}
       >
@@ -722,9 +743,9 @@ export default function EmployeeHandlerCreate(props) {
             dateInput: {
               borderWidth: 0,
               color: "#667085",
-              // alignItems: "flex-start",
+              alignItems: "flex-start",
               fontSize: 12,
-              marginRight: "68%",
+              // marginRight: "68%",
               backgroundColor: "white",
             },
             placeholderText: {
@@ -753,7 +774,14 @@ export default function EmployeeHandlerCreate(props) {
         * Select a Date
       </Text>
 
-      <TouchableOpacity style={styles.payButton} onPress={handleCreate}>
+      <TouchableOpacity
+        style={styles.payButton}
+        onPress={async () => {
+          if (await validated()) {
+            setModal2(true);
+          }
+        }}
+      >
         <Text style={{ color: "white" }}>Create</Text>
       </TouchableOpacity>
       <Spinner
@@ -791,7 +819,7 @@ export default function EmployeeHandlerCreate(props) {
             alignItems: "center",
             marginTop: 22,
             // ---This is for Width---
-            width: "80%",
+            width: "90%",
           }}
         >
           <View
@@ -814,7 +842,7 @@ export default function EmployeeHandlerCreate(props) {
               alignSelf: "center",
               alignItems: "center",
               // ---This is for Height---
-              height: "50%",
+              height: "70%",
             }}
           >
             <Text
@@ -844,6 +872,89 @@ export default function EmployeeHandlerCreate(props) {
                 onPress={() => props.navigation.goBack()}
               >
                 <Text style={{ color: "white" }}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ---------------------------------MODAL2--------------------------------- */}
+      <Modal transparent={true} visible={modal2} animationType="slide">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            // alignItems: "center",
+            alignSelf: "center",
+            marginTop: 22,
+            // ---This is for Width---
+            width: "80%",
+          }}
+        >
+          <View
+            style={{
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              justifyContent: "center",
+              // ---This is for Height---
+              height: "30%",
+            }}
+          >
+            <Text>
+              Are you sure you want to ALLOW the creation of 's account?
+            </Text>
+            <Text></Text>
+            <Text></Text>
+            <View
+              style={{
+                //   borderWidth: 1,
+                width: "100%",
+                height: "20%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* ---------------------------------CONFIRM--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "30%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  props.navigation.navigate("Loading");
+                  handleCreate();
+                  setModal2(false);
+                }}
+              >
+                <Text>Confirm</Text>
+              </TouchableOpacity>
+              {/* ---------------------------------CANCEL--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => setModal2(false)}
+              >
+                <Text>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>

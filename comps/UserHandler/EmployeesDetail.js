@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Picker,
   Modal,
+  Platform,
 } from "react-native";
 
 import { Image, Avatar, Divider } from "react-native-elements";
@@ -32,6 +33,8 @@ export default function EmployeesRequest(props) {
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
   const [phone, setPhone] = useState(null);
+
+  const [heightVal, setHeightVal] = useState("85%");
 
   const user = props.navigation.getParam("user");
   const roles = [
@@ -91,12 +94,14 @@ export default function EmployeesRequest(props) {
   const handleCancel = () => {
     setEditMode(false);
     setSelectedRole(user.role);
+    setHeightVal("85%");
   };
 
   // ------------------------------------------------------------------
   const handleSave = () => {
     db.collection("users").doc(user.id).update({ role: selectedRole });
     props.navigation.goBack();
+    setHeightVal("85%");
   };
 
   // ------------------------------------------------------------------
@@ -116,26 +121,44 @@ export default function EmployeesRequest(props) {
         <View
           style={{
             width: "100%",
+            height: "100%",
             alignItems: "center",
             justifyContent: "flex-start",
+            // borderWidth: 1,
+            // borderColor: "blue",
 
             //backgroundColor: "red",
           }}
         >
           <View
-            style={
-              Platform.OS === "ios" ? styles.avatarIpad : styles.avatarPhone
-            }
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: heightVal,
+              ////
+              // borderWidth: 1,
+              // borderColor: "green",
+            }}
           >
             <Avatar
               rounded
               source={{ uri: user.photoURL }}
-              style={{
-                width: "40%",
-                height: 150,
-                // marginTop: "5%",
-                // marginBottom: "4%",
-              }}
+              style={
+                Platform.OS === "android"
+                  ? {
+                      height: "90%",
+                      width: "28%",
+
+                      // borderWidth: 1,
+                    }
+                  : {
+                      height: "90%",
+                      width: "35%",
+
+                      // borderWidth: 1,
+                    }
+              }
             />
             <Text
               style={{
@@ -153,6 +176,8 @@ export default function EmployeesRequest(props) {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
+                // borderWidth: 1,
+                // paddingBottom:20
               }}
             >
               <Text style={{ fontSize: 15 }}>Change Role: </Text>
@@ -175,7 +200,10 @@ export default function EmployeesRequest(props) {
                   onValueChange={(itemValue, itemIndex) =>
                     setSelectedRole(itemValue)
                   }
-                  itemStyle={{ color: "red", textAlign: "right" }}
+                  itemStyle={{
+                    color: "red",
+                    textAlign: "right",
+                  }}
                 >
                   {roles.map((role, index) => (
                     <Picker.Item label={role} value={role} key={index} />
@@ -219,10 +247,6 @@ export default function EmployeesRequest(props) {
             Role
           </Text>
           <Text style={{ fontSize: 16, marginTop: "1%" }}>{user.role}</Text>
-        </View>
-        <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black" }}>ID</Text>
-          <Text style={{ fontSize: 16 }}>{user.id}</Text>
         </View>
         <View style={styles.text}>
           <Text style={{ fontSize: 16, color: "black" }}>Email</Text>
@@ -365,7 +389,7 @@ export default function EmployeesRequest(props) {
           </TouchableOpacity>
         </View>
       ) : (
-        <ActionButton buttonColor={"#125a61"} size={80}>
+        <ActionButton buttonColor={"#3ea3a3"} size={80}>
           <ActionButton.Item
             buttonColor="#9b59b6"
             title="Reset Password"
@@ -380,7 +404,10 @@ export default function EmployeesRequest(props) {
           <ActionButton.Item
             buttonColor="#3498db"
             title="Edit"
-            onPress={() => setEditMode(true)}
+            onPress={() => {
+              setEditMode(true);
+              setHeightVal("75%");
+            }}
           >
             <MaterialCommunityIcons
               name="logout"
@@ -483,12 +510,18 @@ const styles = StyleSheet.create({
   avatarPhone: {
     justifyContent: "center",
     alignItems: "center",
-    width: "95%",
+    width: "100%",
+    height: "85%",
+    borderWidth: 1,
+    borderColor: "red",
   },
   avatarIpad: {
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
+    height: "85%",
+    borderWidth: 1,
+    borderColor: "green",
   },
   one: {
     backgroundColor: "white",
@@ -499,6 +532,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     // height: "100%",
     borderColor: "lightgray",
+    height: "25%",
   },
   one2: {
     backgroundColor: "white",

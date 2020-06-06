@@ -46,7 +46,7 @@ export default function indexUH(props) {
       name: "Employees Index",
       code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesIndex"),
-      image: require("../../assets/images/employee.png"),
+      image: require("../../assets/images/employees.png"),
 
       height: 120,
       width: 200,
@@ -55,16 +55,7 @@ export default function indexUH(props) {
       name: "Customers Index",
       code: "#185a9d",
       nav: () => props.navigation.navigate("CustomersIndex"),
-      image: require("../../assets/images/employee.png"),
-      height: 120,
-      width: 200,
-    },
-
-    {
-      name: "Employees Pending",
-      code: "#185a9d",
-      nav: () => props.navigation.navigate("EmployeesPending"),
-      image: require("../../assets/images/pending.png"),
+      image: require("../../assets/images/users.png"),
       height: 120,
       width: 200,
     },
@@ -85,13 +76,22 @@ export default function indexUH(props) {
       width: 200,
     },
     {
-      name: "Employees Create Success",
+      name: "Employees Pending",
       code: "#185a9d",
-      nav: () => props.navigation.navigate("EmployeesCreateSuccess"),
-      image: require("../../assets/images/emp.png"),
+      nav: () => props.navigation.navigate("EmployeesPending"),
+      image: require("../../assets/images/p.jpg"),
       height: 120,
       width: 200,
     },
+
+    // {
+    //   name: "Employees Success",
+    //   code: "#185a9d",
+    //   nav: () => props.navigation.navigate("EmployeesCreateSuccess"),
+    //   image: require("../../assets/images/success.png"),
+    //   height: 120,
+    //   width: 200,
+    // },
   ];
 
   // --------------------------------EMPLOYEES----------------------------------
