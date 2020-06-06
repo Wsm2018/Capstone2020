@@ -1123,7 +1123,7 @@ export default function Users() {
     >
       <LottieView
         width={Dimensions.get("window").width / 3}
-        source={require("../../assets/loadingAnimations/load.json")}
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
         autoPlay
         loop
         style={{
