@@ -249,7 +249,7 @@ export default function GiftScreen(props) {
                     style={{
                       width: "100%",
                       // alignItems: "flex-end",
-                      marginTop: "8%",
+                      marginTop: "5%",
                       // justifyContent: "flex-end",
                       // backgroundColor: "blue",
                     }}

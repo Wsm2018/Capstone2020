@@ -5,17 +5,22 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  // Image,
 } from "react-native";
 import Image from "react-native-scalable-image";
 
 import GradientButton from "react-native-gradient-buttons";
 import { Text } from "react-native-elements";
-
 import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import { Dimensions } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 export default function BalanceScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -95,16 +100,16 @@ export default function BalanceScreen({ navigation }) {
       <View
         style={{
           flex: 1,
-          justifyContent: "space-evenly",
+          justifyContent: "space-around",
           alignItems: "center",
           // backgroundColor: "blue",
           // marginTop: "5%",
         }}
       >
-        <View style={{ flex: 0.3 }}>
+        <View style={{ flex: 0.4 }}>
           <Text
             style={{
-              fontSize: 23,
+              fontSize: responsiveScreenFontSize(2.8),
               fontWeight: "bold",
               color: "#185a9d",
             }}
@@ -129,10 +134,23 @@ export default function BalanceScreen({ navigation }) {
                 props.navigation.navigate("Balance", { user: props.user })
               }
             /> */}
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginEnd: 5 }}>
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2.5),
+                fontWeight: "bold",
+                marginEnd: 5,
+              }}
+            >
               {user && user.balance}
             </Text>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>QR</Text>
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2.5),
+                fontWeight: "bold",
+              }}
+            >
+              QR
+            </Text>
           </View>
         </View>
 
@@ -193,7 +211,7 @@ export default function BalanceScreen({ navigation }) {
                     flex: 0.3,
                     backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
-                    height: 40,
+                    height: responsiveScreenHeight(5.5),
                     // width: "30%",
                     // alignSelf: "center",
                     justifyContent: "center",
@@ -213,7 +231,7 @@ export default function BalanceScreen({ navigation }) {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
@@ -226,7 +244,7 @@ export default function BalanceScreen({ navigation }) {
                     flex: 0.3,
 
                     backgroundColor: "#2E9E9B",
-                    height: 40,
+                    height: responsiveScreenHeight(5.5),
                     // width: "30%",
                     // borderWidth: 4,
                     // alignSelf: "center",
@@ -248,7 +266,7 @@ export default function BalanceScreen({ navigation }) {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
@@ -260,7 +278,7 @@ export default function BalanceScreen({ navigation }) {
                     //   color: "#20365F",
                     // }}
                   >
-                    Use Gift Code
+                    Use Gift
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -296,7 +314,11 @@ export default function BalanceScreen({ navigation }) {
                 {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
                 <TextInput
                   width={Dimensions.get("window").width / 2}
-                  style={{ height: 40, paddingLeft: 6 }}
+                  style={{
+                    height: responsiveScreenHeight(5),
+                    paddingLeft: 6,
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
                   value={giftCode}
                   placeholder={
                     giftErrorCounter === 3
@@ -354,7 +376,7 @@ export default function BalanceScreen({ navigation }) {
                   flex: 0.5,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5.5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
@@ -363,12 +385,17 @@ export default function BalanceScreen({ navigation }) {
                   marginEnd: "3%",
                   borderRadius: 10,
                 }}
-                onPress={() => setCodeView(false)}
+                onPress={() => {
+                  setCodeView(false);
+                  setGiftCode("");
+                  setGiftCodeError("transparent");
+                }}
               >
+                {/* 12000000000QR  */}
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -381,7 +408,7 @@ export default function BalanceScreen({ navigation }) {
                   flex: 0.5,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5.5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
@@ -396,7 +423,7 @@ export default function BalanceScreen({ navigation }) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
