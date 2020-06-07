@@ -822,7 +822,7 @@ export default function EmployeeHandlerCreate(props) {
       </TouchableOpacity> */}
 
       {/* ---------------------------------MODAL--------------------------------- */}
-      <Modal transparent={true} visible={true} animationType="slide">
+      <Modal transparent={true} visible={modal} animationType="slide">
         <View
           style={{
             flex: 1,

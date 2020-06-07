@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Button,
   ScrollView,
   Dimensions,
   Image,
@@ -19,7 +18,6 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import ActionButton from "react-native-action-button";
 import { FlatGrid } from "react-native-super-grid";
 import Spinner from "react-native-loading-spinner-overlay";
-
 import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 export default function indexUH(props) {
   const buttons = ["Employees Function", "Customer Function"];
@@ -145,6 +143,67 @@ export default function indexUH(props) {
       >
         User Handler Panel
       </Text> */}
+      <View style={styles.surface}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#185a9d",
+            //backgroundColor: "#2EAAAA",
+            width: "47%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            // borderRightColor: "#e3e3e3",
+            // borderWidth: 6,
+            // borderRadius: 0,
+            // borderLeftColor: "#185a9d",
+            // borderBottomColor: "#185a9d",
+            // borderTopColor: "#185a9d",
+          }}
+          //onPress={}
+        >
+          <MaterialCommunityIcons name="worker" size={50} color="white" />
+          <Text style={{ fontSize: 20, color: "white", marginBottom: "2%" }}>
+            Total of Employees
+          </Text>
+          <Text
+            style={{
+              fontSize: 20,
+              color: "white",
+              marginBottom: "2%",
+              fontWeight: "bold",
+            }}
+          >
+            {employees}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            // backgroundColor: "#E74C3C",
+            backgroundColor: "#185a9d",
+            width: "47%",
+            height: "100%",
+
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          //onPress={() => props.navigation.navigate("CustomersIndex")}
+        >
+          <Feather name="user" size={50} color="white" />
+          <Text style={{ fontSize: 20, color: "white", marginBottom: "2%" }}>
+            Total of Customers
+          </Text>
+          <Text
+            style={{
+              fontSize: 20,
+              color: "white",
+              marginBottom: "2%",
+              fontWeight: "bold",
+            }}
+          >
+            {customers}
+          </Text>
+        </TouchableOpacity>
+      </View>
       {items ? (
         <FlatGrid
           itemDimension={150}
@@ -168,7 +227,7 @@ export default function indexUH(props) {
                   <View
                     style={{
                       alignItems: "center",
-                      flex: 0.2,
+                      flex: 0.3,
                       justifyContent: "center",
                     }}
                   >
@@ -406,7 +465,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
   },
   gridView: {
-    marginTop: 20,
+    // marginTop: 20,
     flex: 1,
   },
   itemContainer: {
@@ -431,12 +490,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   surface: {
-    width: "50%",
-    height: "100%",
-    alignItems: "center",
+    flex: 0.3,
+    marginTop: "2%",
+    //  backgroundColor: "blue",
+    // width: "50%",
+    // height: "100%",
+    // alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
     // alignItems: "center",
-    // justifyContent: "space-evenly",
+    justifyContent: "space-evenly",
   },
 });

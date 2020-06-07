@@ -338,8 +338,23 @@ export default function EmployeesRequest(props) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   ) : (
-    <View>
-      <Text>LOADING...</Text>
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
     </View>
   );
 }
@@ -352,7 +367,7 @@ EmployeesRequest.navigationOptions = (props) => ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#e3e3e3",
     marginTop: "-9%",
   },
   payButton: {
