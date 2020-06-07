@@ -98,11 +98,17 @@ export default function BalanceScreen({ navigation }) {
           justifyContent: "space-evenly",
           alignItems: "center",
           // backgroundColor: "blue",
-          // marginTop: "-5%",
+          // marginTop: "5%",
         }}
       >
-        <View style={{ flex: 0.5 }}>
-          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#2E9E9B" }}>
+        <View style={{ flex: 0.3 }}>
+          <Text
+            style={{
+              fontSize: 23,
+              fontWeight: "bold",
+              color: "#185a9d",
+            }}
+          >
             Current Balance
           </Text>
 
@@ -178,14 +184,14 @@ export default function BalanceScreen({ navigation }) {
                   // backgroundColor: "red",
                   // height: 50,
                   flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignItems: "center",
+                  justifyContent: "center",
+                  // alignItems: "flex-start",
                 }}
               >
                 <TouchableOpacity
                   style={{
-                    flex: 0.4,
-                    backgroundColor: "#20365F",
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
                     height: 40,
                     // width: "30%",
@@ -193,8 +199,8 @@ export default function BalanceScreen({ navigation }) {
                     justifyContent: "center",
                     alignItems: "center",
                     //marginStart: "2%",
-                    //marginEnd: "2%",
-                    borderRadius: 15,
+                    marginEnd: "3%",
+                    borderRadius: 10,
                     //marginBottom: 10,
                   }}
                   onPress={() => navigation.navigate("Cards", { user: user })}
@@ -212,23 +218,23 @@ export default function BalanceScreen({ navigation }) {
                       // fontWeight: "bold",
                     }}
                   >
-                    Show My Cards
+                    My Cards
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
-                    flex: 0.4,
+                    flex: 0.3,
 
-                    backgroundColor: "#20365F",
+                    backgroundColor: "#2E9E9B",
                     height: 40,
                     // width: "30%",
                     // borderWidth: 4,
                     // alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
-                    //marginStart: "2%",
+                    marginStart: "3%",
                     //marginEnd: "2%",
-                    borderRadius: 15,
+                    borderRadius: 10,
                     //marginBottom: 10,
                   }}
                   // style={{ alignItems: "center" }}
@@ -262,48 +268,51 @@ export default function BalanceScreen({ navigation }) {
           </View>
         ) : (
           <View
-            width={Dimensions.get("window").width / 2}
+            width={Dimensions.get("window").width / 1.6}
             style={{
-              flex: 1,
+              flex: 0.6,
               // backgroundColor: "yellow",
               // flexDirection: "row",
-              justifyContent: "space-evenly",
+              // paddingTop: 10,
+              // justifyContent: "space-evenly",
             }}
           >
-            <View
-              style={{
-                // backgroundColor: "green",
-                // alignItems: "center",
+            <View style={{ flex: 0.4 }}>
+              <View
+                style={{
+                  // backgroundColor: "green",
 
-                // flexDirection: "row",
-                // paddingLeft: 6,
-                // width: "60%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 10,
-                // marginBottom: 10,
-              }}
-            >
-              {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-              <TextInput
-                width={Dimensions.get("window").width / 2}
-                style={{ height: 40, paddingLeft: 6 }}
-                value={giftCode}
-                placeholder={
-                  giftErrorCounter === 3
-                    ? "* Try again later"
-                    : giftCodeError === "red"
-                    ? "* Code Invalid"
-                    : giftCodeError === "green"
-                    ? "* Balance Added"
-                    : "Enter the code"
-                }
-                onChangeText={setGiftCode}
-                placeholderTextColor={giftCodeError}
-                editable={giftErrorCounter === 3 ? false : true}
-              />
+                  // alignItems: "center",
+
+                  // flexDirection: "row",
+                  // paddingLeft: 6,
+                  // width: "60%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  // marginBottom: 10,
+                }}
+              >
+                {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
+                <TextInput
+                  width={Dimensions.get("window").width / 2}
+                  style={{ height: 40, paddingLeft: 6 }}
+                  value={giftCode}
+                  placeholder={
+                    giftErrorCounter === 3
+                      ? "* Try again later"
+                      : giftCodeError === "red"
+                      ? "* Code Invalid"
+                      : giftCodeError === "green"
+                      ? "* Balance Added"
+                      : "Enter the code"
+                  }
+                  onChangeText={setGiftCode}
+                  placeholderTextColor={giftCodeError}
+                  editable={giftErrorCounter === 3 ? false : true}
+                />
+              </View>
             </View>
-
             {/* {!flag ? (
               <Text
                 style={
@@ -330,17 +339,20 @@ export default function BalanceScreen({ navigation }) {
             <View
               // width={Dimensions.get("window").width}
               style={{
-                flex: 0.5,
-                // backgroundColor: "red",
+                flex: 0.4,
                 flexDirection: "row",
-                justifyContent: "space-between",
+                // width: "100%",
+                // backgroundColor: "red",
+
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
               <TouchableOpacity
                 // width={Dimensions.get("window").width}
                 style={{
-                  flex: 0.4,
-                  backgroundColor: "#20365F",
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
                   height: 40,
                   // width: "30%",
@@ -348,9 +360,8 @@ export default function BalanceScreen({ navigation }) {
                   justifyContent: "center",
                   alignItems: "center",
                   //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
+                  marginEnd: "3%",
+                  borderRadius: 10,
                 }}
                 onPress={() => setCodeView(false)}
               >
@@ -367,18 +378,17 @@ export default function BalanceScreen({ navigation }) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  flex: 0.4,
-                  backgroundColor: "#20365F",
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
                   height: 40,
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
-                  //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
+                  marginStart: "3%",
+                  // marginEnd: "3%",
+                  borderRadius: 10,
                 }}
                 onPress={handleGiftCode}
                 disabled={giftErrorCounter === 3 ? true : false}

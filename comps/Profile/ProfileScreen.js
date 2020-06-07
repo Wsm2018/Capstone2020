@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  PixelRatio,
   Platform,
   AsyncStorage,
 } from "react-native";
@@ -68,6 +69,7 @@ export default function ProfileScreen(props) {
   const [displayNameErr, setDisplayNameErr] = useState("");
   const [showDisplayErr, setShowDisplayErr] = useState(false);
   const [backgroundEdit, setBackgroundEdit] = useState(false);
+  const size = PixelRatio.getPixelSizeForLayoutSize(140);
 
   // ------------------------------------------- FUNCTIONS --------------------------------------
 
@@ -290,9 +292,9 @@ export default function ProfileScreen(props) {
             <View style={styles.profileImageContainer}>
               <Avatar
                 rounded
-                source={{ uri: photoURL }}
+                source={{ uri: photoURL, width: size, height: size }}
                 size="xlarge"
-                style={styles.profileImage}
+                style={{ ...styles.profileImage, width: 140, height: 140 }}
               />
             </View>
           </View>
@@ -351,12 +353,13 @@ export default function ProfileScreen(props) {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+            <Text style={{ fontSize: 20, paddingRight: 5 }}>{displayName}</Text>
             <TouchableOpacity onPress={() => setEdit(true)}>
               <FontAwesome5
                 name="edit"
                 size={20}
-                style={{ color: "#224229" }}
+                style={{ color: "#185a9d" }}
+                //#60c4c4
               />
             </TouchableOpacity>
           </View>
@@ -480,12 +483,13 @@ export default function ProfileScreen(props) {
                       justifyContent: "space-around",
                       flex: 1,
                       alignItems: "center",
+                      // backgroundColor: "red",
                     }}
                   >
                     {!flag ? (
                       <Avatar
                         accessory={{
-                          size: 40,
+                          size: 45,
                         }}
                         rounded
                         source={{ uri: editPic }}
@@ -494,12 +498,32 @@ export default function ProfileScreen(props) {
                         size="xlarge"
                       />
                     ) : (
-                      <Text>Loading...</Text>
+                      <LottieView
+                        width={Dimensions.get("window").width / 3}
+                        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+                        autoPlay
+                        loop
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                        }}
+                      />
                     )}
                     <Input
                       inputContainerStyle={{
                         width: "100%",
                         borderColor: "black",
+                        height: 40,
+                        // backgroundColor: "green",
+                        // alignItems: "center",
+                        justifyContent: "center",
+                        // flexDirection: "row",
+                        paddingLeft: 6,
+                        // width: "60%",
+                        borderColor: "gray",
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        // marginBottom: 10,
                       }}
                       label="Display Name"
                       value={editDisplayName}
@@ -523,13 +547,19 @@ export default function ProfileScreen(props) {
                     ) : null}
                   </View>
 
-                  <View style={{ justifyContent: "space-evenly", flex: 0.5 }}>
+                  <View
+                    style={{
+                      justifyContent: "space-evenly",
+                      flex: 0.5,
+                      // backgroundColor: "green",
+                    }}
+                  >
                     <View
                       style={{
                         flexDirection: "row",
                         justifyContent: "space-evenly",
                         // backgroundColor: "red",
-                        marginTop: 20,
+                        // marginTop: 20,
                         width: "100%",
                         // marginEnd: 50,
                         // flex: 1,
@@ -537,15 +567,18 @@ export default function ProfileScreen(props) {
                     >
                       <View
                         style={{
-                          backgroundColor: "#20365F",
+                          flex: 0.4,
+                          backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
                           height: 40,
-                          width: "40%",
+                          // width: "30%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
                           //marginStart: "2%",
-                          //marginEnd: "2%",
-                          borderRadius: 30,
+                          marginEnd: "3%",
+
                           //marginBottom: 10,
                         }}
                       >
@@ -563,15 +596,17 @@ export default function ProfileScreen(props) {
                       </View>
                       <View
                         style={{
-                          backgroundColor: "#20365F",
+                          flex: 0.4,
+                          backgroundColor: "#901616",
+                          // borderWidth: 4,
                           height: 40,
-                          width: "40%",
+                          // width: "30%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
-                          // marginStart: "2%",
-                          // marginEnd: "2%",
-                          borderRadius: 30,
+                          marginStart: "3%",
+                          // marginEnd: "3%",
+                          borderRadius: 10,
                           //marginBottom: 10,
                         }}
                       >
@@ -601,14 +636,19 @@ export default function ProfileScreen(props) {
                       <View
                         style={{
                           backgroundColor: "lightgray",
+
+                          // backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
                           height: 40,
-                          width: "90%",
+                          // height: 40,
+                          width: "80%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
                           //marginStart: "2%",
                           //marginEnd: "2%",
-                          borderRadius: 20,
+                          // borderRadius: 20,
                           //marginBottom: 10,
                         }}
                       >
@@ -617,7 +657,7 @@ export default function ProfileScreen(props) {
                             style={{
                               textAlign: "center",
                               fontSize: 16,
-                              color: "gray",
+                              color: "darkgray",
                               fontWeight: "bold",
                             }}
                           >
@@ -959,8 +999,8 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    height: height / 1.8,
-    width: width / 1.4,
+    height: height / 1.5,
+    width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
     shadowRadius: 2,

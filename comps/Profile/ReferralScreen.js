@@ -291,7 +291,7 @@ export default function ReferralScreen(props) {
                         <AntDesign
                           name="questioncircle"
                           size={20}
-                          color="#8C0919"
+                          color="#901616"
                         />
                       </View>
                     </Tooltip>
@@ -464,14 +464,15 @@ export default function ReferralScreen(props) {
                   <TouchableOpacity
                     style={{
                       flex: 0.4,
-                      backgroundColor: "#20365F",
-                      // borderWidth: 4,
-                      // height: 20,
+
+                      backgroundColor: "#2E9E9B",
+                      height: 40,
                       width: "40%",
+                      // borderWidth: 4,
                       // alignSelf: "center",
                       justifyContent: "center",
                       alignItems: "center",
-                      //marginStart: "2%",
+                      // marginStart: "3%",
                       //marginEnd: "2%",
                       borderRadius: 10,
                       //marginBottom: 10,
