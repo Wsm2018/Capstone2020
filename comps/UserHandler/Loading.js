@@ -13,7 +13,6 @@ import LottieView from "lottie-react-native";
 export default function Loading(props) {
   return (
     <View style={styles.container}>
-      >
       <View
         style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
       >

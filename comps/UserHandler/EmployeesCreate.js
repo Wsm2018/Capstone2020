@@ -934,7 +934,7 @@ export default function EmployeeHandlerCreate(props) {
                 textAlign: "center",
               }}
             >
-              Are you sure you want to ALLOW the creation of 's account?
+              Are you sure you want to ALLOW the creation of this account?
             </Text>
             <Text></Text>
             <Text></Text>
@@ -1015,7 +1015,7 @@ const styles = StyleSheet.create({
     // justifyContent:"center"
   },
   redButton: {
-    backgroundColor: "#942b1f",
+    backgroundColor: "#901616",
     height: 40,
     width: "38%",
     alignSelf: "center",
