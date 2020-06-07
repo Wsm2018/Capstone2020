@@ -1,4 +1,6 @@
-import React from "react";
+// import React from "react";
+import React, { useState, useEffect } from "react";
+
 import {
   View,
   Text,
@@ -7,6 +9,7 @@ import {
   ScrollView,
   ImageBackground,
   Alert,
+  PixelRatio,
 } from "react-native";
 // import { Octicons } from "@expo/vector-icons";
 import firebase from "firebase";
@@ -15,10 +18,17 @@ import "firebase/functions";
 import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
 import { Divider, Card as Cards } from "react-native-elements";
-import { Octicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 // import { ScrollView } from "react-native-gesture-handler";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 export default function Car({ car }) {
+  const [deviceType, setDeviceType] = useState(0);
+  const size = PixelRatio.getPixelSizeForLayoutSize(140);
   const handleConfirmation = () => {
     Alert.alert(
       "Confirm Delete",
@@ -41,7 +51,13 @@ export default function Car({ car }) {
       carId: car.id,
     });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   return (
     <View style={styles.container}>
       <Cards containerStyle={styles.card}>
@@ -60,12 +76,11 @@ export default function Car({ car }) {
             bottom: 0,
             justifyContent: "center",
             alignItems: "center",
-            marginTop: "10%",
+            // marginTop: "10%",
           }}
         >
           <View
-            width={Dimensions.get("window").width / 1.41}
-            height={Dimensions.get("window").height / 10}
+            width={Dimensions.get("window").width / 1.5}
             style={{
               flex: 1,
               position: "absolute",
@@ -73,19 +88,46 @@ export default function Car({ car }) {
               left: 0,
               right: 0,
               bottom: 0,
-              justifyContent: "center",
-              alignItems: "flex-end",
+              // justifyContent: "center",
+              // alignItems: "flex-end",
               // marginTop: "-12%",
               // marginEnd: "-3%",
             }}
           >
-            <TouchableOpacity onPress={handleConfirmation}>
+            <TouchableOpacity
+              style={{ alignItems: "flex-end" }}
+              onPress={handleConfirmation}
+            >
               {/* <Text style={styles.notes}>X</Text> */}
-              <Octicons name="trashcan" size={20} color="black" />
+
+              {deviceType === 1 ? (
+                <AntDesign
+                  name="closesquare"
+                  size={30}
+                  style={{ color: "black" }}
+                />
+              ) : (
+                <AntDesign
+                  name="closesquare"
+                  size={50}
+                  style={{ color: "black" }}
+                />
+              )}
             </TouchableOpacity>
           </View>
-          <View>
-            <Text style={styles.plate}> {car.plate}</Text>
+          <View style={{ marginTop: "15%", alignItems: "center" }}>
+            <Text
+              style={
+                deviceType === 1
+                  ? { ...styles.plate, fontSize: responsiveScreenFontSize(2) }
+                  : {
+                      ...styles.plate,
+                      fontSize: responsiveScreenFontSize(3.5),
+                    }
+              }
+            >
+              {car.plate}
+            </Text>
           </View>
         </View>
       </Cards>
@@ -95,10 +137,12 @@ export default function Car({ car }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
   },
   card: {
     borderWidth: 0,
     borderRadius: 20,
+    // width: "100%",
   },
 
   notes: {

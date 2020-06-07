@@ -24,12 +24,18 @@ import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import Car from "./Car";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { ScrollView } from "react-native-gesture-handler";
 const { width, height } = Dimensions.get("screen");
 
 export default function CarsScreen(props) {
   const [cars, setCars] = useState([]);
-
+  const [deviceType, setDeviceType] = useState(0);
+  // const size = PixelRatio.getPixelSizeForLayoutSize(140);
   const getUserCars = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -51,6 +57,13 @@ export default function CarsScreen(props) {
     props.setCarsModal(false);
     props.navigation.navigate("AddCars");
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   return (
     <Modal transparent={true} visible={props.carsModal}>
@@ -91,12 +104,19 @@ export default function CarsScreen(props) {
                     }}
                   />
                   <Text
-                    style={{
-                      // paddingTop: "15%",
-                      fontSize: 20,
-                      color: "darkgray",
-                      fontWeight: "bold",
-                    }}
+                    style={
+                      deviceType === 1
+                        ? { fontSize: responsiveScreenFontSize(2) }
+                        : {
+                            fontSize: responsiveScreenFontSize(5),
+                          }
+                    }
+                    // style={{
+                    //   // paddingTop: "15%",
+                    //   fontSize: 20,
+                    //   color: "darkgray",
+                    //   fontWeight: "bold",
+                    // }}
                   >
                     No vehicles
                   </Text>
