@@ -220,11 +220,6 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({ activeRole: null });
-
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .onSnapshot((userRef) => {
@@ -244,6 +239,12 @@ export default function App(props) {
     const admin = response.data.result !== undefined ? true : false;
 
     const user = { ...userRef.data(), admin };
+
+    await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: user.role });
+
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);
     setUser(user);
