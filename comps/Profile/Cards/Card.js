@@ -106,15 +106,12 @@ export default function Card(props) {
           </View>
           <View
             style={{
-              // flexDirection: "row",
               justifyContent: "space-between",
-              // alignItems: "center",
               alignItems: "flex-start",
             }}
           >
             <Image
               width={Dimensions.get("window").width / 9}
-              // style={{ marginTop: 5 }}
               source={require("../../../assets/images/chip.png")}
             />
             <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
@@ -136,38 +133,27 @@ export default function Card(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#3e3e3e",
     justifyContent: "center",
     alignItems: "center",
   },
   card: {
-    // backgroundColor: "rgb(221,216,216)",
     backgroundColor: "rgb(26,148,149)",
     borderWidth: 0,
     borderRadius: 20,
   },
 
   time: {
-    // marginTop: 5,
     fontSize: 25,
     color: "white",
   },
   notes: {
-    // alignItems: "flex-end",
     fontSize: 16,
     color: "white",
     textTransform: "capitalize",
   },
   two: {
-    backgroundColor: "red",
+    alignItems: "center",
     width: "100%",
-    marginTop: "3%",
-    padding: "5%",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "lightgray",
-
-    // height: "30%",
   },
 });
 

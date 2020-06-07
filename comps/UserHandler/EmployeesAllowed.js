@@ -181,9 +181,9 @@ export default function EmployeesAllowed(props) {
                 searchIcon={true}
                 value={search}
                 containerStyle={{
-                  backgroundColor: "#20365F",
-                  borderBottomColor: "#20365F",
-                  borderTopColor: "#20365F",
+                  backgroundColor: "#185a9d",
+                  borderBottomColor: "#185a9d",
+                  borderTopColor: "#185a9d",
                   width: "100%",
                   height: "20%",
                 }}
@@ -271,7 +271,7 @@ export default function EmployeesAllowed(props) {
                   }}
                 />
                 <Text style={{ color: "grey", fontSize: 20 }}>
-                  User not found
+                  No Empolyees!
                 </Text>
               </View>
             )}
@@ -285,20 +285,35 @@ export default function EmployeesAllowed(props) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   ) : (
-    <View>
-      <Text>LOADING...</Text>
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
     </View>
   );
 }
 EmployeesAllowed.navigationOptions = (props) => ({
   title: "Employees Allowed ",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#e3e3e3",
     marginTop: "-9%",
   },
   payButton: {
@@ -336,7 +351,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     backgroundColor: "#e3e3e3",
     // flex: 0.2,
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
   },
   buttongroup: {
     justifyContent: "flex-start",

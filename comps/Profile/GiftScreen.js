@@ -196,6 +196,21 @@ export default function GiftScreen(props) {
               >
                 {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
                 <Input
+                  inputContainerStyle={{
+                    width: "100%",
+                    borderColor: "black",
+                    height: 40,
+                    // backgroundColor: "green",
+                    // alignItems: "center",
+                    justifyContent: "center",
+                    // flexDirection: "row",
+                    paddingLeft: 6,
+                    // width: "60%",
+                    borderColor: "gray",
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    // marginBottom: 10,
+                  }}
                   placeholder="Receiver@email.com"
                   value={email}
                   onChangeText={(email) => setEmail(email.toLowerCase())}
@@ -208,30 +223,50 @@ export default function GiftScreen(props) {
             Platform.OS !== "ios" ? (
               <View
                 style={{
-                  width: "100%",
+                  flex: 1,
+                  justifyContent: "flex-end",
                   alignItems: "center",
-                  justifyContent: "center",
+                  // backgroundColor: "black",
                 }}
               >
-                <Picker
+                <View
                   style={{
-                    width: "50%",
-                    marginTop: "10%",
-                    // backgroundColor: "blue",
+                    borderColor: "black",
+                    height: 40,
+                    // backgroundColor: "green",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    // flexDirection: "row",
+                    // paddingLeft: 6,
+                    width: "60%",
+                    borderColor: "gray",
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    // marginBottom: 10,
                   }}
-                  selectedValue={amount}
-                  onValueChange={(item) => setAmount(item)}
                 >
-                  <Picker.Item value="" label="Select Amount" />
-                  {amounts.labels.map((item, index) => (
-                    <Picker.Item
-                      key={index}
-                      value={amounts.values[index]}
-                      label={item}
-                    />
-                  ))}
-                </Picker>
-                <Text style={{ color: "red" }}>{amountErrMsg}</Text>
+                  <Picker
+                    style={{
+                      width: "100%",
+                      // alignItems: "flex-end",
+                      marginTop: "5%",
+                      // justifyContent: "flex-end",
+                      // backgroundColor: "blue",
+                    }}
+                    selectedValue={amount}
+                    onValueChange={(item) => setAmount(item)}
+                  >
+                    <Picker.Item value="" label="Select Amount" />
+                    {amounts.labels.map((item, index) => (
+                      <Picker.Item
+                        key={index}
+                        value={amounts.values[index]}
+                        label={item}
+                      />
+                    ))}
+                  </Picker>
+                  <Text style={{ color: "red" }}>{amountErrMsg}</Text>
+                </View>
               </View>
             ) : (
               <View>
@@ -307,8 +342,8 @@ export default function GiftScreen(props) {
               style={{
                 flexDirection: "row",
                 justifyContent: "center",
-                alignItems: "center",
-                flex: 4,
+                alignItems: "flex-end",
+                flex: 1,
                 // backgroundColor: "blue",
               }}
             >
@@ -321,10 +356,16 @@ export default function GiftScreen(props) {
 
                   flexDirection: "row",
                   paddingLeft: 6,
-                  // width: "40%",
-                  borderColor: "black",
-                  borderWidth: 1,
-                  borderRadius: 10,
+
+                  justifyContent: "center",
+                  // flexDirection: "row",
+                  // paddingLeft: 6,
+                  // width: "60%",
+                  borderColor: "gray",
+                  borderWidth: 2,
+                  borderRadius: 5,
+                  // marginBottom: 10,
+
                   // marginBottom: 10,
                 }}
               >
@@ -369,12 +410,13 @@ export default function GiftScreen(props) {
                   </Text>
                 </View> */}
               </View>
-              <View style={{ flex: 0.1 }}>
+              <View style={{ flex: 0.1, paddingBottom: 10 }}>
                 <TouchableOpacity
                   style={{
                     alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
+                    // backgroundColor: "red",
                   }}
                   onPress={handleFlag}
                 >
@@ -393,51 +435,24 @@ export default function GiftScreen(props) {
               style={{
                 flex: 4,
                 // backgroundColor: "red",
-                justifyContent: "space-evenly",
+                justifyContent: "center",
                 alignItems: "center",
-                flexDirection: "row-reverse",
+                flexDirection: "row",
               }}
             >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#20365F",
+                  flex: 0.3,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
                   height: 40,
-                  width: "30%",
+                  // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
                   //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
-                }}
-                onPress={handleNext}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    color: "white",
-                    // fontWeight: "bold",
-                  }}
-                >
-                  Next
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#20365F",
-                  height: 40,
-                  width: "30%",
-                  // borderWidth: 4,
-                  // alignSelf: "center",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
+                  marginEnd: "3%",
+                  borderRadius: 10,
                   //marginBottom: 10,
                 }}
                 onPress={handleClear}
@@ -453,32 +468,22 @@ export default function GiftScreen(props) {
                   Clear
                 </Text>
               </TouchableOpacity>
-            </View>
-          ) : (
-            <View
-              style={{
-                flex: 4,
-                // backgroundColor: "red",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                flexDirection: "row-reverse",
-              }}
-            >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#20365F",
+                  flex: 0.3,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
                   height: 40,
-                  width: "30%",
+                  // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
-                  //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
+                  marginStart: "3%",
+                  // marginEnd: "3%",
+                  borderRadius: 10,
                   //marginBottom: 10,
                 }}
-                onPress={handleSend}
+                onPress={handleNext}
               >
                 <Text
                   style={{
@@ -488,23 +493,34 @@ export default function GiftScreen(props) {
                     // fontWeight: "bold",
                   }}
                 >
-                  Send
+                  Next
                 </Text>
               </TouchableOpacity>
-
+            </View>
+          ) : (
+            <View
+              style={{
+                flex: 1.5,
+                // backgroundColor: "red",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#20365F",
-                  height: 40,
-                  width: "30%",
+                  flex: 0.3,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
                   //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
+                  marginEnd: "3%",
+                  borderRadius: 10,
+                  //marginBottom: 10
                 }}
                 onPress={hanldeGoback}
               >
@@ -517,6 +533,34 @@ export default function GiftScreen(props) {
                   }}
                 >
                   Go Back
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flex: 0.3,
+                  backgroundColor: "#2E9E9B",
+                  // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
+                  // alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //marginStart: "2%",
+                  marginStart: "3%",
+                  borderRadius: 10,
+                  //marginBottom: 10
+                }}
+                onPress={handleSend}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Send
                 </Text>
               </TouchableOpacity>
             </View>

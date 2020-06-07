@@ -161,7 +161,7 @@ export default function Favorites({
                 >
                   <TouchableOpacity
                     style={{
-                      backgroundColor: "#20365F",
+                      backgroundColor: "#2E9E9B",
                       height: 40,
                       width: "40%",
                       justifyContent: "center",
@@ -197,7 +197,7 @@ export default function Favorites({
                     // paddingTop: "15%",
 
                     fontSize: 20,
-                    color: "#229277",
+                    color: "#005c9d",
                     fontWeight: "bold",
                   }}
                 >

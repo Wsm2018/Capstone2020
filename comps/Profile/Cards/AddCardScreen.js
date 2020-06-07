@@ -16,7 +16,7 @@ import db from "../../../db";
 import { Text } from "react-native-elements";
 import { Card } from "react-native-shadow-cards";
 
-import { CreditCardInput } from "react-native-credit-card-input";
+import { CreditCardInput } from "../../../react-native-credit-card-input";
 // import { TouchableOpacity } from "react-native-gesture-handler";
 // import { ScrollView } from "react-native-gesture-handler";
 export default function AddCard(props) {
@@ -133,44 +133,22 @@ export default function AddCard(props) {
     <View
       style={{
         flex: 1,
-        // backgroundColor: "lightgray",
-        // flexDirection: "column",
-        // flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "center",
-        // marginTop: "5%",
-        // marginBottom: "10%",
       }}
     >
       <View
         style={{
           flex: 3,
-          marginTop: "35%",
-
-          width: "90%",
+          width: "80%",
         }}
       >
         <CreditCardInput
-          // elevation={5}
           labels={labels}
           requiresName={true}
           onChange={handleCard}
           allowScroll={true}
-          // labelStyle={{ textAlign: "center" }}
-          inputStyle={{
-            borderWidth: 1,
-            backgroundColor: "white",
-            height: 50,
-            // marginStart: 2,
-            // borderRadius: 5,
-            textAlign: "center",
-          }}
-          inputContainerStyle={
-            {
-              // marginTop: 60,
-            }
-          }
-          labelStyle={{ color: "gray" }}
+          labelStyle={{ color: "#20365F", fontSize: 16 }}
           cardImageFront={require("../../../assets/images/dark1.jpg")}
           cardImageBack={require("../../../assets/images/dark2.png")}
         />
@@ -178,7 +156,7 @@ export default function AddCard(props) {
 
       <TouchableOpacity
         style={{
-          backgroundColor: "#20365F",
+          backgroundColor: "#3d9478",
           height: 40,
           width: "30%",
           alignSelf: "center",

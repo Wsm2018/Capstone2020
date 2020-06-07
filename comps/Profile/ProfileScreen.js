@@ -11,9 +11,18 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  PixelRatio,
   Platform,
   AsyncStorage,
 } from "react-native";
+import * as Device from "expo-device";
+
+// import ResponsiveImageView from "react-native-responsive-image-view";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
 const LottieView = require("lottie-react-native");
@@ -68,9 +77,11 @@ export default function ProfileScreen(props) {
   const [displayNameErr, setDisplayNameErr] = useState("");
   const [showDisplayErr, setShowDisplayErr] = useState(false);
   const [backgroundEdit, setBackgroundEdit] = useState(false);
+  const [deviceType, setDeviceType] = useState(0);
+  const size = PixelRatio.getPixelSizeForLayoutSize(140);
 
+  console.log("------------------------------------------", Device.DeviceType);
   // ------------------------------------------- FUNCTIONS --------------------------------------
-
   const getUser = async () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -195,7 +206,15 @@ export default function ProfileScreen(props) {
     });
   };
 
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+
   // ------------------------------------------------------ USE EFFECTS -------------------------------------------------
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   useEffect(() => {
     console.log("flag", flag);
@@ -270,30 +289,70 @@ export default function ProfileScreen(props) {
           ]}
         >
           <View style={styles.headerContainer}>
-            <View style={styles.coverContainer}>
-              <ImageBackground
-                source={{
-                  uri: profileBackground,
-                }}
-                style={styles.coverImage}
-              >
-                <View style={styles.coverTitleContainer}>
-                  <MaterialCommunityIcons
-                    name="dots-horizontal"
-                    size={40}
-                    color="white"
-                    onPress={() => setBackgroundEdit(true)}
-                  />
-                </View>
-              </ImageBackground>
-            </View>
+            {deviceType === 1 ? (
+              <View style={styles.coverContainer}>
+                <ImageBackground
+                  source={{
+                    uri: profileBackground,
+                  }}
+                  style={styles.coverImage}
+                >
+                  <View style={styles.coverTitleContainer}>
+                    <MaterialCommunityIcons
+                      name="dots-horizontal"
+                      size={40}
+                      color="white"
+                      onPress={() => setBackgroundEdit(true)}
+                    />
+                  </View>
+                </ImageBackground>
+              </View>
+            ) : (
+              <View style={styles.coverContainerTab}>
+                <ImageBackground
+                  source={{
+                    uri: profileBackground,
+                  }}
+                  style={styles.coverImage}
+                >
+                  <View style={styles.coverTitleContainer}>
+                    <MaterialCommunityIcons
+                      name="dots-horizontal"
+                      size={40}
+                      color="white"
+                      onPress={() => setBackgroundEdit(true)}
+                    />
+                  </View>
+                </ImageBackground>
+              </View>
+            )}
+
             <View style={styles.profileImageContainer}>
               <Avatar
                 rounded
                 source={{ uri: photoURL }}
                 size="xlarge"
-                style={styles.profileImage}
+                style={
+                  deviceType === 1
+                    ? {
+                        ...styles.profileImage,
+                        width: 140,
+                        height: 140,
+                      }
+                    : deviceType === 2
+                    ? {
+                        ...styles.profileImageTab,
+                        width: 120 * 2,
+                        height: 120 * 2,
+                        overflow: "hidden",
+                      }
+                    : null
+                }
               />
+
+              {/* <View {...getViewProps()}>
+                <Image {...getImageProps()} />
+              </View> */}
             </View>
           </View>
           {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
@@ -318,11 +377,37 @@ export default function ProfileScreen(props) {
                 }}
               >
                 <Text
-                  style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
+                  style={
+                    deviceType === 1
+                      ? {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(2),
+                          fontWeight: "bold",
+                        }
+                      : {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(1.5),
+                          fontWeight: "bold",
+                        }
+                  }
                 >
                   Reputation
                 </Text>
-                <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
+                <Text
+                  style={
+                    deviceType === 1
+                      ? {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(2),
+                        }
+                      : {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(1.2),
+                        }
+                  }
+                >
+                  {user.reputation}
+                </Text>
               </View>
               <View style={{ width: "30%" }}></View>
               <View
@@ -333,11 +418,37 @@ export default function ProfileScreen(props) {
                 }}
               >
                 <Text
-                  style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+                  style={
+                    deviceType === 1
+                      ? {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(2),
+                          fontWeight: "bold",
+                        }
+                      : {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(1.5),
+                          fontWeight: "bold",
+                        }
+                  }
                 >
                   Points
                 </Text>
-                <Text style={styles.tabLabelNumber}>{user.points}</Text>
+                <Text
+                  style={
+                    deviceType === 1
+                      ? {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(2),
+                        }
+                      : {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(1.2),
+                        }
+                  }
+                >
+                  {user.points}
+                </Text>
               </View>
             </View>
             {/* ================================================= */}
@@ -351,13 +462,34 @@ export default function ProfileScreen(props) {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+            <Text
+              style={
+                deviceType === 1
+                  ? { fontSize: responsiveScreenFontSize(2.5), paddingRight: 5 }
+                  : {
+                      fontSize: responsiveScreenFontSize(1.8),
+                      paddingRight: 5,
+                    }
+              }
+            >
+              {displayName}
+            </Text>
             <TouchableOpacity onPress={() => setEdit(true)}>
-              <FontAwesome5
-                name="edit"
-                size={20}
-                style={{ color: "#224229" }}
-              />
+              {deviceType === 1 ? (
+                <FontAwesome5
+                  name="edit"
+                  size={20}
+                  style={{ color: "#185a9d" }}
+                  //#60c4c4
+                />
+              ) : (
+                <FontAwesome5
+                  name="edit"
+                  size={28}
+                  style={{ color: "#185a9d" }}
+                  //#60c4c4
+                />
+              )}
             </TouchableOpacity>
           </View>
 
@@ -480,26 +612,81 @@ export default function ProfileScreen(props) {
                       justifyContent: "space-around",
                       flex: 1,
                       alignItems: "center",
+                      // backgroundColor: "red",
                     }}
                   >
                     {!flag ? (
                       <Avatar
-                        accessory={{
-                          size: 40,
-                        }}
+                        accessory={
+                          deviceType === 1
+                            ? {
+                                size: 45,
+                              }
+                            : deviceType === 2
+                            ? {
+                                size: 70,
+                              }
+                            : null
+                        }
                         rounded
                         source={{ uri: editPic }}
                         showAccessory
                         onAccessoryPress={handlePickImage}
                         size="xlarge"
+                        style={
+                          deviceType === 1
+                            ? {
+                                ...styles.profileImageEdit,
+                                width: 140,
+                                height: 140,
+                              }
+                            : deviceType === 2
+                            ? {
+                                ...styles.profileImageTab,
+                                width: 250,
+                                height: 250,
+                                // overflow: "hidden",
+                              }
+                            : null
+                        }
                       />
                     ) : (
-                      <Text>Loading...</Text>
+                      // <Avatar
+                      //   accessory={{
+                      //     size: 45,
+                      //   }}
+                      //   rounded
+                      //   source={{ uri: editPic }}
+                      //   showAccessory
+                      //   onAccessoryPress={handlePickImage}
+                      //   size="xlarge"
+                      // />
+                      <LottieView
+                        width={Dimensions.get("window").width / 3}
+                        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+                        autoPlay
+                        loop
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                        }}
+                      />
                     )}
                     <Input
                       inputContainerStyle={{
                         width: "100%",
                         borderColor: "black",
+                        height: 40,
+                        // backgroundColor: "green",
+                        // alignItems: "center",
+                        justifyContent: "center",
+                        // flexDirection: "row",
+                        paddingLeft: 6,
+                        // width: "60%",
+                        borderColor: "gray",
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        // marginBottom: 10,
                       }}
                       label="Display Name"
                       value={editDisplayName}
@@ -523,13 +710,19 @@ export default function ProfileScreen(props) {
                     ) : null}
                   </View>
 
-                  <View style={{ justifyContent: "space-evenly", flex: 0.5 }}>
+                  <View
+                    style={{
+                      justifyContent: "space-evenly",
+                      flex: 0.5,
+                      // backgroundColor: "green",
+                    }}
+                  >
                     <View
                       style={{
                         flexDirection: "row",
                         justifyContent: "space-evenly",
                         // backgroundColor: "red",
-                        marginTop: 20,
+                        // marginTop: 20,
                         width: "100%",
                         // marginEnd: 50,
                         // flex: 1,
@@ -537,15 +730,18 @@ export default function ProfileScreen(props) {
                     >
                       <View
                         style={{
-                          backgroundColor: "#20365F",
+                          flex: 0.4,
+                          backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
                           height: 40,
-                          width: "40%",
+                          // width: "30%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
                           //marginStart: "2%",
-                          //marginEnd: "2%",
-                          borderRadius: 30,
+                          marginEnd: "3%",
+
                           //marginBottom: 10,
                         }}
                       >
@@ -563,15 +759,17 @@ export default function ProfileScreen(props) {
                       </View>
                       <View
                         style={{
-                          backgroundColor: "#20365F",
+                          flex: 0.4,
+                          backgroundColor: "#901616",
+                          // borderWidth: 4,
                           height: 40,
-                          width: "40%",
+                          // width: "30%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
-                          // marginStart: "2%",
-                          // marginEnd: "2%",
-                          borderRadius: 30,
+                          marginStart: "3%",
+                          // marginEnd: "3%",
+                          borderRadius: 10,
                           //marginBottom: 10,
                         }}
                       >
@@ -601,14 +799,19 @@ export default function ProfileScreen(props) {
                       <View
                         style={{
                           backgroundColor: "lightgray",
+
+                          // backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
                           height: 40,
-                          width: "90%",
+                          // height: 40,
+                          width: "80%",
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
                           //marginStart: "2%",
                           //marginEnd: "2%",
-                          borderRadius: 20,
+                          // borderRadius: 20,
                           //marginBottom: 10,
                         }}
                       >
@@ -617,7 +820,7 @@ export default function ProfileScreen(props) {
                             style={{
                               textAlign: "center",
                               fontSize: 16,
-                              color: "gray",
+                              color: "darkgray",
                               fontWeight: "bold",
                             }}
                           >
@@ -658,6 +861,7 @@ export default function ProfileScreen(props) {
                   // borderTopRightRadius: 6,
                   // borderBottomLeftRadius: 40,
                   width: "100%",
+                  height: responsiveScreenHeight(5),
                   borderColor: "darkgrey",
                   // borderRightColor: "black",
                 }}
@@ -667,11 +871,32 @@ export default function ProfileScreen(props) {
                   //backgroundColor: "blue",
                   width: "100%",
                 }}
-                selectedTextStyle={{
-                  color: "black",
-                  fontWeight: "bold",
-                }}
-                textStyle={{ color: "#535150", fontWeight: "bold" }}
+                selectedTextStyle={
+                  deviceType === 1
+                    ? {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(2),
+                      }
+                    : {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(1.5),
+                      }
+                }
+                textStyle={
+                  deviceType === 1
+                    ? {
+                        color: "#535150",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(2),
+                      }
+                    : {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(1.5),
+                      }
+                }
               />
             </View>
             <View
@@ -904,7 +1129,15 @@ const styles = StyleSheet.create({
     marginBottom: 55,
     position: "relative",
   },
+  coverContainerTab: {
+    marginBottom: 60,
+    position: "relative",
+  },
   coverImage: {
+    height: Dimensions.get("window").width * (3 / 7),
+    width: Dimensions.get("window").width,
+  },
+  coverImageTab: {
     height: Dimensions.get("window").width * (3 / 7),
     width: Dimensions.get("window").width,
   },
@@ -950,17 +1183,25 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     borderRadius: 70,
     borderWidth: 4,
-    height: 140,
-    width: 140,
+    // height: 140,
+    // width: 140,
+  },
+  profileImageTab: {
+    borderColor: "#FFF",
+    borderRadius: 280 / 2,
+    borderWidth: 4,
+    // height: 140,
+    // width: 140,
   },
   profileImageContainer: {
+    // top: "10%",
     bottom: 0,
     position: "absolute",
   },
   modalView: {
     margin: 20,
-    height: height / 1.8,
-    width: width / 1.4,
+    height: height / 1.5,
+    width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
     shadowRadius: 2,
@@ -1042,7 +1283,6 @@ const styles = StyleSheet.create({
   tabLabelNumber: {
     fontWeight: "bold",
     color: "#229277",
-    fontSize: 16,
     textAlign: "center",
     marginBottom: 2,
   },

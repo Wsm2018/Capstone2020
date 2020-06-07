@@ -10,7 +10,9 @@ import {
   ActivityIndicator,
   Picker,
   Modal,
+  Platform,
 } from "react-native";
+import ReactNativePickerModule from "react-native-picker-module";
 
 import { Image, Avatar, Divider } from "react-native-elements";
 // import { Card } from "react-native-shadow-cards";
@@ -18,7 +20,10 @@ import { Card } from "react-native-shadow-cards";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ActionButton from "react-native-action-button";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 import moment from "moment";
@@ -29,6 +34,8 @@ export default function EmployeesRequest(props) {
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
   const [phone, setPhone] = useState(null);
+
+  const [heightVal, setHeightVal] = useState("85%");
 
   const user = props.navigation.getParam("user");
   const roles = [
@@ -60,8 +67,106 @@ export default function EmployeesRequest(props) {
     console.log("response", response);
 
     // ---------------------------------
-    let page = `<View><Text>Email:${user.email}</Text>
-    <Text>Password:${response.data.password}</Text></View>`;
+    let page = ` <!DOCTYPE html>
+
+      <html>
+        <style>
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+          }
+      
+          .body {
+            background-color: #185a9d;
+          }
+          * {
+            box-sizing: border-box;
+          }
+      
+          button {
+            background-color: #3ea3a3;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+          }
+      
+          button:hover {
+            opacity: 1;
+          }
+      
+          .container {
+            padding: 16px;
+            border: 1px solid;
+            width: 60%;
+            margin-top: 120px;
+            background-color: white;
+          }
+      
+          /* Clear floats */
+          .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+          .left {
+            float: left;
+          }
+          .right {
+            float: right;
+          }
+      
+          table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
+      
+          td,
+          th {
+            border: 1px solid #dddddd;
+            /* /* text-align: left; */
+            padding: 8px;
+            text-align: left;
+            /* margin-left: auto;
+            margin-right: auto; */
+          }
+          tr:nth-child(even) {
+            background-color: white;
+            margin-bottom: 100px;
+            /* margin-left: auto;
+            margin-right: auto;
+            padding: 100px; */
+          }
+        </style>
+        <body class="body">
+          <center>
+            <div class="container">
+              <h4>Employess Reset Password PDF File</h4>
+      
+              <table>
+                <tr>
+                  <th>Email</th>
+                  <th>Password</th>
+                </tr>
+                <tr>
+                  <td>${user.email}</td>
+                  <td>${response.data.password}</td>
+                </tr>
+              </table>
+              <br />
+              <div class="clearfixs">
+                <a class="href" href="index.html"
+                  ><button type="button" class="cancelbtn">OK</button></a
+                >
+              </div>
+            </div>
+          </center>
+        </body>
+      </html>`;
+
     let pdf = await Print.printToFileAsync({ html: page });
     let uri = pdf.uri;
     const response2 = await fetch(uri);
@@ -88,12 +193,14 @@ export default function EmployeesRequest(props) {
   const handleCancel = () => {
     setEditMode(false);
     setSelectedRole(user.role);
+    setHeightVal("85%");
   };
 
   // ------------------------------------------------------------------
   const handleSave = () => {
     db.collection("users").doc(user.id).update({ role: selectedRole });
     props.navigation.goBack();
+    setHeightVal("85%");
   };
 
   // ------------------------------------------------------------------
@@ -113,26 +220,44 @@ export default function EmployeesRequest(props) {
         <View
           style={{
             width: "100%",
+            height: "100%",
             alignItems: "center",
             justifyContent: "flex-start",
+            // borderWidth: 1,
+            // borderColor: "blue",
 
             //backgroundColor: "red",
           }}
         >
           <View
-            style={
-              Platform.OS === "ios" ? styles.avatarIpad : styles.avatarPhone
-            }
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: heightVal,
+              ////
+              // borderWidth: 1,
+              // borderColor: "green",
+            }}
           >
             <Avatar
               rounded
               source={{ uri: user.photoURL }}
-              style={{
-                width: "40%",
-                height: 150,
-                // marginTop: "5%",
-                // marginBottom: "4%",
-              }}
+              style={
+                Platform.OS === "android"
+                  ? {
+                      height: "90%",
+                      width: "28%",
+
+                      // borderWidth: 1,
+                    }
+                  : {
+                      height: "90%",
+                      width: "35%",
+
+                      // borderWidth: 1,
+                    }
+              }
             />
             <Text
               style={{
@@ -150,35 +275,89 @@ export default function EmployeesRequest(props) {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
+                // borderWidth: 1,
+                // paddingBottom:20
               }}
             >
               <Text style={{ fontSize: 15 }}>Change Role: </Text>
-
-              <View
-                style={{
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#20365F",
-                  height: 40,
-                  marginTop: "1%",
-                  width: "50%",
-                  marginBottom: "2%",
-                  // alignSelf: "center",
-                }}
-              >
-                <Picker
-                  // mode="dropdown"
-                  selectedValue={selectedRole}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setSelectedRole(itemValue)
-                  }
-                  itemStyle={{ color: "red", textAlign: "right" }}
+              {Platform.OS === "android" ? (
+                <View
+                  style={{
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: "#185a9d",
+                    height: 40,
+                    marginTop: "1%",
+                    width: "50%",
+                    marginBottom: "2%",
+                    // alignSelf: "center",
+                  }}
                 >
-                  {roles.map((role, index) => (
-                    <Picker.Item label={role} value={role} key={index} />
-                  ))}
-                </Picker>
-              </View>
+                  <Picker
+                    // mode="dropdown"
+                    selectedValue={selectedRole}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedRole(itemValue)
+                    }
+                    itemStyle={{
+                      color: "red",
+                      textAlign: "right",
+                    }}
+                  >
+                    {roles.map((role, index) => (
+                      <Picker.Item label={role} value={role} key={index} />
+                    ))}
+                  </Picker>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: "#185a9d",
+                    height: 50,
+                    width: "87%",
+                    alignSelf: "center",
+                    // opacity: 0.8,
+                    paddingLeft: 12,
+                    marginTop: 20,
+                    backgroundColor: "white",
+                    // flexDirection: "row-reverse",
+                    justifyContent: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      pickerRef.show();
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text style={{ fontSize: 17, color: "#667085" }}>
+                      {selectedRole == "" ? "Select a role" : selectedRole}
+                    </Text>
+                    <Ionicons
+                      name="md-arrow-dropdown"
+                      size={23}
+                      color="#333333"
+                      style={{
+                        marginRight: "5%",
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <ReactNativePickerModule
+                    pickerRef={(e) => (pickerRef = e)}
+                    selectedValue={selectedRole}
+                    title={"Select role"}
+                    items={roles}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedRole({ value: itemValue, error: false })
+                    }
+                  />
+                </View>
+              )}
             </View>
           ) : (
             <Text
@@ -218,16 +397,12 @@ export default function EmployeesRequest(props) {
           <Text style={{ fontSize: 16, marginTop: "1%" }}>{user.role}</Text>
         </View>
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black" }}>ID</Text>
-          <Text style={{ fontSize: 16 }}>{user.id}</Text>
-        </View>
-        <View style={styles.text}>
           <Text style={{ fontSize: 16, color: "black" }}>Email</Text>
           <Text style={{ fontSize: 16, marginBottom: "5%" }}>{user.email}</Text>
         </View>
       </View>
 
-      <View style={styles.two}>
+      <View style={styles.two2}>
         <Text style={styles.cardTitle}> Personal Informatioon</Text>
 
         <View style={styles.text}>
@@ -249,57 +424,6 @@ export default function EmployeesRequest(props) {
           <Text style={{ fontSize: 16, color: "black" }}>Nationality</Text>
           <Text style={{ fontSize: 16 }}> {user.country}</Text>
         </View>
-
-        {editMode ? (
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              marginTop: "5%",
-              alignSelf: "center",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              textAlign: "center",
-              marginStart: "6%",
-              marginBottom: "5%",
-            }}
-          >
-            <TouchableOpacity style={styles.payButton} onPress={handleSave}>
-              <Text style={{ color: "white" }}>Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.payButton} onPress={handleCancel}>
-              <Text style={{ color: "white" }}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              marginTop: "5%",
-              marginBottom: "5%",
-              alignSelf: "center",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              textAlign: "center",
-              marginStart: "6%",
-            }}
-          >
-            <TouchableOpacity
-              style={styles.payButton}
-              onPress={() => setModal(true)}
-            >
-              <Text style={{ color: "white" }}>Reset Password</Text>
-            </TouchableOpacity>
-            {/* ---------------------------------EDIT--------------------------------- */}
-            <TouchableOpacity
-              style={styles.payButton}
-              onPress={() => setEditMode(true)}
-            >
-              <Text style={{ color: "white" }}>Edit</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
       <View
         style={{
@@ -387,13 +511,13 @@ export default function EmployeesRequest(props) {
                 {/* ---------------------------------CONFIRM--------------------------------- */}
                 <TouchableOpacity
                   onPress={handleDownload}
-                  style={styles.payButton}
+                  style={styles.greenButton}
                 >
                   <Text style={{ color: "white" }}> Confirm</Text>
                 </TouchableOpacity>
                 {/* ---------------------------------CANCEL--------------------------------- */}
                 <TouchableOpacity
-                  style={styles.payButton}
+                  style={styles.redButton}
                   onPress={() => setModal(false)}
                 >
                   <Text style={{ color: "white" }}>Cancel</Text>
@@ -403,12 +527,50 @@ export default function EmployeesRequest(props) {
           </View>
         </Modal>
       </View>
+      {editMode ? (
+        <View style={styles.buttons}>
+          <TouchableOpacity style={styles.greenButton} onPress={handleSave}>
+            <Text style={{ color: "white" }}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.redButton} onPress={handleCancel}>
+            <Text style={{ color: "white" }}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ActionButton buttonColor={"#3ea3a3"} size={80}>
+          <ActionButton.Item
+            buttonColor="#9b59b6"
+            title="Reset Password"
+            onPress={() => setModal(true)}
+          >
+            <SimpleLineIcons
+              name="people"
+              size={20}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+          <ActionButton.Item
+            buttonColor="#3498db"
+            title="Edit"
+            onPress={() => {
+              setEditMode(true);
+              setHeightVal("75%");
+            }}
+          >
+            <MaterialCommunityIcons
+              name="logout"
+              size={20}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+        </ActionButton>
+      )}
     </View>
   );
 }
 EmployeesRequest.navigationOptions = (props) => ({
   title: "Employee Details",
-  headerStyle: { backgroundColor: "#3a68ab" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 const styles = StyleSheet.create({
@@ -421,12 +583,20 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     alignItems: "center",
-
     //backgroundColor: "blue",
   },
   body: {
     flex: 0,
     backgroundColor: "#e3e3e3",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    height: 22,
+    width: 22,
   },
   footer: {
     flex: 0,
@@ -455,15 +625,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   payButton: {
-    backgroundColor: "#327876",
+    backgroundColor: "#185a9d",
     height: 40,
-    width: "45%",
+    width: "38%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
     marginStart: "2%",
     marginEnd: "2%",
-    borderRadius: 10,
+    borderRadius: 5,
     marginBottom: 10,
 
     //flexDirection: "row",
@@ -488,12 +658,44 @@ const styles = StyleSheet.create({
   avatarPhone: {
     justifyContent: "center",
     alignItems: "center",
-    width: "95%",
+    width: "100%",
+    height: "85%",
+    borderWidth: 1,
+    borderColor: "red",
   },
   avatarIpad: {
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
+    height: "85%",
+    borderWidth: 1,
+    borderColor: "green",
+  },
+  greenButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+
+    //flexDirection: "row",
+  },
+  redButton: {
+    backgroundColor: "#942b1f",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
   },
   one: {
     backgroundColor: "white",
@@ -504,6 +706,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     // height: "100%",
     borderColor: "lightgray",
+    height: "25%",
+  },
+  one2: {
+    backgroundColor: "white",
+    width: "100%",
+    // marginTop: "3%",
+    // padding: "2%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    // height: "100%",
+    borderColor: "lightgray",
+  },
+  buttons: {
+    width: "100%",
+    flexDirection: "row",
+    // marginTop: "5%",
+    alignSelf: "center",
+    justifyContent: "space-evenly",
+    // alignItems: "center",
+    // textAlign: "center",
+    // marginStart: "6%",
+    // marginBottom: "5%",
+    backgroundColor: "white",
   },
   two: {
     backgroundColor: "white",
@@ -516,6 +741,19 @@ const styles = StyleSheet.create({
     // flexDirection: "row",
     //flexWrap: "wrap",
 
+    // justifyContent: "space-between",
+  },
+  two2: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "5%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    // flexDirection: "row",
+    //flexWrap: "wrap",
+    borderBottomColor: "white",
     // justifyContent: "space-between",
   },
   cardTitle: {

@@ -5,17 +5,22 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  // Image,
 } from "react-native";
 import Image from "react-native-scalable-image";
 
 import GradientButton from "react-native-gradient-buttons";
 import { Text } from "react-native-elements";
-
 import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import { Dimensions } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 export default function BalanceScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -95,14 +100,20 @@ export default function BalanceScreen({ navigation }) {
       <View
         style={{
           flex: 1,
-          justifyContent: "space-evenly",
+          justifyContent: "space-around",
           alignItems: "center",
           // backgroundColor: "blue",
-          // marginTop: "-5%",
+          // marginTop: "5%",
         }}
       >
-        <View style={{ flex: 0.5 }}>
-          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#2E9E9B" }}>
+        <View style={{ flex: 0.4 }}>
+          <Text
+            style={{
+              fontSize: responsiveScreenFontSize(2.8),
+              fontWeight: "bold",
+              color: "#185a9d",
+            }}
+          >
             Current Balance
           </Text>
 
@@ -123,10 +134,23 @@ export default function BalanceScreen({ navigation }) {
                 props.navigation.navigate("Balance", { user: props.user })
               }
             /> */}
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginEnd: 5 }}>
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2.5),
+                fontWeight: "bold",
+                marginEnd: 5,
+              }}
+            >
               {user && user.balance}
             </Text>
-            <Text style={{ fontSize: 20, fontWeight: "bold" }}>QR</Text>
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2.5),
+                fontWeight: "bold",
+              }}
+            >
+              QR
+            </Text>
           </View>
         </View>
 
@@ -178,23 +202,23 @@ export default function BalanceScreen({ navigation }) {
                   // backgroundColor: "red",
                   // height: 50,
                   flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignItems: "center",
+                  justifyContent: "center",
+                  // alignItems: "flex-start",
                 }}
               >
                 <TouchableOpacity
                   style={{
-                    flex: 0.4,
-                    backgroundColor: "#20365F",
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
-                    height: 40,
+                    height: responsiveScreenHeight(5.5),
                     // width: "30%",
                     // alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
                     //marginStart: "2%",
-                    //marginEnd: "2%",
-                    borderRadius: 15,
+                    marginEnd: "3%",
+                    borderRadius: 10,
                     //marginBottom: 10,
                   }}
                   onPress={() => navigation.navigate("Cards", { user: user })}
@@ -207,28 +231,28 @@ export default function BalanceScreen({ navigation }) {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
                   >
-                    Show My Cards
+                    My Cards
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
-                    flex: 0.4,
+                    flex: 0.3,
 
-                    backgroundColor: "#20365F",
-                    height: 40,
+                    backgroundColor: "#2E9E9B",
+                    height: responsiveScreenHeight(5.5),
                     // width: "30%",
                     // borderWidth: 4,
                     // alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
-                    //marginStart: "2%",
+                    marginStart: "3%",
                     //marginEnd: "2%",
-                    borderRadius: 15,
+                    borderRadius: 10,
                     //marginBottom: 10,
                   }}
                   // style={{ alignItems: "center" }}
@@ -242,7 +266,7 @@ export default function BalanceScreen({ navigation }) {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
@@ -254,7 +278,7 @@ export default function BalanceScreen({ navigation }) {
                     //   color: "#20365F",
                     // }}
                   >
-                    Use Gift Code
+                    Use Gift
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -262,48 +286,55 @@ export default function BalanceScreen({ navigation }) {
           </View>
         ) : (
           <View
-            width={Dimensions.get("window").width / 2}
+            width={Dimensions.get("window").width / 1.6}
             style={{
-              flex: 1,
+              flex: 0.6,
               // backgroundColor: "yellow",
               // flexDirection: "row",
-              justifyContent: "space-evenly",
+              // paddingTop: 10,
+              // justifyContent: "space-evenly",
             }}
           >
-            <View
-              style={{
-                // backgroundColor: "green",
-                // alignItems: "center",
+            <View style={{ flex: 0.4 }}>
+              <View
+                style={{
+                  // backgroundColor: "green",
 
-                // flexDirection: "row",
-                // paddingLeft: 6,
-                // width: "60%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 10,
-                // marginBottom: 10,
-              }}
-            >
-              {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-              <TextInput
-                width={Dimensions.get("window").width / 2}
-                style={{ height: 40, paddingLeft: 6 }}
-                value={giftCode}
-                placeholder={
-                  giftErrorCounter === 3
-                    ? "* Try again later"
-                    : giftCodeError === "red"
-                    ? "* Code Invalid"
-                    : giftCodeError === "green"
-                    ? "* Balance Added"
-                    : "Enter the code"
-                }
-                onChangeText={setGiftCode}
-                placeholderTextColor={giftCodeError}
-                editable={giftErrorCounter === 3 ? false : true}
-              />
+                  // alignItems: "center",
+
+                  // flexDirection: "row",
+                  // paddingLeft: 6,
+                  // width: "60%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  // marginBottom: 10,
+                }}
+              >
+                {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
+                <TextInput
+                  width={Dimensions.get("window").width / 2}
+                  style={{
+                    height: responsiveScreenHeight(5),
+                    paddingLeft: 6,
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                  value={giftCode}
+                  placeholder={
+                    giftErrorCounter === 3
+                      ? "* Try again later"
+                      : giftCodeError === "red"
+                      ? "* Code Invalid"
+                      : giftCodeError === "green"
+                      ? "* Balance Added"
+                      : "Enter the code"
+                  }
+                  onChangeText={setGiftCode}
+                  placeholderTextColor={giftCodeError}
+                  editable={giftErrorCounter === 3 ? false : true}
+                />
+              </View>
             </View>
-
             {/* {!flag ? (
               <Text
                 style={
@@ -330,34 +361,41 @@ export default function BalanceScreen({ navigation }) {
             <View
               // width={Dimensions.get("window").width}
               style={{
-                flex: 0.5,
-                // backgroundColor: "red",
+                flex: 0.4,
                 flexDirection: "row",
-                justifyContent: "space-between",
+                // width: "100%",
+                // backgroundColor: "red",
+
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
               <TouchableOpacity
                 // width={Dimensions.get("window").width}
                 style={{
-                  flex: 0.4,
-                  backgroundColor: "#20365F",
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5.5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
                   //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
+                  marginEnd: "3%",
+                  borderRadius: 10,
                 }}
-                onPress={() => setCodeView(false)}
+                onPress={() => {
+                  setCodeView(false);
+                  setGiftCode("");
+                  setGiftCodeError("transparent");
+                }}
               >
+                {/* 12000000000QR  */}
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -367,18 +405,17 @@ export default function BalanceScreen({ navigation }) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  flex: 0.4,
-                  backgroundColor: "#20365F",
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5.5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
-                  //marginStart: "2%",
-                  //marginEnd: "2%",
-                  borderRadius: 15,
-                  //marginBottom: 10,
+                  marginStart: "3%",
+                  // marginEnd: "3%",
+                  borderRadius: 10,
                 }}
                 onPress={handleGiftCode}
                 disabled={giftErrorCounter === 3 ? true : false}
@@ -386,7 +423,7 @@ export default function BalanceScreen({ navigation }) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}

@@ -100,21 +100,31 @@ export default function AddPromotion(props) {
               justifyContent: "center",
             }}
           >
-            <Text>Promotion Create</Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#20365F",
+                justifyContent: "center",
+                alignSelf: "center",
+                marginTop: "5%",
+                fontWeight: "bold",
+              }}
+            >
+              Promotion Create
+            </Text>
           </View>
           <View style={{ width: "80%" }}>
             <View
               style={{
                 backgroundColor: "white",
                 alignItems: "center",
-
                 flexDirection: "column",
                 // paddingLeft: 6,
                 // width: "80%",
                 borderColor: "black",
                 borderWidth: 1,
-                borderRadius: 10,
-                marginBottom: 10,
+                borderRadius: 5,
+                marginBottom: "5%",
               }}
             >
               <TextInput
@@ -137,44 +147,6 @@ export default function AddPromotion(props) {
               </Text>
             ) : null}
           </View>
-          <View style={{ width: "80%" }}>
-            <DatePicker
-              style={{
-                width: "100%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 10,
-                marginBottom: 10,
-              }}
-              date={expiry}
-              mode="date"
-              placeholder="Select Expiry Date"
-              format="YYYY-MM-DD"
-              minDate={new Date()}
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  position: "absolute",
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0,
-                },
-              }}
-              onDateChange={(date) => {
-                setExpiry(date);
-                setExpiryErr("");
-                setShowExpiryErr(false);
-              }}
-            />
-            {showExpiryErr ? (
-              <Text
-                style={expiryErr ? { color: "red" } : { color: "transparent" }}
-              >
-                {expiryErr}
-              </Text>
-            ) : null}
-          </View>
 
           <View style={{ width: "80%" }}>
             <View
@@ -187,8 +159,8 @@ export default function AddPromotion(props) {
                 // width: "80%",
                 borderColor: "black",
                 borderWidth: 1,
-                borderRadius: 10,
-                marginBottom: 10,
+                borderRadius: 5,
+                marginBottom: "5%",
               }}
             >
               <TextInput
@@ -211,6 +183,53 @@ export default function AddPromotion(props) {
                 }
               >
                 {percentageErr}
+              </Text>
+            ) : null}
+          </View>
+          <View style={{ height: 50, width: "80%" }}>
+            <DatePicker
+              style={{
+                width: "100%",
+                borderColor: "darkgray",
+                borderWidth: 0.5,
+                borderRadius: 5,
+                // marginBottom: "5%",
+              }}
+              date={expiry}
+              mode="date"
+              placeholder="Select Expiry Date"
+              format="YYYY-MM-DD"
+              minDate={new Date()}
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  // position: "absolute",
+                  right: 0,
+                  top: 0,
+                  // marginLeft: 0,
+                },
+
+                placeholderText: {
+                  fontSize: 15,
+                  color: "#393f4a",
+                },
+                dateText: {
+                  fontSize: 15,
+                  color: "#393f4a",
+                },
+              }}
+              onDateChange={(date) => {
+                setExpiry(date);
+                setExpiryErr("");
+                setShowExpiryErr(false);
+              }}
+            />
+            {showExpiryErr ? (
+              <Text
+                style={expiryErr ? { color: "red" } : { color: "transparent" }}
+              >
+                {expiryErr}
               </Text>
             ) : null}
           </View>
