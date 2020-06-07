@@ -249,308 +249,431 @@ export default function CheckOut(props) {
       serviceBooking,
     });
 
-    props.navigation.navigate("Home");
+    props.navigation.navigate("Types");
   };
   return (
-    <ScrollView style={styles.container}>
-      {/* {console.log(
-        "-=-=-=-==-=-=-=-=-=-serviceBooking",
-        serviceBooking,
-        "--assetBooking",
-        assetBooking,
-        "--tName",
-        tName,
-        "--sName",
-        sName
-      )} */}
-      <View style={styles.header}>
-        <LottieView
-          source={require("../../assets/trialimages/7337-credit-card-check-animation.json")}
-          autoPlay
-          loop
-          style={{
-            position: "relative",
-            width: "50%",
-            backgroundColor: "#e3e3e3",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            alignContent: "center",
-            alignSelf: "center",
-          }}
-        />
-      </View>
-      <View style={styles.all}>
-        <View style={styles.card}>
-          <Text
-            style={{
-              marginLeft: "2%",
-              fontSize: 22,
-              color: "#474a47",
-              padding: "2%",
-              // textAlign:"center"
-            }}
-          >
-            Booking Summary
-          </Text>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray", marginTop: "1%" }}>
-              Type
-            </Text>
-            <Text style={{ fontSize: 15, marginTop: "1%" }}>{tName}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>Section</Text>
-            <Text style={{ fontSize: 15 }}> {sName}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>Item</Text>
-            <Text style={{ fontSize: 15 }}> {assetBooking.asset.name}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>
-              Start Date & Time
-            </Text>
-            <Text style={{ fontSize: 15 }}>{assetBooking.startDateTime}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>End Date & Time</Text>
-            <Text style={{ fontSize: 15 }}>{assetBooking.endDateTime}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>Price Per Hour</Text>
-            <Text style={{ fontSize: 15 }}>{assetBooking.asset.price} QAR</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray", marginBottom: "3%" }}>
-              Amount
-            </Text>
-            <Text style={{ fontSize: 15 }}>{totalAmount} QAR </Text>
-          </View>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#f5f5f5",
-              padding: "2%",
-              margin: "2%",
-            }}
-          >
-            <View style={{ width: "30%" }}>
-              <TouchableOpacity
+    <View style={styles.container}>
+      {/* {console.log(assetBooking, "]]]]]]]]]]]]]]]]]]]]]]]]]]]]")} */}
+      {/* <View style={{ backgroundColor: "yellow", flex: 0.5 }}></View> */}
+      <View style={{ flex: 8 }}>
+        <ScrollView>
+          <View style={styles.all}>
+            <View style={styles.card}>
+              <Text
                 style={{
-                  backgroundColor: "#20365F",
-                  width: 70,
-                  height: 70,
-                  margin: 5,
-                  alignItems: "center",
-                  flexDirection: "row",
-                  //elevation: 12,
-                  borderWidth: 2,
-                  borderColor: "#20365F",
+                  marginLeft: "2%",
+                  fontSize: 25,
+                  color: "#185a9d",
+                  padding: "2%",
+                  fontWeight: "bold",
+                  // textAlign:"center"
                 }}
-                disabled
+              >
+                Booking Summary
+              </Text>
+              {/* <View
+                style={{
+                  borderBottomWidth: 1,
+                  borderColor: "#185a9d",
+                  width: "30%",
+                  marginLeft: "10%",
+                  marginTop: "-1%",
+                }}
+              ></View> */}
+              <View
+                style={{
+                  // backgroundColor: "yellow",
+                  width: "100%",
+                  padding: "2%",
+                  marginTop: "3%",
+                  marginBottom: "3%",
+                  // marginRight: "-2%",
+                }}
               >
                 <View
                   style={{
-                    height: "100%",
                     width: "100%",
-                    justifyContent: "center",
-                    textAlign: "center",
-                    alignContent: "center",
-                    alignItems: "center",
+                    flexDirection: "row",
+                    backgroundColor: "#3ea3a3",
+                    // backgroundColor: "#185a9d",
+                    paddingTop: "1%",
+                    paddingBottom: "1%",
+                    // marginBottom: 5,
                   }}
                 >
-                  <MaterialCommunityIcons
-                    name="car"
-                    size={30}
-                    color={"white"}
-                  />
-                  <Text
+                  <View
                     style={{
-                      textAlign: "center",
-                      color: "white",
-                      fontSize: 15,
+                      width: "45%",
+                      // backgroundColor: "yellow",
+                      alignItems: "center",
                     }}
                   >
-                    
-                    {tName}
-                  </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {assetBooking.startDateTime}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: "10%",
+                      // backgroundColor: "green",
+                      alignItems: "center",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="arrow-right"
+                      size={20}
+                      color="white"
+                    />
+                  </View>
+                  <View
+                    style={{
+                      width: "45%",
+                      // backgroundColor: "yellow",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {assetBooking.endDateTime}
+                    </Text>
+                  </View>
                 </View>
-              </TouchableOpacity>
+                <View
+                  style={{
+                    backgroundColor: "#f0f0f0",
+                    width: "100%",
+                    padding: "2%",
+                    flexDirection: "row",
+                    // margin: "2%",
+                    // marginRight: "-2%",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: "30%",
+                      // backgroundColor: "red",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#185a9d",
+                        width: "90%",
+                        // height: 70,
+                        margin: 5,
+                        alignItems: "center",
+                        flexDirection: "row",
+                        //elevation: 12,
+                        borderWidth: 2,
+                        borderColor: "#185a9d",
+                        aspectRatio: 1 / 1,
+                      }}
+                      disabled
+                    >
+                      <View
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          alignContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name="car"
+                          // name={props.assetIcon}
+                          size={50}
+                          color={"white"}
+                        />
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            color: "white",
+                            fontSize: 18,
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {tName}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={{
+                      width: "70%",
+                      paddingLeft: "3%",
+                      // backgroundColor: "green"
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                        ITEM:{" "}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 16, textTransform: "capitalize" }}
+                      >
+                        {assetBooking.asset.name}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                        SECTION:{" "}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 16, textTransform: "capitalize" }}
+                      >
+                        {sName}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                        PRICE:{" "}
+                      </Text>
+                      <Text style={{ fontSize: 16 }}>
+                        {assetBooking.asset.price} QR/Hour
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                        DESCRIPTION:{" "}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 16, textTransform: "capitalize" }}
+                      >
+                        {assetBooking.asset.description}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
             </View>
-            <View style={{ width: "70%" }}>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                <Text style={{ fontWeight: "bold" }}>Price: </Text>
-                <Text></Text>
-              </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                <Text style={{ fontWeight: "bold" }}>Description: </Text>
-                <Text></Text>
-              </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                <Text style={{ fontWeight: "bold" }}>Average Rating:</Text>
-                <Text></Text>
-              </View>
-            </View>
-          </View> */}
-        </View>
-        <View style={{ marginBottom: "3%" }}></View>
+            <View style={{ marginBottom: "3%" }}></View>
 
-        <View style={styles.card}>
-          <Text
+            <View style={styles.card}>
+              <Text
+                style={{
+                  marginLeft: "2%",
+                  fontSize: 18,
+                  color: "#474a47",
+                  padding: "2%",
+                  // textAlign: "center",
+                }}
+              >
+                Services
+              </Text>
+              <View
+                style={{
+                  // backgroundColor: "red",
+                  margin: "1%",
+                  marginStart: "4%",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  minHeight: 100,
+                  // justifyContent: "center",
+                }}
+              >
+                {serviceBooking.length > 0 ? (
+                  serviceBooking.map((s, i) => (
+                    <View
+                      style={{ width: "22%", aspectRatio: 1 / 1.1, margin: 4 }}
+                    >
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#185a9d",
+                          // width: "22%",
+                          // height: 70,
+                          // margin: 5,
+                          alignItems: "center",
+                          flexDirection: "row",
+                          borderWidth: 2,
+                          borderColor: "#185a9d",
+                          // aspectRatio: 1 / 1,
+                        }}
+                        disabled
+                      >
+                        <View
+                          style={{
+                            height: "80%",
+                            width: "100%",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            alignContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <MaterialCommunityIcons
+                            name={s.service.serviceIcon}
+                            size={30}
+                            color={"white"}
+                          />
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              color: "white",
+                              fontSize: 14,
+                              textTransform: "capitalize",
+                              // fontWeight: "bold",
+                            }}
+                          >
+                            {s.service.name}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                      <View
+                        style={{
+                          backgroundColor: "#3ea3a3",
+                          height: "20%",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: "2%",
+                          }}
+                        >
+                          {(s.day, "", s.show)}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          color: "white",
+                          fontWeight: "bold",
+                          position: "absolute",
+                          left: 5,
+                          top: 1,
+                        }}
+                      >
+                        #{i + 1}
+                      </Text>
+                    </View>
+                  ))
+                ) : (
+                  <View
+                    style={{
+                      paddingLeft: "2%",
+                      paddingBottom: "1%",
+                      paddingTop: "2%",
+                    }}
+                  >
+                    <Text>No services added</Text>
+                  </View>
+                )}
+              </View>
+              {/* <Divider style={{ backgroundColor: "lightgray" }} /> */}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+      {/* <View style={{ marginTop: "1%" }}></View> */}
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <View style={styles.bottomCard}>
+          <View
             style={{
-              marginLeft: "2%",
-              fontSize: 18,
-              color: "#474a47",
-              padding: "2%",
-              // textAlign: "center",
+              width: "33%",
+              // backgroundColor: "red",
+              justifyContent: "center",
+              // alignItems: "center",
+              paddingLeft: "5%",
             }}
           >
-            Service(s)
-          </Text>
-          {serviceBooking.length > 0 ? (
-            serviceBooking.map((s, i) => (
-              <View>
-                <View style={styles.text}>
-                  <Text
-                    style={{ fontSize: 15, color: "gray", marginTop: "1%" }}
-                  >
-                    Service #{i + 1}
-                  </Text>
-                  <Text style={{ fontSize: 15, marginTop: "1%" }}>
-                    {s.service.name}
-                  </Text>
-                </View>
-                <View style={styles.text}>
-                  <Text style={{ fontSize: 15, color: "gray" }}>
-                    Date & Time
-                  </Text>
-                  <Text style={{ fontSize: 15 }}>{(s.day, "", s.show)} </Text>
-                </View>
-                <View style={styles.text}>
-                  <Text style={{ fontSize: 15, color: "gray" }}>
-                    Price Per Hour
-                  </Text>
-                  <Text style={{ fontSize: 15 }}>{s.service.price} QAR</Text>
-                </View>
-
-                <View style={styles.text}>
-                  <Text
-                    style={{ fontSize: 15, color: "gray", marginBottom: "3%" }}
-                  >
-                    Amount
-                  </Text>
-                  <Text style={{ fontSize: 15, marginBottom: "3%" }}>
-                    {s.service.price} QAR
-                  </Text>
-                </View>
-                <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
-                  {/* <TouchableOpacity
-                  onPress={() => payLater()}
-                  style={styles.edit}
-                >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    <Feather name="edit-3" size={24} color="#809cb0" />
-                  </Text>
-                </TouchableOpacity> */}
-                  {/* <TouchableOpacity
-                  onPress={() => payLater()}
-                  style={styles.delete}
-                >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    <FontAwesome name="remove" size={20} color="#d64231" />
-                  </Text>
-                </TouchableOpacity> */}
-                </View>
-              </View>
-            ))
-          ) : (
-            <View style={{ paddingLeft: "4%", paddingBottom: "1%" }}>
-              <Text>No services added</Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#185a9d",
+                fontWeight: "bold",
+                // marginBottom: "2%",
+              }}
+            >
+              TOTAL
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                // backgroundColor: "red",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 18,
+                  // color: "#0d1c38",
+                  fontWeight: "bold",
+                  marginBottom: "3%",
+                }}
+              >
+                {totalAmount}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14.5,
+                  // color: "#0d1c38",
+                  fontWeight: "bold",
+                  // marginBottom: "3%",
+                  paddingLeft: 2,
+                }}
+              >
+                QAR
+              </Text>
             </View>
-          )}
-          {/* <Divider style={{ backgroundColor: "lightgray" }} /> */}
-        </View>
-        <View style={{ marginTop: "3%" }}></View>
-        <View style={styles.card}>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray", marginTop: "3%" }}>
-              Subtotal
-            </Text>
-            <Text style={{ fontSize: 15, marginTop: "3%" }}>
-              {/* {subtotal} QAR (Backend code needed) */}
-            </Text>
           </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: 15, color: "gray" }}>Discount</Text>
-            <Text style={{ fontSize: 15 }}> 50% (Backend needed)</Text>
-          </View>
-          <View style={styles.text}>
-            <Text
-              style={{
-                fontSize: 16,
-                color: "#0d1c38",
-                fontWeight: "bold",
-                marginBottom: "3%",
-              }}
+          <View
+            style={{
+              // backgroundColor: "yellow",
+              width: "65%",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => payLater()}
+              style={styles.payLaterButton}
             >
-              Total
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                color: "#0d1c38",
-                fontWeight: "bold",
-                marginBottom: "3%",
-              }}
-            >
-              {totalAmount} QAR (Backend needed)
-            </Text>
-          </View>
-          <Card.Actions>
+              <Text style={{ color: "white", fontWeight: "bold" }}>
+                PAY LATER
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
                 props.navigation.navigate("Payment", {
                   assetBooking: assetBooking,
+                  serviceBooking: serviceBooking,
+                  totalAmount: totalAmount,
                 })
               }
               style={styles.payButton}
             >
               <Text style={{ color: "white", fontWeight: "bold" }}>
-                Pay Now
+                PAY NOW
               </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => payLater()}
-              style={styles.payButton}
-            >
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                Pay Later
-              </Text>
-            </TouchableOpacity>
-          </Card.Actions>
-        </View>
-        {/*service*/}
-        {/* {displayServices.map((s) => (
-          <View>
-            <Text>Service: {s.service.name}</Text>
-            <Text>Price Per Hour {s.service.price}</Text>
-
-            <Text>Total: {s.service.price * s.hours.length}</Text>
-            <Text>Bookings</Text>
-            {s.hours.map((h) => (
-              <Text>{h}</Text>
-            ))}
           </View>
-        ))} */}
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 CheckOut.navigationOptions = {
   title: "CheckOut",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };
 //
@@ -587,6 +710,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "lightgray",
   },
+  bottomCard: {
+    backgroundColor: "white",
+    width: "100%",
+    flex: 1,
+    borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    borderColor: "lightgray",
+    flexDirection: "row",
+  },
   text: {
     fontSize: 80,
     marginLeft: "4%",
@@ -596,16 +728,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   payButton: {
-    backgroundColor: "#519153",
+    backgroundColor: "#3ea3a3",
     height: 40,
-    width: "45%",
-    alignSelf: "center",
+    width: "60%",
+    // alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
     marginStart: "2%",
     marginEnd: "2%",
-    borderRadius: 10,
-    marginBottom: 10,
+    // borderRadius: 30,
+    // marginBottom: 10,
+  },
+  payLaterButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "34%",
+    // alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    // padding: "1%",
+    // borderRadius: 30,
+    // marginBottom: 10,
   },
   edit: {
     //backgroundColor: "#809cb0",

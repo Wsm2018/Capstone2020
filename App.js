@@ -445,7 +445,7 @@ export default function App(props) {
         }
         // --------------------------------SERVICE EMPLOYEE----------------------------------
         // if user is customer or service employee go to <AppContainer/>
-        else if (user.role === "service employee") {
+        else if (user.role === "services employee") {
           return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
@@ -479,7 +479,7 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "service employee":
+              case "services employee":
                 return <ServiceEmployeeAppContainer />;
 
               case "customer":
