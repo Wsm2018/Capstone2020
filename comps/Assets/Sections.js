@@ -325,7 +325,7 @@ export default function Sections(props) {
   // };
 
   const handleAddFavorite = async (item) => {
-    // console.log(item);
+    console.log("fav preseddddddddddddddddddd ");
     // if (!(await checkFavorites(item.id))) {
     //   db.collection("users")
     //     .doc(firebase.auth().currentUser.uid)
@@ -342,24 +342,25 @@ export default function Sections(props) {
       uid: firebase.auth().currentUser.uid,
       asset: item,
     });
-    // console.log(response);
+    console.log(response);
     if (response.data !== "Exists") {
       alert("Asset Added");
       // getUserFavoriteAssets();
     } else {
+      console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       handleDeleteFavorite(item.id);
     }
   };
 
   const handleDeleteFavorite = async (id) => {
-    // console.log(id);
+    console.log("deleteddddddddddd ", id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
       assetId: id,
     });
     if (response.data !== null) {
-      // alert("Asset Deleteted");
+      alert("Asset Deleteted");
     }
   };
 
@@ -448,6 +449,16 @@ export default function Sections(props) {
     console.log(checkInfo.data().showInMap);
   };
 
+  const changeStartDate = async (d) => {
+    setTempStartDate(d);
+    // startTimeModal === false && setStartTimeModal(true);
+  };
+
+  const changeEndDate = async (d) => {
+    setTempEndDate(d);
+    // setEndTimeModal(true);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -479,7 +490,7 @@ export default function Sections(props) {
           >
             <View
               style={{
-                width: "45%",
+                width: "47%",
                 alignItems: "center",
                 justifyContent: "center",
                 // borderWidth: 1,
@@ -509,14 +520,15 @@ export default function Sections(props) {
                   },
                   dateInput: {
                     // marginLeft: 36,
-                    // backgroundColor: "#185a9d",
+                    backgroundColor: startDate ? "transparent" : "#f0f0f0",
                     borderWidth: 0,
                     borderColor: "#185a9d",
                     // color: "white",
                   },
                   // ... You can check the source to find the other keys.
                 }}
-                onDateChange={setTempStartDate}
+                // onDateChange={setTempStartDate}
+                onDateChange={(d) => changeStartDate(d)}
               />
               {/* <DatePicker
                 style={{ width: "100%" }}
@@ -550,8 +562,9 @@ export default function Sections(props) {
             <View
               style={{
                 width: "10%",
-                // alignItems: "center",
+                alignItems: "center",
                 justifyContent: "center",
+                paddingRight: "2%",
               }}
             >
               <MaterialCommunityIcons
@@ -562,7 +575,7 @@ export default function Sections(props) {
             </View>
             <View
               style={{
-                width: "45%",
+                width: "47%",
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -589,12 +602,15 @@ export default function Sections(props) {
                   },
                   dateInput: {
                     // marginLeft: 36,
+                    backgroundColor: endDate ? "transparent" : "#f0f0f0",
+
                     borderWidth: 0,
                     borderColor: "#185a9d",
                   },
                   // ... You can check the source to find the other keys.
                 }}
-                onDateChange={setTempEndDate}
+                // onDateChange={setTempEndDate}
+                onDateChange={(d) => changeEndDate(d)}
                 disabled={!startDate}
                 minDate={
                   startTime == "11:00 PM"
@@ -672,9 +688,9 @@ export default function Sections(props) {
                           }
                           style={{
                             margin: 3,
-                            // backgroundColor: "green",
+                            // backgroundColor: "#185a9d",
                             borderWidth: 2,
-                            borderColor: "#20365F",
+                            borderColor: "#185a9d",
                             backgroundColor: "white",
                             width: "90%",
                             aspectRatio: 2 / 1,
@@ -685,9 +701,10 @@ export default function Sections(props) {
                         >
                           <Text
                             style={{
-                              color: "#20365F",
+                              color: "#185a9d",
                               fontSize: 13,
                               textAlign: "center",
+                              // fontWeight: "bold",
                             }}
                           >
                             {t}
@@ -714,9 +731,9 @@ export default function Sections(props) {
                         style={{
                           marginTop: 30,
                           // backgroundColor: "green",
-                          borderWidth: 2,
-                          borderColor: "#20365F",
-                          backgroundColor: "#20365F",
+                          // borderWidth: 2,
+                          borderColor: "#3ea3a3",
+                          backgroundColor: "#3ea3a3",
                           width: "25%",
                           aspectRatio: 2 / 1,
                           borderRadius: 5,
@@ -768,7 +785,7 @@ export default function Sections(props) {
                   }
                   style={{
                     backgroundColor:
-                      selectedSection === s ? "#20365F" : "#e3e3e3",
+                      selectedSection === s ? "#185a9d" : "white",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -776,7 +793,7 @@ export default function Sections(props) {
                     flexDirection: "row",
                     //elevation: 12,
                     borderWidth: 2,
-                    borderColor: "#20365F",
+                    borderColor: "#185a9d",
                   }}
                 >
                   <View
@@ -793,12 +810,12 @@ export default function Sections(props) {
                       // name="map-marker"
                       name={sectionIcon}
                       size={40}
-                      color={selectedSection === s ? "white" : "#20365F"}
+                      color={selectedSection === s ? "white" : "#3ea3a3"}
                     />
                     <Text
                       style={{
                         textAlign: "center",
-                        color: selectedSection === s ? "white" : "#20365F",
+                        color: selectedSection === s ? "white" : "#185a9d",
                         fontSize: 20,
                         textTransform: "capitalize",
                       }}
@@ -873,7 +890,7 @@ export default function Sections(props) {
                       key={i}
                       style={{
                         backgroundColor:
-                          selectedList === l ? "#20365F" : "#e3e3e3",
+                          selectedList === l ? "#185a9d" : "white",
                         width: 60,
                         height: 60,
                         margin: 5,
@@ -881,7 +898,7 @@ export default function Sections(props) {
                         flexDirection: "row",
                         //elevation: 12,
                         borderWidth: 2,
-                        borderColor: "#20365F",
+                        borderColor: "#185a9d",
                       }}
                     >
                       <View
@@ -897,12 +914,12 @@ export default function Sections(props) {
                         <MaterialCommunityIcons
                           name="car"
                           size={30}
-                          color={selectedList === l ? "white" : "#20365F"}
+                          color={selectedList === l ? "white" : "#3ea3a3"}
                         />
                         <Text
                           style={{
                             textAlign: "center",
-                            color: selectedList === l ? "white" : "#20365F",
+                            color: selectedList === l ? "white" : "#185a9d",
                             fontSize: 18,
                           }}
                         >
@@ -911,11 +928,17 @@ export default function Sections(props) {
                         <Badge
                           value={
                             <MaterialCommunityIcons
-                              name="heart"
+                              name={
+                                favoriteIds.includes(l.id)
+                                  ? "heart"
+                                  : "heart-outline"
+                              }
                               // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
                               size={18}
                               color={
-                                favoriteIds.includes(l.id) ? "#c44949" : "white"
+                                favoriteIds.includes(l.id)
+                                  ? "#c44949"
+                                  : "lightgray"
                               }
                               // onPress={
                               //   favoriteAssets.includes(l.id)
@@ -932,10 +955,12 @@ export default function Sections(props) {
                             right: -10,
                           }}
                           badgeStyle={{
-                            backgroundColor: "#20365F",
+                            backgroundColor:
+                              selectedList === l ? "#185a9d" : "white",
                             width: 25,
                             height: 25,
-                            borderColor: "transparent",
+                            borderColor: "#185a9d",
+                            borderWidth: 0,
                           }}
                         />
                       </View>
@@ -1049,14 +1074,14 @@ export default function Sections(props) {
           </View>
         ) : null}
 
-        <View style={{ height: 15 }}></View>
+        {/* <View style={{ height: 15 }}></View> */}
       </ScrollView>
     </View>
   );
 }
 Sections.navigationOptions = (props) => ({
   title: "Sections",
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
 
@@ -1113,6 +1138,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: "3%",
     padding: "5%",
+    // paddingBottom: 0,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: "lightgray",

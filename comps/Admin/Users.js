@@ -461,36 +461,6 @@ export default function Users() {
         </View>
       </Modal>
       <ScrollView>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-end",
-          }}
-        >
-          {/* ---------------------------------RESET PASSWORD--------------------------------- */}
-          <TouchableOpacity
-            style={{ borderWidth: 1 }}
-            onPress={() => setModal(true)}
-          >
-            <Text>Reset Password</Text>
-          </TouchableOpacity>
-          <Text> | </Text>
-          {/* ---------------------------------EDIT--------------------------------- */}
-          <TouchableOpacity
-            style={{ borderWidth: 1 }}
-            onPress={() => setEditMode(true)}
-          >
-            <Text>Edit</Text>
-          </TouchableOpacity>
-          <Text> | </Text>
-          {/* ---------------------------------RESET PASSWORD--------------------------------- */}
-          <TouchableOpacity
-            style={{ borderWidth: 1 }}
-            onPress={() => setModal2(true)}
-          >
-            <Text>Delete</Text>
-          </TouchableOpacity>
-        </View>
         {/* =====================profile picture===========================*/}
         <View style={styles.one}>
           <View
@@ -499,15 +469,67 @@ export default function Users() {
             }
           >
             <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
-            <Text
+            <View style={{ flex: 2, backgroundColor: "red" }}>
+              <Text
+                style={{
+                  alignSelf: "center",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
+              >
+                {user.displayName}
+              </Text>
+            </View>
+
+            <View
               style={{
-                alignSelf: "center",
-                fontWeight: "bold",
-                fontSize: 16,
+                flex: 2,
+                flexDirection: "row",
+                // backgroundColor: "red",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {user.displayName}
-            </Text>
+              {/* ---------------------------------RESET PASSWORD--------------------------------- */}
+              <View
+                style={{
+                  // backgroundColor: "red",
+                  flex: 0.5,
+                  alignItems: "flex-end",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity onPress={() => setModal(true)}>
+                  <Text>Reset Password</Text>
+                </TouchableOpacity>
+              </View>
+              {/* ---------------------------------EDIT--------------------------------- */}
+              <View
+                style={{
+                  // backgroundColor: "blue",
+                  flex: 0.6,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity onPress={() => setEditMode(true)}>
+                  <Text>Edit Info</Text>
+                </TouchableOpacity>
+              </View>
+              {/* ---------------------------------RESET PASSWORD--------------------------------- */}
+              <View
+                style={{
+                  // backgroundColor: "green",
+                  flex: 0.5,
+                  alignItems: "flex-start",
+                  justifyContent: "center",
+                }}
+              >
+                <TouchableOpacity onPress={() => setModal2(true)}>
+                  <Text>Delete User</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
         {/* =====================profile picture===========================*/}
@@ -1309,7 +1331,7 @@ const styles = StyleSheet.create({
   },
   one: {
     backgroundColor: "white",
-    width: "100%",
+    flex: 1,
     // justifyContent: "space-between",
     // marginTop: "3%",
     // padding: "2%",
