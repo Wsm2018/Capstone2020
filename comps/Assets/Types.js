@@ -132,7 +132,7 @@ export default function Types(props) {
             <TimedSlideshow
               items={items}
               progressBarDirection="middle"
-              progressBarColor="#185a9d"
+              progressBarColor="#3ea3a3"
               // renderCloseIcon=
               // onPress={() => console.log("Close Clickedddddd")}
               // renderCloseIcon={null}

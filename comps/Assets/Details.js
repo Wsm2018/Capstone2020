@@ -612,7 +612,7 @@ export default function Details(props) {
                 <View
                   style={{
                     width: "25%",
-                    justifyContent: "center",
+                    // justifyContent: "center",
                     alignItems: "center",
                     padding: 5,
                   }}
@@ -626,14 +626,14 @@ export default function Details(props) {
 
                   <TouchableOpacity
                     style={{
-                      backgroundColor: "#20365F",
+                      backgroundColor: "#185a9d",
                       width: 70,
                       height: 70,
                       margin: 5,
                       alignItems: "center",
                       flexDirection: "row",
                       borderWidth: 2,
-                      borderColor: "#20365F",
+                      borderColor: "#185a9d",
                     }}
                     disabled
                   >
@@ -665,8 +665,8 @@ export default function Details(props) {
                   </TouchableOpacity>
                 </View>
 
-                <View style={{ width: "70%", padding: 10 }}>
-                  <Text style={{ fontWeight: "bold" }}>Timing(s): </Text>
+                <View style={{ width: "70%", padding: 10, paddingTop: 5 }}>
+                  <Text style={{ fontWeight: "bold" }}>Timings: </Text>
                   {s.hours.map((h) => (
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
@@ -682,7 +682,7 @@ export default function Details(props) {
                         <MaterialCommunityIcons
                           name="close"
                           size={15}
-                          color={"#20365F"}
+                          color={"#3ea3a3"}
                           // onPress={() => setModalAddReview(false)}
                         />
                       </TouchableOpacity>
@@ -699,7 +699,12 @@ export default function Details(props) {
                   {/* <Text style={{ fontSize: 20 }}>{s.service.name}</Text> */}
                 </View>
                 <View
-                  style={{ alignItems: "center", width: "5%", marginLeft: -3 }}
+                  style={{
+                    alignItems: "center",
+                    width: "5%",
+                    marginLeft: -5,
+                    paddingTop: 5,
+                  }}
                 >
                   <TouchableOpacity
                     onPress={() => deleteAll(s.service)}
@@ -708,7 +713,7 @@ export default function Details(props) {
                     <MaterialCommunityIcons
                       name="close"
                       size={20}
-                      color={"#20365F"}
+                      color={"#3ea3a3"}
                       // onPress={() => setModalAddReview(false)}
                     />
                   </TouchableOpacity>
@@ -718,8 +723,8 @@ export default function Details(props) {
           ))
         ) : (
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={{ width: "90%" }}>
-              <Text>No services selected</Text>
+            <View style={{ width: "90%", paddingTop: 5 }}>
+              <Text>Click on '+' to add services</Text>
             </View>
             {/* <View
               style={{
@@ -748,11 +753,12 @@ export default function Details(props) {
             <TouchableOpacity
               style={{
                 // width: "10%",
-                backgroundColor: "#20365F",
+                backgroundColor: "#3ea3a3",
                 justifyContent: "center",
                 alignItems: "center",
                 padding: 5,
                 marginBottom: 5,
+                // borderRadius: 100,
               }}
               onPress={() => setModalAddService(true)}
             >
@@ -789,11 +795,11 @@ export default function Details(props) {
             <MaterialCommunityIcons
               name="close"
               size={22}
-              color={"#20365F"}
+              color={"#3ea3a3"}
               onPress={() => setModalAddService(false)}
             />
           </View>
-          <View style={{ height: "85%" }}>
+          <View style={{ height: "92%" }}>
             <ScrollView>
               <View style={{}}>
                 {services ? (
@@ -827,7 +833,7 @@ export default function Details(props) {
                           <MaterialCommunityIcons
                             name={s.serviceIcon}
                             size={25}
-                            color="#20365F"
+                            color="#185a9d"
                           />
                           <Text> {s.name}</Text>
                         </View>
@@ -837,13 +843,13 @@ export default function Details(props) {
                               <MaterialIcons
                                 name="expand-less"
                                 size={20}
-                                color="#20365F"
+                                color="#185a9d"
                               />
                             ) : (
                               <MaterialIcons
                                 name="expand-more"
                                 size={20}
-                                color="#20365F"
+                                color="#185a9d"
                               />
                             )}
                           </Text>
@@ -865,8 +871,12 @@ export default function Details(props) {
                                 }
                               }
                             >
-                              {/* {console.log(userDays)} */}
+                              {/* {console.log(d, dayindex)} */}
 
+                              {/* {d.timesList.length === 0 &&
+                                dayindex === userDays.length - 1 && (
+                                  <Text>No services available</Text>
+                                )} */}
                               {d.timesList.length > 0 && (
                                 <Text>{getDay(d.day)}</Text>
                               )}
@@ -884,9 +894,9 @@ export default function Details(props) {
                                         "green" ? (
                                           <TouchableOpacity
                                             style={{
-                                              borderWidth: 2,
-                                              borderColor: "#20365F",
-                                              backgroundColor: "#20365F",
+                                              // borderWidth: 2,
+                                              borderColor: "#185a9d",
+                                              backgroundColor: "#185a9d",
                                               borderRadius: 5,
                                               padding: 5,
                                               width: "23%",
@@ -913,7 +923,7 @@ export default function Details(props) {
                                           <TouchableOpacity
                                             style={{
                                               borderWidth: 2,
-                                              borderColor: "#20365F",
+                                              borderColor: "#185a9d",
                                               backgroundColor: "white",
                                               borderRadius: 5,
                                               padding: 5,
@@ -928,7 +938,7 @@ export default function Details(props) {
                                           >
                                             <Text
                                               style={{
-                                                color: "#20365F",
+                                                color: "#185a9d",
                                                 fontSize: 13,
                                                 textAlign: "center",
                                               }}
@@ -981,17 +991,18 @@ export default function Details(props) {
               </View>
             </ScrollView>
           </View>
-          <View style={{ paddingTop: "5%" }}>
+          <View style={{ marginTop: 12, justifyContent: "center" }}>
             <TouchableOpacity
               onPress={() => setModalAddService(false)}
               style={{
-                backgroundColor: "#20365F",
+                backgroundColor: "#3ea3a3",
                 height: 50,
                 width: "50%",
                 alignSelf: "center",
                 justifyContent: "center",
                 alignItems: "center",
                 borderRadius: 30,
+                // marginTop: "5%",
               }}
             >
               {/* <Text style={{ color: "white", fontWeight: "bold" }}>
@@ -1007,7 +1018,7 @@ export default function Details(props) {
           </View>
         </View>
       </Modal>
-      <View style={{ marginTop: 20 }}>
+      <View style={{ marginTop: 50 }}>
         <TouchableOpacity
           onPress={() =>
             props.navigation.navigate("CheckOut", {
@@ -1022,20 +1033,20 @@ export default function Details(props) {
             })
           }
           style={{
-            backgroundColor: "#20365F",
-            height: 50,
-            width: "55%",
+            backgroundColor: "#3ea3a3",
+            height: 45,
+            width: "100%",
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
             // marginStart: "2%",
             // marginEnd: "2%",
-            borderRadius: 30,
+            // borderRadius: 30,
             // marginBottom: 10,
           }}
         >
           <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
-            Checkout
+            PROCEED TO CHECKOUT
           </Text>
         </TouchableOpacity>
       </View>
@@ -1054,6 +1065,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    // marginBottom: -1,
   },
   developmentModeText: {
     marginBottom: 20,

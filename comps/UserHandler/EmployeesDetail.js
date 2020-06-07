@@ -12,6 +12,7 @@ import {
   Modal,
   Platform,
 } from "react-native";
+import ReactNativePickerModule from "react-native-picker-module";
 
 import { Image, Avatar, Divider } from "react-native-elements";
 // import { Card } from "react-native-shadow-cards";
@@ -279,35 +280,84 @@ export default function EmployeesRequest(props) {
               }}
             >
               <Text style={{ fontSize: 15 }}>Change Role: </Text>
-
-              <View
-                style={{
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#185a9d",
-                  height: 40,
-                  marginTop: "1%",
-                  width: "50%",
-                  marginBottom: "2%",
-                  // alignSelf: "center",
-                }}
-              >
-                <Picker
-                  // mode="dropdown"
-                  selectedValue={selectedRole}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setSelectedRole(itemValue)
-                  }
-                  itemStyle={{
-                    color: "red",
-                    textAlign: "right",
+              {Platform.OS === "android" ? (
+                <View
+                  style={{
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: "#185a9d",
+                    height: 40,
+                    marginTop: "1%",
+                    width: "50%",
+                    marginBottom: "2%",
+                    // alignSelf: "center",
                   }}
                 >
-                  {roles.map((role, index) => (
-                    <Picker.Item label={role} value={role} key={index} />
-                  ))}
-                </Picker>
-              </View>
+                  <Picker
+                    // mode="dropdown"
+                    selectedValue={selectedRole}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedRole(itemValue)
+                    }
+                    itemStyle={{
+                      color: "red",
+                      textAlign: "right",
+                    }}
+                  >
+                    {roles.map((role, index) => (
+                      <Picker.Item label={role} value={role} key={index} />
+                    ))}
+                  </Picker>
+                </View>
+              ) : (
+                <View
+                  style={{
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: "#185a9d",
+                    height: 50,
+                    width: "87%",
+                    alignSelf: "center",
+                    // opacity: 0.8,
+                    paddingLeft: 12,
+                    marginTop: 20,
+                    backgroundColor: "white",
+                    // flexDirection: "row-reverse",
+                    justifyContent: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      pickerRef.show();
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text style={{ fontSize: 17, color: "#667085" }}>
+                      {selectedRole == "" ? "Select a role" : selectedRole}
+                    </Text>
+                    <Ionicons
+                      name="md-arrow-dropdown"
+                      size={23}
+                      color="#333333"
+                      style={{
+                        marginRight: "5%",
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <ReactNativePickerModule
+                    pickerRef={(e) => (pickerRef = e)}
+                    selectedValue={selectedRole}
+                    title={"Select role"}
+                    items={roles}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedRole({ value: itemValue, error: false })
+                    }
+                  />
+                </View>
+              )}
             </View>
           ) : (
             <Text

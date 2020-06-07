@@ -12,26 +12,26 @@ import LottieView from "lottie-react-native";
 
 export default function Loading(props) {
   return (
-    <View
-      style={{
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexDirection: "column",
-      }}
-    >
-      <LottieView
-        source={require("../../assets/17723-waitting.json")}
-        autoPlay
-        loop
-        style={{
-          position: "relative",
-          width: "100%",
-          justifyContent: "center",
-          alignSelf: "center",
-          paddingTop: "30%",
-        }}
-      />
-      <Text style={{ color: "grey", fontSize: 20 }}>Loading...</Text>
+    <View style={styles.container}>
+      >
+      <View
+        style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+      >
+        <LottieView
+          source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "50%",
+            backgroundColor: "white",
+            alignItems: "center",
+            justifyContent: "center",
+            alignContent: "center",
+            alignSelf: "center",
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -39,5 +39,6 @@ export default function Loading(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#e3e3e3",
   },
 });

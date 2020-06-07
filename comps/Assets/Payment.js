@@ -35,6 +35,7 @@ export default function Payment(props) {
   const partial = props.navigation.getParam("partial", "not found");
   const extension = props.navigation.getParam("oldPayment", "not found");
   const total = props.navigation.getParam("totalAmount", "some default value");
+
   //const [serviceBooking, setServiceBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
   const [card, setCard] = useState({});
   const [cards, setCards] = useState([]);
@@ -265,159 +266,198 @@ export default function Payment(props) {
     setUseBalance(true);
   };
   return (
-    <View style={{ paddingTop: 10 }}>
-      <ScrollView>
-        <Text>
-          Total Amount:{" "}
-          {promotionValid === true ? (
-            <Text>
-              <Text
+    <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
+      <View style={{ flex: 8 }}>
+        <ScrollView>
+          {/* <Text>
+            Total Amount:{" "}
+            {promotionValid === true ? (
+              <Text>
+                <Text
+                  style={{
+                    textDecorationLine: "line-through",
+                    textDecorationStyle: "solid",
+                    color: "gray",
+                  }}
+                >
+                  {total}
+                </Text>{" "}
+                {total - (total * promotion.percentage) / 100}
+              </Text>
+            ) : (
+              total
+            )}{" "}
+            QAR
+          </Text> */}
+          <View
+            style={{
+              backgroundColor: "white",
+              margin: "4%",
+              padding: "2%",
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: "lightgray",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 27, fontWeight: "bold" }}>
+              {user.balance - usedBalance}
+              <Text style={{ fontSize: 18 }}> QAR</Text>
+            </Text>
+            <Text style={{ fontSize: 14 }}>CURRENT BALANCE</Text>
+
+            {/* <Button title="use" onPress={() => setModalVisible(true)} /> */}
+            {useBalance && (
+              <View>
+                <Text>Used balance: {usedBalance} QAR</Text>
+                <Text>Amount to pay: {totalAmount} QAR</Text>
+              </View>
+            )}
+          </View>
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <TextInput
+              style={{
+                height: 40,
+                borderColor: "gray",
+                borderWidth: 1,
+                width: "90%",
+                textAlign: "center",
+                marginTop: "5%",
+                backgroundColor: "white",
+              }}
+              onChangeText={setCode}
+              onSubmitEditing={() => handlePromotion(code)}
+              placeholder="Promotion"
+              value={code}
+            />
+            {promotionValid === true ? (
+              <Text>The promotion is valid</Text>
+            ) : promotionValid === false ? (
+              <Text>The promotion is NOT valid</Text>
+            ) : (
+              <Text></Text>
+            )}
+          </View>
+
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false);
+            }}
+          >
+            <View style={{ marginTop: 22 }}>
+              <View
                 style={{
-                  textDecorationLine: "line-through",
-                  textDecorationStyle: "solid",
-                  color: "gray",
+                  marginTop: 22,
+                  backgroundColor: "#919191",
+                  margin: "5%",
+                  padding: "5%",
+                  // paddingTop: "1%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 5,
+                  ...Platform.select({
+                    ios: {
+                      paddingTop: 50,
+                      margin: "15%",
+                      minHeight: 300,
+                      width: "70%",
+                    },
+                    android: {
+                      minHeight: 200,
+                    },
+                  }),
                 }}
               >
-                {total}
-              </Text>{" "}
-              {total - (total * promotion.percentage) / 100}
-            </Text>
-          ) : (
-            total
-          )}{" "}
-          QAR
-        </Text>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <TextInput
-            style={{
-              height: 40,
-              borderColor: "gray",
-              borderWidth: 1,
-              width: "90%",
-              textAlign: "center",
-              marginTop: "5%",
-              backgroundColor: "white",
-            }}
-            onChangeText={setCode}
-            onSubmitEditing={() => handlePromotion(code)}
-            placeholder="Promotion"
-            value={code}
-          />
-          {promotionValid === true ? (
-            <Text>The promotion is valid</Text>
-          ) : promotionValid === false ? (
-            <Text>The promotion is NOT valid</Text>
-          ) : (
-            <Text></Text>
-          )}
-        </View>
-        <View>
-          <Text>Balance available: {user.balance - usedBalance} QAR</Text>
-          <Button title="use" onPress={() => setModalVisible(true)} />
-          {useBalance && (
-            <View>
-              <Text>Used balance: {usedBalance} QAR</Text>
-              <Text>Amount to pay: {totalAmount} QAR</Text>
+                <Text>Balance available: {user.balance} QAR</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  onChangeText={(text) => setUsedBalance(text)}
+                  placeholder="Balance To Use"
+                  value={cardNumber}
+                />
+                <Button
+                  title="Use"
+                  disabled={usedBalance > user.balance ? true : false}
+                  onPress={() => handleUseBalance()}
+                />
+                <Button title="Cancel" onPress={() => setModalVisible(false)} />
+              </View>
             </View>
-          )}
-        </View>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(false);
-          }}
-        >
-          <View style={{ marginTop: 22 }}>
-            <View
-              style={{
-                marginTop: 22,
-                backgroundColor: "#919191",
-                margin: "5%",
-                padding: "5%",
-                // paddingTop: "1%",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 5,
-                ...Platform.select({
-                  ios: {
-                    paddingTop: 50,
-                    margin: "15%",
-                    minHeight: 300,
-                    width: "70%",
-                  },
-                  android: {
-                    minHeight: 200,
-                  },
-                }),
+          </Modal>
+
+          <View>
+            {cards &&
+              cards.map((card) => (
+                <CheckBox
+                  title={card.cardNumber}
+                  checked={checked === card.id ? true : false}
+                  onPress={() => {
+                    handleCardSelect(card);
+                  }}
+                />
+              ))}
+            <CheckBox
+              title="Other"
+              checked={checked === 1 ? true : false}
+              onPress={() => {
+                handleCardSelect({ id: 1 });
               }}
-            >
-              <Text>Balance available: {user.balance} QAR</Text>
+            />
+          </View>
+          {other && (
+            <View>
+              <TextInput
+                style={styles.input}
+                onChangeText={(text) => setName(text)}
+                placeholder="Name"
+                value={name}
+              />
+
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                onChangeText={(text) => setUsedBalance(text)}
-                placeholder="Balance To Use"
+                onChangeText={(text) => setCardNumber(text)}
+                placeholder="Card Number"
                 value={cardNumber}
+                maxLength={16}
               />
-              <Button
-                title="Use"
-                disabled={usedBalance > user.balance ? true : false}
-                onPress={() => handleUseBalance()}
-              />
-              <Button title="Cancel" onPress={() => setModalVisible(false)} />
-            </View>
-          </View>
-        </Modal>
 
-        <View>
-          {cards &&
-            cards.map((card) => (
-              <CheckBox
-                title={card.cardNumber}
-                checked={checked === card.id ? true : false}
-                onPress={() => {
-                  handleCardSelect(card);
-                }}
-              />
-            ))}
-          <CheckBox
-            title="Other"
-            checked={checked === 1 ? true : false}
-            onPress={() => {
-              handleCardSelect({ id: 1 });
-            }}
-          />
-        </View>
-        {other && (
-          <View>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setName(text)}
-              placeholder="Name"
-              value={name}
-            />
+              <View style={{ flexDirection: "row" }}>
+                {yearsList ? (
+                  <Picker
+                    selectedValue={year}
+                    itemStyle={{ height: 60 }}
+                    style={{
+                      height: 50,
+                      width: 200,
+                      fontSize: 20,
+                      backgroundColor: "#DCDCDC",
+                      marginBottom: 4,
+                      marginTop: 4,
+                      marginRight: "auto",
+                      marginLeft: "auto",
+                    }}
+                    onValueChange={(itemValue) => setYear(itemValue)}
+                  >
+                    <Picker.Item label={"Year"} value={""} />
+                    {yearsList.map((y) => (
+                      <Picker.Item label={y} value={y} />
+                    ))}
+                  </Picker>
+                ) : null}
 
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              onChangeText={(text) => setCardNumber(text)}
-              placeholder="Card Number"
-              value={cardNumber}
-              maxLength={16}
-            />
-
-            <View style={{ flexDirection: "row" }}>
-              {yearsList ? (
                 <Picker
-                  selectedValue={year}
+                  selectedValue={month}
                   itemStyle={{ height: 60 }}
                   style={{
                     height: 50,
@@ -429,65 +469,106 @@ export default function Payment(props) {
                     marginRight: "auto",
                     marginLeft: "auto",
                   }}
-                  onValueChange={(itemValue) => setYear(itemValue)}
+                  onValueChange={(itemValue) => setMonth(itemValue)}
                 >
-                  <Picker.Item label={"Year"} value={""} />
-                  {yearsList.map((y) => (
+                  <Picker.Item label={"Month"} value={""} />
+                  {monthList.map((y) => (
                     <Picker.Item label={y} value={y} />
                   ))}
                 </Picker>
-              ) : null}
-
+              </View>
+              <TextInput
+                style={styles.input}
+                onChangeText={(text) => setCVC(text)}
+                keyboardType="numeric"
+                placeholder="CVC"
+                maxLength={3}
+                value={CVC}
+              />
               <Picker
-                selectedValue={month}
-                itemStyle={{ height: 60 }}
-                style={{
-                  height: 50,
-                  width: 200,
-                  fontSize: 20,
-                  backgroundColor: "#DCDCDC",
-                  marginBottom: 4,
-                  marginTop: 4,
-                  marginRight: "auto",
-                  marginLeft: "auto",
-                }}
-                onValueChange={(itemValue) => setMonth(itemValue)}
+                selectedValue={cardType}
+                style={{ width: 200 }}
+                onValueChange={(itemValue) => setCardType(itemValue)}
               >
-                <Picker.Item label={"Month"} value={""} />
-                {monthList.map((y) => (
-                  <Picker.Item label={y} value={y} />
-                ))}
+                <Picker.Item label="Select Card Type" value="" />
+                <Picker.Item label="Visa" value="visa" />
+                <Picker.Item label="Amex" value="amex" />
+                <Picker.Item label="Mastercard" value="mastercard" />
               </Picker>
-            </View>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setCVC(text)}
-              keyboardType="numeric"
-              placeholder="CVC"
-              maxLength={3}
-              value={CVC}
-            />
-            <Picker
-              selectedValue={cardType}
-              style={{ width: 200 }}
-              onValueChange={(itemValue) => setCardType(itemValue)}
-            >
-              <Picker.Item label="Select Card Type" value="" />
-              <Picker.Item label="Visa" value="visa" />
-              <Picker.Item label="Amex" value="amex" />
-              <Picker.Item label="Mastercard" value="mastercard" />
-            </Picker>
 
-            <CheckBox
-              title="Save Card"
-              checked={addCreditCard}
-              onPress={() => setAddCreditCard(!addCreditCard)}
+              <CheckBox
+                title="Save Card"
+                checked={addCreditCard}
+                onPress={() => setAddCreditCard(!addCreditCard)}
+              />
+            </View>
+          )}
+          {/* <View
+            style={{ width: "30%", marginLeft: "auto", marginRight: "auto" }}
+          >
+            <Button
+              title="Pay"
+              onPress={() => pay()}
+              disabled={
+                (name && cardNumber && month && year && CVC) ||
+                (other === false && checked != "")
+                  ? false
+                  : true
+              }
             />
-          </View>
-        )}
-        <View style={{ width: "30%", marginLeft: "auto", marginRight: "auto" }}>
-          <Button
-            title="Pay"
+          </View> */}
+        </ScrollView>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          borderTopWidth: 1,
+          borderColor: "gray",
+          flexDirection: "row",
+        }}
+      >
+        <View
+          style={{ width: "40%", paddingLeft: "4%", justifyContent: "center" }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#185a9d",
+              fontWeight: "bold",
+              // marginBottom: "2%",
+            }}
+          >
+            Total Amount
+          </Text>
+          <Text style={{ fontWeight: "bold", fontSize: 15 }}>
+            {promotionValid === true ? (
+              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                <Text
+                  style={{
+                    textDecorationLine: "line-through",
+                    textDecorationStyle: "solid",
+                    color: "gray",
+                  }}
+                >
+                  {total}
+                </Text>{" "}
+                {total - (total * promotion.percentage) / 100}
+              </Text>
+            ) : (
+              total
+            )}{" "}
+            QAR
+          </Text>
+        </View>
+        <View
+          style={{
+            width: "60%",
+            justifyContent: "center",
+            alignItems: "flex-end",
+          }}
+        >
+          <TouchableOpacity
             onPress={() => pay()}
             disabled={
               (name && cardNumber && month && year && CVC) ||
@@ -495,15 +576,46 @@ export default function Payment(props) {
                 ? false
                 : true
             }
-          />
+            style={{
+              backgroundColor:
+                (name && cardNumber && month && year && CVC) ||
+                (other === false && checked != "")
+                  ? "#3ea3a3"
+                  : "lightgray",
+              height: 40,
+              width: "60%",
+              // alignSelf: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              // marginStart: "2%",
+              marginEnd: "5%",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>PAY</Text>
+          </TouchableOpacity>
+          {(name && cardNumber && month && year && CVC) ||
+          (other === false && checked != "") ? null : (
+            <Text
+              style={{
+                fontSize: 12,
+                marginEnd: "11%",
+                color: "gray",
+                textAlign: "center",
+              }}
+            >
+              (Incomplete Details)
+            </Text>
+          )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 Payment.navigationOptions = {
   title: "Payment",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
 };
 //
 const styles = StyleSheet.create({});
