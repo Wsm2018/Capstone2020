@@ -56,7 +56,7 @@ export default function Users() {
   const [endDate, setEndDate] = useState();
   const [loaded, setLoaded] = useState(false);
   const [valueText, setValueText] = useState();
-  const subscriptionLevel = ["gold", "sliver", "bronze"];
+  const subscriptionLevel = ["gold", "silver", "bronze"];
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -233,8 +233,8 @@ export default function Users() {
           startDate: new Date(),
           endDate: new Date(moment().add(1, "month").calendar()),
         },
-        sliver: {
-          type: "sliver",
+        silver: {
+          type: "silver",
           startDate: new Date(),
           endDate: new Date(moment().add(1, "month").calendar()),
         },
@@ -249,11 +249,11 @@ export default function Users() {
           .doc(user.id)
           .collection("subscription")
           .add(sub.gold);
-      } else if (valueText === "sliver") {
+      } else if (valueText === "silver") {
         db.collection("users")
           .doc(user.id)
           .collection("subscription")
-          .add(sub.sliver);
+          .add(sub.silver);
       } else if (valueText === "bronze") {
         db.collection("users")
           .doc(user.id)
@@ -265,7 +265,11 @@ export default function Users() {
         .doc(user.id)
         .collection("subscription")
         .doc(subscription.id)
-        .update({ startDate, endDate, type: valueText });
+        .update({
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          type: valueText,
+        });
     }
   };
 
@@ -318,7 +322,7 @@ export default function Users() {
               elevation: 5,
               justifyContent: "center",
               // ---This is for Height---
-              height: "50%",
+              height: "60%",
             }}
           >
             <Text>
@@ -335,7 +339,6 @@ export default function Users() {
               value={password}
               onChangeText={setPassword}
             />
-            <Text></Text>
             <View
               style={{
                 //   borderWidth: 1,
@@ -525,7 +528,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ marginRight: "5%" }}>
+              <View style={{ width: 100 }}>
                 <Text style={styles.text2}>Email:</Text>
               </View>
               <View
@@ -556,7 +559,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ marginRight: "5%" }}>
+              <View style={{ width: 100 }}>
                 <Text style={styles.text2}>Name:</Text>
               </View>
               <View
@@ -579,8 +582,14 @@ export default function Users() {
           )}
 
           {editMode ? (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View style={{ marginRight: "5%" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "5%",
+              }}
+            >
+              <View style={{ width: 100 }}>
                 <Text style={styles.text2}>Phone:</Text>
               </View>
               <View
@@ -609,22 +618,40 @@ export default function Users() {
         </View>
         {/* ---------------------------------PICKER--------------------------------- */}
         <View style={styles.three}>
-          <Text style={styles.cardTitle}> User Details</Text>
-
+          <Text style={{ ...styles.cardTitle, marginBottom: "5%" }}>
+            {" "}
+            User Details
+          </Text>
           {editMode ? (
             Platform.OS === "android" ? (
-              <View style={{ flexDirection: "row" }}>
-                <Text style={styles.text2}>Role:</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: "5%",
+                }}
+              >
+                <View style={{ width: 100 }}>
+                  <Text style={styles.text2}>Role: </Text>
+                </View>
 
                 <View
                   style={{
-                    borderColor: "lightgray",
-                    backgroundColor: "lightgray",
-                    flex: 0.5,
-                    // width: "50%",
+                    flex: 0.81,
+                    borderRadius: 5,
+                    borderWidth: 2,
+                    borderColor: "gray",
+                    height: 40,
+                    //width: "80%",
+                    alignSelf: "center",
+                    paddingLeft: 12,
+                    //marginTop: 20,
+                    justifyContent: "space-between",
+                    //width: 300,
                   }}
                 >
                   <Picker
+                    style={styles.picker}
                     // style={{ width: "50%" }}
                     // mode="dropdown"
                     selectedValue={selectedRole}
@@ -639,58 +666,76 @@ export default function Users() {
                 </View>
               </View>
             ) : (
-              <View style={{ flex: 1, flexDirection: "row", width: "100%" }}>
-                <Text style={styles.text2}>Role:</Text>
-
-                <TouchableOpacity
+              <View
+                style={{
+                  //backgroundColor: "darkred",
+                  flex: 0.15,
+                  width: "100%",
+                  flexDirection: "row",
+                }}
+              >
+                <View
                   style={{
-                    width: "60%",
-                    // paddingVertical: 24,
+                    flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  onPress={() => {
-                    rolePickRef.show();
+                    marginBottom: "5%",
                   }}
                 >
-                  <View
-                    style={{
-                      width: "100%",
-                      height: 40,
+                  <View style={{ width: 100 }}>
+                    <Text style={styles.text2}>Role: </Text>
+                  </View>
 
-                      // flexDirection: "row",
-                      // justifyContent: "space-evenly",
-                      alignItems: "center",
-                      // backgroundColor: "red",
-                      borderWidth: 1,
-
-                      paddingLeft: 6,
-                      // width: "60%",
-                      borderColor: "black",
-                      borderWidth: 1,
-                      borderRadius: 10,
-                      // marginBottom: 10,
-                    }}
-                  >
-                    <View
+                  <View width={Dimensions.get("window").width / 1.8}>
+                    <TouchableOpacity
                       style={{
-                        flex: 1,
-                        justifyContent: "space-between",
-                        flexDirection: "row",
+                        width: "100%",
+                        // paddingVertical: 24,
+                        // backgroundColor: "blue",
+                        alignItems: "center",
+                        justifyContent: "center",
+
+                        height: 20,
+                      }}
+                      onPress={() => {
+                        rolePickRef.show();
                       }}
                     >
-                      <Text style={{ fontWeight: "bold" }}>
-                        {selectedRole === "" ? "Select Role" : selectedRole}
-                      </Text>
-                      {/* <AntDesign
-                        style={{ marginRight: "5%" }}
-                        name="caretdown"
-                        size={15}
-                        color="gray"
-                      /> */}
-                    </View>
+                      <View
+                        style={{
+                          width: "100%",
+                          height: 40,
+
+                          // flexDirection: "row",
+                          // justifyContent: "space-evenly",
+                          alignItems: "center",
+                          // backgroundColor: "red",
+                          borderWidth: 1,
+
+                          paddingLeft: 6,
+                          // width: "60%",
+                          borderColor: "gray",
+                          borderWidth: 2,
+                          borderRadius: 5,
+                          // marginBottom: 10,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: "space-between",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            // backgroundColor: "blue",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {selectedRole === "" ? "Select Role" : selectedRole}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                </View>
                 <ReactNativePickerModule
                   pickerRef={(e) => (rolePickRef = e)}
                   title={"Roles"}
@@ -702,7 +747,7 @@ export default function Users() {
                     console.log("Cancelled");
                   }}
                   onValueChange={(valueText, index) => {
-                    setSelectedRole(value);
+                    setSelectedRole(valueText);
                   }}
                 />
               </View>
@@ -712,38 +757,88 @@ export default function Users() {
               <Text style={styles.text2}>Role: {user.role}</Text>
             </View>
           )}
-
           {editMode ? (
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.text2}>Balance:</Text>
-
-              <TextInput
-                placeholder={"Balance"}
-                value={balance}
-                onChangeText={setBalance}
-                style={styles.textinput}
-                width={Dimensions.get("window").width / 2}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "5%",
+              }}
+            >
+              <View style={{ width: 100 }}>
+                <Text style={styles.text2}>Balance: </Text>
+              </View>
+              <View
+                width={Dimensions.get("window").width / 1.8}
+                style={styles.inputStyle}
+              >
+                <TextInput
+                  placeholder={"Balance"}
+                  value={balance}
+                  onChangeText={setBalance}
+                  // style={styles.textinput}
+                  width={Dimensions.get("window").width / 2}
+                />
+              </View>
             </View>
           ) : (
             <View style={styles.text}>
               <Text style={styles.text2}>Balance: {user.balance}</Text>
             </View>
           )}
-          <View style={styles.text}>
-            <Text style={styles.text2}>Referral Code: {user.referralCode}</Text>
-          </View>
           {editMode ? (
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.text2}>Tokens:</Text>
-
-              <TextInput
-                placeholder={"Tokens"}
-                value={tokens}
-                onChangeText={setTokens}
-                style={styles.textinput}
-                width={Dimensions.get("window").width / 2}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "5%",
+              }}
+            >
+              <View style={{ width: 100 }}>
+                <Text style={styles.text2}>Referral: </Text>
+              </View>
+              <View
+                width={Dimensions.get("window").width / 1.8}
+                style={styles.inputStyle}
+              >
+                <TextInput
+                  placeholder={user.referralCode}
+                  // value={tokens}
+                  // onChangeText={setTokens}
+                  disabled={true}
+                  // style={styles.textinput}
+                  width={Dimensions.get("window").width / 2}
+                />
+              </View>
+            </View>
+          ) : (
+            <View style={styles.text}>
+              <Text style={styles.text2}>Referral: {user.referralCode}</Text>
+            </View>
+          )}
+          {editMode ? (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "5%",
+              }}
+            >
+              <View style={{ width: 100 }}>
+                <Text style={styles.text2}>Tokens: </Text>
+              </View>
+              <View
+                width={Dimensions.get("window").width / 1.8}
+                style={styles.inputStyle}
+              >
+                <TextInput
+                  placeholder={"Tokens"}
+                  value={tokens}
+                  onChangeText={setTokens}
+                  // style={styles.textinput}
+                  width={Dimensions.get("window").width / 2}
+                />
+              </View>
             </View>
           ) : (
             <View style={styles.text}>
@@ -751,16 +846,28 @@ export default function Users() {
             </View>
           )}
           {editMode ? (
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.text2}>Reputation:</Text>
-
-              <TextInput
-                placeholder={"Reputation"}
-                value={reputation}
-                onChangeText={setReputation}
-                style={styles.textinput}
-                width={Dimensions.get("window").width / 2}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "5%",
+              }}
+            >
+              <View style={{ width: 100 }}>
+                <Text style={styles.text2}>Reputation: </Text>
+              </View>
+              <View
+                width={Dimensions.get("window").width / 1.8}
+                style={styles.inputStyle}
+              >
+                <TextInput
+                  placeholder={"Reputation"}
+                  value={reputation}
+                  onChangeText={setReputation}
+                  // style={styles.textinput}
+                  width={Dimensions.get("window").width / 2}
+                />
+              </View>
             </View>
           ) : (
             <View style={styles.text}>
@@ -849,7 +956,7 @@ export default function Users() {
           </Modal>
 
           {editMode ? (
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ backgroundColor: "yellow", flexDirection: "row" }}>
               <Text
                 style={{
                   fontSize: 16,
@@ -863,9 +970,11 @@ export default function Users() {
                   {Platform.OS === "ios" ? (
                     <View>
                       <TouchableOpacity
-                        style={{
-                          paddingVertical: 10,
-                        }}
+                        style={
+                          {
+                            // paddingVertical: 10,
+                          }
+                        }
                         onPress={() => {
                           pickerRef.show();
                         }}
@@ -946,9 +1055,11 @@ export default function Users() {
                     onDateChange={(endDate) => setEndDate(endDate)}
                   />
                   <TouchableOpacity
-                    style={{
-                      paddingVertical: 10,
-                    }}
+                    style={
+                      {
+                        // paddingVertical: 10,
+                      }
+                    }
                     onPress={() => {
                       setModal3(true);
                     }}
@@ -972,9 +1083,11 @@ export default function Users() {
                     {Platform.OS === "ios" ? (
                       <View>
                         <TouchableOpacity
-                          style={{
-                            paddingVertical: 10,
-                          }}
+                          style={
+                            {
+                              // paddingVertical: 10,
+                            }
+                          }
                           onPress={() => {
                             pickerRef.show();
                           }}
@@ -1011,9 +1124,11 @@ export default function Users() {
                     )}
                   </View>
                   <TouchableOpacity
-                    style={{
-                      paddingVertical: 10,
-                    }}
+                    style={
+                      {
+                        // paddingVertical: 10,
+                      }
+                    }
                     onPress={() => {
                       subscribe("new");
                     }}
@@ -1026,7 +1141,7 @@ export default function Users() {
           ) : subscription ? (
             <View>
               <View style={{ marginLeft: "4%" }}>
-                <Text style={{ fontSize: 16 }}>Subscription:</Text>
+                <Text style={{ fontSize: 16 }}>Subscription: </Text>
               </View>
               <View style={{ marginLeft: "8%" }}>
                 <Text>Type: {subscription.type}</Text>
@@ -1050,49 +1165,51 @@ export default function Users() {
               </View>
             </View>
           )}
-        </View>
-        <Text></Text>
+          {editMode && (
+            <View
+              // style={{ backgroundColor: "red", flex: 1 }}
+              style={{
+                //   borderWidth: 1,
+                flex: 1,
+                backgroundColor: "lightgreen",
+                width: "100%",
+                height: "100%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* ---------------------------------SAVE--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "50%",
 
-        {editMode && (
-          <View
-            style={{
-              //   borderWidth: 1,
-              width: "100%",
-              height: "5%",
-              justifyContent: "space-around",
-              alignItems: "center",
-              flexDirection: "row",
-              marginBottom: 20,
-            }}
-          >
-            {/* ---------------------------------SAVE--------------------------------- */}
-            <TouchableOpacity
-              style={{
-                borderWidth: 1,
-                width: "25%",
-                height: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              onPress={handleSave}
-            >
-              <Text>Save</Text>
-            </TouchableOpacity>
-            {/* ---------------------------------CANCEL--------------------------------- */}
-            <TouchableOpacity
-              style={{
-                borderWidth: 1,
-                width: "25%",
-                height: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              onPress={handleCancel}
-            >
-              <Text>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={handleSave}
+              >
+                <Text>Save</Text>
+              </TouchableOpacity>
+              {/* ---------------------------------CANCEL--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "50%",
+
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={handleCancel}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </View>
   ) : users ? (
@@ -1104,8 +1221,6 @@ export default function Users() {
             rightAvatar={
               <Ionicons name="ios-arrow-forward" size={24} color="black" />
             }
-            // titleStyle={{ marginLeft: "4%" }}
-            // subtitleStyle={{ marginLeft: "4%" }}
             title={user.displayName}
             subtitle={user.email}
             bottomDivider
@@ -1131,7 +1246,6 @@ export default function Users() {
           width: "100%",
         }}
       />
-      {/* <Text>NANI</Text> */}
     </View>
   );
 }
@@ -1141,6 +1255,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ebe8e8",
     // alignItems: "center",
+    // paddingBottom: 50,
     justifyContent: "center",
   },
   avatarPhone: {
@@ -1164,7 +1279,7 @@ const styles = StyleSheet.create({
     // flexDirection: "row",
     //flexWrap: "wrap",
     // flex: 1,
-    height: "30%",
+    height: "25%",
   },
   three: {
     backgroundColor: "white",
@@ -1177,7 +1292,7 @@ const styles = StyleSheet.create({
     // flexDirection: "row",
     //flexWrap: "wrap",
     // flex: 1,
-    height: "50%",
+    // height: "100%",
   },
   inputStyle: {
     height: 40,
@@ -1207,6 +1322,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     // backgroundColor: "red",
     width: "100%",
+
     height: 30,
     color: "black",
     fontWeight: "bold",
@@ -1229,6 +1345,14 @@ const styles = StyleSheet.create({
   },
   text2: {
     fontSize: 16,
+  },
+  picker: {
+    height: 40,
+    width: "99%",
+    borderColor: "black",
+    borderWidth: 1,
+    color: "#667085",
+    borderStyle: "solid",
   },
 });
 Users.navigationOptions = {

@@ -142,16 +142,16 @@ export default function CarsScreen(props) {
             <TouchableOpacity
               style={{
                 // flex: 0.2,
-                backgroundColor: "#20365F",
+                backgroundColor: "#2E9E9B",
                 height: 40,
                 width: "50%",
-                alignSelf: "center",
+                // alignSelf: "center",
                 justifyContent: "center",
                 alignItems: "center",
                 // marginStart: "2%",
                 // marginEnd: "2%",
                 borderRadius: 10,
-                marginBottom: 10,
+                // marginBottom: 10,
               }}
               // style={{ alignItems: "center", justifyContent: "center" }}
               onPress={handleNavigate}
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   title: {
     // alignItems: "flex-end",
     fontSize: 20,
-    color: "#229277",
+    color: "#005c9d",
     textAlign: "center",
     fontWeight: "bold",
     textTransform: "capitalize",
