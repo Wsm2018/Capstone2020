@@ -12,6 +12,7 @@ import {
   View,
   Picker,
   Modal,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/functions";
@@ -272,6 +273,33 @@ export default function Payment(props) {
     setModalVisible(false);
     setUseBalance(true);
   };
+
+  ///////////////////////////////Font-End////////////////////////////////
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const _keyboardDidShow = () => {
+    // console.log("keyyyyyyyyyyyyyyyShow");
+
+    setMargin(300);
+  };
+
+  const _keyboardDidHide = () => {
+    // console.log("keyyyyyyyyyyyyyyyHide");
+    setMargin(0);
+  };
+
+  const [marginVal, setMargin] = useState(0);
+  /////////////////////////////////////////////////////////////////////////////////////
   return (
     <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
       <View style={{ flex: 8 }}>
@@ -406,7 +434,7 @@ export default function Payment(props) {
                   />
                 ))}
               <CheckBox
-                title="OTHER"
+                title="+ Add New Card"
                 checked={checked === 1 ? true : false}
                 onPress={() => {
                   handleCardSelect({ id: 1 });
@@ -886,19 +914,21 @@ export default function Payment(props) {
           </TouchableOpacity>
 
           {(name && cardNumber && month && year && CVC) ||
-          (other === false && checked != "") ? null : (
-            <Text
-              style={{
-                fontSize: 12,
-                // marginEnd: "11%",
-                marginTop: "2%",
-                color: "gray",
-                textAlign: "center",
-              }}
-            >
-              (Incomplete Details)
-            </Text>
-          )}
+          (other === false && checked != "")
+            ? null
+            : marginVal === 0 && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    // marginEnd: "11%",
+                    // marginTop: marginVal === 0 ? "1%" : 0,
+                    color: "gray",
+                    textAlign: "center",
+                  }}
+                >
+                  (Incomplete Details)
+                </Text>
+              )}
         </View>
       </View>
     </View>
