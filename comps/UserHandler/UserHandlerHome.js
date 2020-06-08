@@ -7,8 +7,15 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  PixelRatio,
 } from "react-native";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
@@ -25,6 +32,7 @@ export default function indexUH(props) {
   const [employees, setEmployees] = useState(0);
   const [customers, setCustomers] = useState(0);
   const [spinner, setSpinner] = useState(false);
+  const [deviceType, setDeviceType] = useState(0);
 
   const roles = [
     "asset handler",
@@ -38,7 +46,6 @@ export default function indexUH(props) {
     "user handler (incomplete)",
     "services employee (incomplete)",
   ];
-  const data = [employees, customers];
   const items = [
     {
       name: "Employees Index",
@@ -122,7 +129,14 @@ export default function indexUH(props) {
       .doc(firebase.auth().currentUser.uid)
       .update({ activeRole: null });
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
 
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   useEffect(() => {
     const unsubscribeEmployees = handleEmployees();
     const unsubscribeCustomers = handleCustomers();
@@ -161,13 +175,23 @@ export default function indexUH(props) {
           }}
           //onPress={}
         >
-          <MaterialCommunityIcons name="worker" size={50} color="white" />
-          <Text style={{ fontSize: 20, color: "white", marginBottom: "2%" }}>
+          <MaterialCommunityIcons
+            name="worker"
+            size={responsiveScreenWidth(10)}
+            color="white"
+          />
+          <Text
+            style={{
+              fontSize: responsiveScreenFontSize(1.8),
+              color: "white",
+              marginBottom: "2%",
+            }}
+          >
             Total of Employees
           </Text>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: responsiveScreenFontSize(1.8),
               color: "white",
               marginBottom: "2%",
               fontWeight: "bold",
@@ -188,13 +212,19 @@ export default function indexUH(props) {
           }}
           //onPress={() => props.navigation.navigate("CustomersIndex")}
         >
-          <Feather name="user" size={50} color="white" />
-          <Text style={{ fontSize: 20, color: "white", marginBottom: "2%" }}>
+          <Feather name="user" size={responsiveScreenWidth(10)} color="white" />
+          <Text
+            style={{
+              fontSize: responsiveScreenFontSize(1.8),
+              color: "white",
+              marginBottom: "2%",
+            }}
+          >
             Total of Customers
           </Text>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: responsiveScreenFontSize(1.8),
               color: "white",
               marginBottom: "2%",
               fontWeight: "bold",
@@ -206,7 +236,7 @@ export default function indexUH(props) {
       </View>
       {items ? (
         <FlatGrid
-          itemDimension={150}
+          itemDimension={responsiveScreenWidth(40)}
           items={items}
           style={styles.gridView}
           renderItem={({ item, index }) => (
@@ -231,7 +261,15 @@ export default function indexUH(props) {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={styles.itemName}>{item.name}</Text>
+                    <Text
+                      style={{
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(1.8),
+                      }}
+                    >
+                      {item.name}
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -394,7 +432,10 @@ export default function indexUH(props) {
       </View> */}
       <ActionButton
         buttonColor={"#3ea3a3"}
-        size={80}
+        size={responsiveScreenFontSize(10)}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(5) }}
         // position="left"
         //verticalOrientation="down"
       >
@@ -438,13 +479,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#e3e3e3",
   },
   actionButtonIcon: {
-    fontSize: 20,
-    height: 22,
+    fontSize: responsiveFontSize(2.5),
+    // height: 40,
     color: "white",
   },
   actionButtonIcon2: {
-    height: 22,
-    width: 22,
+    //height: 22,
+    // width: 22,
+    fontSize: responsiveFontSize(2.5),
   },
   containerLogin: {
     flex: 0.7,
@@ -471,7 +513,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     justifyContent: "flex-end",
     borderRadius: 5,
-    height: 150,
+    height: responsiveScreenWidth(35),
   },
   itemName: {
     fontSize: 16,
