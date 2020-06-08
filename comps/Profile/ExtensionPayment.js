@@ -73,11 +73,8 @@ export default function Payment(props) {
   //const [balanceToUse, setBalanceToUse] = useState(0);
   const [usedBalance, setUsedBalance] = useState(0);
   const [useBalance, setUseBalance] = useState(false);
-  const [subscription, setSubscription] = useState(false);
-  const [pointsChart, setPointsChart] = useState([]);
 
   useEffect(() => {
-    console.log("totalllllllllllll", total);
     calculation();
   }, [promotionValid]);
 
@@ -127,25 +124,7 @@ export default function Payment(props) {
       });
   };
   useEffect(() => {
-    db.collection("pointsChart").onSnapshot((querySnapshot) => {
-      const pointsChart = [];
-      querySnapshot.forEach((doc) => {
-        pointsChart.push({ id: doc.id, ...doc.data() });
-      });
-      setPointsChart([...pointsChart]);
-    });
 
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("subscription")
-      .onSnapshot((querySnapshot) => {
-        const subscription = [];
-        querySnapshot.forEach((doc) => {
-          subscription.push({ id: doc.id, ...doc.data() });
-        });
-        // console.log(subscription);
-        setSubscription([...subscription]);
-      });
     getUser();
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -167,7 +146,7 @@ export default function Payment(props) {
   }, []);
 
   const pay = async () => {
-    console.log("154");
+    console.log("154")
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
     const editBooking = firebase.functions().httpsCallable("editBooking");
     const assetManager = firebase.functions().httpsCallable("assetManager");
@@ -176,69 +155,55 @@ export default function Payment(props) {
       .doc(firebase.auth().currentUser.uid)
       .get();
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
-
+    
     let c = {};
     if (other) {
       c = {
         cardNumber: cardNumber,
         expiryDate: year + "/" + month,
-        cvc: CVC,
+        cvc : CVC,
         cardType: cardType,
         holderName: name,
       };
     } else {
       c = card;
     }
-    console.log(
-      "174",
-      addCreditCard,
-      totalAmount,
-      usedBalance,
-      firebase.auth().currentUser.uid
-    );
-
-    let u = user.data();
+    //console.log("174",addCreditCard, totalAmount,usedBalance , firebase.auth().currentUser.uid)
+    let u = user.data()
     u.id = firebase.auth().currentUser.uid;
     u.balance = u.balance - usedBalance;
-
-    const subscriptionType =
-      subscription && subscription[0] && subscription[0].type
-        ? subscription[0].type
-        : "normal";
-
-    const pointsChartE = pointsChart.filter(
-      (p) => p.subscriptionType === subscriptionType
-    )[0];
-
-    const points = (total / pointsChartE.spentValue) * pointsChartE.points;
-    u.points = u.points + points;
-    if (partial != "not found") {
-      console.log("177");
-      var toUpd = partial;
-      toUpd.status = true;
-      toUpd.card = c;
-      console.log("ehhee", toUpd.status, partial.id, toUpd.card, total, u);
+    console.log("175")
+    if( partial != "not found" ){
+      console.log("177")
+      var toUpd = partial
+      toUpd.status = true
+      toUpd.card = c
+      console.log("ehhee",toUpd.status ,partial.id, toUpd.card , total , u )
       const response = await assetManager({
         doc: partial.id,
-        type: "update",
-        collection: "payments",
-        obj: toUpd,
+        type: "update", 
+        collection:"payments",
+        obj: toUpd
       });
-      console.log("188");
-    } else if (extension != "not found") {
-      console.log("ehhee", extension.id, assetBooking.endDateTime, c, total, u);
+      console.log("188")
+    }
+    else if( extension != "not found"){
+      console.log("191")
+      //console.log("ehhee",extension.id ,assetBooking.endDateTime, c , total , u )
       const response = await editBooking({
         paymentId: extension.id,
-        card: c,
-        endDateTime: assetBooking.endDateTime,
+        card: c, 
+        endDateTime:  assetBooking.endDateTime,
         assetBooking: assetBooking,
-        totalAmount: totalAmount,
+        totalAmount: total,
         status: true,
         serviceBooking: serviceBooking,
-        user: u,
+        user: u
       });
-    } else {
-      //console.log()
+      console.log("203")
+    }
+    else{
+      console.log("206")
       const response = await handleBooking({
         user: u,
         asset: assetBooking.asset,
@@ -248,17 +213,18 @@ export default function Payment(props) {
         promotionCode: null,
         dateTime: moment().format("YYYY-MM-DD T HH:mm"),
         status: true,
-        addCreditCard: addCreditCard && other,
+        addCreditCard: addCreditCard,
         uid: firebase.auth().currentUser.uid,
-        totalAmount: totalAmount,
+        totalAmount: total,
         status: true,
         serviceBooking,
       });
+      console.log("222")
       //props.navigation.navigate("Home");
     }
-    db.collection("users").doc(user.id).update(u);
-    console.log("192");
-    props.navigation.navigate("Types");
+    
+    console.log("126")
+    props.navigation.navigate("Home");
   };
   const handleCardSelect = (card) => {
     setChecked(card.id);
@@ -498,8 +464,7 @@ export default function Payment(props) {
             title="Pay"
             onPress={() => pay()}
             disabled={
-              (name && cardNumber && month && year && CVC) ||
-              (other === false && checked != "")
+              (name && cardNumber && month && year && CVC) || other === false
                 ? false
                 : true
             }

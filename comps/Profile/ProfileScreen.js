@@ -50,6 +50,7 @@ import Favorites from "./Favorites";
 const { width, height } = Dimensions.get("screen");
 
 export default function ProfileScreen(props) {
+  // ------------------------------------- STATES ----------------------------------------
   const [user, setUser] = useState(null);
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [photoURL, setPhotoURL] = useState("");
@@ -63,6 +64,11 @@ export default function ProfileScreen(props) {
   const [flag, setFlag] = useState(false);
   const [editPic, setEditPic] = useState("");
   const [editDisplayName, setEditDisplayName] = useState("");
+  const [displayNameErr, setDisplayNameErr] = useState("");
+  const [showDisplayErr, setShowDisplayErr] = useState(false);
+  const [backgroundEdit, setBackgroundEdit] = useState(false);
+
+  // ------------------------------------------- FUNCTIONS --------------------------------------
 
   const getUser = async () => {
     db.collection("users")
@@ -83,12 +89,7 @@ export default function ProfileScreen(props) {
     setHasCameraRollPermission(status === "granted");
   };
 
-  useEffect(() => {
-    getUser();
-    askPermission();
-  }, []);
-
-  const handleSave = async (uri, type, displayName) => {
+  const handleSave = async (uri, type) => {
     const response = await fetch(uri);
     const blob = await response.blob();
     if (type === "profile") {
@@ -103,10 +104,11 @@ export default function ProfileScreen(props) {
         .child(`users/${firebase.auth().currentUser.uid}`)
         .getDownloadURL();
       console.log("url ", url);
-      handleSaveEdit(url, displayName);
+      await handleSaveEdit(url, editDisplayName);
       setPhotoURL(url);
       setFlag(false);
     } else {
+      setBackgroundEdit(false);
       const putResult = await firebase
         .storage()
         .ref()
@@ -123,6 +125,7 @@ export default function ProfileScreen(props) {
         profileBackground: url,
       });
       getUser();
+
       // setPhotoURL(url);
     }
   };
@@ -173,17 +176,38 @@ export default function ProfileScreen(props) {
   };
 
   const saveImage = async () => {
-    // setPhotoURL(editPic);
-
-    handleSave(editPic, "profile", editDisplayName);
-    // if (flag) {
-    //   handleSaveEdit();
-    // }
+    console.log(editDisplayName);
+    console.log(displayName);
+    if (editDisplayName) {
+      handleSave(editPic, "profile");
+    } else {
+      setDisplayNameErr("Enter Display Name");
+      setShowDisplayErr(true);
+    }
   };
+
+  const removeBackground = () => {
+    setBackgroundEdit(false);
+    db.collection("users").doc(firebase.auth().currentUser.uid).update({
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+    });
+  };
+
+  // ------------------------------------------------------ USE EFFECTS -------------------------------------------------
 
   useEffect(() => {
     console.log("flag", flag);
   }, [flag]);
+
+  useEffect(() => {
+    getUser();
+    askPermission();
+  }, []);
+
+  useEffect(() => {
+    console.log("user got changed ");
+  }, [user]);
 
   ///////////////////////////////Font-End////////////////////////////////
 
@@ -209,8 +233,17 @@ export default function ProfileScreen(props) {
     setMargin(0);
   };
 
+  const removeProfile = () => {
+    handleSave(
+      "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
+      "profile"
+    );
+  };
+
   const [marginVal, setMargin] = useState(0);
   /////////////////////////////////////////////////////////////////////////////////////
+
+  // ----------------------------------------------- RETURN --------------------------------------
 
   return (
     user && (
@@ -230,11 +263,11 @@ export default function ProfileScreen(props) {
                 style={styles.coverImage}
               >
                 <View style={styles.coverTitleContainer}>
-                  <Ionicons
-                    name="md-images"
+                  <MaterialCommunityIcons
+                    name="dots-horizontal"
                     size={40}
                     color="white"
-                    onPress={handlePickBackgroundImage}
+                    onPress={() => setBackgroundEdit(true)}
                   />
                 </View>
               </ImageBackground>
@@ -313,6 +346,110 @@ export default function ProfileScreen(props) {
             </TouchableOpacity>
           </View>
 
+          <Modal
+            visible={backgroundEdit}
+            animationType="fade"
+            transparent={true}
+          >
+            <View
+              style={{
+                flex: 1,
+                alignItems: "flex-end",
+                // justifyContent: "",
+              }}
+            >
+              <View elevation={5} style={styles.modalView2}>
+                <TouchableOpacity
+                  style={{
+                    flex: 0.2,
+                    marginEnd: "2%",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-end",
+                    // height: "30%",
+                    // marginEnd: 15,
+                    // marginTop: 15,
+                  }}
+                  onPress={() => setBackgroundEdit(false)}
+                >
+                  <AntDesign
+                    name="close"
+                    size={25}
+                    style={{ color: "#224229" }}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={{
+                    flex: 1,
+                    // justifyContent: "space-evenly",
+                    width: "100%",
+                    // backgroundColor: "red",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* <TouchableOpacity
+                    style={{ alignItems: "center" }}
+                    onPress={() => handlePickBackgroundImage()}
+                  >
+                    <Text></Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.4,
+                      backgroundColor: "lightgray",
+                      height: 40,
+                      justifyContent: "center",
+                      width: "100%",
+                      // alignItems: "center",
+                      // borderRadius: 10,
+                    }}
+                    onPress={() => handlePickBackgroundImage()}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        // color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      Choose Background Picture
+                    </Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity
+                    style={{ alignItems: "center" }}
+                    onPress={() => removeBackground()}
+                  >
+                    <Text>Remove Background</Text>
+                  </TouchableOpacity> */}
+
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.4,
+                      backgroundColor: "lightgray",
+                      height: 40,
+                      justifyContent: "center",
+                      width: "100%",
+                      // alignItems: "center",
+                      // borderRadius: 10,
+                    }}
+                    onPress={() => removeBackground()}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        // color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      Remove Background
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
           <Modal visible={edit} animationType="fade" transparent={true}>
             <View style={styles.centeredView}>
               <View elevation={5} style={styles.modalView}>
@@ -345,9 +482,54 @@ export default function ProfileScreen(props) {
                       }}
                       label="Display Name"
                       value={editDisplayName}
-                      onChangeText={setEditDisplayName}
+                      onChangeText={(name) => {
+                        setEditDisplayName(name);
+                        setDisplayNameErr("");
+                        setShowDisplayErr(false);
+                      }}
                       // onSubmitEditing={saveImage}
                     />
+                    {showDisplayErr ? (
+                      <Text
+                        style={
+                          showDisplayErr
+                            ? { color: "red" }
+                            : { color: "transparent" }
+                        }
+                      >
+                        {displayNameErr}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <View
+                    style={{ justifyContent: "center", alignItems: "center" }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: "#20365F",
+                        height: 40,
+                        width: "90%",
+                        // alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        //marginStart: "2%",
+                        //marginEnd: "2%",
+                        borderRadius: 30,
+                        //marginBottom: 10,
+                      }}
+                    >
+                      <TouchableOpacity onPress={() => removeProfile()}>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            fontSize: 16,
+                            color: "white",
+                          }}
+                        >
+                          Remove Profile Picture
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
 
                   <View
@@ -729,6 +911,27 @@ const styles = StyleSheet.create({
     padding: 35,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  modalView2: {
+    margin: 20,
+    height: height / 5,
+    width: width / 1.4,
+    backgroundColor: "#fff",
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
+    borderRadius: 20,
+    // padding: 35,
+    // justifyContent: "center",
+    // alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

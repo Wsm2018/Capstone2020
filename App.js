@@ -9,6 +9,7 @@ import {
   ScrollView,
   Image,
   AsyncStorage,
+  AppState,
 } from "react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
@@ -44,6 +45,8 @@ import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 
+import * as Location from "expo-location";
+
 // import AsyncStorage from "@react-native-community/async-storage";
 
 export default function App(props) {
@@ -53,6 +56,26 @@ export default function App(props) {
   const [guideView, setGuideView] = useState(true);
   const [admin, setAdmin] = useState(null);
   const [activeRole, setActiveRole] = useState(null);
+
+  const handleLogout = async () => {
+    const userInfo = await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get();
+    if (userInfo.data().role === "guest") {
+      await fetch(
+        `https://us-central1-capstone2020-b64fd.cloudfunctions.net/deleteGuestUser?uid=${
+          firebase.auth().currentUser.uid
+        }`
+      );
+      firebase.auth().signOut();
+    } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
+      firebase.auth().signOut();
+    }
+  };
 
   const DashboardTabNavigator = createBottomTabNavigator(
     {
@@ -199,10 +222,6 @@ export default function App(props) {
   async function getUser() {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .update({ activeRole: null });
-
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
       .onSnapshot((userRef) => {
         console.log("userRef", userRef.data().activeRole);
         setActiveRole(userRef.data().activeRole);
@@ -220,6 +239,12 @@ export default function App(props) {
     const admin = response.data.result !== undefined ? true : false;
 
     const user = { ...userRef.data(), admin };
+
+    await db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: user.role });
+
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);
     setUser(user);
@@ -248,9 +273,82 @@ export default function App(props) {
     getFirstLaunch();
   }, []);
 
+  const handleAppState = (nextAppState) => {
+    if (nextAppState === "active") {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+    } else {
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "offline" });
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+    console.log(location);
+  };
+
+  const updateLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      });
+  };
+
+  // --------------------------------LOCATION TRACKER----------------------------------
+  // User Location gets updated when logged in then every 10 seconds while logged in
+  const locationTracker = () => {
+    const timerId = setInterval(async () => {
+      // code here
+      let location = await Location.getCurrentPositionAsync({});
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+          location: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        });
+      console.log("update location");
+    }, 1000 * 10);
+    return timerId;
+  };
+
+  // --------------------------------USE EFFECT----------------------------------
+  // Runs when user logs in or out
+  // Adds user status listener
+  // Adds location tracker
   useEffect(() => {
     if (loggedIn) {
+      AppState.addEventListener("change", handleAppState);
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ status: "online" });
+
+      updateLocation();
       getUser();
+      // const trackerId = locationTracker();
+
+      return () => {
+        // clearInterval(trackerId);
+        AppState.removeEventListener("change", handleAppState);
+        setUser(null);
+        setActiveRole(null);
+        console.log("Logging Out");
+      };
     }
   }, [loggedIn]);
 
@@ -308,7 +406,7 @@ export default function App(props) {
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
         else if (user.role.slice(-12) === "(incomplete)") {
-          return <EmployeeAuthentication />;
+          return <EmployeeAuthentication user={user} setUser={setUser} />;
         }
         // If employee is any OTHER role
         else {
@@ -336,7 +434,7 @@ export default function App(props) {
                 return <AppContainer />;
 
               case "service employee":
-                return <AppContainer />;
+                return <ServiceEmployeeAppContainer />;
 
               case "customer":
                 return <AppContainer />;

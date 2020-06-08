@@ -54,12 +54,14 @@ export default function EmployeesRequest(props) {
   // --------------------------------USERS----------------------------------
   const handleUsers = () => {
     db.collection("users")
-      .where("role", "==", "user")
+      .where("role", "==", "customer")
       .onSnapshot((queryBySnapshot) => {
         let tempUsers = [];
-        queryBySnapshot.forEach((doc) =>
-          tempUsers.push({ id: doc.id, ...doc.data() })
-        );
+        queryBySnapshot.forEach((doc) => {
+          if (doc.data().email !== "DELETED") {
+            tempUsers.push({ id: doc.id, ...doc.data() });
+          }
+        });
 
         tempUsers = tempUsers.sort((a, b) =>
           a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase())

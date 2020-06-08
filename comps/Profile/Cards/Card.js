@@ -98,7 +98,7 @@ export default function Card(props) {
               source={images[1]}
               width={Dimensions.get("window").width / 8}
             />
-          ) : cardInfo && cardInfo.cardType === "amex" ? (
+          ) : cardInfo && cardInfo.cardType === "american-express" ? (
             <Image
               source={images[2]}
               width={Dimensions.get("window").width / 8}
@@ -113,13 +113,11 @@ export default function Card(props) {
               source={images[4]}
               width={Dimensions.get("window").width / 8}
             />
-          ) : (
-            cardInfo &&
-            cardInfo.cardType === "jcb"(<Image source={images[5]} />)
-          )}
+          ) : cardInfo && cardInfo.cardType === "jcb" ? (
+            <Image source={images[5]} />
+          ) : null}
 
           <TouchableOpacity onPress={() => handleDeleteAlert()}>
-            {/* <Text style={styles.notes}>X</Text> */}
             <Octicons name="trashcan" size={20} color="#ede9eb" />
           </TouchableOpacity>
         </View>
