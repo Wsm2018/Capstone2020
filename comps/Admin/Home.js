@@ -9,9 +9,13 @@ import {
   Image,
 } from "react-native";
 import firebase from "firebase/app";
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import "firebase/auth";
 import db from "../../db";
 import { FlatGrid } from "react-native-super-grid";
+import ActionButton from "react-native-action-button";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
 // import LottieView from "lottie-react-native";
 
 // import { Item } from "react-native-paper/lib/typescript/src/components/List/List";
@@ -131,12 +135,8 @@ export default function Home(props) {
           </View>
         )}
       />
-      <View
-        style={{
-          alignItems: "flex-end",
-        }}
-      >
-        <TouchableOpacity
+      <View>
+        {/* <TouchableOpacity
           style={{
             justifyContent: "center",
             alignItems: "center",
@@ -152,8 +152,7 @@ export default function Home(props) {
           <Text style={{ color: "#e3e3e3", fontSize: 18, fontWeight: "bold" }}>
             Roles
           </Text>
-          {/* <Text>Promotion Code</Text> */}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* <TouchableOpacity onPress={() => props.navigation.navigate("News")}>
           <Text>News</Text>
@@ -163,6 +162,38 @@ export default function Home(props) {
           <Text>Logout</Text>
         </TouchableOpacity> */}
       </View>
+      <ActionButton
+        buttonColor={"#3ea3a3"}
+        size={60}
+        // position="left"
+        //verticalOrientation="down"
+      >
+        <ActionButton.Item
+          buttonColor="#9b59b6"
+          title="Change Role"
+          onPress={handleChangeRole}
+        >
+          <SimpleLineIcons
+            name="people"
+            size={20}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+        <ActionButton.Item
+          buttonColor="#3498db"
+          title="Logout"
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={20}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+      </ActionButton>
 
       {/* <View
         style={{
@@ -222,6 +253,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 12,
     color: "#fff",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    height: 22,
+    width: 22,
   },
 });
 Home.navigationOptions = {

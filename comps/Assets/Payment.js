@@ -12,6 +12,7 @@ import {
   View,
   Picker,
   Modal,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/functions";
@@ -21,6 +22,9 @@ import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { AsyncStorage } from "react-native";
 import { CheckBox } from "react-native-elements";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function Payment(props) {
   // use 24 time format or 12 !!!!!!
@@ -75,6 +79,10 @@ export default function Payment(props) {
   const [usedBalance, setUsedBalance] = useState(0);
   const [useBalance, setUseBalance] = useState(false);
   const [subscription, setSubscription] = useState(false);
+
+  //////////////////////////Front-End////////////////////////////////
+  const [promoView, setPromoView] = useState(false);
+  /////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     console.log("totalllllllllllll", total);
@@ -265,6 +273,33 @@ export default function Payment(props) {
     setModalVisible(false);
     setUseBalance(true);
   };
+
+  ///////////////////////////////Font-End////////////////////////////////
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const _keyboardDidShow = () => {
+    // console.log("keyyyyyyyyyyyyyyyShow");
+
+    setMargin(300);
+  };
+
+  const _keyboardDidHide = () => {
+    // console.log("keyyyyyyyyyyyyyyyHide");
+    setMargin(0);
+  };
+
+  const [marginVal, setMargin] = useState(0);
+  /////////////////////////////////////////////////////////////////////////////////////
   return (
     <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
       <View style={{ flex: 8 }}>
@@ -292,63 +327,464 @@ export default function Payment(props) {
           <View
             style={{
               backgroundColor: "white",
-              margin: "4%",
-              padding: "2%",
-              borderRadius: 10,
+              // margin: "4%",
+              padding: "3%",
+              // borderRadius: 10,
               borderWidth: 1,
               borderColor: "lightgray",
               alignItems: "center",
+              // flex: 1.5,
+              // justifyContent: "space-between",
             }}
           >
             <Text style={{ fontSize: 27, fontWeight: "bold" }}>
               {user.balance - usedBalance}
               <Text style={{ fontSize: 18 }}> QAR</Text>
             </Text>
-            <Text style={{ fontSize: 14 }}>CURRENT BALANCE</Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: "#185a9d",
+                fontWeight: "bold",
+                paddingTop: 4,
+              }}
+            >
+              CURRENT BALANCE
+            </Text>
 
-            {/* <Button title="use" onPress={() => setModalVisible(true)} /> */}
-            {useBalance && (
+            {/* <Button
+              title="Deduct From Balance"
+              onPress={() => setModalVisible(true)}
+            /> */}
+            {/* {useBalance && (
               <View>
                 <Text>Used balance: {usedBalance} QAR</Text>
                 <Text>Amount to pay: {totalAmount} QAR</Text>
               </View>
-            )}
+            )} */}
           </View>
           <View
             style={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
+              // alignItems: "center",
+              // justifyContent: "center",x\\
+              // width: "100%",
+              backgroundColor: "white",
+              marginTop: "3%",
+              paddingBottom: "5%",
             }}
           >
-            <TextInput
+            <Text
               style={{
-                height: 40,
-                borderColor: "gray",
-                borderWidth: 1,
-                width: "90%",
-                textAlign: "center",
-                marginTop: "5%",
-                backgroundColor: "white",
+                textAlign: "left",
+                // paddingStart: "2%",
+                padding: "2%",
+                // paddingTop: "2%",
+
+                backgroundColor: "#185a9d",
+                color: "white",
+                fontWeight: "bold",
               }}
-              onChangeText={setCode}
-              onSubmitEditing={() => handlePromotion(code)}
-              placeholder="Promotion"
-              value={code}
-            />
-            {promotionValid === true ? (
-              <Text>The promotion is valid</Text>
-            ) : promotionValid === false ? (
-              <Text>The promotion is NOT valid</Text>
-            ) : (
-              <Text></Text>
+            >
+              SELECT A CARD
+            </Text>
+            {/*  */}
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "white",
+                marginTop: "2%",
+              }}
+            >
+              {/* <Text style={{ padding: "2%" }}>Select a Card: </Text> */}
+              {/* {console.log(cards)} */}
+              {cards &&
+                cards.map((card) => (
+                  <CheckBox
+                    title={
+                      <Text
+                        style={{
+                          textTransform: "uppercase",
+                          paddingLeft: "2%",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        <FontAwesome
+                          name="credit-card"
+                          size={22}
+                          color={"#3ea3a3"}
+                        />
+                        {"  "}
+                        {
+                          card.cardType + " | " + card.cardNumber
+                          // +
+                          // " | " +
+                          // card.expiryDate
+                        }
+                      </Text>
+                    }
+                    checked={checked === card.id ? true : false}
+                    onPress={() => {
+                      handleCardSelect(card);
+                    }}
+                    containerStyle={{
+                      borderColor: "#e3e3e3",
+                      borderWidth: 1.5,
+                      justifyContent: "center",
+                    }}
+                  />
+                ))}
+              <CheckBox
+                title="+ Add New Card"
+                checked={checked === 1 ? true : false}
+                onPress={() => {
+                  handleCardSelect({ id: 1 });
+                }}
+                textStyle={{ color: "black" }}
+                containerStyle={{ borderColor: "#e3e3e3", borderWidth: 1.5 }}
+              />
+              {other && (
+                <View
+                  style={{
+                    // width: "100%",
+                    margin: "2%",
+                    // marginTop: 0,
+                    padding: "2%",
+                    paddingTop: "4%",
+                    // backgroundColor: "#e3e3e3",
+                    borderWidth: 1.5,
+                    borderColor: "#e3e3e3",
+                  }}
+                >
+                  <TextInput
+                    style={styles.input}
+                    keyboardType="numeric"
+                    onChangeText={(text) => setCardNumber(text)}
+                    placeholder="Card Number"
+                    value={cardNumber}
+                    maxLength={16}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(text) => setName(text)}
+                    placeholder="Card Holder Name"
+                    value={name}
+                  />
+                  <View
+                    style={{
+                      borderWidth: 1.5,
+                      paddingLeft: "2%",
+                      marginBottom: 10,
+                      borderColor: "gray",
+                      minHeight: 70,
+                    }}
+                  >
+                    <Text style={{ color: "gray", marginTop: 5 }}>
+                      Expiry Date:
+                      {Platform.OS === "ios" && (
+                        <Text style={{ fontSize: 10 }}>
+                          {" "}
+                          (Scroll to Select)
+                        </Text>
+                      )}
+                    </Text>
+                    <View style={{ flexDirection: "row" }}>
+                      {yearsList ? (
+                        <Picker
+                          selectedValue={year}
+                          itemStyle={{ height: 60 }}
+                          style={{
+                            height: 50,
+                            width: "50%",
+                            fontSize: 20,
+                            backgroundColor: "transparent",
+                            marginBottom: 4,
+                            marginTop: 4,
+                            marginRight: "auto",
+                            marginLeft: "auto",
+                          }}
+                          onValueChange={(itemValue) => setYear(itemValue)}
+                        >
+                          <Picker.Item label={"Select Year"} value={""} />
+                          {yearsList.map((y) => (
+                            <Picker.Item label={y} value={y} />
+                          ))}
+                        </Picker>
+                      ) : null}
+
+                      <Picker
+                        selectedValue={month}
+                        itemStyle={{ height: 60 }}
+                        style={{
+                          height: 50,
+                          width: "50%",
+                          fontSize: 20,
+                          backgroundColor: "transparent",
+                          marginBottom: 4,
+                          marginTop: 4,
+                          marginRight: "auto",
+                          marginLeft: "auto",
+                        }}
+                        onValueChange={(itemValue) => setMonth(itemValue)}
+                      >
+                        <Picker.Item label={"Select Month"} value={""} />
+                        {monthList.map((y) => (
+                          <Picker.Item label={y} value={y} />
+                        ))}
+                      </Picker>
+                    </View>
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(text) => setCVC(text)}
+                    keyboardType="numeric"
+                    placeholder="CVC"
+                    maxLength={3}
+                    value={CVC}
+                  />
+                  <View
+                    style={{
+                      borderWidth: 1.5,
+                      borderColor: "gray",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Picker
+                      selectedValue={cardType}
+                      style={{ width: "100%", borderWidth: 1.5 }}
+                      onValueChange={(itemValue) => setCardType(itemValue)}
+                    >
+                      <Picker.Item label="Select Card Type" value="" />
+                      <Picker.Item label="Visa" value="visa" />
+                      <Picker.Item label="Amex" value="amex" />
+                      <Picker.Item label="Mastercard" value="mastercard" />
+                    </Picker>
+                  </View>
+
+                  <CheckBox
+                    title="Save Card"
+                    checked={addCreditCard}
+                    onPress={() => setAddCreditCard(!addCreditCard)}
+                    containerStyle={{
+                      borderColor: "#e3e3e3",
+                      borderWidth: 1.5,
+                      alignItems: "center",
+                      width: "50%",
+                      alignSelf: "center",
+                    }}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+          <View
+            style={{
+              // alignItems: "center",
+              // justifyContent: "center",
+              // width: "100%",
+              backgroundColor: "white",
+              marginTop: "4%",
+              // paddingBottom: "5%",
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "left",
+                // paddingStart: "2%",
+                padding: "2%",
+                // paddingTop: "2%",
+
+                backgroundColor: "#185a9d",
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              EXTRAS
+            </Text>
+            <TouchableOpacity
+              onPress={() => setModalVisible(!modalVisible)}
+              style={{
+                // backgroundColor: "red",
+                width: "100%",
+                height: 50,
+                // justifyContent: "center",
+                alignItems: "center",
+                paddingStart: "3%",
+                flexDirection: "row",
+                borderWidth: 1,
+                borderColor: "lightgray",
+              }}
+              // disabled={promotionValid === true ? true : false}
+            >
+              {useBalance && usedBalance > 0 ? (
+                <MaterialIcons name="done" size={25} color={"#3ea3a3"} />
+              ) : modalVisible ? (
+                <MaterialCommunityIcons
+                  name="minus"
+                  size={25}
+                  color={"#3ea3a3"}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name="plus"
+                  size={25}
+                  color={"#3ea3a3"}
+                />
+              )}
+
+              {/* <Text style={{ paddingLeft: 5 }}>
+                Promo Code{" "}
+                {promotionValid === true && (
+                  <Text style={{ color: "#3ea3a3" }}>(Deducte Added)</Text>
+                )}
+              </Text> */}
+              <Text style={{ paddingLeft: 5 }}>
+                Deduct From Balance
+                {useBalance && usedBalance > 0 && (
+                  <Text style={{ color: "#3ea3a3" }}>
+                    {" "}
+                    (Deduct Amount: {usedBalance} QAR)
+                  </Text>
+                )}
+              </Text>
+            </TouchableOpacity>
+            {modalVisible && (
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "center",
+                  padding: "3%",
+                  paddingBottom: "10%",
+                  justifyContent: "center",
+                }}
+              >
+                <TextInput
+                  style={{
+                    width: "90%",
+                    borderWidth: 1.5,
+                    padding: 5,
+                    borderColor: "gray",
+                    textAlign: "center",
+                    height: 50,
+                  }}
+                  keyboardType="numeric"
+                  onChangeText={(text) => setUsedBalance(text)}
+                  placeholder="Enter Amount to Deduct"
+                  value={cardNumber}
+                />
+                {/* <Button
+                title="Use"
+                disabled={usedBalance > user.balance ? true : false}
+                onPress={() => handleUseBalance()}
+              /> */}
+                <TouchableOpacity
+                  disabled={usedBalance > user.balance ? true : false}
+                  onPress={() => handleUseBalance()}
+                  style={{
+                    backgroundColor:
+                      usedBalance > user.balance ? "lightgray" : "#3ea3a3",
+                    width: "90%",
+                    borderRadius: 8,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    Deduct
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={() => setPromoView(!promoView)}
+              style={{
+                // backgroundColor: "red",
+                width: "100%",
+                height: 50,
+                // justifyContent: "center",
+                alignItems: "center",
+                paddingStart: "3%",
+                flexDirection: "row",
+                borderWidth: 1,
+                borderColor: "lightgray",
+              }}
+              disabled={promotionValid === true ? true : false}
+            >
+              {promotionValid ? (
+                <MaterialIcons name="done" size={25} color={"#3ea3a3"} />
+              ) : promoView ? (
+                <MaterialCommunityIcons
+                  name="minus"
+                  size={25}
+                  color={"#3ea3a3"}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name="plus"
+                  size={25}
+                  color={"#3ea3a3"}
+                />
+              )}
+
+              <Text style={{ paddingLeft: 5 }}>
+                Promo Code{" "}
+                {promotionValid === true && (
+                  <Text style={{ color: "#3ea3a3" }}>(Code Used)</Text>
+                )}
+              </Text>
+            </TouchableOpacity>
+            {promoView && !promotionValid && (
+              <View
+                style={{
+                  width: "90%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingBottom: "5%",
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  style={{
+                    height: 50,
+                    borderColor: "gray",
+                    borderWidth: 1.5,
+                    width: "90%",
+                    textAlign: "center",
+                    marginTop: "5%",
+                    backgroundColor: "white",
+                  }}
+                  onChangeText={setCode}
+                  onSubmitEditing={() => handlePromotion(code)}
+                  placeholder="Enter Promotion Code"
+                  // placeholderTextColor="gray"
+                  value={code}
+                />
+
+                {promotionValid === true ? (
+                  <Text
+                    style={{ color: "#3ea3a3", marginTop: 5, marginBottom: 10 }}
+                  >
+                    Code Valid
+                  </Text>
+                ) : promotionValid === false ? (
+                  <Text
+                    style={{ color: "red", marginTop: 5, marginBottom: 10 }}
+                  >
+                    Code Invalid
+                  </Text>
+                ) : (
+                  <Text></Text>
+                )}
+              </View>
             )}
           </View>
 
           <Modal
             animationType="fade"
             transparent={true}
-            visible={modalVisible}
+            // visible={modalVisible}
+            visible={false}
             onRequestClose={() => {
               setModalVisible(false);
             }}
@@ -394,142 +830,24 @@ export default function Payment(props) {
               </View>
             </View>
           </Modal>
-
-          <View>
-            {cards &&
-              cards.map((card) => (
-                <CheckBox
-                  title={card.cardNumber}
-                  checked={checked === card.id ? true : false}
-                  onPress={() => {
-                    handleCardSelect(card);
-                  }}
-                />
-              ))}
-            <CheckBox
-              title="Other"
-              checked={checked === 1 ? true : false}
-              onPress={() => {
-                handleCardSelect({ id: 1 });
-              }}
-            />
-          </View>
-          {other && (
-            <View>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) => setName(text)}
-                placeholder="Name"
-                value={name}
-              />
-
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={(text) => setCardNumber(text)}
-                placeholder="Card Number"
-                value={cardNumber}
-                maxLength={16}
-              />
-
-              <View style={{ flexDirection: "row" }}>
-                {yearsList ? (
-                  <Picker
-                    selectedValue={year}
-                    itemStyle={{ height: 60 }}
-                    style={{
-                      height: 50,
-                      width: 200,
-                      fontSize: 20,
-                      backgroundColor: "#DCDCDC",
-                      marginBottom: 4,
-                      marginTop: 4,
-                      marginRight: "auto",
-                      marginLeft: "auto",
-                    }}
-                    onValueChange={(itemValue) => setYear(itemValue)}
-                  >
-                    <Picker.Item label={"Year"} value={""} />
-                    {yearsList.map((y) => (
-                      <Picker.Item label={y} value={y} />
-                    ))}
-                  </Picker>
-                ) : null}
-
-                <Picker
-                  selectedValue={month}
-                  itemStyle={{ height: 60 }}
-                  style={{
-                    height: 50,
-                    width: 200,
-                    fontSize: 20,
-                    backgroundColor: "#DCDCDC",
-                    marginBottom: 4,
-                    marginTop: 4,
-                    marginRight: "auto",
-                    marginLeft: "auto",
-                  }}
-                  onValueChange={(itemValue) => setMonth(itemValue)}
-                >
-                  <Picker.Item label={"Month"} value={""} />
-                  {monthList.map((y) => (
-                    <Picker.Item label={y} value={y} />
-                  ))}
-                </Picker>
-              </View>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) => setCVC(text)}
-                keyboardType="numeric"
-                placeholder="CVC"
-                maxLength={3}
-                value={CVC}
-              />
-              <Picker
-                selectedValue={cardType}
-                style={{ width: 200 }}
-                onValueChange={(itemValue) => setCardType(itemValue)}
-              >
-                <Picker.Item label="Select Card Type" value="" />
-                <Picker.Item label="Visa" value="visa" />
-                <Picker.Item label="Amex" value="amex" />
-                <Picker.Item label="Mastercard" value="mastercard" />
-              </Picker>
-
-              <CheckBox
-                title="Save Card"
-                checked={addCreditCard}
-                onPress={() => setAddCreditCard(!addCreditCard)}
-              />
-            </View>
-          )}
-          {/* <View
-            style={{ width: "30%", marginLeft: "auto", marginRight: "auto" }}
-          >
-            <Button
-              title="Pay"
-              onPress={() => pay()}
-              disabled={
-                (name && cardNumber && month && year && CVC) ||
-                (other === false && checked != "")
-                  ? false
-                  : true
-              }
-            />
-          </View> */}
         </ScrollView>
       </View>
       <View
         style={{
-          flex: 1,
+          flex: 1.2,
           backgroundColor: "white",
           borderTopWidth: 1,
-          borderColor: "gray",
+          borderColor: "lightgray",
           flexDirection: "row",
         }}
       >
         <View
-          style={{ width: "40%", paddingLeft: "4%", justifyContent: "center" }}
+          style={{
+            width: "60%",
+            paddingLeft: "4%",
+            justifyContent: "center",
+            // backgroundColor: "red",
+          }}
         >
           <Text
             style={{
@@ -539,11 +857,11 @@ export default function Payment(props) {
               // marginBottom: "2%",
             }}
           >
-            Total Amount
+            TOTAL DUE
           </Text>
-          <Text style={{ fontWeight: "bold", fontSize: 15 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 16, paddingLeft: 5 }}>
             {promotionValid === true ? (
-              <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+              <Text style={{ fontWeight: "bold", fontSize: 22 }}>
                 <Text
                   style={{
                     textDecorationLine: "line-through",
@@ -563,9 +881,9 @@ export default function Payment(props) {
         </View>
         <View
           style={{
-            width: "60%",
+            width: "40%",
             justifyContent: "center",
-            alignItems: "flex-end",
+            alignItems: "center",
           }}
         >
           <TouchableOpacity
@@ -583,29 +901,34 @@ export default function Payment(props) {
                   ? "#3ea3a3"
                   : "lightgray",
               height: 40,
-              width: "60%",
+              width: "90%",
               // alignSelf: "center",
               justifyContent: "center",
               alignItems: "center",
               // marginStart: "2%",
               marginEnd: "5%",
+              borderRadius: 8,
             }}
           >
             <Text style={{ color: "white", fontWeight: "bold" }}>PAY</Text>
           </TouchableOpacity>
+
           {(name && cardNumber && month && year && CVC) ||
-          (other === false && checked != "") ? null : (
-            <Text
-              style={{
-                fontSize: 12,
-                marginEnd: "11%",
-                color: "gray",
-                textAlign: "center",
-              }}
-            >
-              (Incomplete Details)
-            </Text>
-          )}
+          (other === false && checked != "")
+            ? null
+            : marginVal === 0 && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    // marginEnd: "11%",
+                    // marginTop: marginVal === 0 ? "1%" : 0,
+                    color: "gray",
+                    textAlign: "center",
+                  }}
+                >
+                  (Incomplete Details)
+                </Text>
+              )}
         </View>
       </View>
     </View>
@@ -618,4 +941,12 @@ Payment.navigationOptions = {
   headerTintColor: "white",
 };
 //
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  input: {
+    height: 50,
+    borderWidth: 1.5,
+    borderColor: "gray",
+    marginBottom: 10,
+    paddingLeft: 5,
+  },
+});

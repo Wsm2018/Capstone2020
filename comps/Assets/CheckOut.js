@@ -414,6 +414,7 @@ export default function CheckOut(props) {
                     style={{
                       width: "70%",
                       paddingLeft: "3%",
+                      justifyContent: "space-evenly",
                       // backgroundColor: "green"
                     }}
                   >
@@ -487,17 +488,17 @@ export default function CheckOut(props) {
                 {serviceBooking.length > 0 ? (
                   serviceBooking.map((s, i) => (
                     <View
-                      style={{ width: "22%", aspectRatio: 1 / 1.1, margin: 4 }}
+                      style={{ width: "22%", aspectRatio: 1 / 1.5, margin: 4 }}
                     >
                       <TouchableOpacity
                         style={{
-                          backgroundColor: "#185a9d",
+                          // backgroundColor: "#185a9d",
                           // width: "22%",
                           // height: 70,
                           // margin: 5,
                           alignItems: "center",
                           flexDirection: "row",
-                          borderWidth: 2,
+                          borderWidth: 3,
                           borderColor: "#185a9d",
                           // aspectRatio: 1 / 1,
                         }}
@@ -516,12 +517,12 @@ export default function CheckOut(props) {
                           <MaterialCommunityIcons
                             name={s.service.serviceIcon}
                             size={30}
-                            color={"white"}
+                            color={"#185a9d"}
                           />
                           <Text
                             style={{
                               textAlign: "center",
-                              color: "white",
+                              color: "#185a9d",
                               fontSize: 14,
                               textTransform: "capitalize",
                               // fontWeight: "bold",
@@ -533,7 +534,7 @@ export default function CheckOut(props) {
                       </TouchableOpacity>
                       <View
                         style={{
-                          backgroundColor: "#3ea3a3",
+                          backgroundColor: "#185a9d",
                           height: "20%",
                           justifyContent: "center",
                           alignItems: "center",
@@ -552,11 +553,11 @@ export default function CheckOut(props) {
                       </View>
                       <Text
                         style={{
-                          color: "white",
+                          color: "#3ea3a3",
                           fontWeight: "bold",
                           position: "absolute",
                           left: 5,
-                          top: 1,
+                          top: 2,
                         }}
                       >
                         #{i + 1}
@@ -736,7 +737,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginStart: "2%",
     marginEnd: "2%",
-    // borderRadius: 30,
+    borderRadius: 8,
     // marginBottom: 10,
   },
   payLaterButton: {
@@ -749,7 +750,7 @@ const styles = StyleSheet.create({
     marginStart: "2%",
     marginEnd: "2%",
     // padding: "1%",
-    // borderRadius: 30,
+    borderRadius: 8,
     // marginBottom: 10,
   },
   edit: {

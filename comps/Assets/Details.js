@@ -758,7 +758,7 @@ export default function Details(props) {
                 alignItems: "center",
                 padding: 5,
                 marginBottom: 5,
-                // borderRadius: 100,
+                borderRadius: 8,
               }}
               onPress={() => setModalAddService(true)}
             >
@@ -1001,7 +1001,7 @@ export default function Details(props) {
                 alignSelf: "center",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: 30,
+                borderRadius: 8,
                 // marginTop: "5%",
               }}
             >
@@ -1041,7 +1041,7 @@ export default function Details(props) {
             alignItems: "center",
             // marginStart: "2%",
             // marginEnd: "2%",
-            // borderRadius: 30,
+            borderRadius: 8,
             // marginBottom: 10,
           }}
         >

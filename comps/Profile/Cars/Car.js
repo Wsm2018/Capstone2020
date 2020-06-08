@@ -11,6 +11,7 @@ import {
   Alert,
   PixelRatio,
 } from "react-native";
+import * as Device from "expo-device";
 // import { Octicons } from "@expo/vector-icons";
 import firebase from "firebase";
 import "firebase/auth";
@@ -51,6 +52,7 @@ export default function Car({ car }) {
       carId: car.id,
     });
   };
+
   const getDeviceType = async () => {
     const type = await Device.getDeviceTypeAsync();
     setDeviceType(type);
@@ -119,7 +121,7 @@ export default function Car({ car }) {
             <Text
               style={
                 deviceType === 1
-                  ? { ...styles.plate, fontSize: responsiveScreenFontSize(2) }
+                  ? { ...styles.plate, fontSize: responsiveScreenFontSize(4) }
                   : {
                       ...styles.plate,
                       fontSize: responsiveScreenFontSize(3.5),

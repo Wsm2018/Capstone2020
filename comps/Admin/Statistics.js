@@ -204,26 +204,81 @@ export default function Statistics(props) {
       (user) => user.role === "services employee"
     );
 
-    const data = [
-      admins.length,
-      customers.length,
-      userHandlers.length,
-      managers.length,
-      customerSupport.length,
-      serviceEmployee.length,
-    ];
-    const label = [
-      "Admins",
-      "Customers",
-      "User Handlers",
-      "Managers",
-      "Customer Support",
-      "Services Employee",
+    // const data = [
+    //   admins.length,
+    //   customers.length,
+    //   userHandlers.length,
+    //   managers.length,
+    //   customerSupport.length,
+    //   serviceEmployee.length,
+    // ];
+    // const label = [
+    //   "Admins",
+    //   "Customers",
+    //   "User Handlers",
+    //   "Managers",
+    //   "Customer Support",
+    //   "Services Employee",
+    // ];
+
+    // console.log(data);
+    // setLabels([...label]);
+    // setUserChart([...data]);
+    const result = [
+      {
+        name: "Admins",
+        users: admins.length,
+        // color: "#03396c",
+        color: "#011f4b",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "Customers",
+        users: customers.length,
+        color: "#005b96",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "User Handlers",
+        users: userHandlers.length,
+        color: "#c7a43e",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "Managers",
+        users: managers.length,
+        color: "#29a8ab",
+        // color: "#b3cde0",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "Aseet Handlers",
+        users: assetHandler.length,
+        color: "#b4cfd1",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "Support Agent",
+        users: customerSupport.length,
+        color: "#901616",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
+      {
+        name: "Service Worker",
+        users: serviceEmployee.length,
+        color: "#be9b7b",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15,
+      },
     ];
 
-    console.log(data);
-    setLabels([...label]);
-    setUserChart([...data]);
+    setUserChart([...result]);
   };
   // --------------------------------------- USE EFFECTS --------------------------------------------
 
@@ -257,7 +312,6 @@ export default function Statistics(props) {
               alignItems: "center",
               flex: 1,
               justifyContent: "flex-start",
-              // backgroundColor: "red",
             }}
           >
             <View
@@ -271,35 +325,28 @@ export default function Statistics(props) {
                 // width: Dimensions.get("window").width / 1.5,
               }}
             >
-              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  color: "#005c9d",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  textTransform: "capitalize",
+                }}
+              >
                 Total Users
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                height: "50%",
-                width: Dimensions.get("window").width / 1.3,
-              }}
-            >
-              <BarChart
-                svg={{
-                  fill: "#800020",
-                  stroke: "#450011",
-                  strokeWidth: 1,
-                }}
-                contentInset={{ top: 30, bottom: 30 }}
-                spacingInner={0}
-                spacingOuter={0}
-                style={{ flex: 1, height: "100%" }}
+            <View style={{ marginRight: 30 }}>
+              <PieChart
                 data={userChart}
-              />
-
-              <XAxis
-                style={{ marginHorizontal: -10, marginTop: 15 }}
-                data={labels}
-                formatLabel={(value, index) => index}
-                contentInset={{ left: 30, right: 30 }}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="users"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
               />
             </View>
           </View>
@@ -310,10 +357,11 @@ export default function Statistics(props) {
               alignItems: "center",
               justifyContent: "center",
             }}
+            // looks good imma change the loading
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/load.json")}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
               autoPlay
               loop
               style={{
@@ -346,7 +394,15 @@ export default function Statistics(props) {
                 // width: Dimensions.get("window").width / 1.5,
               }}
             >
-              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  color: "#005c9d",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  textTransform: "capitalize",
+                }}
+              >
                 All Assets Bookings
               </Text>
             </View>
@@ -373,7 +429,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/load.json")}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
               autoPlay
               loop
               style={{
@@ -406,7 +462,15 @@ export default function Statistics(props) {
                 // width: Dimensions.get("window").width / 1.5,
               }}
             >
-              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  color: "#005c9d",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  textTransform: "capitalize",
+                }}
+              >
                 All Services Bookings
               </Text>
             </View>
@@ -433,7 +497,7 @@ export default function Statistics(props) {
           >
             <LottieView
               width={Dimensions.get("window").width / 3}
-              source={require("../../assets/loadingAnimations/load.json")}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
               autoPlay
               loop
               style={{

@@ -100,25 +100,41 @@ export default function Sections(props) {
   ]);
   const fav = props.navigation.getParam("flag", false);
   console.log(fav);
+
+  useEffect(() => {
+    // setShowSections(false);
+    // setSelectedList("");
+    // setAssetList([]);
+    // setSelectedSection(null);
+  }, [startDate, endDate]);
+
   useEffect(() => {
     if (fav) {
       console.log("hello");
       // console.log(props.navigation.getParam("startDate", ""));
       setStartDate(props.navigation.getParam("startDate", ""));
       setEndDate(props.navigation.getParam("startDate", ""));
-      console.log(props.navigation.getParam("asset", null).type);
-      type = props.navigation.getParam("asset", null).type;
-      tName = props.navigation.getParam("asset", null).tName;
-      console.log(props.navigation.getParam("asset", null).assetSection);
-      setSelectedSection(props.navigation.getParam("asset", null).assetSection);
-      console.log("asset", props.navigation.getParam("asset", null));
+      console.log(props.navigation.getParam("assetType", null));
+      type = props.navigation.getParam("assetType", null).id;
+      tName = props.navigation.getParam("assetType", null).name;
+      sectionIcon = props.navigation.getParam("assetType", null).sectionIcon;
+      assetIcon = props.navigation.getParam("assetType", null).assetIcon;
+      // console.log("asset Icon", assetIcon);
+      // console.log("section Icon", sectionIcon);
+      // console.log(props.navigation.getParam("asset", null).assetSection);
+      // setSelectedSection(props.navigation.getParam("selectedSection", ""));
+      selectAndCheck(props.navigation.getParam("selectedSection", ""));
+      // console.log("line 127 ----------- ", selectedSection);
+      // console.log("asset", props.navigation.getParam("asset", null));
       setSelectedList(props.navigation.getParam("asset", null));
       setDetailsView(true);
     }
   }, []);
 
   useEffect(() => {
+    // console.log("line 127 ----------- ", selectedSection);
     if (selectedSection !== null) {
+      console.log("this is a test");
       var temp = [];
       setAssetList(temp);
       getList();
@@ -132,7 +148,7 @@ export default function Sections(props) {
   }, [assetList]);
 
   useEffect(() => {
-    if (selectedSection) {
+    if (selectedSection && !fav) {
       setSelectedList("");
     }
   }, [selectedSection]);
@@ -216,10 +232,10 @@ export default function Sections(props) {
   const [showSections, setShowSections] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  const type = props.navigation.getParam("type", "failed").id;
-  const tName = props.navigation.getParam("type", "failed").name;
-  const sectionIcon = props.navigation.getParam("type", "failed").sectionIcon;
-  const assetIcon = props.navigation.getParam("type", "failed").assetIcon;
+  let type = props.navigation.getParam("type", "failed").id;
+  let tName = props.navigation.getParam("type", "failed").name;
+  let sectionIcon = props.navigation.getParam("type", "failed").sectionIcon;
+  let assetIcon = props.navigation.getParam("type", "failed").assetIcon;
 
   useEffect(() => {
     getSections();
@@ -290,12 +306,6 @@ export default function Sections(props) {
   };
 
   ////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    setShowSections(false);
-    setSelectedList("");
-    setAssetList([]);
-    setSelectedSection(null);
-  }, [startDate, endDate]);
 
   const getSections = async () => {
     const temp = [];
@@ -340,7 +350,7 @@ export default function Sections(props) {
     const addFavorite = firebase.functions().httpsCallable("addFavorite");
     const response = await addFavorite({
       uid: firebase.auth().currentUser.uid,
-      asset: item,
+      asset: item.id,
     });
     console.log(response);
     if (response.data !== "Exists") {
@@ -451,12 +461,12 @@ export default function Sections(props) {
 
   const changeStartDate = async (d) => {
     setTempStartDate(d);
-    // startTimeModal === false && setStartTimeModal(true);
+    startTimeModal === false && setStartTimeModal(true);
   };
 
   const changeEndDate = async (d) => {
     setTempEndDate(d);
-    // setEndTimeModal(true);
+    endTimeModal === false && setEndTimeModal(true);
   };
 
   return (
@@ -497,67 +507,69 @@ export default function Sections(props) {
               }}
             >
               {/* date */}
-
-              <DatePicker
-                style={{ width: "100%" }}
-                //is24Hour
-                date={startDate}
-                mode="date"
-                placeholder="Choose A Start Date"
-                format="YYYY-MM-DD T h:mm A"
-                minDate={moment()}
-                maxDate={moment().add(3, "month")}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    backgroundColor: startDate ? "transparent" : "#f0f0f0",
-                    borderWidth: 0,
-                    borderColor: "#185a9d",
-                    // color: "white",
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                // onDateChange={setTempStartDate}
-                onDateChange={(d) => changeStartDate(d)}
-              />
-              {/* <DatePicker
-                style={{ width: "100%" }}
-                date={startDate}
-                mode="datetime"
-                placeholder="Start Date"
-                format="YYYY-MM-DD T h:mm:ss"
-                minDate={new Date()}
-                maxDate="2022-01-01"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    // backgroundColor: "lightgray",
-                    borderWidth: 0,
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                onDateChange={setStartDate}
-              /> */}
+              {Platform.OS === "ios" ? (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={startDate}
+                  mode="datetime"
+                  placeholder="Choose A Start Date"
+                  format="YYYY-MM-DD T h:mm:ss"
+                  minDate={new Date()}
+                  maxDate="2022-01-01"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      backgroundColor: startDate ? "transparent" : "#f0f0f0",
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  onDateChange={setStartDate}
+                />
+              ) : (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  //is24Hour
+                  date={startDate}
+                  mode="date"
+                  placeholder="Choose A Start Date"
+                  format="YYYY-MM-DD T h:mm A"
+                  minDate={moment()}
+                  maxDate={moment().add(3, "month")}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: startDate ? "transparent" : "#f0f0f0",
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                      // color: "white",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  // onDateChange={setTempStartDate}
+                  onDateChange={(d) => changeStartDate(d)}
+                />
+              )}
             </View>
             <View
               style={{
@@ -581,73 +593,79 @@ export default function Sections(props) {
               }}
             >
               {/* Date 2 */}
-              <DatePicker
-                style={{ width: "100%" }}
-                date={endDate}
-                mode="date"
-                placeholder="Choose An End Date"
-                format="YYYY-MM-DD T h:mm A"
-                // minDate={startDate}
-                //maxDate={moment(startDate).add(2,"day")}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    backgroundColor: endDate ? "transparent" : "#f0f0f0",
+              {Platform.OS === "ios" ? (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={endDate}
+                  mode="datetime"
+                  placeholder="Choose An End Date"
+                  format="YYYY-MM-DD T h:mm:ss"
+                  minDate={startDate}
+                  maxDate="2022-01-01"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: endDate ? "transparent" : "#f0f0f0",
 
-                    borderWidth: 0,
-                    borderColor: "#185a9d",
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                // onDateChange={setTempEndDate}
-                onDateChange={(d) => changeEndDate(d)}
-                disabled={!startDate}
-                minDate={
-                  startTime == "11:00 PM"
-                    ? moment(startDate.split(" ")[0] + "T00:00:00")
-                        .add(1, "day")
-                        .format()
-                    : startDate
-                }
-              />
-              {/* <DatePicker
-                style={{ width: "100%" }}
-                date={endDate}
-                mode="datetime"
-                placeholder="End Date"
-                format="YYYY-MM-DD T h:mm:ss"
-                minDate={startDate}
-                maxDate="2022-01-01"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    borderWidth: 0,
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                onDateChange={setEndDate}
-                disabled={!startDate}
-              /> */}
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  onDateChange={setEndDate}
+                  disabled={!startDate}
+                />
+              ) : (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={endDate}
+                  mode="date"
+                  placeholder="Choose An End Date"
+                  format="YYYY-MM-DD T h:mm A"
+                  // minDate={startDate}
+                  //maxDate={moment(startDate).add(2,"day")}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: endDate ? "transparent" : "#f0f0f0",
+
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  // onDateChange={setTempEndDate}
+                  onDateChange={(d) => changeEndDate(d)}
+                  disabled={!startDate}
+                  minDate={
+                    startTime == "11:00 PM"
+                      ? moment(startDate.split(" ")[0] + "T00:00:00")
+                          .add(1, "day")
+                          .format()
+                      : startDate
+                  }
+                />
+              )}
             </View>
           </View>
         </View>
@@ -769,6 +787,7 @@ export default function Sections(props) {
           {showSections === true ? (
             assetSections.map((s, i) => (
               <View style={{ width: "33%", alignItems: "center" }} key={i}>
+                {/* {console.log("sssssssssssssssssssssss", selectedSection)} */}
                 <TouchableOpacity
                   onPress={
                     // (
@@ -785,7 +804,9 @@ export default function Sections(props) {
                   }
                   style={{
                     backgroundColor:
-                      selectedSection === s ? "#185a9d" : "white",
+                      selectedSection && selectedSection.id === s.id
+                        ? "#185a9d"
+                        : "white",
                     width: 100,
                     height: 100,
                     margin: 5,
@@ -810,12 +831,19 @@ export default function Sections(props) {
                       // name="map-marker"
                       name={sectionIcon}
                       size={40}
-                      color={selectedSection === s ? "white" : "#3ea3a3"}
+                      color={
+                        selectedSection && selectedSection.id === s.id
+                          ? "white"
+                          : "#3ea3a3"
+                      }
                     />
                     <Text
                       style={{
                         textAlign: "center",
-                        color: selectedSection === s ? "white" : "#185a9d",
+                        color:
+                          selectedSection && selectedSection.id === s.id
+                            ? "white"
+                            : "#185a9d",
                         fontSize: 20,
                         textTransform: "capitalize",
                       }}
@@ -890,7 +918,7 @@ export default function Sections(props) {
                       key={i}
                       style={{
                         backgroundColor:
-                          selectedList === l ? "#185a9d" : "white",
+                          selectedList.id === l.id ? "#185a9d" : "white",
                         width: 60,
                         height: 60,
                         margin: 5,
@@ -914,12 +942,13 @@ export default function Sections(props) {
                         <MaterialCommunityIcons
                           name="car"
                           size={30}
-                          color={selectedList === l ? "white" : "#3ea3a3"}
+                          color={selectedList.id === l.id ? "white" : "#3ea3a3"}
                         />
                         <Text
                           style={{
                             textAlign: "center",
-                            color: selectedList === l ? "white" : "#185a9d",
+                            color:
+                              selectedList.id === l.id ? "white" : "#185a9d",
                             fontSize: 18,
                           }}
                         >
@@ -956,7 +985,7 @@ export default function Sections(props) {
                           }}
                           badgeStyle={{
                             backgroundColor:
-                              selectedList === l ? "#185a9d" : "white",
+                              selectedList.id === l.id ? "#185a9d" : "white",
                             width: 25,
                             height: 25,
                             borderColor: "#185a9d",

@@ -31,7 +31,7 @@ import { Avatar, ListItem } from "react-native-elements";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-
+const { width, height } = Dimensions.get("screen");
 import moment from "moment";
 
 export default function Users() {
@@ -57,6 +57,7 @@ export default function Users() {
   const [loaded, setLoaded] = useState(false);
   const [valueText, setValueText] = useState();
   const subscriptionLevel = ["gold", "silver", "bronze"];
+  const [selectedSub, setSelectedSub] = useState("");
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -276,6 +277,7 @@ export default function Users() {
   const endSubscription = () => {
     setModal3(false);
     setSubscription(null);
+    setSelectedSub("");
     db.collection("users")
       .doc(user.id)
       .collection("subscription")
@@ -286,96 +288,158 @@ export default function Users() {
   return user ? (
     <View style={styles.container}>
       {/* MOVES THIS  TOUCHABLE DOWN */}
-      <TouchableOpacity onPress={() => setUser(null)}>
-        <Text>Back to Users List</Text>
-      </TouchableOpacity>
+
       {/* ---------------------------------------------- */}
 
-      <Text>User Details</Text>
       {/* ---------------------------------MODAL--------------------------------- */}
       <Modal transparent={true} visible={modal} animationType="slide">
         <View
           style={{
             flex: 1,
             justifyContent: "center",
-            // alignItems: "center",
+            alignItems: "center",
             alignSelf: "center",
             marginTop: 22,
             // ---This is for Width---
-            width: "80%",
+            // width: "80%",
           }}
         >
           <View
+            elevation={5}
             style={{
-              margin: 20,
-              backgroundColor: "white",
+              height: height / 2.2,
+              width: width / 1.6,
+              backgroundColor: "#fff",
+              shadowOpacity: 1,
+              shadowRadius: 2,
+              shadowOffset: {
+                height: 1,
+                width: 1,
+              },
               borderRadius: 20,
-              padding: 35,
-              alignItems: "center",
+              // padding: 35,
+              // justifyContent: "center",
+              // alignItems: "center",
               shadowColor: "#000",
               shadowOffset: {
                 width: 0,
                 height: 2,
               },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              justifyContent: "center",
-              // ---This is for Height---
-              height: "60%",
             }}
           >
-            <Text>
-              Are you sure you want to update {user.displayName}'s password?
-            </Text>
-            <Text></Text>
-            <Text>
-              This will update the account password and will download a pdf
-              after the change
-            </Text>
-            <Text></Text>
-            <TextInput
-              placeholder={"New Password"}
-              value={password}
-              onChangeText={setPassword}
-            />
             <View
               style={{
-                //   borderWidth: 1,
-                width: "100%",
-                height: "10%",
-                justifyContent: "space-around",
+                justifyContent: "center",
                 alignItems: "center",
-                flexDirection: "row",
+                flex: 0.5,
+                marginStart: 10,
               }}
             >
-              {/* -------------------------CONFIRM RESET PASS------------------------- */}
-              <TouchableOpacity
+              <View style={{ marginBottom: "10%", marginTop: 20 }}>
+                <Text
+                  style={{ fontSize: 16, color: "#005c9d", fontWeight: "bold" }}
+                >
+                  Are you sure you want to update {user.displayName}'s password?
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontSize: 16, color: "#901616" }}>
+                  Note: This will update the account password and will download
+                  a pdf after the changes.
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                // backgroundColor: "green",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: -20,
+              }}
+            >
+              <View
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
+                  ...styles.inputStyle,
+                  width: "80%",
+                }}
+              >
+                <TextInput
+                  placeholder={"New Password"}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+
+              <View
+                style={{
+                  flex: 0.5,
+                  // backgroundColor: "red",
                   justifyContent: "center",
                   alignItems: "center",
+                  flexDirection: "row",
                 }}
-                onPress={handleDownload}
-                disabled={password === "" ? true : false}
               >
-                <Text>CONFIRM</Text>
-              </TouchableOpacity>
-              {/* -------------------------CANCEL RESET PASS-------------------------- */}
-              <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => setModal(false)}
-              >
-                <Text>Cancel</Text>
-              </TouchableOpacity>
+                {/* -------------------------CONFIRM RESET PASS------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
+                    // borderWidth: 4,
+                    height: 40,
+                    // width: "30%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    marginEnd: "3%",
+                    borderRadius: 10,
+                    //marginBottom: 10,
+                  }}
+                  onPress={handleDownload}
+                  disabled={password === "" ? true : false}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "white",
+                      // fontWeight: "bold",
+                    }}
+                  >
+                    Confirm
+                  </Text>
+                </TouchableOpacity>
+                {/* -------------------------CANCEL RESET PASS-------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
+                    // borderWidth: 4,
+                    height: 40,
+                    // width: "30%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    marginStart: "3%",
+                    borderRadius: 10,
+                    //marginBottom: 10,
+                  }}
+                  onPress={() => setModal(false)}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "white",
+                      // fontWeight: "bold",
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -468,8 +532,41 @@ export default function Users() {
               Platform.OS === "ios" ? styles.avatarIpad : styles.avatarPhone
             }
           >
+            <View
+              style={{
+                width: "100%",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  // width: "20%",
+                  // backgroundColor: "yellow",
+                  // flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+                onPress={() => setUser(null)}
+              >
+                {/* <Ionicons name="ios-arrow-back" size={22} color="#005c9d" /> */}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: "#005c9d",
+                    marginStart: 10,
+                    // textAlign: "center",
+                    fontWeight: "bold",
+                    // textTransform: "capitalize",
+                  }}
+                >
+                  Go back to list
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
-            <View style={{ flex: 2, backgroundColor: "red" }}>
+            <View style={{ flex: 2 }}>
               <Text
                 style={{
                   alignSelf: "center",
@@ -483,7 +580,8 @@ export default function Users() {
 
             <View
               style={{
-                flex: 2,
+                // flex: 4,
+                marginTop: 20,
                 flexDirection: "row",
                 // backgroundColor: "red",
                 alignItems: "center",
@@ -494,39 +592,68 @@ export default function Users() {
               <View
                 style={{
                   // backgroundColor: "red",
-                  flex: 0.5,
-                  alignItems: "flex-end",
+                  paddingStart: 15,
+                  flex: 1,
+                  alignItems: "flex-start",
                   justifyContent: "center",
                 }}
               >
                 <TouchableOpacity onPress={() => setModal(true)}>
-                  <Text>Reset Password</Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#2E9E9B",
+
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Reset Password
+                  </Text>
                 </TouchableOpacity>
               </View>
               {/* ---------------------------------EDIT--------------------------------- */}
               <View
                 style={{
-                  // backgroundColor: "blue",
-                  flex: 0.6,
+                  // backgroundColor: "yellow",
+                  flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
                 <TouchableOpacity onPress={() => setEditMode(true)}>
-                  <Text>Edit Info</Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#005c9d",
+
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Edit Info
+                  </Text>
                 </TouchableOpacity>
               </View>
               {/* ---------------------------------RESET PASSWORD--------------------------------- */}
               <View
                 style={{
                   // backgroundColor: "green",
-                  flex: 0.5,
-                  alignItems: "flex-start",
+                  flex: 1,
+                  paddingEnd: Platform.OS === "android" ? 0 : 10,
+                  alignItems: "flex-end",
                   justifyContent: "center",
                 }}
               >
                 <TouchableOpacity onPress={() => setModal2(true)}>
-                  <Text>Delete User</Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#901616",
+
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Delete this User
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -640,10 +767,7 @@ export default function Users() {
         </View>
         {/* ---------------------------------PICKER--------------------------------- */}
         <View style={styles.three}>
-          <Text style={{ ...styles.cardTitle, marginBottom: "5%" }}>
-            {" "}
-            User Details
-          </Text>
+          <Text style={styles.cardTitle}> User Details</Text>
           {editMode ? (
             Platform.OS === "android" ? (
               <View
@@ -691,7 +815,7 @@ export default function Users() {
               <View
                 style={{
                   //backgroundColor: "darkred",
-                  flex: 0.15,
+                  flex: 0.2,
                   width: "100%",
                   flexDirection: "row",
                 }}
@@ -747,6 +871,7 @@ export default function Users() {
                             justifyContent: "space-between",
                             flexDirection: "row",
                             alignItems: "center",
+
                             // backgroundColor: "blue",
                           }}
                         >
@@ -785,6 +910,7 @@ export default function Users() {
                 flexDirection: "row",
                 alignItems: "center",
                 marginBottom: "5%",
+                marginTop: 10,
               }}
             >
               <View style={{ width: 100 }}>
@@ -978,19 +1104,36 @@ export default function Users() {
           </Modal>
 
           {editMode ? (
-            <View style={{ backgroundColor: "yellow", flexDirection: "row" }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                }}
-              >
-                Subscription:{" "}
-              </Text>
+            <View
+              style={
+                subscription
+                  ? {
+                      height: 300,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }
+                  : {
+                      height: 150,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }
+              }
+            >
+              <View style={{ alignItems: "flex-start", width: "100%" }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                  }}
+                >
+                  Subscription:{" "}
+                </Text>
+              </View>
               {subscription ? (
-                <View>
-                  <Text style={styles.text2}>Selected Level: {valueText}</Text>
+                <>
+                  <Text style={styles.text3}>Selected Level: {valueText}</Text>
+
                   {Platform.OS === "ios" ? (
-                    <View>
+                    <View style={{ padding: 10 }}>
                       <TouchableOpacity
                         style={
                           {
@@ -1001,7 +1144,11 @@ export default function Users() {
                           pickerRef.show();
                         }}
                       >
-                        <Text>Select subscription level</Text>
+                        <Text>
+                          {selectedSub != ""
+                            ? selectedSub
+                            : `Select a subscription level:`}
+                        </Text>
                       </TouchableOpacity>
                       <ReactNativePickerModule
                         pickerRef={(e) => (pickerRef = e)}
@@ -1016,79 +1163,147 @@ export default function Users() {
                         onValueChange={(valueText, index) => {
                           console.log("value: ", valueText);
                           console.log("index: ", index);
+                          setSelectedSub(valueText);
                           setValueText(valueText);
                         }}
                       />
                     </View>
                   ) : (
-                    <Picker
-                      selectedValue={valueText}
-                      style={{ height: 50, width: 150 }}
-                      onValueChange={(item, itemIndex) => setValueText(item)}
+                    <View
+                      style={{
+                        borderRadius: 5,
+                        borderWidth: 2,
+                        borderColor: "gray",
+                        height: 45,
+                        width: 250,
+                      }}
                     >
-                      {subscriptionLevel.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
-                      ))}
-                    </Picker>
+                      <Picker
+                        selectedValue={valueText}
+                        style={{
+                          height: 45,
+                          width: 250,
+                        }}
+                        onValueChange={(item, itemIndex) => setValueText(item)}
+                      >
+                        {subscriptionLevel.map((item, index) => (
+                          <Picker.Item key={index} label={item} value={item} />
+                        ))}
+                      </Picker>
+                    </View>
                   )}
-                  <DatePicker
-                    style={{ width: 200 }}
-                    date={startDate}
-                    mode="date"
-                    placeholder="Select Start Date"
-                    format="YYYY-MM-DD"
-                    minDate={moment(new Date()).format("YYYY-MM-DD")}
-                    maxDate={endDate}
-                    confirmBtnText="Confirm"
-                    cancelBtnText="Cancel"
-                    customStyles={{
-                      dateIcon: {
-                        position: "absolute",
-                        left: 0,
-                        top: 4,
-                        marginLeft: 0,
-                      },
-                      dateInput: {
-                        marginLeft: 36,
-                      },
-                    }}
-                    onDateChange={(startDate) => setStartDate(startDate)}
-                  />
-                  <DatePicker
-                    style={{ width: 200 }}
-                    date={endDate}
-                    mode="date"
-                    placeholder="Select End Date"
-                    format="YYYY-MM-DD"
-                    minDate={startDate}
-                    confirmBtnText="Confirm"
-                    cancelBtnText="Cancel"
-                    customStyles={{
-                      dateIcon: {
-                        position: "absolute",
-                        left: 0,
-                        top: 4,
-                        marginLeft: 0,
-                      },
-                      dateInput: {
-                        marginLeft: 36,
-                      },
-                    }}
-                    onDateChange={(endDate) => setEndDate(endDate)}
-                  />
-                  <TouchableOpacity
-                    style={
-                      {
-                        // paddingVertical: 10,
-                      }
-                    }
-                    onPress={() => {
-                      setModal3(true);
+                  <View
+                    style={{
+                      justifyContent: "center",
+
+                      alignItems: "center",
                     }}
                   >
-                    <Text>End Subscription</Text>
-                  </TouchableOpacity>
-                </View>
+                    <DatePicker
+                      style={{
+                        width: 250,
+                        margin: 5,
+                        // height: 40,
+                        // backgroundColor: "green",
+                        // alignItems: "center",
+                        justifyContent: "center",
+                        // flexDirection: "row",
+                        paddingLeft: 6,
+                        // width: "60%",
+                        borderColor: "gray",
+                        borderWidth: 2,
+                        borderRadius: 5,
+                      }}
+                      date={startDate}
+                      mode="date"
+                      placeholder="Select Start Date"
+                      format="YYYY-MM-DD"
+                      minDate={moment(new Date()).format("YYYY-MM-DD")}
+                      maxDate={endDate}
+                      confirmBtnText="Confirm"
+                      cancelBtnText="Cancel"
+                      customStyles={{
+                        dateIcon: {
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                          marginLeft: 0,
+                        },
+                        dateInput: {
+                          // marginLeft: 36,
+                          borderWidth: 0,
+                        },
+                      }}
+                      onDateChange={(startDate) => setStartDate(startDate)}
+                    />
+                    <DatePicker
+                      style={{
+                        width: 250,
+                        marginBottom: 5,
+                        // height: 40,
+                        // alignItems: "center",
+                        justifyContent: "center",
+                        // flexDirection: "row",
+                        paddingLeft: 6,
+                        // width: "60%",
+                        borderColor: "gray",
+                        borderWidth: 2,
+                        borderRadius: 5,
+                      }}
+                      date={endDate}
+                      mode="date"
+                      placeholder="Select End Date"
+                      format="YYYY-MM-DD"
+                      minDate={startDate}
+                      confirmBtnText="Confirm"
+                      cancelBtnText="Cancel"
+                      customStyles={{
+                        dateIcon: {
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                          marginLeft: 0,
+                        },
+                        dateInput: {
+                          // marginLeft: 36,
+                          borderWidth: 0,
+                        },
+                      }}
+                      onDateChange={(endDate) => setEndDate(endDate)}
+                    />
+                  </View>
+                  <View style={{ width: 150 }}>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#901616",
+                        // borderWidth: 4,
+                        height: 40,
+                        // width: "30%",
+                        // alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginStart: "2%",
+                        // marginEnd: "3%",
+                        borderRadius: 10,
+                        //marginBottom: 10,
+                      }}
+                      onPress={() => {
+                        setModal3(true);
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+                          // fontWeight: "bold",
+                        }}
+                      >
+                        End Subscription
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
               ) : (
                 <ScrollView>
                   <View
@@ -1103,18 +1318,21 @@ export default function Users() {
                       Selected Level: {valueText}
                     </Text> */}
                     {Platform.OS === "ios" ? (
-                      <View>
+                      <View style={{ padding: 10 }}>
                         <TouchableOpacity
-                          style={
-                            {
-                              // paddingVertical: 10,
-                            }
-                          }
+                          style={{
+                            // paddingVertical: 10,
+                            width: 200,
+                          }}
                           onPress={() => {
                             pickerRef.show();
                           }}
                         >
-                          <Text>Select subscription level</Text>
+                          <Text>
+                            {selectedSub != ""
+                              ? selectedSub
+                              : `Select a subscription level:`}
+                          </Text>
                         </TouchableOpacity>
                         <ReactNativePickerModule
                           pickerRef={(e) => (pickerRef = e)}
@@ -1129,34 +1347,84 @@ export default function Users() {
                           onValueChange={(valueText, index) => {
                             console.log("value: ", valueText);
                             console.log("index: ", index);
+                            setSelectedSub(valueText);
                             setValueText(valueText);
                           }}
                         />
                       </View>
                     ) : (
-                      <Picker
-                        selectedValue={valueText}
-                        style={{ height: 50, width: 150 }}
-                        onValueChange={(item, itemIndex) => setValueText(item)}
+                      <View
+                        style={{
+                          marginTop: 10,
+                          borderRadius: 5,
+                          borderWidth: 2,
+                          borderColor: "gray",
+                          height: 45,
+                          width: 250,
+                        }}
                       >
-                        {subscriptionLevel.map((item, index) => (
-                          <Picker.Item key={index} label={item} value={item} />
-                        ))}
-                      </Picker>
+                        <Picker
+                          selectedValue={valueText}
+                          style={{
+                            height: 45,
+                            width: 250,
+                          }}
+                          onValueChange={(item, itemIndex) =>
+                            setValueText(item)
+                          }
+                        >
+                          {subscriptionLevel.map((item, index) => (
+                            <Picker.Item
+                              key={index}
+                              label={item}
+                              value={item}
+                            />
+                          ))}
+                        </Picker>
+                      </View>
                     )}
                   </View>
-                  <TouchableOpacity
-                    style={
-                      {
-                        // paddingVertical: 10,
-                      }
-                    }
-                    onPress={() => {
-                      subscribe("new");
+                  <View
+                    style={{
+                      marginTop: 5,
+                      flex: 1,
+                      alignItems: "center",
+                      // backgroundColor: "red",
+                      justifyContent: "center",
+                      width: "100%",
                     }}
                   >
-                    <Text>Add Subscription</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#005c9d",
+                        // borderWidth: 4,
+                        height: 40,
+                        width: "75%",
+                        // alignSelf: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        //marginStart: "2%",
+                        // marginEnd: "3%",
+                        borderRadius: 10,
+                        //marginBottom: 10,
+                      }}
+                      onPress={() => {
+                        subscribe("new");
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          color: "white",
+
+                          // fontWeight: "bold",
+                        }}
+                      >
+                        Add Subscription
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </ScrollView>
               )}
             </View>
@@ -1180,7 +1448,7 @@ export default function Users() {
               </View>
             </View>
           ) : (
-            <View>
+            <View style={{ flex: 1 }}>
               <View style={{ marginLeft: "4%", flexDirection: "row" }}>
                 <Text style={{ fontSize: 16 }}>Subscription: </Text>
                 <Text style={{ fontSize: 16 }}>No Subscription</Text>
@@ -1193,42 +1461,71 @@ export default function Users() {
               style={{
                 //   borderWidth: 1,
                 flex: 1,
-                backgroundColor: "lightgreen",
-                width: "100%",
-                height: "100%",
-                justifyContent: "space-around",
+
+                // width: "100%",
+                // height: "100%",
+                justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "row",
+                paddingBottom: "10%",
+                paddingTop: "5%",
               }}
             >
-              {/* ---------------------------------SAVE--------------------------------- */}
-              <TouchableOpacity
+              <View
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "50%",
-
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
+                  height: 40,
                   justifyContent: "center",
                   alignItems: "center",
+                  marginEnd: "2%",
+                  borderRadius: 10,
                 }}
-                onPress={handleSave}
               >
-                <Text>Save</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={handleSave}>
+                  <Text
+                    style={{
+                      // height: 60,
+                      // backgroundColor: "red",
+                      // width: "60%",
+                      textAlign: "center",
+                      fontSize: 18,
+                      // fontWeight: "bold",
+                      color: "white",
+                    }}
+                  >
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
               {/* ---------------------------------CANCEL--------------------------------- */}
-              <TouchableOpacity
+              <View
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "50%",
-
+                  flex: 0.5,
+                  backgroundColor: "#2E9E9B",
+                  height: 40,
                   justifyContent: "center",
                   alignItems: "center",
+                  marginStart: "2%",
+                  borderRadius: 10,
                 }}
-                onPress={handleCancel}
               >
-                <Text>Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={handleCancel}>
+                  <Text
+                    style={{
+                      // height: 60,
+                      // backgroundColor: "red",
+                      // width: "60%",
+                      textAlign: "center",
+                      fontSize: 18,
+                      // fontWeight: "bold",
+                      color: "white",
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         </View>
@@ -1307,10 +1604,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     marginTop: "3%",
-    padding: "5%",
+    paddingBottom: "10%",
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: "lightgray",
+    padding: "5%",
     // flexDirection: "row",
     //flexWrap: "wrap",
     // flex: 1,
@@ -1346,7 +1644,7 @@ const styles = StyleSheet.create({
     width: "100%",
 
     height: 30,
-    color: "black",
+    color: "#005c9d",
     fontWeight: "bold",
   },
   text: {
@@ -1367,6 +1665,12 @@ const styles = StyleSheet.create({
   },
   text2: {
     fontSize: 16,
+    // fontWeight: "bold",
+  },
+  text3: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#005c9d",
   },
   picker: {
     height: 40,
