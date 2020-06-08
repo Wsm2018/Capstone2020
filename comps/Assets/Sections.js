@@ -451,12 +451,12 @@ export default function Sections(props) {
 
   const changeStartDate = async (d) => {
     setTempStartDate(d);
-    // startTimeModal === false && setStartTimeModal(true);
+    startTimeModal === false && setStartTimeModal(true);
   };
 
   const changeEndDate = async (d) => {
     setTempEndDate(d);
-    // setEndTimeModal(true);
+    endTimeModal === false && setEndTimeModal(true);
   };
 
   return (
@@ -497,67 +497,69 @@ export default function Sections(props) {
               }}
             >
               {/* date */}
-
-              <DatePicker
-                style={{ width: "100%" }}
-                //is24Hour
-                date={startDate}
-                mode="date"
-                placeholder="Choose A Start Date"
-                format="YYYY-MM-DD T h:mm A"
-                minDate={moment()}
-                maxDate={moment().add(3, "month")}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    backgroundColor: startDate ? "transparent" : "#f0f0f0",
-                    borderWidth: 0,
-                    borderColor: "#185a9d",
-                    // color: "white",
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                // onDateChange={setTempStartDate}
-                onDateChange={(d) => changeStartDate(d)}
-              />
-              {/* <DatePicker
-                style={{ width: "100%" }}
-                date={startDate}
-                mode="datetime"
-                placeholder="Start Date"
-                format="YYYY-MM-DD T h:mm:ss"
-                minDate={new Date()}
-                maxDate="2022-01-01"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    // backgroundColor: "lightgray",
-                    borderWidth: 0,
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                onDateChange={setStartDate}
-              /> */}
+              {Platform.OS === "ios" ? (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={startDate}
+                  mode="datetime"
+                  placeholder="Choose A Start Date"
+                  format="YYYY-MM-DD T h:mm:ss"
+                  minDate={new Date()}
+                  maxDate="2022-01-01"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      backgroundColor: startDate ? "transparent" : "#f0f0f0",
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  onDateChange={setStartDate}
+                />
+              ) : (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  //is24Hour
+                  date={startDate}
+                  mode="date"
+                  placeholder="Choose A Start Date"
+                  format="YYYY-MM-DD T h:mm A"
+                  minDate={moment()}
+                  maxDate={moment().add(3, "month")}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: startDate ? "transparent" : "#f0f0f0",
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                      // color: "white",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  // onDateChange={setTempStartDate}
+                  onDateChange={(d) => changeStartDate(d)}
+                />
+              )}
             </View>
             <View
               style={{
@@ -581,73 +583,79 @@ export default function Sections(props) {
               }}
             >
               {/* Date 2 */}
-              <DatePicker
-                style={{ width: "100%" }}
-                date={endDate}
-                mode="date"
-                placeholder="Choose An End Date"
-                format="YYYY-MM-DD T h:mm A"
-                // minDate={startDate}
-                //maxDate={moment(startDate).add(2,"day")}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    backgroundColor: endDate ? "transparent" : "#f0f0f0",
+              {Platform.OS === "ios" ? (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={endDate}
+                  mode="datetime"
+                  placeholder="Choose An End Date"
+                  format="YYYY-MM-DD T h:mm:ss"
+                  minDate={startDate}
+                  maxDate="2022-01-01"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: endDate ? "transparent" : "#f0f0f0",
 
-                    borderWidth: 0,
-                    borderColor: "#185a9d",
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                // onDateChange={setTempEndDate}
-                onDateChange={(d) => changeEndDate(d)}
-                disabled={!startDate}
-                minDate={
-                  startTime == "11:00 PM"
-                    ? moment(startDate.split(" ")[0] + "T00:00:00")
-                        .add(1, "day")
-                        .format()
-                    : startDate
-                }
-              />
-              {/* <DatePicker
-                style={{ width: "100%" }}
-                date={endDate}
-                mode="datetime"
-                placeholder="End Date"
-                format="YYYY-MM-DD T h:mm:ss"
-                minDate={startDate}
-                maxDate="2022-01-01"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    // position: "absolute",
-                    // left: 0,
-                    // top: 4,
-                    // marginLeft: 0,
-                    width: 0,
-                    height: 0,
-                  },
-                  dateInput: {
-                    // marginLeft: 36,
-                    borderWidth: 0,
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                onDateChange={setEndDate}
-                disabled={!startDate}
-              /> */}
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  onDateChange={setEndDate}
+                  disabled={!startDate}
+                />
+              ) : (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  date={endDate}
+                  mode="date"
+                  placeholder="Choose An End Date"
+                  format="YYYY-MM-DD T h:mm A"
+                  // minDate={startDate}
+                  //maxDate={moment(startDate).add(2,"day")}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  customStyles={{
+                    dateIcon: {
+                      // position: "absolute",
+                      // left: 0,
+                      // top: 4,
+                      // marginLeft: 0,
+                      width: 0,
+                      height: 0,
+                    },
+                    dateInput: {
+                      // marginLeft: 36,
+                      backgroundColor: endDate ? "transparent" : "#f0f0f0",
+
+                      borderWidth: 0,
+                      borderColor: "#185a9d",
+                    },
+                    // ... You can check the source to find the other keys.
+                  }}
+                  // onDateChange={setTempEndDate}
+                  onDateChange={(d) => changeEndDate(d)}
+                  disabled={!startDate}
+                  minDate={
+                    startTime == "11:00 PM"
+                      ? moment(startDate.split(" ")[0] + "T00:00:00")
+                          .add(1, "day")
+                          .format()
+                      : startDate
+                  }
+                />
+              )}
             </View>
           </View>
         </View>

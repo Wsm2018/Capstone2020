@@ -69,7 +69,7 @@ export default function indexUH(props) {
       name: "Employees Allowed",
       code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesAllowed"),
-      image: require("../../assets/images/emp.png"),
+      image: require("../../assets/images/employees.png"),
       height: 120,
       width: 200,
     },

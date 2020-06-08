@@ -132,7 +132,8 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: theme === "light" ? "#185a9d" : "black" },
+        // style: { backgroundColor: theme === "light" ? "#185a9d" : "black" },
+        style: { backgroundColor: "#185a9d" },
       },
     }
   );
