@@ -434,7 +434,7 @@ export default function Payment(props) {
                   />
                 ))}
               <CheckBox
-                title="OTHER"
+                title="+ Add New Card"
                 checked={checked === 1 ? true : false}
                 onPress={() => {
                   handleCardSelect({ id: 1 });

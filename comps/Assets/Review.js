@@ -89,7 +89,11 @@ export default function Details(props) {
           // console.log(sum, "----123---------------------");
         }
         setReviews(temp);
-        setAvgRating(parseFloat(sum / temp.length));
+        console.log("summmmmmmmmmmm", sum);
+        if (sum === 0) {
+        } else {
+          setAvgRating(parseFloat(sum / temp.length));
+        }
       });
   };
 
