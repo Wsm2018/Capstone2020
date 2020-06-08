@@ -538,7 +538,7 @@ export default function Authentication(props) {
                             }
                             containerStyle={styles.Inputs}
                             onChangeText={setRegisterEmail}
-                            placeholder="E-mail"
+                            placeholder="E-mail *"
                             value={registerEmail}
                             placeholderTextColor="#185a9d"
                             inputStyle={{
@@ -618,7 +618,7 @@ export default function Authentication(props) {
                               }
                               containerStyle={styles.Inputs}
                               onChangeText={setRegisterPassword}
-                              placeholder="Password"
+                              placeholder="Password *"
                               secureTextEntry={true}
                               value={registerPassword}
                               errorMessage="* Enter a strong password"
@@ -646,7 +646,7 @@ export default function Authentication(props) {
                             }
                             containerStyle={styles.Inputs}
                             onChangeText={setConfirmRegisterPassword}
-                            placeholder="Confirm Password"
+                            placeholder="Confirm Password *"
                             secureTextEntry={true}
                             value={confirmRegisterPassword}
                             placeholderTextColor="#185a9d"
@@ -673,7 +673,7 @@ export default function Authentication(props) {
                             containerStyle={styles.Inputs}
                             placeholderTextColor="#185a9d"
                             onChangeText={setDisplayName}
-                            placeholder="Display Name"
+                            placeholder="Display Name *"
                             value={displayName}
                             errorMessage="* Invalid name"
                             errorStyle={{ color: displayNameError }}
@@ -828,7 +828,7 @@ export default function Authentication(props) {
                                 placeholderTextColor="#185a9d"
                                 onChangeText={setPhone}
                                 keyboardType="number-pad"
-                                placeholder="Phone Number"
+                                placeholder="Phone Number *"
                                 value={phone}
                                 errorMessage="* Invalid Phone No."
                                 errorStyle={{
@@ -1006,7 +1006,7 @@ export default function Authentication(props) {
                         }
                         containerStyle={styles.Inputs}
                         onChangeText={setLoginEmail}
-                        placeholder="E-mail"
+                        placeholder="E-mail *"
                         value={loginEmail}
                         errorMessage="* E-mail not valid"
                         placeholderTextColor="#185a9d"
@@ -1024,7 +1024,7 @@ export default function Authentication(props) {
                         leftIcon={<Icon name="key" size={20} color="#185a9d" />}
                         containerStyle={styles.Inputs}
                         onChangeText={setLoginPassword}
-                        placeholder="Password"
+                        placeholder="Password *"
                         secureTextEntry={true}
                         value={loginPassword}
                         placeholderTextColor="#185a9d"
@@ -1109,7 +1109,7 @@ export default function Authentication(props) {
                         }
                         containerStyle={styles.Inputs}
                         onChangeText={setLoginEmail}
-                        placeholder="E-mail"
+                        placeholder="E-mail *"
                         value={loginEmail}
                         inputStyle={{
                           fontSize: 16,
@@ -1161,7 +1161,7 @@ export default function Authentication(props) {
                             }
                             containerStyle={styles.Inputs}
                             onChangeText={setAccessCode}
-                            placeholder="Access Code"
+                            placeholder="Access Code *"
                             value={AccessCode}
                             errorMessage="* Code Invalid"
                             inputStyle={{
@@ -1267,7 +1267,7 @@ export default function Authentication(props) {
                             }
                             containerStyle={styles.Inputs}
                             onChangeText={setAccessDisplayName}
-                            placeholder="Display Name"
+                            placeholder="Display Name *"
                             value={accessDisplayName}
                             inputStyle={{
                               fontSize: 16,
@@ -1345,7 +1345,7 @@ export default function Authentication(props) {
                               placeholderTextColor="#20365F"
                               onChangeText={setPhoneAccess}
                               keyboardType="number-pad"
-                              placeholder="Phone No."
+                              placeholder="Phone Number *"
                               value={phoneAccess}
                               errorMessage="* Invalid Phone No."
                               errorStyle={{ color: phoneErr2 }}

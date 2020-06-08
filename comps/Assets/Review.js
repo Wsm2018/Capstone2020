@@ -368,6 +368,7 @@ export default function Details(props) {
                                 justifyContent: "center",
                                 alignItems: "center",
                                 padding: 5,
+                                borderRadius: 8,
                               }}
                               onPress={() => setModalViewReview(true)}
                             >
