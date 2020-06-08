@@ -30,6 +30,7 @@ export default function Favorites({
   user,
 }) {
   // ------------------------------------- USE STATES ---------------------------------------------
+  // ------------------------------------- USE STATES ---------------------------------------------
 
   const [favoriteAssets, setFavoriteAssets] = useState([]);
   const [assetModal, setAssetModal] = useState(false);
@@ -38,6 +39,11 @@ export default function Favorites({
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [allBookings, setAllBookings] = useState([]);
 
+  const [assetTypes, setAssetTypes] = useState([]);
+  const [assetTypeIds, setAssetTypeIds] = useState([]);
+  const [assetSections, setAssetSections] = useState([]);
+  const [assetSectionIds, setAssetSectionIds] = useState([]);
+
   // ------------------------------------- FUNCTIONS ----------------------------------------------
 
   const getUserFavoriteAssets = () => {
@@ -45,12 +51,41 @@ export default function Favorites({
       .doc(firebase.auth().currentUser.uid)
       .collection("favorites")
       .onSnapshot((querySnap) => {
-        let favorites = [];
-        querySnap.forEach((document) => {
-          favorites.push({ id: document.id, ...document.data() });
+        let assetArr = [];
+        querySnap.forEach(async (doc) => {
+          let assetBookings = [];
+          const asset = await db.collection("assets").doc(doc.id).get();
+          console.log(asset.data());
+          const assets = await db
+            .collection("assets")
+            .doc(doc.id)
+            .collection("assetBookings")
+            .get();
+          assets.forEach((assetBooking) => {
+            assetBookings.push({ id: assetBooking.id, ...assetBooking.data() });
+          });
+          assetArr.push({
+            id: asset.id,
+            assetName: asset.data().name,
+            assetSection: asset.data().assetSection,
+            assetBookings: assetBookings,
+          });
+          if (assetArr.length === querySnap.size) {
+            setFavoriteAssets([...assetArr]);
+          }
         });
-        setFavoriteAssets([...favorites]);
       });
+  };
+
+  const formatDate = (date) => {
+    const splitDateTime = date.split("T");
+    const splitTimes = splitDateTime[1].split(":");
+    let hour = splitTimes[0];
+    if (parseInt(hour) < 12) {
+      hour = `0${hour}`;
+    }
+    const dateTime = `${splitDateTime[0]}T${hour}:${splitTimes[1]}:${splitTimes[2]}`;
+    return new Date(dateTime);
   };
 
   const handleDeleteAlert = (id) => {
@@ -70,7 +105,6 @@ export default function Favorites({
   };
 
   const handleDeleteFavorite = async (id) => {
-    // console.log(id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
@@ -81,7 +115,45 @@ export default function Favorites({
     }
   };
 
-  const handleBooking = () => {
+  const getAssetSections = async () => {
+    db.collection("assetSections").onSnapshot((query) => {
+      let assetSection = [];
+      let ids = [];
+      query.forEach((doc) => {
+        ids.push(doc.id);
+        assetSection.push({ id: doc.id, ...doc.data() });
+      });
+      setAssetSectionIds([...ids]);
+      setAssetSections([...assetSection]);
+    });
+  };
+
+  const getAssetTypes = async () => {
+    db.collection("assetTypes").onSnapshot((query) => {
+      let assetType = [];
+      let ids = [];
+      query.forEach((doc) => {
+        ids.push(doc.id);
+        assetType.push({ id: doc.id, ...doc.data() });
+      });
+      setAssetTypeIds([...ids]);
+      setAssetTypes([...assetType]);
+    });
+  };
+
+  const handleBooking = async () => {
+    const sectionIndex = assetSectionIds.includes(selectedAsset.assetSection)
+      ? assetSectionIds.indexOf(selectedAsset.assetSection)
+      : -1;
+    const selectedSection =
+      sectionIndex !== -1 ? assetSections[sectionIndex] : null;
+
+    const typeId = assetTypeIds.includes(selectedSection.assetType)
+      ? assetTypeIds.indexOf(selectedSection.assetType)
+      : -1;
+
+    const assetType = typeId !== -1 ? assetTypes[typeId] : null;
+
     if (selectedAsset.assetBookings.length === 0) {
       setAssetModal(false);
       setFavoritesModal(false);
@@ -95,9 +167,42 @@ export default function Favorites({
             startDate: startDate,
             endDate: endDate,
             asset: selectedAsset,
+            selectedSection: selectedSection,
+            assetType: assetType,
           },
         })
       );
+    } else {
+      const filteredArray = selectedAsset.assetBookings.filter(
+        (item) =>
+          formatDate(item.endDateTime.replace(/\s+/g, "")) -
+            formatDate(startDate.replace(/\s+/g, "")) >
+            0 &&
+          formatDate(item.startDateTime.replace(/\s+/g, "")) -
+            formatDate(endDate.replace(/\s+/g, "")) <
+            0
+      );
+      if (filteredArray.length > 0) {
+        alert("Asset booked within these times");
+      } else {
+        setAssetModal(false);
+        setFavoritesModal(false);
+        navigation.navigate(
+          "Home",
+          {},
+          NavigationActions.navigate({
+            routeName: "Sections",
+            params: {
+              flag: true,
+              startDate: startDate,
+              endDate: endDate,
+              asset: selectedAsset,
+              selectedSection: selectedSection,
+              assetType: assetType,
+            },
+          })
+        );
+      }
     }
   };
 
@@ -105,6 +210,8 @@ export default function Favorites({
 
   useEffect(() => {
     getUserFavoriteAssets();
+    getAssetSections();
+    getAssetTypes();
   }, []);
 
   // ----------------------------------------- RETURN ---------------------------------------------
@@ -266,7 +373,7 @@ export default function Favorites({
 
                               // marginTop: 15,
                             }}
-                            onPress={() => handleDeleteAlert(item.asset.id)}
+                            onPress={() => handleDeleteAlert(item.id)}
                           >
                             <FontAwesome
                               name="remove"
@@ -285,7 +392,7 @@ export default function Favorites({
                           <TouchableOpacity
                             onPress={() => {
                               setAssetModal(true);
-                              setSelectedAsset(item.asset);
+                              setSelectedAsset(item);
                             }}
                             style={{
                               flex: 0.4,
@@ -331,7 +438,7 @@ export default function Favorites({
                             // backgroundColor: "blue",
                           }}
                         >
-                          {item.asset.name}
+                          {item.assetName}
                         </Text>
                       </View>
                     </Card>

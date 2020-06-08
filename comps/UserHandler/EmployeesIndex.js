@@ -23,7 +23,13 @@ import {
 } from "@expo/vector-icons";
 import { Icon, ButtonGroup, ListItem, SearchBar } from "react-native-elements";
 import LottieView from "lottie-react-native";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
@@ -36,6 +42,7 @@ export default function EmployeesRequest(props) {
   const [allUsers, setAllUsers] = useState(null);
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
+  const [deviceType, setDeviceType] = useState(0);
 
   const buttons = ["All Employees", "Filter by date joined"];
   const [view, setView] = useState(0);
@@ -92,7 +99,10 @@ export default function EmployeesRequest(props) {
         setAllUsers(tempUsers);
       });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
   // ---------------------------------DOWNLOAD---------------------------------
   const handleDownload = async (user) => {
     // ---------------------------------
@@ -225,16 +235,18 @@ export default function EmployeesRequest(props) {
                   borderTopColor: "#185a9d",
                   width: "100%",
                   height: "20%",
+                  fontSize: responsiveScreenFontSize(1.8),
                 }}
                 inputContainerStyle={{
                   borderRadius: 20,
                   borderWidth: 1,
                   borderColor: "#fafafa",
                   backgroundColor: "#fafafa",
+                  fontSize: responsiveScreenFontSize(1.8),
                 }}
                 style={{
                   //backgroundColor: "white",
-                  fontSize: 18,
+                  fontSize: responsiveScreenFontSize(1.8),
                   paddingLeft: "2%",
                   // borderColor: "#185a9d",
                   // borderWidth: 2,
@@ -278,7 +290,7 @@ export default function EmployeesRequest(props) {
                   >
                     {users.map((user, i) => (
                       <ListItem
-                        style={{}}
+                        style={{ fontSize: 50 }}
                         key={i}
                         rightAvatar={
                           <Ionicons
@@ -287,8 +299,14 @@ export default function EmployeesRequest(props) {
                             color="black"
                           />
                         }
-                        titleStyle={{ marginLeft: "4%" }}
-                        subtitleStyle={{ marginLeft: "4%" }}
+                        titleStyle={{
+                          marginLeft: "4%",
+                          fontSize: responsiveScreenFontSize(1.8),
+                        }}
+                        subtitleStyle={{
+                          marginLeft: "4%",
+                          fontSize: responsiveScreenFontSize(1.6),
+                        }}
                         // leftAvatar={user.photoURL}
                         title={user.displayName}
                         subtitle={user.email}
@@ -322,7 +340,12 @@ export default function EmployeesRequest(props) {
                     paddingTop: "30%",
                   }}
                 />
-                <Text style={{ color: "grey", fontSize: 20 }}>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: responsiveScreenFontSize(1.8),
+                  }}
+                >
                   User not found
                 </Text>
               </View>

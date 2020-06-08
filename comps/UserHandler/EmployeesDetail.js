@@ -363,8 +363,7 @@ export default function EmployeesRequest(props) {
             <Text
               style={{
                 alignSelf: "center",
-                fontWeight: "bold",
-                fontSize: 16,
+                fontSize: 15,
                 marginBottom: "2%",
               }}
             >
@@ -686,7 +685,7 @@ const styles = StyleSheet.create({
     //flexDirection: "row",
   },
   redButton: {
-    backgroundColor: "#942b1f",
+    backgroundColor: "#901616",
     height: 40,
     width: "38%",
     alignSelf: "center",
@@ -760,8 +759,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     // backgroundColor: "red",
     width: "100%",
-    height: 30,
-    color: "black",
+    height: 35,
+    color: "#185a9d",
     fontWeight: "bold",
   },
   three: {

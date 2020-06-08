@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     // backgroundColor: "red",
     width: "100%",
-    height: 30,
+    height: 35,
     color: "black",
     fontWeight: "bold",
     padding: "0%",
@@ -365,11 +365,9 @@ const styles = StyleSheet.create({
   phonecardTitle: {
     fontSize: 18,
     // backgroundColor: "red",
-    // width: "100%",
-    height: 30,
-    color: "black",
+    width: "100%",
+    height: 35,
+    color: "#185a9d",
     fontWeight: "bold",
-    padding: "0%",
-    // marginLeft: "2%",
   },
 });
