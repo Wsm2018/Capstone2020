@@ -121,142 +121,131 @@ export default function SubscriptionsScreen(props) {
       setFlag(!flag)
     }
   };
+
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Card
-          elevation={2}
-          style={{
-            width: "100%",
-            flex: 1,
-            borderWidth: 1,
-            borderTopWidth: 0,
-            borderColor: "darkgray",
-          }}
-        >
-            {!userSubscription ?
-              paymentFlag === true ?
-            <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
-            <ScrollView >
-                <View>
-                    <Text>Selected Level: {valueText}</Text>
-                    {Platform.OS === "ios" ? 
-                    <View>
-                      <TouchableOpacity
-                        style={{
-                          paddingVertical: 10,
-                        }}
-                        onPress={() => {
-                          pickerRef.show();
-                        }}
-                      >
-                        <Text>Select subscription level</Text>
-                      </TouchableOpacity>
-                      <ReactNativePickerModule
-                        pickerRef={(e) => (pickerRef = e)}
-                        title={"Select a subscription level"}
-                        items={subscriptionLevel}
-                        onDismiss={() => {
-                          console.log("onDismiss");
-                        }}
-                        onCancel={() => {
-                          console.log("Cancelled");
-                        }}
-                        onValueChange={(valueText, index) => {
-                          setValueText(valueText);
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <Picker
-                      selectedValue={valueText}
-                      style={{ height: 50, width: 150 }}
-                      onValueChange={(item, itemIndex) => setValueText(item)}
-                    >
-                      {subscriptionLevel.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
-                      ))}
-                    </Picker>
-                    
-                    }
-                    
-                    {valueText === "bronze"? <Text>this level will gives you: 3 price : 10</Text>
-                    :valueText === "sliver" ?<Text>this level will gives you: 5 price : 20</Text>
-                    :valueText === "gold" ?<Text>this level will gives you: 10 price : 50</Text>
-                    : null}
-              </View>
-              <TouchableOpacity
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Card
+        elevation={2}
+        style={{
+          width: "100%",
+          flex: 1,
+          borderWidth: 1,
+          borderTopWidth: 0,
+          borderColor: "darkgray",
+        }}
+      >
+          {!userSubscription ?
+            paymentFlag === true ?
+          <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
+          <ScrollView >
+              <View>
+                  <Text>Selected Level: {valueText}</Text>
+                  {Platform.OS === "ios" ? 
+                  <View>
+                  <TouchableOpacity
+                  style={{
+                  paddingVertical: 10,
+                  }}
+                  onPress={() => {
+                  pickerRef.show()
+                  }}>
+                  <Text>Select subscription level</Text>
+                  </TouchableOpacity>
+                  <ReactNativePickerModule
+                  pickerRef={e => (pickerRef = e)}
+                  title={"Select a subscription level"}
+                  items={subscriptionLevel}
+                  onDismiss={() => {
+                  console.log("onDismiss")
+                  }}
+                  onCancel={() => {
+                  console.log("Cancelled")
+                  }}
+                  onValueChange={(valueText, index) => {
+                  setValueText(valueText)
+                  }}
+                  /> 
+                  </View>
+                  : 
+
+                  <Picker
+                  selectedValue={valueText}
+                  style={{ height: 50, width: 150 }}
+                  onValueChange={(item, itemIndex) => setValueText(item)}
+                  >
+                  {subscriptionLevel.map((item, index) =>
+                    <Picker.Item key={index} label={item} value={item} />
+                  )}
+                  </Picker>
+                  
+                  }
+                  
+                  {valueText === "bronze"? <Text>this level will gives you: 3 price : 10</Text>
+                  :valueText === "sliver" ?<Text>this level will gives you: 5 price : 20</Text>
+                  :valueText === "gold" ?<Text>this level will gives you: 10 price : 50</Text>
+                  : null}
+            </View>
+            <TouchableOpacity
+                  style={{
+                  paddingVertical: 10,
+                  }}
+                  onPress={() => {
+                    process()
+                  }}>
+                  <Text>subscribe now and pay</Text>
+            </TouchableOpacity>
+          </ScrollView>
+          </View> : 
+          <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
+            <Text>Payment</Text>
+            {valueText === "bronze"? <Text>this level will gives you: 3 price : 10</Text>
+                  :valueText === "sliver" ?<Text>this level will gives you: 5 price : 20</Text>
+                  :valueText === "gold" ?<Text>this level will gives you: 10 price : 50</Text>
+                  : null}
+            {flag === true ? 
+                  <TouchableOpacity
+                  style={{
+                  paddingVertical: 10,
+                  }}
+                  onPress={() => {
+                  subscribe("new")
+                  }}>
+                  <Text>subscribe now</Text>
+                  </TouchableOpacity>: 
+                  <TouchableOpacity
                     style={{
                     paddingVertical: 10,
                     }}
                     onPress={() => {
-                      process()
+
+                    subscribe("updateSub")
                     }}>
-                    <Text>subscribe now and pay</Text>
-              </TouchableOpacity>
-            </ScrollView>
-            </View> : 
-            <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
-              <Text>Payment</Text>
-              {valueText === "bronze"? <Text>this level will gives you: 3 price : 10</Text>
-                    :valueText === "sliver" ?<Text>this level will gives you: 5 price : 20</Text>
-                    :valueText === "gold" ?<Text>this level will gives you: 10 price : 50</Text>
-                    : null}
-              {flag === true ? 
-                    <TouchableOpacity
-                    style={{
-                      paddingVertical: 10,
-                    }}
-                    onPress={() => {
-                      subscribe("new");
-                    }}
-                  >
                     <Text>subscribe now</Text>
                   </TouchableOpacity>
-                ) : (
+                } 
+          </View>
+          : 
+          <View style={{ flex: 1, justifyContent: "center", alignItems: 'baseline' }}>
+              <ScrollView>
+                  <Text>Subscription will end at: {moment(userSubscription.endDate.toDate()).format('L')}</Text>
+                    <Text>your subscription level is: {userSubscription.type}</Text>
                   <TouchableOpacity
-                    style={{
+                      style={{
                       paddingVertical: 10,
                       }}
                       onPress={() => {
-
-                      subscribe("updateSub")
+                      subscribe("update")
                       }}>
-                      <Text>subscribe now</Text>
-                    </TouchableOpacity>
-                  } 
-            </View>
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "baseline",
-              }}
-            >
-              <ScrollView>
-                <Text>
-                  Subscription will end at:{" "}
-                  {moment(userSubscription.endDate.toDate()).format("L")}
-                </Text>
-                <Text>your subscription level is: {userSubscription.type}</Text>
-                <TouchableOpacity
-                  style={{
-                    paddingVertical: 10,
-                  }}
-                  onPress={() => {
-                    subscribe("update");
-                  }}
-                >
-                  <Text>renew and upgrade</Text>
-                </TouchableOpacity>
+                      <Text>renew and upgrade</Text>
+                  </TouchableOpacity>
               </ScrollView>
-            </View>
-          )}
+            </View>}
         </Card>
       </View>
     </View>
-  );
+);
+
 }
 const styles = StyleSheet.create({
   container: {

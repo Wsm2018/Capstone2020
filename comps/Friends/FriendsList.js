@@ -23,7 +23,7 @@ import {
   Feather,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-navigation";
-import { ListItem } from "react-native-elements";
+import { ListItem, Icon } from "react-native-elements";
 import moment from "moment";
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -355,49 +355,120 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Button
-        title="Map"
-        onPress={() => props.navigation.navigate("FriendsMap")}
-      />
-      {/* <Text>Friends List</Text> */}
-      {/* <Button title="TEST" onPress={() => props.navigation.navigate("Test")} /> */}
-      {/* <Button title="Delete All" onPress={deleteAll} /> */}
-      <View style={{ flexDirection: "row" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          //paddingTop:'2%',
+        }}
+      >
+        <MaterialCommunityIcons
+          name="account-search"
+          size={40}
+          color="#fff"
+          style={{ paddingTop: "2%", marginBottom: 10 }}
+        />
         <TextInput
-          style={{ borderWidth: 1, borderColor: "white", width: "85%" }}
-          placeholder="Search here..."
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "80%",
+            height: "80%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          placeholderTextColor="#20365F"
+          placeholder="Search Here"
           onChangeText={setSearch}
           value={search}
         />
-        {editMode ? (
-          <TouchableOpacity
-            style={{
-              width: "15%",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "white",
-              borderWidth: 1,
-            }}
-            onPress={() => setEditMode(false)}
-          >
-            <Text>Done</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={{
-              width: "15%",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "white",
-              borderWidth: 1,
-            }}
-            onPress={() => setEditMode(true)}
-          >
-            <Text>Edit</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("FriendsMap")}
+        >
+          <FontAwesome5 name="map-marker-alt" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
-
+      <View
+        style={{
+          flexDirection: "column",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          height: "30%",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "20%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          onPress={() => props.navigation.navigate("FriendsSearch")}
+        >
+          <Ionicons name="md-person-add" size={28} color="#20365F" />
+          <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
+            Add Friends
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "20%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          onPress={() => props.navigation.navigate("FriendsRequest")}
+        >
+          <FontAwesome name="users" size={24} color="#20365F" />
+          {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
+          <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
+            Friends Requests
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {editMode ? (
+        <TouchableOpacity
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => setEditMode(false)}
+        >
+          <AntDesign name="checkcircle" size={24} color="#3ea3a3" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={{
+            // width: "15%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => setEditMode(true)}
+        >
+          <FontAwesome5 name="edit" size={24} color="#fff" />
+          {/* <Text>Edit</Text> */}
+        </TouchableOpacity>
+      )}
       {friends.length > 0 ? (
         <SafeAreaView
           style={{
@@ -525,7 +596,6 @@ export default function FriendsList(props) {
           </Text>
         </View>
       )}
-
       {editMode && (
         <Button
           title="Delete All My Friends"
@@ -536,59 +606,6 @@ export default function FriendsList(props) {
           color="red"
         />
       )}
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 100,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
-        onPress={() => props.navigation.navigate("FriendsSearch")}
-      >
-        <Ionicons name="md-person-add" size={28} color="#20365F" />
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Add Friends
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 30,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 50,
-        }}
-        onPress={() => props.navigation.navigate("FriendsRequest")}
-      >
-        <FontAwesome name="users" size={24} color="#20365F" />
-        {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Friends Requests
-        </Text>
-      </TouchableOpacity>
-
       {/* ---------------------------------MODAL--------------------------------- */}
       <Modal transparent={true} visible={modal} animationType="slide">
         <View
@@ -688,24 +705,24 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: "15%",
-    backgroundColor: "#20365F",
+    //   paddingTop: "15%",
+    backgroundColor: "#fff",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#000",
+    paddingBottom: 10,
+  },
+  inputStyle: {
+    flex: 1,
   },
 });
 
 FriendsList.navigationOptions = {
-  //   title: "News ",
-  // headerStyle: {
-  //       backgroundColor: '#20365F',
-  //   },
-  //   headerTintColor: '#fff',
-  //   headerTitleStyle: {
-  //       fontWeight: 'bold',
-  //   },
-  //   tabBarIcon: () => {
-  //     <Icon name="news" type="font-awesome" size={24} color={"black"} />;
-  //   },
-  header: null,
+  //header: null,
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
   tabBarIcon: () => {
     <Icon name="news" type="font-awesome" size={24} color={"black"} />;
   },
