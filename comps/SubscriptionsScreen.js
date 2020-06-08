@@ -19,8 +19,10 @@ export default function SubscriptionsScreen(props) {
   let pickerRef = null;
   const [valueText, setValueText] = useState("");
   const [userSubscription, setUserSubscription] = useState();
-  const subscriptionLevel = ["gold", "silver", "bronze"];
+  const subscriptionLevel = ["gold", "sliver", "bronze"];
   const [flag, setFlag] = useState(true);
+  const [subscription, setSubscription] = useState();
+  const [paymentFlag, setPaymentFlag] = useState(true);
   console.log("user from referrel ", userSubscription);
 
   useEffect(() => {
@@ -32,20 +34,30 @@ export default function SubscriptionsScreen(props) {
           const endDate = doc.data().endDate.toDate();
           if (endDate > new Date()) {
             setUserSubscription({ id: doc.id, ...doc.data() });
+            setSubscription({ id: doc.id, ...doc.data() });
           }
         });
       });
   }, []);
 
+  const process = () => {
+    if (valueText === "") {
+      alert("Select level");
+    } else {
+      setPaymentFlag(!paymentFlag);
+    }
+  };
+
   const subscribe = async (type) => {
-    let sub = {
+    console.log("subs: ", userSubscription);
+    const sub = {
       gold: {
         type: "gold",
         startDate: new Date(),
         endDate: new Date(moment().add(1, "month").calendar()),
       },
-      silver: {
-        type: "silver",
+      sliver: {
+        type: "sliver",
         startDate: new Date(),
         endDate: new Date(moment().add(1, "month").calendar()),
       },
@@ -55,26 +67,39 @@ export default function SubscriptionsScreen(props) {
         endDate: new Date(moment().add(1, "month").calendar()),
       },
     };
+
     if (type === "updateSub") {
       db.collection("users")
         .doc(firebase.auth().currentUser.uid)
         .collection("subscription")
-        .doc(userSubscription.id)
+        .doc(subscription.id)
         .update({
           endDate: new Date(),
         });
       console.log(valueText);
       if (valueText === "gold") {
+        const decrement = firebase.firestore.FieldValue.increment(-50);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
           .add(sub.gold);
-      } else if (valueText === "silver") {
+      } else if (valueText === "sliver") {
+        const decrement = firebase.firestore.FieldValue.increment(-20);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
-          .add(sub.silver);
+          .add(sub.sliver);
       } else if (valueText === "bronze") {
+        const decrement = firebase.firestore.FieldValue.increment(-10);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
@@ -83,16 +108,28 @@ export default function SubscriptionsScreen(props) {
     }
     if (type === "new") {
       if (valueText === "gold") {
+        const decrement = firebase.firestore.FieldValue.increment(-50);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
           .add(sub.gold);
-      } else if (valueText === "silver") {
+      } else if (valueText === "sliver") {
+        const decrement = firebase.firestore.FieldValue.increment(-20);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
-          .add(sub.silver);
+          .add(sub.sliver);
       } else if (valueText === "bronze") {
+        const decrement = firebase.firestore.FieldValue.increment(-10);
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({ balance: decrement });
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
@@ -116,64 +153,93 @@ export default function SubscriptionsScreen(props) {
             borderColor: "darkgray",
           }}
         >
-          {userSubscription === undefined ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "baseline",
-              }}
-            >
-              <ScrollView>
-                <View>
-                  <Text>Selected Level: {valueText}</Text>
-                  {Platform.OS === "ios" ? (
-                    <View>
-                      <TouchableOpacity
-                        style={{
-                          paddingVertical: 10,
-                        }}
-                        onPress={() => {
-                          pickerRef.show();
-                        }}
+          {!userSubscription ? (
+            paymentFlag === true ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "baseline",
+                }}
+              >
+                <ScrollView>
+                  <View>
+                    <Text>Selected Level: {valueText}</Text>
+                    {Platform.OS === "ios" ? (
+                      <View>
+                        <TouchableOpacity
+                          style={{
+                            paddingVertical: 10,
+                          }}
+                          onPress={() => {
+                            pickerRef.show();
+                          }}
+                        >
+                          <Text>Select subscription level</Text>
+                        </TouchableOpacity>
+                        <ReactNativePickerModule
+                          pickerRef={(e) => (pickerRef = e)}
+                          title={"Select a subscription level"}
+                          items={subscriptionLevel}
+                          onDismiss={() => {
+                            console.log("onDismiss");
+                          }}
+                          onCancel={() => {
+                            console.log("Cancelled");
+                          }}
+                          onValueChange={(valueText, index) => {
+                            setValueText(valueText);
+                          }}
+                        />
+                      </View>
+                    ) : (
+                      <Picker
+                        selectedValue={valueText}
+                        style={{ height: 50, width: 150 }}
+                        onValueChange={(item, itemIndex) => setValueText(item)}
                       >
-                        <Text>Select subscription level</Text>
-                      </TouchableOpacity>
-                      <ReactNativePickerModule
-                        pickerRef={(e) => (pickerRef = e)}
-                        title={"Select a subscription level"}
-                        items={subscriptionLevel}
-                        onDismiss={() => {
-                          console.log("onDismiss");
-                        }}
-                        onCancel={() => {
-                          console.log("Cancelled");
-                        }}
-                        onValueChange={(valueText, index) => {
-                          setValueText(valueText);
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <Picker
-                      selectedValue={valueText}
-                      style={{ height: 50, width: 150 }}
-                      onValueChange={(item, itemIndex) => setValueText(item)}
-                    >
-                      {subscriptionLevel.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
-                      ))}
-                    </Picker>
-                  )}
+                        {subscriptionLevel.map((item, index) => (
+                          <Picker.Item key={index} label={item} value={item} />
+                        ))}
+                      </Picker>
+                    )}
 
-                  {valueText === "bronze" ? (
-                    <Text>this level will gives you: 3 </Text>
-                  ) : valueText === "silver" ? (
-                    <Text>this level will gives you: 5</Text>
-                  ) : valueText === "gold" ? (
-                    <Text>this level will gives you: 10</Text>
-                  ) : null}
-                </View>
+                    {valueText === "bronze" ? (
+                      <Text>this level will gives you: 3 price : 10</Text>
+                    ) : valueText === "sliver" ? (
+                      <Text>this level will gives you: 5 price : 20</Text>
+                    ) : valueText === "gold" ? (
+                      <Text>this level will gives you: 10 price : 50</Text>
+                    ) : null}
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 10,
+                    }}
+                    onPress={() => {
+                      process();
+                    }}
+                  >
+                    <Text>subscribe now and pay</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              </View>
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "baseline",
+                }}
+              >
+                <Text>Payment</Text>
+                {valueText === "bronze" ? (
+                  <Text>this level will gives you: 3 price : 10</Text>
+                ) : valueText === "sliver" ? (
+                  <Text>this level will gives you: 5 price : 20</Text>
+                ) : valueText === "gold" ? (
+                  <Text>this level will gives you: 10 price : 50</Text>
+                ) : null}
                 {flag === true ? (
                   <TouchableOpacity
                     style={{
@@ -197,8 +263,8 @@ export default function SubscriptionsScreen(props) {
                     <Text>subscribe now</Text>
                   </TouchableOpacity>
                 )}
-              </ScrollView>
-            </View>
+              </View>
+            )
           ) : (
             <View
               style={{
