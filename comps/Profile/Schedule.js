@@ -160,9 +160,12 @@ export default function Schedule(props) {
         <View>
           <Text>My services </Text>
           {user.services &&
-            services &&
+            services.length > 0 &&
             user.services.map((service) => (
-              <Text>{services.filter((s) => s.id === service)[0].name}</Text>
+              <Text>
+                {services.filter((s) => s.id === service).length > 0 &&
+                  services.filter((s) => s.id === service)[0].name}
+              </Text>
             ))}
         </View>
 
