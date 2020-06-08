@@ -159,11 +159,11 @@ export default function Schedule(props) {
         <Text>Schedule</Text>
         <View>
           <Text>My services </Text>
-          {user.services &&
+          {/* {user.services &&
             services &&
             user.services.map((service) => (
               <Text>{services.filter((s) => s.id === service)[0].name}</Text>
-            ))}
+            ))} */}
         </View>
 
         <DatePicker

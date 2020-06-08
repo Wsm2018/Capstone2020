@@ -1,4 +1,4 @@
-//@refresh reset
+
 import { Button } from "react-native-elements"
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from 'react-navigation-stack';
@@ -13,7 +13,8 @@ import {
     TouchableOpacity,
     View,
     Modal,
-    CheckBox
+    CheckBox,
+    Dimensions
 } from "react-native";
 
 
@@ -243,181 +244,458 @@ export default function AssetManagement(props) {
         setColor()
         setLong(0.0)
         setLat(0.0)
+        setUri()
     }
 
     return (
         <ScrollView>
 
-            <Text>Asset Managment</Text>
-            {
-                types && !selectedType ?
-                    <View>{
-                        types.map(t =>
-                            <TouchableOpacity onPress={() =>
-                                setSelectedType(t) ||
-                                setShowAddType(false) ||
-                                setName(t.name) ||
-                                setAssetIcon(t.assetIcon) ||
-                                setSectionIcon(t.sectionIcon) ||
-                                setShowInMap(t.showInMap) ||
-                                setTitle(t.title)
-                            }><Text>{t.name}</Text></TouchableOpacity>
-                        )
-                    }
-                    </View>
-                    :
-                    null
-            }
+            <View style={styles.two}>
+                <View style={{ flexDirection: "row" }}>
+                    <Text style={styles.cardTitle}>Asset Types</Text>
+                    <MaterialCommunityIcons
+                        name={"plus-box"}
+                        size={25}
+                        color={"#609e9f"}
+                        onPress={() => setShowAddType(true)}
+
+                    />
+
+                </View>
+
+
+                {
+                    types ?
+                        <View style={{
+                            width: "100%", flexDirection: "row",
+                            flexWrap: "wrap"
+                        }}>
+                            {
+
+                                types.map(t =>
+                                    <View style={{
+                                        //width: "20%",
+                                        borderColor: "#CCD1D1",
+                                        alignItems: "center",
+                                        borderWidth: 1,
+                                        margin: "4%",
+                                        padding: 4
+                                    }}>
+                                        <TouchableOpacity onPress={() =>
+                                            setSelectedType(t) ||
+                                            setShowAddType(false) ||
+                                            setName(t.name) ||
+                                            setAssetIcon(t.assetIcon) ||
+                                            setSectionIcon(t.sectionIcon) ||
+                                            setShowInMap(t.showInMap) ||
+                                            setTitle(t.title)
+                                        }>
+                                            <Image
+                                                style={{ width: 130, height: 130, marginLeft: "auto", marginRight: "auto" }}
+                                                source={{ uri: t.image }}
+                                            />
+                                            <Text style={styles.names}>{t.name}</Text>
+                                        </TouchableOpacity>
+
+                                    </View>
+                                )
+                            }
+
+                        </View>
+                        :
+                        null
+                }
+
+            </View>
+
 
             {
                 selectedType && sections ?
-                    <View>
-                        {
-                            sections.map(t =>
-                                t.assetType == selectedType.id ?
-                                    <TouchableOpacity onPress={() => setSelectedSection(t) }><Text>{t.name}</Text></TouchableOpacity>
-                                    :
-                                    null
+                    <View style={styles.details}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{
+                                fontSize: 18,
+                                // backgroundColor: "red",
+                                width: "60%",
+                                height: 50,
+                                color: "gray",
+                            }}>{selectedType.name} Details</Text>
 
-                            )}
+                            <View style={{
+                                flexDirection: "row",
+                                //backgroundColor: "blue" ,
+                                width: "100%"
+                            }}>
+                                <MaterialCommunityIcons
+                                    name={"delete"}
+                                    size={20}
+                                    color={"#609e9f"}
+                                    //onPress={() => handleDelete("assetTypes", selectedType.id)}
+                                    style={{ width: "15%" }}
+                                />
+                                <MaterialCommunityIcons
+                                    name={"square-edit-outline"}
+                                    size={20}
+                                    color={"#609e9f"}
+                                    onPress={() => setShowEditType(true)}
+                                    style={{ width: "15%" }}
+                                />
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#901616"}
+                                    onPress={() => setSelectedType() || setSelectedSection() || setSelectedAsset()}
+                                    style={{ width: "15%" }}
+                                />
+                            </View>
 
-                <Button title="Add Section" onPress={() => setShowAddSection(true)} />
-                <Button title="Manage Services" onPress={() => props.navigation.navigate("ServiceManagement", {assetType: selectedType})} />
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Name</Text>
+                            <Text>{selectedType.name}</Text>
+                        </View>
 
-                    </View>
-                    :
-                    null
-            }
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Title</Text>
+                            <Text>{selectedType.Title}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Section Icon</Text>
+                            <Text>{selectedType.sectionIcon}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Asset Icon</Text>
+                            <Text>{selectedType.assetIcon}</Text>
+                        </View>
 
-            {
-                selectedSection && assets ?
-                    <View>
-                        {
-                            assets.map(t =>
-                                t.assetSection == selectedSection.id ?
-                                    <TouchableOpacity onPress={() => setSelectedAsset(t)}><Text>{t.code}</Text></TouchableOpacity>
-                                    :
-                                    null
-                            )}
-                        <Button title={"Edit " + selectedSection.name} onPress={() =>
-                            setShowEditSection(true) ||
-                            setName(selectedSection.name)
-                        } />
-                        <Button title={"Delete " + selectedSection.name} onPress={() => handleDelete("assetSections", selectedSection.id)} />
-                        <Button title={"Add " + selectedSection.name} onPress={() => setShowAddAsset(true)} />
-                    </View>
-                    :
-                    null
-            }
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Show In Map</Text>
+                            <MaterialCommunityIcons
+                                name={selectedType.showInMap ? "check" : "close"}
+                                size={30}
+                                color={selectedType.showInMap ? "#2ECC71" : "#20365F"}
+                            />
+                        </View>
+                        <View style={{ width: "40%", marginTop: "2%" }}>
+                            <Button title="Manage Services" onPress={() => props.navigation.navigate("ServiceManagement", { assetType: selectedType })} />
+                        </View>
 
 
-            {
-                selectedSection || selectedType ?
-                    <Button title={"Go Back"} onPress={() => setSelectedType() || setSelectedSection()} />
-                    :
-                    null
-            }
+                        <View style={styles.two2}>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.cardTitle}>{selectedType.name} Sections</Text>
 
-            {
-                selectedAsset ?
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
-                    >
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                {
-                                    showEditAsset ?
-                                        <View>
-                                            <TextInput
-                                                onChangeText={setName}
-                                                placeholder="Name"
-                                                value={name}
-                                            />
-                                            <TextInput
-                                                onChangeText={setCode}
-                                                placeholder="code"
-                                                value={code}
-                                            />
-                                            <TextInput
-                                                onChangeText={setPrice}
-                                                placeholder="Price"
-                                                value={price}
-                                            />
-                                            <TextInput
-                                                onChangeText={setType}
-                                                placeholder="Type"
-                                                value={type}
-                                            />
-                                            <TextInput
-                                                onChangeText={setNumOfPeople}
-                                                placeholder="Number of people"
-                                                value={numOfPeople}
-                                            />
-                                            <TextInput
-                                                onChangeText={setLocation}
-                                                placeholder="Name"
-                                                value={location}
-                                            />
-                                            <TextInput
-                                                onChangeText={setDescription}
-                                                placeholder="Description"
-                                                value={description}
-                                            />
+                                <MaterialCommunityIcons
+                                    name={"plus-box"}
+                                    size={25}
+                                    color={"#609e9f"}
+                                    onPress={() => setShowAddSection(true)}
+                                    style={{ position: "absolute", left: "100%" }}
+                                />
 
-                                            <Button title="Edit" onPress={() => handleEdit("assets", {
-                                                assetSection: selectedSection.id,
-                                                name,
-                                                code,
-                                                rate: 0,
-                                                price,
-                                                status: false,
-                                                lock: false,
-                                                numOfPeople,
-                                                location,
-                                                description,
-                                                type
-                                            }, selectedAsset.id)
-
-                                            } />
-                                            <Button title="Cancel" onPress={() => setShowEditAsset(false) || cancelAll()} />
+                            </View>
+                            {
+                                sections.map((t, i) =>
+                                    t.assetType == selectedType.id ?
+                                        <View style={{ width: "33%", alignItems: "center" }} key={i}>
+                                            <TouchableOpacity
+                                                onPress={() => setSelectedSection(t)}
+                                                style={{
+                                                    backgroundColor:
+                                                        selectedSection === t ? "#20365F" : "#e3e3e3",
+                                                    width: 100,
+                                                    height: 100,
+                                                    margin: 5,
+                                                    alignItems: "center",
+                                                    flexDirection: "row",
+                                                    //elevation: 12,
+                                                    borderWidth: 2,
+                                                    borderColor: "#20365F",
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        // height: "20%",
+                                                        width: "100%",
+                                                        justifyContent: "center",
+                                                        textAlign: "center",
+                                                        alignContent: "center",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <MaterialCommunityIcons
+                                                        name={selectedType.sectionIcon}
+                                                        size={40}
+                                                        color={selectedSection === t ? "white" : "#20365F"}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            textAlign: "center",
+                                                            color: selectedSection === t ? "white" : "#20365F",
+                                                            fontSize: 20,
+                                                        }}
+                                                    >
+                                                        {t.name}
+                                                    </Text>
+                                                </View>
+                                            </TouchableOpacity>
                                         </View>
 
                                         :
-                                        <View>
-                                            <Text>{selectedAsset.name ? selectedAsset.name : null}</Text>
-                                            <Text>{selectedAsset.price ? selectedAsset.price : null}</Text>
-                                            {selectedAsset.location? 
-                                            <View>
-                                            <Text>{selectedAsset.location.longitude}</Text>
-                                            <Text>{selectedAsset.location.latitude}</Text>
-                                            </View>
-                                             : null}
-                                            <Text>{ selectedType.name }</Text>
-                                            <Text>{selectedAsset.numOfPeople ? selectedAsset.numOfPeople : null}</Text>
-                                            <Text>{selectedAsset.description ? selectedAsset.description : null}</Text>
+                                        null
 
-                                            <TouchableOpacity onPress={() => setShowEditAsset(true) ||
-                                                setName(selectedAsset.name) ||
-                                                setPrice(selectedAsset.price) ||
-                                                setLocation(selectedAsset.location) ||
-                                                setDescription(selectedAsset.description) ||
-                                                setType(selectedAsset.type) ||
-                                                setCode(selectedAsset.code) ||
-                                                setNumOfPeople(selectedAsset.numOfPeople)
-                                            } ><Text>Edit</Text></TouchableOpacity>
-                                            <TouchableOpacity onPress={() => setSelectedAsset() || setName()}><Text>Back</Text></TouchableOpacity>
-                                            <TouchableOpacity onPress={() => handleDelete("assets", selectedAsset.id)}><Text>Delete</Text></TouchableOpacity>
-                                        </View>
-                                }
+                                )}
+                        </View>
+                    </View>
+                    :
+                    null
+            }
+
+
+            {
+                selectedSection && assets ?
+                    <View style={styles.three}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{
+                                fontSize: 18,
+                                // backgroundColor: "red",
+                                width: "60%",
+                                height: 50,
+                                color: "gray",
+                            }}>{selectedSection.name} Details</Text>
+
+
+                            {/* <View style={{
+                                flexDirection: "row",
+                                backgroundColor: "blue" ,
+                                //width: "100%"
+                            }}> */}
+
+                            <MaterialCommunityIcons
+                                name={"delete"}
+                                size={20}
+                                color={"#20365F"}
+                                // onPress={() => handleDelete("assetSections", selectedSection.id)}
+                                // style={{ marginRight: "5%" }}
+                                style={{ width: "15%" }}
+                            />
+
+                            <MaterialCommunityIcons
+                                name={"square-edit-outline"}
+                                size={20}
+                                color={"#20365F"}
+                                onPress={() => setShowEditSection(true) ||
+                                    setName(selectedSection.name)}
+                                style={{ width: "15%" }}
+                            />
+
+
+                            <MaterialCommunityIcons
+                                name={"close"}
+                                size={20}
+                                color={"#901616"}
+                                onPress={() => setSelectedSection() || setSelectedAsset()}
+                                //style={{ marginRight: "5%" }}
+                                style={{ width: "15%" }}
+                            />
+
+                            {/* </View> */}
+
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Name</Text>
+                            <Text style={{ width: "70%" }}>{selectedSection.name}</Text>
+                        </View>
+
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Color</Text>
+                            <View style={{ width: "70%" }}>
+                                <Text style={{ width: "10%", backgroundColor: selectedSection.color }}></Text>
+                            </View>
+
+
+                        </View>
+                        {selectedSection.location ?
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Location</Text>
+
+                                <Text style={{ width: "30%" }}>Longitude {selectedSection.location.longitude}</Text>
+                                <Text style={{ width: "30%" }}>Latitude {selectedSection.location.latitude}</Text>
 
 
                             </View>
+                            : null}
+
+
+                        <View style={styles.two2}>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.cardTitle}>{selectedSection.name} {selectedType.name}s</Text>
+
+                                <MaterialCommunityIcons
+                                    name={"plus-box"}
+                                    size={25}
+                                    color={"#609e9f"}
+                                    onPress={() => setShowAddAsset(true)}
+                                    style={{ position: "absolute", left: "100%" }}
+                                />
+
+                            </View>
+
+                            {
+
+                                assets.map((t, i) =>
+                                    t.assetSection == selectedSection.id ?
+                                        <View key={i}>
+                                            <TouchableOpacity
+                                                onPress={() => setSelectedAsset(t)}
+                                                style={{
+                                                    backgroundColor:
+                                                        selectedSection === t ? "#20365F" : "#e3e3e3",
+                                                    width: 80,
+                                                    height: 80,
+                                                    margin: 5,
+                                                    alignItems: "center",
+                                                    flexDirection: "row",
+                                                    //elevation: 12,
+                                                    borderWidth: 2,
+                                                    borderColor: "#20365F",
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        // height: "20%",
+                                                        width: "100%",
+                                                        justifyContent: "center",
+                                                        textAlign: "center",
+                                                        alignContent: "center",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <MaterialCommunityIcons
+                                                        name={selectedType.assetIcon}
+                                                        size={40}
+                                                        color={"#20365F"}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            textAlign: "center",
+                                                            color: "#20365F",
+                                                            fontSize: 20,
+                                                        }}
+                                                    >
+                                                        {t.code}
+                                                    </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        </View>
+                                        :
+                                        null
+                                )}
+
                         </View>
-                    </Modal>
+                    </View>
+                    :
+                    null
+            }
+
+
+
+
+            {
+                selectedAsset ?
+                    <View style={styles.details}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{
+                                fontSize: 18,
+                                // backgroundColor: "red",
+                                width: "60%",
+                                height: 50,
+                                color: "gray",
+                            }}>{selectedAsset.code} Details</Text>
+
+                            <View style={{
+                                flexDirection: "row",
+                                //backgroundColor: "blue" ,
+                                width: "100%"
+                            }}>
+                                <MaterialCommunityIcons
+                                    name={"delete"}
+                                    size={20}
+                                    color={"#20365F"}
+                                    //onPress={() => handleDelete("assets", selectedAsset.id)}
+                                    style={{ width: "15%" }}
+                                />
+                                <MaterialCommunityIcons
+                                    name={"square-edit-outline"}
+                                    size={20}
+                                    color={"#20365F"}
+                                    onPress={() => setShowEditAsset(true) ||
+                                        setName(selectedAsset.name) ||
+                                        setPrice(selectedAsset.price) ||
+                                        setLocation(selectedAsset.location) ||
+                                        setDescription(selectedAsset.description) ||
+                                        setType(selectedAsset.type) ||
+                                        setCode(selectedAsset.code) ||
+                                        setNumOfPeople(selectedAsset.numOfPeople)
+                                    }
+                                    style={{ width: "15%" }}
+                                />
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#901616"}
+                                    onPress={() => setSelectedAsset()}
+                                    style={{ width: "15%" }}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Code</Text>
+                            <Text style={{ width: "70%" }} >{selectedAsset.code}</Text>
+                        </View>
+
+
+
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Name</Text>
+                            <Text style={{ width: "70%" }}>{selectedType.name}</Text>
+                        </View>
+
+
+
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Price Per Hour</Text>
+                            <Text style={{ width: "70%" }}>{selectedAsset.price} QR</Text>
+                        </View>
+
+                        {selectedAsset.numOfPeople ?
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Number Of People</Text>
+                                <Text>{selectedAsset.numOfPeople}</Text>
+                            </View>
+                            : null}
+
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.listNames}>Description</Text>
+                            <Text style={{ width: "70%" }}>{selectedAsset.description ? selectedAsset.description : null}</Text>
+                        </View>
+
+                        {selectedAsset.location ?
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Location</Text>
+
+                                <Text style={{ width: "30%" }}>Longitude {selectedAsset.location.longitude}</Text>
+                                <Text style={{ width: "30%" }}>Latitude {selectedAsset.location.latitude}</Text>
+
+
+                            </View>
+                            : null}
+
+                    </View>
+
                     :
 
                     null
@@ -435,70 +713,130 @@ export default function AssetManagement(props) {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                <TextInput
-                                    onChangeText={setName}
-                                    placeholder="Name"
-                                    value={name}
-                                />
-                                <TextInput
-                                    onChangeText={setTitle}
-                                    placeholder="Name"
-                                    value={title}
+
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#ABB2B9"}
+                                    onPress={() => setShowInMap(false) || setShowAddType(false) || setShowEditType(false) || setName()}
+                                    style={{ position: "absolute", left: "110%", marginTop: "4%" }}
                                 />
 
-                                <Text>Show In Map</Text>
-                                <CheckBox
-                                    value={showInMap}
-                                    onValueChange={() => setShowInMap(!showInMap)}
-                                />
-                                <Text>Location</Text>
-                                <Text>Longitude</Text>
-                                <TextInput
-                                    onChangeText={setLong}
-                                    placeholder="Longitude"
-                                    value={long}
-                                />
-                                <Text>Latitude</Text>
-                                <TextInput
-                                    onChangeText={setLat}
-                                    placeholder="Latitude"
-                                    value={lat}
-                                />
-
-                                <TouchableOpacity onPress={() => setOpenSectionIcon(true)}>
-                                    <Text>Section Icon</Text>
-                                    <MaterialCommunityIcons
-                                        name={sectionIcon ? sectionIcon : "help"}
-                                        size={30}
-                                        color={"#20365F"}
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Name</Text>
+                                    <TextInput
+                                        onChangeText={setName}
+                                        placeholder="Name"
+                                        value={name}
+                                        style={styles.textInputs}
                                     />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={() => setOpenAssetIcon(true)}>
-                                    <Text>Asset Icon</Text>
-                                    <MaterialCommunityIcons
-                                        name={assetIcon ? assetIcon : "help"}
-                                        size={30}
-                                        color={"#20365F"}
-
-                                    />
-                                </TouchableOpacity>
-                                <View
-                                    style={{ width: "30%" }}
-                                >
-                                    <Button title="Pick Image" onPress={handlePickImage} />
                                 </View>
-                                <TouchableOpacity onPress={() => handleType({ name, sectionIcon, assetIcon, showInMap, title })} disabled={!name || !sectionIcon || !uri || !assetIcon}><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity>
-                                <TouchableOpacity onPress={() => setShowInMap(false) || setShowAddType(false) || setShowEditType(false) || setName()}><Text>Cancel</Text></TouchableOpacity>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Title</Text>
+                                    <TextInput
+                                        onChangeText={setTitle}
+                                        placeholder="Name"
+                                        value={title}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
+
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Show In Map</Text>
+                                    <CheckBox
+                                        value={showInMap}
+                                        onValueChange={() => setShowInMap(!showInMap)}
+                                        style={{
+                                            width: "70%",
+                                            borderWidth: 1,
+                                            borderColor: "#0E6655",
+                                            padding: 5,
+                                            margin: "1%",
+                                        }}
+                                    />
+
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+
+                                    <Text style={styles.inputTitles}>Section Icon</Text>
+                                    <TouchableOpacity style={{ width: "70%", margin: "1%" }} onPress={() => setOpenSectionIcon(true)}>
+                                        <MaterialCommunityIcons
+                                            name={sectionIcon ? sectionIcon : "help"}
+                                            size={30}
+                                            color={"#20365F"}
+                                            style={{
+                                                width: "100%",
+                                                // borderWidth: 1,
+                                                //borderColor: "#0E6655",
+                                                padding: 5,
+                                                margin: "1%",
+                                            }}
+                                        />
+                                    </TouchableOpacity>
+
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+
+                                    <Text style={styles.inputTitles}>Asset Icon</Text>
+                                    <TouchableOpacity style={{ width: "70%", margin: "1%" }} onPress={() => setOpenAssetIcon(true)}>
+                                        <MaterialCommunityIcons
+                                            name={assetIcon ? assetIcon : "help"}
+                                            size={30}
+                                            color={"#20365F"}
+                                            style={{
+                                                width: "100%",
+                                                // borderWidth: 1,
+                                                //borderColor: "#0E6655",
+                                                padding: 5,
+                                                margin: "1%",
+                                            }}
+
+                                        />
+                                    </TouchableOpacity>
+
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <View style={{ width: "35%", marginTop: "auto", marginBottom: "auto" }}>
+                                        <Button title="Pick Image" onPress={handlePickImage} />
+                                    </View>
+                                    <View style={{ width: "70%", margin: "2%" }}>
+                                        {
+                                            uri ?
+                                                <Image
+                                                    style={{ width: "100%", height: 130, marginLeft: "auto", marginRight: "auto", margin: "2%" }}
+                                                    source={{ uri: uri }}
+                                                />
+                                                :
+                                                <Text style={{ margin: "1%", width: "100%", width: 130, height: 130, borderWidth: 1, borderColor: "#566573", backgroundColor: "#EAECEE" }}></Text>
+
+                                        }
+                                    </View>
+
+                                </View>
+
+
+
+
+                                {/* <TouchableOpacity  ><Text>{showAddType ? "Add" : "Edit"}</Text></TouchableOpacity> */}
+                                {/**disabled={!name || !sectionIcon || !uri || !assetIcon} */}
+                                <MaterialCommunityIcons
+                                    name={showAddType ? "plus-circle-outline" : "square-edit-outline"}
+                                    size={30}
+                                    color={"#609e9f"}
+                                    onPress={() => handleType({ name, sectionIcon, assetIcon, showInMap, title })}
+                                    style={{ marginBottom: "4%" }}
+                                />
                             </View>
                         </View>
                     </Modal>
-                    :
 
-                    !selectedType ?
-                        <Button title="+" onPress={() => setShowAddType(true)} />
-                        :
-                        null
+                    :
+                    null
             }
 
             {
@@ -512,46 +850,92 @@ export default function AssetManagement(props) {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                <TextInput
-                                    onChangeText={setName}
-                                    placeholder="Name"
-                                    value={name}
-                                />
-                                <Text>Location</Text>
-                                <Text>Longitude</Text>
-                                <TextInput
-                                    onChangeText={setLong}
-                                    placeholder="Longitude"
-                                    value={long}
-                                />
-                                <Text>Latitude</Text>
-                                <TextInput
-                                    onChangeText={setLat}
-                                    placeholder="Latitude"
-                                    value={lat}
+
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#ABB2B9"}
+                                    onPress={() => setShowAddSection(false) || setShowEditSection(false) || cancelAll()}
+                                    style={{ position: "absolute", left: "110%", marginTop: "4%" }}
                                 />
 
-                                <TouchableOpacity
-                                    style={{
-                                        width: "20%",
-                                        height: "20%",
-                                        alignItems: "center",
-                                        marginBottom: 15,
-                                        borderColor: color ? `#${color}` : "black",
-                                        borderWidth: 1,
-                                        backgroundColor: color ? `#${color}` : "white"
-                                    }}
-                                    onPress={() => setShowColorPicker(true)}
-                                >
-                                    <Text>Section Color</Text>
-                                </TouchableOpacity>
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Name</Text>
+                                    <TextInput
+                                        onChangeText={setName}
+                                        placeholder="Name"
+                                        value={name}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
 
-                                <Button title={showAddSection ? "Add" : "Edit"} onPress={() =>
-                                    showAddSection ? handleAdd("assetSections", { assetType: selectedType.id, name, color, location: { Latitude: lat, Longitude: long } })
-                                        :
-                                        handleEdit("assetSections", { name, assetType: selectedType.id }, selectedSection.id)} disabled={!name} />
-                                <Button title="Cancel" onPress={() => setShowAddSection(false) || setShowEditSection(false) || cancelAll()} />
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%", height: "15%" }}>
+                                    <Text style={styles.inputTitles}>Section Color</Text>
+                                    <View style={{ width: "70%", margin: "1%", }}>
+                                        <TouchableOpacity
+                                            style={{
+                                                borderColor: "yellow",
+                                                width: "20%",
+                                                height: "80%",
+                                                //marginBottom:"auto",
+                                                //marginTop:"auto",
+                                                //alignItems: "center",
+                                                //marginBottom: 15,
+                                                borderColor: color ? `#${color}` : "black",
+                                                borderWidth: 1,
+                                                backgroundColor: color ? `#${color}` : "white"
+                                            }}
+                                            onPress={() => setShowColorPicker(true)}
+                                        >
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Location</Text>
+                                    <View style={{ width: "70%", margin: "1%" }}>
+                                        <Text>Longitude</Text>
+                                        <TextInput
+                                            onChangeText={setLong}
+                                            placeholder="Longitude"
+                                            value={long}
+                                            style={{
+                                                borderWidth: 1,
+                                                borderColor: "#D4EFDF",
+                                                padding: 5,
+                                                margin: "1%", width: "100%"
+                                            }}
+                                        />
+                                        <Text>Latitude</Text>
+                                        <TextInput
+                                            onChangeText={setLat}
+                                            placeholder="Latitude"
+                                            value={lat}
+                                            style={{
+                                                width: "100%", borderWidth: 1,
+                                                borderColor: "#D4EFDF",
+
+                                                padding: 5,
+                                                margin: "1%",
+                                            }}
+                                        />
+                                    </View></View>
+                                <MaterialCommunityIcons
+                                    name={showAddSection ? "plus-circle-outline" : "square-edit-outline"}
+                                    size={30}
+                                    color={"#609e9f"}
+                                    onPress={() =>
+                                        showAddSection ? handleAdd("assetSections", { assetType: selectedType.id, name, color, location: { Latitude: lat, Longitude: long } })
+                                            :
+                                            handleEdit("assetSections", { name, assetType: selectedType.id }, selectedSection.id)} disabled={!name}
+                                // style={{ position: "absolute", left: "110%", marginTop: "4%" }}
+                                />
+
+
                             </View>
+
+
                         </View>
                     </Modal>
                     :
@@ -560,7 +944,7 @@ export default function AssetManagement(props) {
 
 
             {
-                showAddAsset ?
+                showAddAsset || showEditAsset ?
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -570,51 +954,140 @@ export default function AssetManagement(props) {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                <TextInput
-                                    onChangeText={setName}
-                                    placeholder="Name"
-                                    value={name}
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#ABB2B9"}
+                                    onPress={() => setShowAddAsset(false) || cancelAll()}
+                                    style={{ position: "absolute", left: "110%", marginTop: "4%" }}
                                 />
-                                <TextInput
-                                    onChangeText={setCode}
-                                    placeholder="code"
-                                    value={code}
-                                />
-                                <TextInput
-                                    onChangeText={setPrice}
-                                    placeholder="Price"
-                                    value={price}
-                                />
-                                <TextInput
-                                    onChangeText={setType}
-                                    placeholder="Type"
-                                    value={type}
-                                />
-                                <TextInput
-                                    onChangeText={setNumOfPeople}
-                                    placeholder="Number of people"
-                                    value={numOfPeople}
-                                />
-                                <Text>Location</Text>
-                                <Text>Longitude</Text>
-                                <TextInput
-                                    onChangeText={setLong}
-                                    placeholder="Longitude"
-                                    value={long}
-                                />
-                                <Text>Latitude</Text>
-                                <TextInput
-                                    onChangeText={setLat}
-                                    placeholder="Latitude"
-                                    value={lat}
-                                />
-                                <TextInput
-                                    onChangeText={setDescription}
-                                    placeholder="Description"
-                                    value={description}
-                                />
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Name</Text>
+                                    <TextInput
+                                        onChangeText={setName}
+                                        placeholder="Name"
+                                        value={name}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
 
-                                <Button title="Add" onPress={() => handleAdd("assets", {
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Code</Text>
+                                    <TextInput
+                                        onChangeText={setCode}
+                                        placeholder="code"
+                                        value={code}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Price</Text>
+                                    <TextInput
+                                        onChangeText={setPrice}
+                                        placeholder="Price"
+                                        value={price}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Type</Text>
+                                    <TextInput
+                                        onChangeText={setType}
+                                        placeholder="Type"
+                                        value={type}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Number of People</Text>
+                                    <TextInput
+                                        onChangeText={setNumOfPeople}
+                                        placeholder="Number of people"
+                                        value={numOfPeople}
+                                        style={styles.textInputs}
+                                    />
+                                </View>
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Location</Text>
+                                    <View style={{ width: "70%", margin: "1%" }}>
+                                        <Text>Longitude</Text>
+                                        <TextInput
+                                            onChangeText={setLong}
+                                            placeholder="Longitude"
+                                            value={long}
+                                            style={{
+                                                borderWidth: 1,
+                                                borderColor: "#D4EFDF",
+                                                padding: 5,
+                                                margin: "1%", width: "100%"
+                                            }}
+                                        />
+                                        <Text>Latitude</Text>
+                                        <TextInput
+                                            onChangeText={setLat}
+                                            placeholder="Latitude"
+                                            value={lat}
+                                            style={{
+                                                width: "100%", borderWidth: 1,
+                                                borderColor: "#D4EFDF",
+
+                                                padding: 5,
+                                                margin: "1%",
+                                            }}
+                                        />
+                                    </View></View>
+
+                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                    <Text style={styles.inputTitles}>Description</Text>
+                                    <TextInput
+                                        onChangeText={setDescription}
+                                        placeholder="Description"
+                                        value={description}
+                                        style={{borderWidth: 1,
+                                            borderColor: "#D4EFDF",
+                                            width: "70%",
+                                            //height:"150%",
+                                            padding: 5,
+                                            margin: "1%",}}
+                                    />
+                                </View>
+
+                                <MaterialCommunityIcons
+                                    name={showAddAsset ? "plus-circle-outline" : "square-edit-outline"}
+                                    size={30}
+                                    color={"#609e9f"}
+                                    onPress={() => showAddAsset ? handleAdd("assets", {
+                                        assetSection: selectedSection.id,
+                                        name,
+                                        code,
+                                        rate: 0,
+                                        price,
+                                        status: false,
+                                        lock: false,
+                                        numOfPeople,
+                                        location: { Latitude: lat, Longitude: long },
+                                        description,
+                                        type
+                                    }) : handleEdit("assets",{
+                                        assetSection: selectedSection.id,
+                                        name,
+                                        code,
+                                        rate: 0,
+                                        price,
+                                        status: false,
+                                        lock: false,
+                                        numOfPeople,
+                                        location: { Latitude: lat, Longitude: long },
+                                        description,
+                                        type
+                                    } , selectedAsset.id ) }  
+                                    style={{  marginBottom: "4%" }}
+                                />
+                                {/* <Button title="Add" onPress={() => handleAdd("assets", {
                                     assetSection: selectedSection.id,
                                     name,
                                     code,
@@ -626,15 +1099,15 @@ export default function AssetManagement(props) {
                                     location: { Latitude: lat, Longitude: long },
                                     description,
                                     type
-                                })} disabled={!name || !code || !price || !description} />
-                                <Button title="Cancel" onPress={() => setShowAddAsset(false) || cancelAll()} />
+                                })} disabled={!name || !code || !price || !description} /> */}
+
                             </View>
                         </View>
                     </Modal>
                     :
                     null
             }
-            {/*  */}
+
             {
                 openSectionIcon || openAssetIcon ?
                     <Modal
@@ -668,7 +1141,7 @@ export default function AssetManagement(props) {
                                                         <MaterialCommunityIcons
                                                             name={i}
                                                             size={30}
-                                                            color={"#20365F"}
+                                                            color={"#609e9f"}
                                                         />
                                                     </TouchableOpacity>
                                                 </View>
@@ -743,6 +1216,95 @@ AssetManagement.navigationOptions = (props) => ({
 
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#e3e3e3",
+        width: Math.round(Dimensions.get("window").width),
+        // height: Math.round(Dimensions.get("window").height),
+    },
+    header: {
+        flex: 1,
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
+        backgroundColor: "white",
+        // height: "25%",
+    },
+    one: {
+        backgroundColor: "white",
+        width: "100%",
+        // marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+    },
+    two: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    two2: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        //padding: "5%",
+        borderTopWidth: 1,
+        //borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    details: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        //flexDirection: "row",
+        //flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    three: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+    },
+    four: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+    },
+    cardTitle: {
+        fontSize: 18,
+        // backgroundColor: "red",
+        width: "85%",
+        height: 50,
+        color: "gray",
+    },
     centeredView: {
         flex: 1,
         justifyContent: "center",
@@ -754,7 +1316,10 @@ const styles = StyleSheet.create({
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        paddingTop: 35,
+        paddingLeft: 35,
+        paddingRight: 35,
+
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -772,5 +1337,38 @@ const styles = StyleSheet.create({
         padding: 10,
         elevation: 2
     },
-
+    names: {
+        fontSize: 15,
+        // backgroundColor: "red",
+        width: "90%",
+        height: 30,
+        color: "#566573",
+        alignItems: "center",
+        marginLeft: "auto",
+        marginRight: "auto"
+    },
+    listNames: {
+        fontSize: 15,
+        //backgroundColor: "red",
+        width: "30%",
+        height: 30,
+        color: "#566573",
+        alignItems: "center",
+        //marginLeft: "auto",
+        marginRight: "2%"
+    },
+    textInputs: {
+        borderWidth: 1,
+        borderColor: "#D4EFDF",
+        width: "70%",
+        padding: 5,
+        margin: "1%",
+        //backgroundColor: "blue"
+    },
+    inputTitles: {
+        width: "35%",
+        marginBottom: "auto",
+        marginTop: "auto",
+        //backgroundColor:"red"
+    }
 });

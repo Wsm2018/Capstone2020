@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Button, TouchableOpacity, TextInput, Alert, Modal, StyleSheet } from "react-native";
+import { View, Text, Button, TouchableOpacity, TextInput, Alert, Modal, StyleSheet, Dimensions } from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -9,7 +9,7 @@ import Collapsible from 'react-native-collapsible';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function ServiceManagement(props) {
-    const assetType = props.navigation.getParam("assetType", '2pioF3LLXnx2Btr4OJPn');
+    const assetType = props.navigation.getParam("assetType", 'not found');
     //const assetType = { id: '2pioF3LLXnx2Btr4OJPn' }
     const [services, setServices] = useState([])
     const [selectedService, setSelectedService] = useState()
@@ -19,7 +19,7 @@ export default function ServiceManagement(props) {
     const [maxBookings, setMaxBookings] = useState()
     const [price, setPrice] = useState()
     const weekDays = useRef()
-    const [collaps, setCollaps] = useState()
+    const [isCollapsed, setIsCollapsed] = useState()
     const [timesList, setTimesList] = useState([
         { use: false, show: "12:00 AM", time: "00:00:00" },
         { use: false, show: "1:00 AM", time: "1:00:00" },
@@ -47,6 +47,8 @@ export default function ServiceManagement(props) {
         { use: false, show: "11:00 PM", time: "23:00:00" },
     ])
     const [showIcons, setShowIcons] = useState(false)
+    const [showSchedule, setShowSchedule] = useState(false)
+    const [showWorkers, setShowWorkers] = useState(false)
     const [serviceIcon, setServiceIcon] = useState()
     const [week, setWeek] = useState(["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
     const [serviceWorkHoursDays, setServiceWorkHoursDays] = useState([])
@@ -57,6 +59,7 @@ export default function ServiceManagement(props) {
     const [selectedUser, setSelectedUser] = useState()
     const [filteredWorkers, setFilteredWorkers] = useState([])
     const [openWorkersModal, setOpenWorkersModal] = useState(false)
+    const [collaps, setCollaps] = useState()
     const icons = [
         "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
         "alpha-m", "alpha-n", "alpha-o", "alpha-p", "alpha-q", "alpha-r", "alpha-s", "alpha-t", "alpha-u", "alpha-v", "alpha-w", "alpha-x",
@@ -82,6 +85,13 @@ export default function ServiceManagement(props) {
 
     }, [])
 
+    const handleSelectService = (s) => {
+        var addWD = serviceWorkHoursDays.filter(w => w.service.id == s.id)[0]
+        setSelectedService()
+        var temp = { service: addWD.service, workingDays: addWD.workingDays }
+        setSelectedService(temp)
+    }
+
     useEffect(() => {
         if (selectedService) {
             var temp = []
@@ -98,7 +108,10 @@ export default function ServiceManagement(props) {
         }
     }, [selectedService])
 
+
+
     const getServices = () => {
+        setServiceWorkHoursDays([])
         db.collection("services").onSnapshot((snapshot) => {
             const temp = []
             snapshot.forEach(doc => {
@@ -122,9 +135,9 @@ export default function ServiceManagement(props) {
     }
 
     useEffect(() => {
-
+        // console.log("services",services)
         if (services.length > 0) {
-            setServiceWorkHoursDays([])
+            //setServiceWorkHoursDays([])
             var temp = services
             for (let i = 0; i < services.length; i++) {
                 db.collection('services').doc(services[i].id).collection("workingDays").onSnapshot((snapshot) => {
@@ -134,14 +147,18 @@ export default function ServiceManagement(props) {
                     })
                     manageDays(services[i], weekDays)
                 });
+               // console.log("here", i)
+
             }
         }
 
 
     }, [services])
 
+
     const manageDays = (service, weekDays) => {
         var temp = serviceWorkHoursDays
+      
         var workingAt = []
         for (let i = 0; i < week.length; i++) {
             var findDay = weekDays.filter(w => w.day === week[i])[0]
@@ -157,23 +174,7 @@ export default function ServiceManagement(props) {
     const handleDB = async () => {
         const manageServices = firebase.functions().httpsCallable("manageServices");
         if (showAdd) {
-            // var sId = ""
-            // let add = await db.collection("services").add({
-            //     name,
-            //     price,
-            //     maxBookings,
-            //     rating: 0,
-            //     serviceIcon,
-            //     assetType: assetType.id
-            // }).then(docRef =>
-            //     sId = docRef.id
-            // )
-            // for (let i = 0; i < weekDays.current.length; i++) {
-            //     if (weekDays.current[i].hours.length > 0) {
-            //         db.collection("services").doc(sId).collection("workingDays").doc(weekDays.current[i].day).set({ hours: weekDays.current[i].hours })
-            //     }
-            // }
-            
+
             var obj = {
                 name,
                 price,
@@ -207,35 +208,10 @@ export default function ServiceManagement(props) {
                 selectedService,
                 serviceWorkHoursDays,
             });
-            // db.collection("services").doc(selectedService.service.id).update({
-            //     name,
-            //     price,
-            //     maxBookings,
-            //     serviceIcon
-            // })
-            var fix = await db.collection("services").doc(selectedService.service.id).get()
 
-            // for (let i = 0; i < serviceWorkHoursDays.length; i++) {
-            //     if (serviceWorkHoursDays[i].service == selectedService.service) {
-            //         for (let k = 0; k < serviceWorkHoursDays[i].workingDays.length; k++) {
-            //             if (serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
-            //                 console.log("why edit hhhaaa??", selectedService.service.id, serviceWorkHoursDays[i].workingDays[k].day)
-            //                 db.collection("services").doc(selectedService.service.id).collection("workingDays").doc(serviceWorkHoursDays[i].workingDays[k].day).set(
-            //                     { hours: serviceWorkHoursDays[i].workingDays[k].hours })
-            //             }
-            //             else {
-            //                 console.log("why delete hhhaaa??", serviceWorkHoursDays[i].workingDays[k].day, selectedService.service.id)
-            //                 db.collection("services").doc(selectedService.service.id).collection("workingDays").doc(serviceWorkHoursDays[i].workingDays[k].day).delete()
-
-            //             }
-            //         }
-
-            //     }
-            // }
-            var temp = selectedService
-            temp.service = fix.data()
-            temp.service.id = selectedService.service.id
-            setSelectedService(temp)
+            
+            getServices()
+            handleSelectService(selectedService.service)
             setShowEdit(false)
             weekDays.current = [{ day: "Saturday", hours: [] }, { day: "Sunday", hours: [] }, { day: "Monday", hours: [] }, { day: "Tuesday", hours: [] }, { day: "Wednesday", hours: [] }, { day: "Thursday", hours: [] }, { day: "Friday", hours: [] }]
         }
@@ -260,7 +236,8 @@ export default function ServiceManagement(props) {
 
         var found = []
         if (selectedService) {
-            found = serviceWorkHoursDays.filter(f => f.service == selectedService.service)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
+           
+            found = serviceWorkHoursDays.filter(f => f.service.id == selectedService.service.id)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
         }
         else {
             found = weekDays.current.filter(w => w.day == day)[0].hours.filter(h => h == hour)
@@ -274,7 +251,7 @@ export default function ServiceManagement(props) {
             var temp = serviceWorkHoursDays
             var found = serviceWorkHoursDays.filter(f => f.service == selectedService.service)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
             if (found.length > 0) {
-                console.log("remove")
+            
                 var tempHours = []
                 for (let i = 0; i < serviceWorkHoursDays.length; i++) {
                     if (serviceWorkHoursDays[i].service == selectedService.service) {
@@ -283,18 +260,18 @@ export default function ServiceManagement(props) {
                                 for (let j = 0; j < serviceWorkHoursDays[i].workingDays[k].hours.length; j++) {
                                     if (serviceWorkHoursDays[i].workingDays[k].hours[j] != hour) {
                                         tempHours.push(serviceWorkHoursDays[i].workingDays[k].hours[j])
-                                        //console.log("adding hour",)
+                                    
                                     }
                                 }
                                 temp[i].workingDays[k].hours = tempHours
-                                //console.log("removing",temp[i].workingDays[k])
+                            
                             }
 
                         }
 
                     }
                 }
-                console.log("")
+            
                 setServiceWorkHoursDays(temp)
             }
             else {
@@ -308,7 +285,7 @@ export default function ServiceManagement(props) {
                         }
                     }
                 }
-                console.log("add", temp)
+                
             }
             setServiceWorkHoursDays(temp)
         }
@@ -325,11 +302,11 @@ export default function ServiceManagement(props) {
                     }
                     else {
                         var tempHours = []
-                        console.log("oha", weekDays.current[i].hours.length)
+                       
                         for (let k = 0; k < weekDays.current[i].hours.length; k++) {
-                            console.log(" loopp", k)
+                      
                             if (weekDays.current[i].hours[k] != hour) {
-                                console.log("add day", weekDays.current[i].hours[k])
+                          
                                 tempHours.push(weekDays.current[i].hours[k])
                             }
                         }
@@ -337,7 +314,7 @@ export default function ServiceManagement(props) {
                     }
                 }
                 weekDays.current = temp
-                console.log("week days remove", weekDays.current)
+      
             }
             else {
                 //add to list
@@ -345,11 +322,12 @@ export default function ServiceManagement(props) {
                 var index = weekDays.current.findIndex(w => w.day == day)
                 temp[index].hours.push(hour)
                 weekDays.current = temp
-                console.log("week days add", weekDays.current)
+          
             }
 
         }
         var update = timesList
+        setTimesList([])
         setTimesList(update)
     }
 
@@ -368,7 +346,7 @@ export default function ServiceManagement(props) {
             });
         }
         else if (status == "add") {
-            console.log("tmep", temp)
+           
             temp = u
             temp.services.push(selectedService.service.id)
             const response = await manageServiceWorkers({
@@ -383,7 +361,7 @@ export default function ServiceManagement(props) {
     const filterWorkers = () => {
         var temp = []
         for (let i = 0; i < users.length; i++) {
-            if (users[i].services && users[i].role == "service employee") {
+            if (users[i].services && users[i].role == "services employee") {
                 var check = users[i].services.filter(s => s == selectedService.service.id)
                 if (check.length == 0) {
                     temp.push(users[i])
@@ -398,114 +376,312 @@ export default function ServiceManagement(props) {
 
     return (
         <ScrollView>
-            <Text>{assetType.name} Service Management</Text>
+
+            <View style={styles.two}>
+                <View style={{ flexDirection: "row" }}>
+                    <Text style={styles.cardTitle}>{assetType.name} Services</Text>
+                    <MaterialCommunityIcons
+                        name={"plus-box"}
+                        size={25}
+                        color={"#609e9f"}
+                        onPress={() => setShowAdd(true) || setSelectedService()}
+                    />
+
+                </View>
+                {
+                    services ?
+                        services.map(s =>
+                            <TouchableOpacity onPress={() => handleSelectService(s)} style={{
+                                flexDirection: "row",
+                                marginBottom: "1%",
+                                width: "46%",
+                                height: 36,
+                                margin: "1%"
+
+                            }}>
+                                <MaterialCommunityIcons
+                                    name={s.serviceIcon}
+                                    size={25}
+                                    color={"#609e9f"}
+                                    onPress={() => setShowAdd(true)}
+                                    style={{
+                                        width: "25%",
+                                        marginRight: "3%",
+                                        marginLeft: "1%"
+                                    }}
+                                />
+                                <View style={{
+                                    marginBottom: "auto",
+                                    marginTop: "auto",
+                                }}>
+                                    <Text style={{
+                                    }}>{s.name}</Text>
+                                </View>
+
+
+                            </TouchableOpacity>
+                        )
+                        :
+                        null
+                }
+
+
+            </View>
+
+
+
+
+
             {
-                services && !selectedService ?
-                    <View>
-                        {
-                            serviceWorkHoursDays.map(s =>
-                                <TouchableOpacity onPress={() => setSelectedService(s)}><Text>{s.service.name}</Text></TouchableOpacity>
-                            )
-                        }
-                        {!showAdd ? <Button title="Add" onPress={() => setShowAdd(true)} /> : null}
+                selectedService && selectedService.service && !showEdit ?
+                    <View style={styles.three}>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{
+                                fontSize: 18,
+                                //backgroundColor: "red",
+                                width: "60%",
+                                height: 50,
+                                color: "gray",
+                            }}>
+
+                                {selectedService.service.name} Details</Text>
+
+                            <MaterialCommunityIcons
+                                name={"delete"}
+                                size={20}
+                                color={"#609e9f"}
+                                onPress={() => handleDB()}
+                                style={{ width: "15%" }}
+                            />
+                            <MaterialCommunityIcons
+                                name={"square-edit-outline"}
+                                size={20}
+                                color={"#609e9f"}
+                                onPress={() =>
+                                    setShowEdit(true) ||
+                                    setShowAdd(false) ||
+                                    setMaxBookings(selectedService.service.maxBookings) ||
+                                    setPrice(selectedService.service.price) ||
+                                    setName(selectedService.service.name) ||
+                                    setServiceIcon(selectedService.service.serviceIcon)
+                                    //console.log("ehhh", selectedService)
+                                }
+                                style={{ width: "15%" }}
+                            />
+                            <MaterialCommunityIcons
+                                name={"close"}
+                                size={20}
+                                color={"#901616"}
+                                onPress={() => setSelectedService()}
+                                style={{ width: "15%" }}
+                            />
+                            {/* </View> */}
+
+                        </View>
+
+                        <View>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Name</Text>
+                                <Text>{selectedService.service.name}</Text>
+                            </View>
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Price</Text>
+                                <Text>{selectedService.service.price}</Text>
+                            </View>
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Max Booking Per Day</Text>
+                                <Text>{selectedService.service.maxBookings}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Rating</Text>
+                                <Text>{selectedService.service.rating}</Text>
+                            </View>
+                            <Button title="Schedule" onPress={() => setShowSchedule(true)} />
+                            <Button title="Workers" onPress={()=> setShowWorkers(true) || filterWorkers()}/>
+                            <Text>Workers</Text>
+                            {/* <Button title="add" onPress={() => } /> */}
+                            
+
+                            {/* {
+                                openWorkersModal ?
+                                    <Modal
+                                        animationType="slide"
+                                        transparent={true}
+                                        //visible={addServices}
+                                        onRequestClose={() => {
+                                            Alert.alert("Modal has been closed.");
+                                        }}
+                                    >
+                                        <View style={styles.centeredView}>
+                                            <View style={styles.modalView}>
+                                                
+                                                
+
+
+                                            </View>
+                                        </View>
+                                    </Modal>
+                                    :
+                                    null
+                            } */}
+
+                        </View>
                     </View>
                     :
+                    null}
+
+            {
+                showWorkers ?
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        //visible={addServices}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"#901616"}
+                                    onPress={() => setShowWorkers(false)}
+                                    style={{ width: "15%" }}
+                                />
+                           <Text style={{
+                                fontSize: 18,
+                                //backgroundColor: "red",
+                                width: "100%",
+                                height: 40,
+                                color: "gray",
+                                borderBottomWidth:1,
+                                borderBottomColor:"gray"
+                            }}>
+
+                                Assigned Workers</Text>
+                                    
+                                    {
+                                workers ?
+                                    <View>
+
+                                        {
+                                            workers.map(w =>
+
+                                                <TouchableOpacity onPress={() => setSelectedUser(w)}><Text>{w.email}</Text></TouchableOpacity>
+
+                                            )}
+                                    </View>
+                                    :
+                                    <Text>No Assigned Workers</Text>
+                            }
+                                {/* {filteredWorkers ?
+                                                    filteredWorkers.map(f =>
+                                                        <View>
+                                                            <Text>{f.email}</Text>
+                                                            <Button title="Assign" onPress={() => manageWorker("add", f)} />
+                                                            <Button title="Cancel" onPress={() => setOpenWorkersModal(false)} />
+                                                        </View>
+                                                    )
+                                                    :
+                                                    <Text>No Available Workers</Text>
+                                                } */}
+                                                
+                                                
+                            </View>
+                        </View>
+                    </Modal>
+                    :
+
                     null
             }
 
             {
-                selectedService && !showEdit ?
-                    <View>
-                        <Text>Name: {selectedService.service.name}</Text>
-                        <Text>Price: {selectedService.service.price}</Text>
-                        <Text>Max Booking Per Day: {selectedService.service.maxBookings}</Text>
-                        <Text>Rating: {selectedService.service.rating}</Text>
-                        <Text>Working Hours</Text>
-                        {
-                            selectedService.workingDays.map(w =>
-                                <View>
-                                    <Text>{w.day}</Text>
+                showSchedule ?
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        //visible={addServices}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"grey"}
+                                    onPress={() => setShowSchedule(false)}
+                                    style={{ width: "15%", position: "absolute", left: "110%", marginTop: "3%" }}
+                                />
+                                <Text style={{
+                                    fontSize: 18,
+                                    // backgroundColor: "red",
+                                    //width: "85%",
+                                    
+                                    marginBottom: "9%",
+                                    color: "gray",
+                                    marginLeft: "auto", 
+                                    marginRight: "auto"
+                                }}>Working Hours</Text>
+                                {
+                                    selectedService.workingDays.map(w =>
+                                        <View style={{ width: "100%"}}>
+                                            <View style={{
+                                                //backgroundColor: isCollapsed != w.day ? "#EAFAF1" : "#D4EFDF",
+                                                margin: "1%",
+                                                padding: 6,
+                                                borderRadius: isCollapsed != w.day ? 2 : 15,
+                                            }}>
+                                                <TouchableOpacity style={{ margin: "1%", }} 
+                                                onPress={() =>  isCollapsed == w.day ? setIsCollapsed(): setIsCollapsed(w.day)}>
+                                                    <Text
+                                                    style={{
+                                                        fontSize: 15,
+                                                        // backgroundColor: "red",
+                                                        width: "85%",
+                                                        marginBottom: "4%",
+                                                        color: "black", 
+                                                    }}
+                                                    >{w.day}</Text>
+                                                </TouchableOpacity>
+                                                <Collapsible collapsed={isCollapsed != w.day}>
+                                                    {
+                                                        w.hours.length > 0 ?
 
-                                    {
-                                        w.hours.length > 0 ?
-
-                                            <View style={{ flexDirection: "row" }}>{
-                                                w.hours.map(h =>
-                                                    <Text style={{ borderColor: "black", borderWidth: 1 }}>{display(h)}</Text>
-                                                )}
+                                                            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>{
+                                                                w.hours.map(h =>
+                                                                    <View style={{
+                                                                        borderColor: "black",
+                                                                        margin: 3,
+                                                                        borderWidth: 3,
+                                                                        borderRadius: 7,
+                                                                        padding: 2,
+                                                                        width: 72,
+                                                                        borderColor: "#0B5345",
+                                                                        backgroundColor: "white"
+                                                                    }}>
+                                                                        <Text style={{ marginLeft: "auto", marginRight: "auto" }}>{display(h)}</Text>
+                                                                    </View>
+                                                                )}
+                                                            </View>
+                                                            :
+                                                            <Text>No Working Hours</Text>
+                                                    }
+                                                </Collapsible>
                                             </View>
-                                            :
-                                            <Text>No Working Hours</Text>
-                                    }
-                                </View>
-                            )
-                        }
-                        <Text>Workers</Text>
-                        <Button title="add" onPress={() => filterWorkers()} />
-                        {
-                            workers ?
-                                <View>
-
-                                    {
-                                        workers.map(w =>
-
-                                            <TouchableOpacity onPress={() => setSelectedUser(w)}><Text>{w.email}</Text></TouchableOpacity>
-
-                                        )}
-                                </View>
-                                :
-                                <Text>No Assigned Workers</Text>
-                        }
-
-                        {
-                            openWorkersModal ?
-                                <Modal
-                                    animationType="slide"
-                                    transparent={true}
-                                    //visible={addServices}
-                                    onRequestClose={() => {
-                                        Alert.alert("Modal has been closed.");
-                                    }}
-                                >
-                                    <View style={styles.centeredView}>
-                                        <View style={styles.modalView}>
-                                            {filteredWorkers ?
-                                                filteredWorkers.map(f =>
-                                                    <View>
-                                                        <Text>{f.email}</Text>
-                                                        <Button title="Assign" onPress={() => manageWorker("add", f)} />
-                                                        <Button title="Cancel" onPress={() => setOpenWorkersModal(false)} />
-                                                    </View>
-                                                )
-                                                :
-                                                <Text>No Available Workers</Text>
-                                            }
-
-
                                         </View>
-                                    </View>
-                                </Modal>
-                                :
-                                null
-                        }
-
-                        <Button title={"Edit"}
-                            onPress={() =>
-                                setShowEdit(true) ||
-                                setShowAdd(false) ||
-                                setMaxBookings(selectedService.service.maxBookings) ||
-                                setPrice(selectedService.service.price) ||
-                                setName(selectedService.service.name) ||
-                                setServiceIcon(selectedService.service.serviceIcon)
-                                //console.log("ehhh", selectedService)
-                            }
-                        />
-                        <Button title={"Delete"} onPress={() => handleDB()} />
-                        <Button title={"Back"} onPress={() => setSelectedService()} />
-
-                    </View>
+                                    )
+                                }
+                            </View>
+                        </View>
+                    </Modal>
                     :
-                    null}
+                    null
+            }
             {
                 selectedUser && !openWorkersModal ?
                     <Modal
@@ -725,19 +901,110 @@ export default function ServiceManagement(props) {
 
 
 const styles = StyleSheet.create({
-    input: { height: 40, borderColor: "#284057", borderWidth: 1, width: "60%", backgroundColor: "white", paddingLeft: 7 },
-    label: { fontSize: 15, color: "#284057", width: "30%", fontWeight: "bold" },
+    container: {
+        flex: 1,
+        backgroundColor: "#e3e3e3",
+        width: Math.round(Dimensions.get("window").width),
+        // height: Math.round(Dimensions.get("window").height),
+    },
+    header: {
+        flex: 1,
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
+        backgroundColor: "white",
+        // height: "25%",
+    },
+    one: {
+        backgroundColor: "white",
+        width: "100%",
+        // marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+    },
+    two: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    two2: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        //padding: "5%",
+        borderTopWidth: 1,
+        //borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    details: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        //flexDirection: "row",
+        //flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    three: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        flexDirection: "row",
+        flexWrap: "wrap",
+    },
+    four: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+    },
+    cardTitle: {
+        fontSize: 18,
+        // backgroundColor: "red",
+        width: "85%",
+        height: 50,
+        color: "gray",
+    },
     centeredView: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 22
+        marginTop: 22,
+        //width : "70%"
     },
     modalView: {
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        paddingTop: 35,
+        paddingLeft: 35,
+        paddingRight: 35,
+        paddingBottom: 35,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -746,7 +1013,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        elevation: 5
+        elevation: 5,
+        width: "85%"
     },
     openButton: {
         backgroundColor: "#F194FF",
@@ -754,4 +1022,38 @@ const styles = StyleSheet.create({
         padding: 10,
         elevation: 2
     },
-}) //backgroundColor:"white" fontWieght:"bold" , paddingLeft: 5
+    names: {
+        fontSize: 15,
+        // backgroundColor: "red",
+        width: "90%",
+        height: 30,
+        color: "#566573",
+        alignItems: "center",
+        marginLeft: "auto",
+        marginRight: "auto"
+    },
+    listNames: {
+        fontSize: 15,
+        //backgroundColor: "red",
+        width: "30%",
+        height: 40,
+        color: "#566573",
+        alignItems: "center",
+        //marginLeft: "auto",
+        marginRight: "2%"
+    },
+    textInputs: {
+        borderWidth: 1,
+        borderColor: "#D4EFDF",
+        width: "70%",
+        padding: 5,
+        margin: "1%",
+        //backgroundColor: "blue"
+    },
+    inputTitles: {
+        width: "35%",
+        marginBottom: "auto",
+        marginTop: "auto",
+        //backgroundColor:"red"
+    }
+});

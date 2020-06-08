@@ -480,6 +480,125 @@ export default function Sections(props) {
             </View>
           </View>
         </View>
+
+        
+        {
+         startTimeModal || endTimeModal? 
+         <Modal
+            animationType="slide"
+            transparent={true}
+            visible={true}
+            // onRequestClose={() => {
+            //   Alert.alert("Modal has been closed.");
+            // }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <View
+                  style={{
+                    // backgroundColor: "yellow",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    padding: 5,
+                  }}
+                >
+                  {displayList.current.length > 0 ? (
+                    displayList.current.map((t ,i ) => (
+                      <View
+                      key={i}
+                        style={{
+                          // backgroundColor: "red",
+                          width: "25%",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() =>
+                            startTimeModal
+                              ? setStartTime(t) || setStartTimeModal(false)
+                              : setEndTime(t) || setEndTimeModal(false)
+                          }
+                          style={{
+                            margin: 3,
+                            // backgroundColor: "green",
+                            borderWidth: 2,
+                            borderColor: "#20365F",
+                            backgroundColor: "white",
+                            width: "90%",
+                            aspectRatio: 2 / 1,
+                            borderRadius: 5,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#20365F",
+                              fontSize: 13,
+                              textAlign: "center",
+                            }}
+                          >
+                            {t}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))
+                  ) : (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "80%",
+                      }}
+                    >
+                      <Text>
+                        Sorry, there are no timings available for the chosen
+                        date
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setStartTimeModal(false) || setEndTimeModal(false)
+                        }
+                        style={{
+                          marginTop: 30,
+                          // backgroundColor: "green",
+                          borderWidth: 2,
+                          borderColor: "#20365F",
+                          backgroundColor: "#20365F",
+                          width: "25%",
+                          aspectRatio: 2 / 1,
+                          borderRadius: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            // fontSize: 13,
+                            textAlign: "center",
+                          }}
+                        >
+                          Back
+                        </Text>
+                      </TouchableOpacity>
+                      {/* <Button
+                      title="Exit"
+                      onPress={() =>
+                        setStartTimeModal(false) || setEndTimeModal(false)
+                      }
+                    /> */}
+                    </View>
+                  )}
+                </View>
+              </View>
+            </View>
+          </Modal>
+         :
+         <Text>not working</Text>
+       }
+
         <View style={styles.two}>
           <Text style={styles.cardTitle}>Sections</Text>
           {showSections === true ? (

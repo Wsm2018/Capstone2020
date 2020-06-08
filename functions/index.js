@@ -344,33 +344,35 @@ exports.editBooking = functions.https.onCall(async (data, context) => {
 });
 
 exports.manageServices = functions.https.onCall(async (data, context) => {
-
   if (data.status === "add") {
     var sId = ""
     let add = await db.collection("services").add(data.obj).then((docRef) =>
       (sId = docRef.id)
     )
+    console.log("353")
     for (let i = 0; i < data.weekDays.length; i++) {
+      
       if (data.weekDays[i].hours.length > 0) {
-        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays.day).set({ hours: data.weekDays[i].hours })
+        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays[i].day).set({ hours: data.weekDays[i].hours })
       }
     }
-
   }
 
   if (data.status === "update") {
     db.collection("services").doc(data.selectedService.service.id).update(data.obj)
-
+    console.log("here", data.serviceWorkHoursDays.length)
     for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
-      if (data.serviceWorkHoursDays[i].service === data.selectedService.service) {
+      console.log("loop",data.serviceWorkHoursDays[i].service.id , data.selectedService.service.id,data.serviceWorkHoursDays[i].service.id === data.selectedService.service.id)
+      if (data.serviceWorkHoursDays[i].service.id === data.selectedService.service.id) {
+        console.log("i", i)
         for (let k = 0; k < data.serviceWorkHoursDays[i].workingDays.length; k++) {
+          console.log("k", k)
           if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
             db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).set(
               { hours: data.serviceWorkHoursDays[i].workingDays[k].hours })
           }
           else {
             db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).delete()
-
           }
         }
 
