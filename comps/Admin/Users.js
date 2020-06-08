@@ -31,7 +31,7 @@ import { Avatar, ListItem } from "react-native-elements";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-
+const { width, height } = Dimensions.get("screen");
 import moment from "moment";
 
 export default function Users() {
@@ -277,7 +277,7 @@ export default function Users() {
   const endSubscription = () => {
     setModal3(false);
     setSubscription(null);
-
+    setSelectedSub("");
     db.collection("users")
       .doc(user.id)
       .collection("subscription")
@@ -297,84 +297,149 @@ export default function Users() {
           style={{
             flex: 1,
             justifyContent: "center",
-            // alignItems: "center",
+            alignItems: "center",
             alignSelf: "center",
             marginTop: 22,
             // ---This is for Width---
-            width: "80%",
+            // width: "80%",
           }}
         >
           <View
+            elevation={5}
             style={{
-              margin: 20,
-              backgroundColor: "white",
+              height: height / 2.2,
+              width: width / 1.6,
+              backgroundColor: "#fff",
+              shadowOpacity: 1,
+              shadowRadius: 2,
+              shadowOffset: {
+                height: 1,
+                width: 1,
+              },
               borderRadius: 20,
-              padding: 35,
-              alignItems: "center",
+              // padding: 35,
+              // justifyContent: "center",
+              // alignItems: "center",
               shadowColor: "#000",
               shadowOffset: {
                 width: 0,
                 height: 2,
               },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              justifyContent: "center",
-              // ---This is for Height---
-              height: "60%",
             }}
           >
-            <Text>
-              Are you sure you want to update {user.displayName}'s password?
-            </Text>
-            <Text></Text>
-            <Text>
-              This will update the account password and will download a pdf
-              after the change
-            </Text>
-            <Text></Text>
-            <TextInput
-              placeholder={"New Password"}
-              value={password}
-              onChangeText={setPassword}
-            />
             <View
               style={{
-                //   borderWidth: 1,
-                width: "100%",
-                height: "10%",
-                justifyContent: "space-around",
+                justifyContent: "center",
                 alignItems: "center",
-                flexDirection: "row",
+                flex: 0.5,
+                marginStart: 10,
               }}
             >
-              {/* -------------------------CONFIRM RESET PASS------------------------- */}
-              <TouchableOpacity
+              <View style={{ marginBottom: "10%", marginTop: 20 }}>
+                <Text
+                  style={{ fontSize: 16, color: "#005c9d", fontWeight: "bold" }}
+                >
+                  Are you sure you want to update {user.displayName}'s password?
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontSize: 16, color: "#901616" }}>
+                  Note: This will update the account password and will download
+                  a pdf after the changes.
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                // backgroundColor: "green",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: -20,
+              }}
+            >
+              <View
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
+                  ...styles.inputStyle,
+                  width: "80%",
+                }}
+              >
+                <TextInput
+                  placeholder={"New Password"}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+
+              <View
+                style={{
+                  flex: 0.5,
+                  // backgroundColor: "red",
                   justifyContent: "center",
                   alignItems: "center",
+                  flexDirection: "row",
                 }}
-                onPress={handleDownload}
-                disabled={password === "" ? true : false}
               >
-                <Text>CONFIRM</Text>
-              </TouchableOpacity>
-              {/* -------------------------CANCEL RESET PASS-------------------------- */}
-              <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => setModal(false)}
-              >
-                <Text>Cancel</Text>
-              </TouchableOpacity>
+                {/* -------------------------CONFIRM RESET PASS------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
+                    // borderWidth: 4,
+                    height: 40,
+                    // width: "30%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    marginEnd: "3%",
+                    borderRadius: 10,
+                    //marginBottom: 10,
+                  }}
+                  onPress={handleDownload}
+                  disabled={password === "" ? true : false}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "white",
+                      // fontWeight: "bold",
+                    }}
+                  >
+                    Confirm
+                  </Text>
+                </TouchableOpacity>
+                {/* -------------------------CANCEL RESET PASS-------------------------- */}
+                <TouchableOpacity
+                  style={{
+                    flex: 0.3,
+                    backgroundColor: "#2E9E9B",
+                    // borderWidth: 4,
+                    height: 40,
+                    // width: "30%",
+                    // alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //marginStart: "2%",
+                    marginStart: "3%",
+                    borderRadius: 10,
+                    //marginBottom: 10,
+                  }}
+                  onPress={() => setModal(false)}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 16,
+                      color: "white",
+                      // fontWeight: "bold",
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -470,8 +535,6 @@ export default function Users() {
             <View
               style={{
                 width: "100%",
-                // backgroundColor: "red",
-
                 alignItems: "flex-start",
                 justifyContent: "flex-start",
               }}
@@ -575,7 +638,7 @@ export default function Users() {
                 style={{
                   // backgroundColor: "green",
                   flex: 1,
-                  // paddingEnd: 10,
+                  paddingEnd: Platform.OS === "android" ? 0 : 10,
                   alignItems: "flex-end",
                   justifyContent: "center",
                 }}
