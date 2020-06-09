@@ -201,7 +201,7 @@ const POSTAL_CODE_INPUT_WIDTH = 120; // https://github.com/yannickcr/eslint-plug
         <ScrollView
           contentContainerStyle={{ flex: 1 }}
           ref="Form"
-          horizontal={false}
+          horizontal
           keyboardShouldPersistTaps="always"
           scrollEnabled={allowScroll}
           showsHorizontalScrollIndicator={false}

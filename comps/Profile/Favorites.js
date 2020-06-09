@@ -12,7 +12,12 @@ import {
 } from "react-native";
 import Image from "react-native-scalable-image";
 import { Card } from "react-native-shadow-cards";
-
+import * as Device from "expo-device";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 import { AntDesign, FontAwesome } from "react-native-vector-icons";
 
 import db from "../../db";
@@ -31,7 +36,7 @@ export default function Favorites({
 }) {
   // ------------------------------------- USE STATES ---------------------------------------------
   // ------------------------------------- USE STATES ---------------------------------------------
-
+  const [deviceType, setDeviceType] = useState(0);
   const [favoriteAssets, setFavoriteAssets] = useState([]);
   const [assetModal, setAssetModal] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -76,6 +81,13 @@ export default function Favorites({
         });
       });
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   const formatDate = (date) => {
     const splitDateTime = date.split("T");
@@ -229,7 +241,11 @@ export default function Favorites({
             }}
             onPress={() => setFavoritesModal(false)}
           >
-            <AntDesign name="close" size={25} style={{ color: "#224229" }} />
+            <AntDesign
+              name="close"
+              size={deviceType === 1 ? 20 : 40}
+              style={{ color: "#224229" }}
+            />
           </TouchableOpacity>
 
           <View style={{ flex: 10, alignItems: "center" }}>
@@ -250,7 +266,7 @@ export default function Favorites({
                 <Text
                   style={{
                     // paddingTop: "15%",
-                    fontSize: 20,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "darkgray",
                     fontWeight: "bold",
                   }}
@@ -269,11 +285,11 @@ export default function Favorites({
                   <TouchableOpacity
                     style={{
                       backgroundColor: "#2E9E9B",
-                      height: 40,
-                      width: "40%",
+                      height: responsiveScreenHeight(5),
+                      width: responsiveScreenWidth(40),
                       justifyContent: "center",
                       alignItems: "center",
-                      borderRadius: 15,
+                      borderRadius: 10,
                     }}
                     onPress={() => {
                       setFavoritesModal(false);
@@ -287,7 +303,7 @@ export default function Favorites({
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "white",
                         // fontWeight: "bold",
                       }}

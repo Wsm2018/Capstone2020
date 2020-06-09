@@ -13,6 +13,11 @@ import "firebase/auth";
 import "firebase/functions";
 import Card from "./Card";
 import LottieView from "lottie-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user", "No param");
@@ -91,8 +96,8 @@ export default function CardsScreen(props) {
           style={{
             // flex: 0.2,
             backgroundColor: "#20365F",
-            height: 40,
-            width: "50%",
+            height: responsiveScreenHeight(7),
+            width: responsiveScreenWidth(40),
             alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
@@ -108,7 +113,7 @@ export default function CardsScreen(props) {
               // backgroundColor: "red",
               // width: "60%",
               textAlign: "center",
-              fontSize: 18,
+              fontSize: responsiveScreenFontSize(2),
               // fontWeight: "bold",
               color: "white",
             }}

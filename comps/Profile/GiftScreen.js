@@ -13,6 +13,15 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import * as Device from "expo-device";
+
+// import ResponsiveImageView from "react-native-responsive-image-view";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
+
 const LottieView = require("lottie-react-native");
 
 import { AntDesign, MaterialCommunityIcons } from "react-native-vector-icons";
@@ -27,6 +36,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/functions";
 export default function GiftScreen(props) {
+  const [deviceType, setDeviceType] = useState(0);
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [flag, setFlag] = useState(false);
@@ -39,6 +49,14 @@ export default function GiftScreen(props) {
   let pickerRef = null;
   const [errorMessage, setErrorMessage] = useState("");
   const [amountErrMsg, setAmountErrMsg] = useState("");
+
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   useEffect(() => {
     if (amount === "other") {
@@ -314,7 +332,7 @@ export default function GiftScreen(props) {
                       <AntDesign
                         style={{ marginRight: "5%" }}
                         name="caretdown"
-                        size={15}
+                        size={deviceType === 1 ? 20 : 40}
                         color="gray"
                       />
                     </View>
@@ -378,8 +396,8 @@ export default function GiftScreen(props) {
                   > */}
                 <TextInput
                   style={{
-                    height: 40,
-                    width: "80%",
+                    height: responsiveScreenHeight(5),
+                    width: responsiveScreenWidth(40),
                     paddingLeft: 6,
                     // backgroundColor: "red",
                   }}
@@ -422,7 +440,7 @@ export default function GiftScreen(props) {
                 >
                   <AntDesign
                     name="closecircle"
-                    size={25}
+                    size={deviceType === 1 ? 20 : 40}
                     style={{ color: "gray" }}
                   />
                 </TouchableOpacity>
@@ -445,8 +463,8 @@ export default function GiftScreen(props) {
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
-                  // width: "30%",
+                  height: responsiveScreenHeight(5),
+                  width: responsiveScreenWidth(40),
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
@@ -460,7 +478,7 @@ export default function GiftScreen(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -473,8 +491,8 @@ export default function GiftScreen(props) {
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
-                  // width: "30%",
+                  height: responsiveScreenHeight(5),
+                  width: responsiveScreenWidth(40),
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
@@ -488,7 +506,7 @@ export default function GiftScreen(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -512,8 +530,8 @@ export default function GiftScreen(props) {
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
-                  // width: "30%",
+                  height: responsiveScreenHeight(5),
+                  width: responsiveScreenWidth(40),
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
@@ -527,7 +545,7 @@ export default function GiftScreen(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -540,8 +558,8 @@ export default function GiftScreen(props) {
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
-                  // width: "30%",
+                  height: responsiveScreenHeight(5),
+                  width: responsiveScreenWidth(40),
                   // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
@@ -555,7 +573,7 @@ export default function GiftScreen(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}

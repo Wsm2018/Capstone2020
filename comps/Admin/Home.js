@@ -14,6 +14,12 @@ import "firebase/auth";
 import db from "../../db";
 import { FlatGrid } from "react-native-super-grid";
 import ActionButton from "react-native-action-button";
+import * as Device from "expo-device";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 // import LottieView from "lottie-react-native";
@@ -21,9 +27,17 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 // import { Item } from "react-native-paper/lib/typescript/src/components/List/List";
 
 export default function Home(props) {
+  const [deviceType, setDeviceType] = useState(0);
   const handleLogout = () => {
     firebase.auth().signOut();
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   const items = [
     {
       name: "Users",
@@ -164,7 +178,7 @@ export default function Home(props) {
       </View>
       <ActionButton
         buttonColor={"#3ea3a3"}
-        size={60}
+        size={deviceType === 1 ? 60 : 80}
         // position="left"
         //verticalOrientation="down"
       >
@@ -175,7 +189,7 @@ export default function Home(props) {
         >
           <SimpleLineIcons
             name="people"
-            size={20}
+            size={deviceType === 1 ? 60 : 80}
             style={styles.actionButtonIcon}
           />
         </ActionButton.Item>
@@ -189,7 +203,6 @@ export default function Home(props) {
         >
           <MaterialCommunityIcons
             name="logout"
-            size={20}
             style={styles.actionButtonIcon}
           />
         </ActionButton.Item>
@@ -255,7 +268,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   actionButtonIcon: {
-    fontSize: 20,
+    fontSize: responsiveScreenFontSize(2),
     height: 22,
     color: "white",
   },

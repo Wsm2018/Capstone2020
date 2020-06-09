@@ -13,6 +13,12 @@ import { Button, Text, Divider } from "react-native-elements";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
+// import { Dimensions } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { Divider } from "react-native-elements";
 
 import db from "../../../db";
@@ -132,7 +138,17 @@ export default function AddCars(props) {
             // backgroundColor: "blue",
           }}
         >
-          <Text>Fill in your car information</Text>
+          <Text
+            style={{
+              fontSize: 20,
+              color: "#005c9d",
+              textAlign: "center",
+              fontWeight: "bold",
+              textTransform: "capitalize",
+            }}
+          >
+            Fill in your car details
+          </Text>
         </View>
         {/* <LottieView
           width={Dimensions.get("window").width}
@@ -168,11 +184,11 @@ export default function AddCars(props) {
         >
           {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
+            width={Dimensions.get("window").width / 2}
             style={{
-              height: 50,
-              width: "80%",
+              height: responsiveScreenHeight(5),
               paddingLeft: 6,
-              // backgroundColor: "red",
+              fontSize: responsiveScreenFontSize(2),
             }}
             placeholder="Enter Car Brand"
             onChangeText={setBrand}
@@ -195,7 +211,13 @@ export default function AddCars(props) {
         >
           {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 50, paddingLeft: 6, width: "80%" }}
+            width={Dimensions.get("window").width / 2}
+            style={{
+              height: responsiveScreenHeight(5),
+              paddingLeft: 6,
+              fontSize: responsiveScreenFontSize(2),
+            }}
+            // style={{ height: 50, paddingLeft: 6, width: "80%" }}
             placeholder="Enter Car Model"
             // label="Car Model"
             onChangeText={setModel}
@@ -218,7 +240,13 @@ export default function AddCars(props) {
         >
           {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
           <TextInput
-            style={{ height: 50, paddingLeft: 6, width: "80%" }}
+            // width={Dimensions.get("window").width / 2}
+            style={{
+              height: responsiveScreenHeight(5),
+              paddingLeft: 6,
+              fontSize: responsiveScreenFontSize(2),
+            }}
+            // style={{ height: 50, paddingLeft: 6, width: "80%" }}
             placeholder="Enter Plate Number"
             onChangeText={setPlate}
             // label="Plate Number"
@@ -272,16 +300,15 @@ export default function AddCars(props) {
       >
         <TouchableOpacity
           style={{
-            backgroundColor: "#20365F",
+            backgroundColor: "#3d9478",
             height: 40,
-            width: "40%",
-            // alignSelf: "center",
+            width: "30%",
+            alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
-            //marginStart: "2%",
-            //marginEnd: "2%",
-            borderRadius: 30,
-            //marginBottom: 10,
+
+            borderRadius: 10,
+            marginBottom: 10,
           }}
           onPress={handleSubmit}
         >

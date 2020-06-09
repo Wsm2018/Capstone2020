@@ -83,7 +83,7 @@ export default function AddPromotion(props) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding " : null}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: "#f5f0f0" }}
       >
         <View
           style={{
@@ -103,7 +103,7 @@ export default function AddPromotion(props) {
             <Text
               style={{
                 fontSize: 20,
-                color: "#20365F",
+                color: "#005c9d",
                 justifyContent: "center",
                 alignSelf: "center",
                 marginTop: "5%",
@@ -190,9 +190,10 @@ export default function AddPromotion(props) {
             <DatePicker
               style={{
                 width: "100%",
-                borderColor: "darkgray",
+                borderColor: "gray",
                 borderWidth: 0.5,
                 borderRadius: 5,
+                backgroundColor: "white",
                 // marginBottom: "5%",
               }}
               date={expiry}
@@ -238,18 +239,26 @@ export default function AddPromotion(props) {
         <View
           style={{
             flex: 0.5,
+            // backgroundColor: "red",
             justifyContent: "center",
             alignItems: "center",
+            flexDirection: "row",
           }}
         >
           <TouchableOpacity
             style={{
-              backgroundColor: "#20365F",
+              flex: 0.3,
+              backgroundColor: "#2E9E9B",
+              // borderWidth: 4,
               height: 40,
-              width: "40%",
+              // width: "30%",
+              // alignSelf: "center",
               justifyContent: "center",
               alignItems: "center",
-              borderRadius: 30,
+              //marginStart: "2%",
+              marginEnd: "3%",
+              borderRadius: 10,
+              //marginBottom: 10,
             }}
             onPress={handleSubmit}
           >

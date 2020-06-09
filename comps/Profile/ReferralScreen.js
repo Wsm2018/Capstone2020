@@ -400,7 +400,7 @@ export default function ReferralScreen(props) {
                     style={{
                       // paddingTop: "10%",
                       paddingBottom: "5%",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       // color: "darkred",
                       fontWeight: "bold",
                     }}
@@ -410,7 +410,8 @@ export default function ReferralScreen(props) {
                   <View
                     width={Dimensions.get("window").width / 1.8}
                     style={{
-                      height: 50,
+                      height: responsiveScreenHeight(5),
+                      width: responsiveScreenWidth(50),
                       // backgroundColor: "green",
                       // alignItems: "center",
                       justifyContent: "center",
@@ -426,7 +427,12 @@ export default function ReferralScreen(props) {
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      <Text style={{ fontSize: 20, color: "gray" }}>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "gray",
+                        }}
+                      >
                         🇶🇦 +974{" "}
                       </Text>
                       <TextInput
@@ -438,7 +444,7 @@ export default function ReferralScreen(props) {
                         }}
                         keyboardType="phone-pad"
                         maxLength={8}
-                        fontSize={20}
+                        fontSize={responsiveScreenFontSize(2)}
                       />
                     </View>
                   </View>
@@ -485,7 +491,7 @@ export default function ReferralScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "white",
                         fontWeight: "bold",
                       }}
