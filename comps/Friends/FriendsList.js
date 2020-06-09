@@ -8,6 +8,7 @@ import {
   ScrollView,
   FlatList,
   TextInput,
+  Modal,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -22,7 +23,7 @@ import {
   Feather,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-navigation";
-import { ListItem } from "react-native-elements";
+import { ListItem, Icon } from "react-native-elements";
 import moment from "moment";
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -39,6 +40,11 @@ export default function FriendsList(props) {
   const [chats, setChats] = useState(null);
 
   const [search, setSearch] = useState("");
+
+  const [editMode, setEditMode] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const numOfChars = 30;
 
   const unsubUsers = useRef();
   // ------------------------------CURRENT USER------------------------------------
@@ -69,6 +75,7 @@ export default function FriendsList(props) {
                 notifications: 0,
                 dateTime: new Date(0),
                 status: "offline",
+                lastMessage: "",
               });
             }
           });
@@ -177,6 +184,7 @@ export default function FriendsList(props) {
           friend.dateTime = new Date(
             moment(chat[0].dateTime.toDate()).format()
           );
+          friend.lastMessage = chat[0].text;
           let notifications = chat.filter(
             (c) =>
               c.status === "unread" &&
@@ -296,6 +304,29 @@ export default function FriendsList(props) {
       .delete();
   };
 
+  // -------------------------------REMOVE ALL-----------------------------------
+  const removeAllFriends = async () => {
+    if (allFriends.length > 0) {
+      let tempFriendsId = allFriends.map((friend) => {
+        return (friend = friend.id);
+      });
+
+      tempFriendsId.forEach((id) => {
+        db.collection("users")
+          .doc(id)
+          .collection("friends")
+          .doc(firebase.auth().currentUser.uid)
+          .delete();
+
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("friends")
+          .doc(id)
+          .delete();
+      });
+    }
+  };
+
   return !friends ? (
     <View
       style={{
@@ -324,19 +355,120 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Button
-        title="Map"
-        onPress={() => props.navigation.navigate("FriendsMap")}
-      />
-      {/* <Text>Friends List</Text> */}
-      {/* <Button title="TEST" onPress={() => props.navigation.navigate("Test")} /> */}
-      {/* <Button title="Delete All" onPress={deleteAll} /> */}
-      <TextInput
-        style={{ borderWidth: 1, borderColor: "white" }}
-        placeholder="Search here..."
-        onChangeText={setSearch}
-        value={search}
-      />
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          //paddingTop:'2%',
+        }}
+      >
+        <MaterialCommunityIcons
+          name="account-search"
+          size={40}
+          color="#fff"
+          style={{ paddingTop: "2%", marginBottom: 10 }}
+        />
+        <TextInput
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "80%",
+            height: "80%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          placeholderTextColor="#20365F"
+          placeholder="Search Here"
+          onChangeText={setSearch}
+          value={search}
+        />
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("FriendsMap")}
+        >
+          <FontAwesome5 name="map-marker-alt" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          flexDirection: "column",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          height: "30%",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "20%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          onPress={() => props.navigation.navigate("FriendsSearch")}
+        >
+          <Ionicons name="md-person-add" size={28} color="#20365F" />
+          <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
+            Add Friends
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "20%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          onPress={() => props.navigation.navigate("FriendsRequest")}
+        >
+          <FontAwesome name="users" size={24} color="#20365F" />
+          {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
+          <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
+            Friends Requests
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {editMode ? (
+        <TouchableOpacity
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => setEditMode(false)}
+        >
+          <AntDesign name="checkcircle" size={24} color="#3ea3a3" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={{
+            // width: "15%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => setEditMode(true)}
+        >
+          <FontAwesome5 name="edit" size={24} color="#fff" />
+          {/* <Text>Edit</Text> */}
+        </TouchableOpacity>
+      )}
       {friends.length > 0 ? (
         <SafeAreaView
           style={{
@@ -369,38 +501,77 @@ export default function FriendsList(props) {
                   //  <AntDesign name="adduser" size={35} color="#20365F" />
                   // }
                   rightElement={
-                    <TouchableOpacity onPress={() => removeFriend(item)}>
-                      <MaterialCommunityIcons
-                        name="delete-forever-outline"
-                        size={30}
-                        color="#1B2D4F"
-                      />
-                      {/* <Feather name="x-circle" size={30} color="black" /> */}
-                    </TouchableOpacity>
+                    editMode && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedFriend(item);
+                          setModal(true);
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name="delete-forever-outline"
+                          size={30}
+                          color="#1B2D4F"
+                        />
+                        {/* <Feather name="x-circle" size={30} color="black" /> */}
+                      </TouchableOpacity>
+                    )
                   }
                   rightIcon={
-                    <TouchableOpacity
-                      onPress={() =>
-                        props.navigation.navigate("FriendsChat", {
-                          friend: item,
-                        })
-                      }
-                    >
-                      <FontAwesome5
-                        name="rocketchat"
-                        size={24}
-                        color="#1B2D4F"
-                      />
-                      {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
-                    </TouchableOpacity>
+                    // <TouchableOpacity
+                    //   onPress={() =>
+                    //     props.navigation.navigate("FriendsChat", {
+                    //       friend: item,
+                    //     })
+                    //   }
+                    // >
+                    //   <FontAwesome5
+                    //     name="rocketchat"
+                    //     size={24}
+                    //     color="#1B2D4F"
+                    //   />
+                    //   {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
+                    // </TouchableOpacity>
+
                     // <FontAwesome5 name="rocketchat" size={24} color="black" />
+
+                    <View>
+                      <Text>{item.status}</Text>
+                    </View>
                   }
                   title={item.displayName + " " + item.notifications}
                   titleStyle={{ fontSize: 20 }}
-                  subtitle={item.status}
+                  subtitle={
+                    // if more than 1 \n
+                    item.lastMessage.split("\n").length > 0
+                      ? // if first line more than 32 chars
+                        item.lastMessage.split("\n")[0].length > numOfChars
+                        ? // message limited to 32 chars with .....
+                          item.lastMessage
+                            .split("\n")[0]
+                            .substring(0, numOfChars) + "......"
+                        : // first line showed
+                          item.lastMessage.split("\n")[0]
+                      : // else
+                      // if message more than 32 chars
+                      item.lastMessage.length > numOfChars
+                      ? // message limited to 32 chars with .....
+                        item.lastMessage.trim().substring(0, numOfChars) +
+                        "......"
+                      : // message showed
+                        item.lastMessage.trim()
+                  }
                   //subtitle={item.status + " to add you"}
                   subtitleStyle={{ fontSize: 12, color: "grey" }}
                   bottomDivider
+                  onPress={
+                    editMode
+                      ? false
+                      : () =>
+                          props.navigation.navigate("FriendsChat", {
+                            friend: item,
+                          })
+                  }
                 />
               )}
             />
@@ -425,58 +596,108 @@ export default function FriendsList(props) {
           </Text>
         </View>
       )}
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 100,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
-        onPress={() => props.navigation.navigate("FriendsSearch")}
-      >
-        <Ionicons name="md-person-add" size={28} color="#20365F" />
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Add Friends
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 30,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 50,
-        }}
-        onPress={() => props.navigation.navigate("FriendsRequest")}
-      >
-        <FontAwesome name="users" size={24} color="#20365F" />
-        {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Friends Requests
-        </Text>
-      </TouchableOpacity>
+      {editMode && (
+        <Button
+          title="Delete All My Friends"
+          onPress={() => {
+            setSelectedFriend("ALL");
+            setModal(true);
+          }}
+          color="red"
+        />
+      )}
+      {/* ---------------------------------MODAL--------------------------------- */}
+      <Modal transparent={true} visible={modal} animationType="slide">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            // alignItems: "center",
+            alignSelf: "center",
+            marginTop: 22,
+            // ---This is for Width---
+            width: "80%",
+          }}
+        >
+          <View
+            style={{
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              justifyContent: "center",
+              // ---This is for Height---
+              height: "30%",
+            }}
+          >
+            {selectedFriend === "ALL" ? (
+              <Text>Are you sure you want to DELETE ALL your friends?</Text>
+            ) : (
+              <Text>
+                Are you sure you want to DELETE{" "}
+                {selectedFriend && selectedFriend.displayName} from your
+                friends?
+              </Text>
+            )}
+            <Text></Text>
+            <Text></Text>
+            <View
+              style={{
+                //   borderWidth: 1,
+                width: "100%",
+                height: "20%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* ---------------------------------CONFIRM--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "30%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  if (selectedFriend === "ALL") {
+                    removeAllFriends();
+                    setModal(false);
+                  } else {
+                    removeFriend(selectedFriend);
+                    setModal(false);
+                  }
+                }}
+              >
+                <Text>Confirm</Text>
+              </TouchableOpacity>
+              {/* ---------------------------------CANCEL--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => setModal(false)}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -484,24 +705,24 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: "15%",
-    backgroundColor: "#20365F",
+    //   paddingTop: "15%",
+    backgroundColor: "#fff",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#000",
+    paddingBottom: 10,
+  },
+  inputStyle: {
+    flex: 1,
   },
 });
 
 FriendsList.navigationOptions = {
-  //   title: "News ",
-  // headerStyle: {
-  //       backgroundColor: '#20365F',
-  //   },
-  //   headerTintColor: '#fff',
-  //   headerTitleStyle: {
-  //       fontWeight: 'bold',
-  //   },
-  //   tabBarIcon: () => {
-  //     <Icon name="news" type="font-awesome" size={24} color={"black"} />;
-  //   },
-  header: null,
+  //header: null,
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
   tabBarIcon: () => {
     <Icon name="news" type="font-awesome" size={24} color={"black"} />;
   },

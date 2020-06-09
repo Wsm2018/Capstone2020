@@ -17,7 +17,7 @@ export default function Profile() {
       //   handleLogout();
       // }}
       >
-        <Text>Profile !</Text>
+        <Text>Profile !@!!!!!!!!!!!!!!</Text>
       </TouchableOpacity>
     </View>
   );
