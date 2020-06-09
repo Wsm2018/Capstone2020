@@ -294,28 +294,28 @@ exports.sendMail = functions.https.onRequest((request, response) => {
 });
 
 exports.assetManager = functions.https.onCall(async (data, context) => {
-
   if (data.type === "add") {
-    db.collection(data.collection).add(
-      data.obj
-    );
+    db.collection(data.collection).add(data.obj);
+  } else if (data.type === "update") {
+    db.collection(data.collection).doc(data.doc).set(data.obj);
+  } else {
+    db.collection(data.collection).doc(data.doc).delete();
   }
-  else if (data.type === "update") {
-    db.collection(data.collection).doc(data.doc).set(
-      data.obj
-    );
-  }
-  else {
-    db.collection(data.collection).doc(data.doc).delete()
-  }
-
 });
 
 exports.editBooking = functions.https.onCall(async (data, context) => {
-  var newAssetBooking = data.assetBooking
-  newAssetBooking.endDateTime = data.endDateTime
-  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount, assetBooking: newAssetBooking, status: data.status })
-  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime })
+  var newAssetBooking = data.assetBooking;
+  newAssetBooking.endDateTime = data.endDateTime;
+  db.collection("payments").doc(data.paymentId).update({
+    totalAmount: data.totalAmount,
+    assetBooking: newAssetBooking,
+    status: data.status,
+  });
+  db.collection("assets")
+    .doc(data.assetBooking.asset.id)
+    .collection("assetBookings")
+    .doc(data.assetBooking.id)
+    .update({ endDateTime: data.endDateTime });
 
   for (let i = 0; i < data.serviceBooking.length; i++) {
     var serviceBooking = {
@@ -323,68 +323,87 @@ exports.editBooking = functions.https.onCall(async (data, context) => {
       assetBooking: newAssetBooking,
       dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
       worker: data.serviceBooking[i].worker,
-      completed: false
-    }
+      completed: false,
+    };
 
-    var sId = ""
-    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef =>
-      sId = docRef.id
-    )
-    serviceBooking.id = sId
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
 
-    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
-      serviceBooking,
-      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
-      worker: data.serviceBooking[i].worker,
-      completed: false
-    })
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
   }
-
-
 });
 
 exports.manageServices = functions.https.onCall(async (data, context) => {
-
   if (data.status === "add") {
-    var sId = ""
-    let add = await db.collection("services").add(data.obj).then((docRef) =>
-      (sId = docRef.id)
-    )
+    var sId = "";
+    let add = await db
+      .collection("services")
+      .add(data.obj)
+      .then((docRef) => (sId = docRef.id));
     for (let i = 0; i < data.weekDays.length; i++) {
       if (data.weekDays[i].hours.length > 0) {
-        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays.day).set({ hours: data.weekDays[i].hours })
+        db.collection("services")
+          .doc(sId)
+          .collection("workingDays")
+          .doc(data.weekDays.day)
+          .set({ hours: data.weekDays[i].hours });
       }
     }
-
   }
 
   if (data.status === "update") {
-    db.collection("services").doc(data.selectedService.service.id).update(data.obj)
+    db.collection("services")
+      .doc(data.selectedService.service.id)
+      .update(data.obj);
 
     for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
-      if (data.serviceWorkHoursDays[i].service === data.selectedService.service) {
-        for (let k = 0; k < data.serviceWorkHoursDays[i].workingDays.length; k++) {
+      if (
+        data.serviceWorkHoursDays[i].service === data.selectedService.service
+      ) {
+        for (
+          let k = 0;
+          k < data.serviceWorkHoursDays[i].workingDays.length;
+          k++
+        ) {
           if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
-            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).set(
-              { hours: data.serviceWorkHoursDays[i].workingDays[k].hours })
-          }
-          else {
-            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).delete()
-
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .set({
+                hours: data.serviceWorkHoursDays[i].workingDays[k].hours,
+              });
+          } else {
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .delete();
           }
         }
-
       }
     }
   }
-
-})
+});
 
 exports.manageServiceWorkers = functions.https.onCall(async (data, context) => {
-
-  db.collection("users").doc(data.user.id).update(data.user)
-
-})
+  db.collection("users").doc(data.user.id).update(data.user);
+});
 exports.addFriend = functions.https.onCall(async (data, context) => {
   console.log("data", data);
   db.collection("users")
@@ -515,7 +534,6 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
-
   }
 });
 
@@ -674,7 +692,34 @@ exports.roleToIncomplete = functions.https.onCall(async (data, context) => {
 });
 
 exports.testJose = functions.https.onCall(async (data, context) => {
-  console.log("data.id", data.id);
+  console.log("testJose data", data);
+  console.log("testJose it started");
+  let passwordCode = Math.random().toString(36).slice(-8);
+  let doc = await db
+    .collection("users")
+    .doc(firebase.auth().currentUser.uid)
+    .get();
+
+  let resetPasswordArr;
+  if (
+    doc.data().resetPassword === undefined ||
+    doc.data().resetPassword === null
+  ) {
+    resetPasswordArr = [];
+  }
+
+  resetPasswordArr = doc.data().resetPassword;
+
+  db.collection("users")
+    .doc(data.id)
+    .update({ resetPassword: true, passwordCode });
+
+  setTimeout(() => {
+    db.collection("users")
+      .doc(data.id)
+      .update({ resetPassword: false, passwordCode: null });
+    console.log("testJose it's done");
+  }, 1000 * 10);
   // let userId = data.id;
   // let additionalClaims = {
   //   done: false,
@@ -690,21 +735,22 @@ exports.testJose = functions.https.onCall(async (data, context) => {
   // } catch (error) {
   //   console.log(error);
   // }
-  let userId = data.id;
-  let additionalClaims = {
-    premiumAccount: true,
-  };
+  // let userId = data.id;
+  // let additionalClaims = {
+  //   premiumAccount: true,
+  // };
 
-  admin
-    .auth()
-    .createCustomToken(userId, additionalClaims)
-    .then(function (customToken) {
-      return customToken;
-    })
-    .catch(function (error) {
-      console.log("Error creating custom token:", error);
-    });
+  // admin
+  //   .auth()
+  //   .createCustomToken(userId, additionalClaims)
+  //   .then(function (customToken) {
+  //     return customToken;
+  //   })
+  //   .catch(function (error) {
+  //     console.log("Error creating custom token:", error);
+  //   });
 });
+
 exports.deleteFavorite = functions.https.onCall(async (data, context) => {
   console.log("deleteFavorite   ", data);
   const res = await db
@@ -1072,4 +1118,59 @@ exports.deletePromotion = functions.https.onCall(async (data, context) => {
   console.log("delete promotion ", data);
   const response = await db.collection("promotionCodes").doc(data.id).delete();
   return response;
+});
+
+exports.sendResetPassCode = functions.https.onCall(async (data, context) => {
+  console.log("sendResetPassCode data", data);
+
+  let doc = await db
+    .collection("users")
+    .doc(data.id)
+    // .doc(firebase.auth().currentUser.uid)
+    .get();
+
+  let resetPasswordArr = doc.data().resetPassword;
+  console.log(resetPasswordArr);
+  // if never done it or null
+  if (resetPasswordArr === undefined || resetPasswordArr === null) {
+    resetPasswordArr = [];
+  }
+  // if more than one code submitted expire all
+  if (resetPasswordArr.length > 0) {
+    resetPasswordArr.map((item) => {
+      item.expired = true;
+      return item;
+    });
+  }
+  let passwordCode = Math.random().toString(36).slice(-8);
+  let passCode = { passwordCode, expired: false };
+  resetPasswordArr.push(passCode);
+  let body = `<p style="font-size: 16px;">Enter the code below to reset your password</p><p style="font-size: 32px;">${passwordCode}</p>`;
+  const response = await fetch(
+    `https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${
+      doc.data().email
+    }&sub=Reset Password&body=${body}`
+  );
+  // console.log(resetPasswordArr);
+  db.collection("users")
+    .doc(data.id)
+    // .doc(firebase.auth().currentUser.uid)
+    .update({ resetPassword: resetPasswordArr });
+  setTimeout(async () => {
+    let doc = await db
+      .collection("users")
+      .doc(data.id)
+      // .doc(firebase.auth().currentUser.uid)
+      .get();
+    let resetPasswordArr = doc.data().resetPassword;
+    resetPasswordArr.shift();
+    if (resetPasswordArr.length === 0) {
+      resetPasswordArr = null;
+    }
+    db.collection("users")
+      .doc(data.id)
+      // .doc(firebase.auth().currentUser.uid)
+      .update({ resetPassword: resetPasswordArr });
+    console.log("testJose it's done");
+  }, 1000 * 120);
 });
