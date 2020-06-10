@@ -16,6 +16,8 @@ import CustomersDetail from "./CustomersDetail";
 
 import UserHandlerHome from "./UserHandlerHome";
 
+import Loading from "./Loading";
+
 const EmployeeHandlerStack = createAppContainer(
   createStackNavigator(
     {
@@ -30,6 +32,8 @@ const EmployeeHandlerStack = createAppContainer(
 
       CustomersIndex: CustomersIndex,
       CustomersDetail: CustomersDetail,
+
+      Loading: Loading,
     },
     {
       // initialRouteName: "FriendsList",

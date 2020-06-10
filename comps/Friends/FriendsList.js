@@ -23,7 +23,7 @@ import {
   Feather,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-navigation";
-import { ListItem } from "react-native-elements";
+import { ListItem, Icon, Badge } from "react-native-elements";
 import moment from "moment";
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -355,58 +355,285 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <Button
-        title="Map"
-        onPress={() => props.navigation.navigate("FriendsMap")}
-      />
-      {/* <Text>Friends List</Text> */}
-      {/* <Button title="TEST" onPress={() => props.navigation.navigate("Test")} /> */}
-      {/* <Button title="Delete All" onPress={deleteAll} /> */}
-      <View style={{ flexDirection: "row" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          //paddingTop:'2%',
+        }}
+      >
+        <MaterialCommunityIcons
+          name="account-search"
+          size={40}
+          color="#fff"
+          style={{ paddingTop: "2%", marginBottom: 10 }}
+        />
         <TextInput
-          style={{ borderWidth: 1, borderColor: "white", width: "85%" }}
-          placeholder="Search here..."
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "80%",
+            height: "80%",
+            marginLeft: 7,
+            marginRight: 7,
+          }}
+          placeholderTextColor="#20365F"
+          placeholder="Search Here"
           onChangeText={setSearch}
           value={search}
         />
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate("FriendsMap")}
+        >
+          <FontAwesome5 name="map-marker-alt" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          flexDirection: "column",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#e3e3e3",
+          borderTopColor: "#185a9d",
+          height: "20%",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            borderRadius: 8,
+            borderBottomRightRadius: 0,
+            borderBottomLeftRadius: 0,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "40%",
+            marginLeft: 7,
+            marginRight: 7,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => props.navigation.navigate("FriendsSearch")}
+        >
+          <Ionicons name="md-person-add" size={28} color="#185a9d" />
+          <Text
+            style={{
+              color: "#185a9d",
+              fontSize: 18,
+              paddingLeft: "5%",
+              fontWeight: "500",
+            }}
+          >
+            ADD FRIENDS
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            borderRadius: 8,
+            borderTopRightRadius: 0,
+            borderTopLeftRadius: 0,
+            paddingLeft: "2%",
+            borderColor: "grey",
+            borderWidth: 1,
+            width: "95%",
+            height: "40%",
+            marginLeft: 7,
+            marginRight: 7,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => props.navigation.navigate("FriendsRequest")}
+        >
+          <FontAwesome name="users" size={28} color="#185a9d" />
+          {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
+          <Text
+            style={{
+              color: "#185a9d",
+              fontSize: 18,
+              paddingLeft: "5%",
+              fontWeight: "500",
+            }}
+          >
+            FRIENDS REQUESTS
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          height: "5%",
+        }}
+      >
+        {!editMode ? (
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 18,
+              paddingLeft: "5%",
+              fontWeight: "500",
+            }}
+          >
+            MY FRIENDS
+          </Text>
+        ) : (
+          //   <Text
+          //   style={{
+          //     color: "#fff",
+          //     fontSize: 18,
+          //     paddingLeft: "5%",
+          //     fontWeight: "500",
+          //   }}
+          // >
+          //   DELETE FRIENDS
+          // </Text>//#endregion
+          <View style={{ flexDirection: "row" }}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 18,
+                paddingLeft: "5%",
+                fontWeight: "500",
+                paddingTop: "2%",
+              }}
+            >
+              MY FRIENDS
+            </Text>
+            <TouchableOpacity
+              style={{
+                //width: "15%",
+                //  height:'15%',
+                borderWidth: 1,
+                borderRadius: 8,
+                borderColor: "#901616",
+                //marginLeft: "39%",
+                // justifyContent: 'flex-end',
+                alignItems: "flex-end",
+                // paddingTop: "1%",
+                backgroundColor: "#901616",
+              }}
+              onPress={() => {
+                setSelectedFriend("ALL");
+                setModal(true);
+              }}
+            >
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 18,
+                  // paddingLeft: "2%",
+                  // paddingRight:'2%',
+                  // paddingBottom:'1%',
+                  padding: "0.5%",
+                  fontWeight: "500",
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="delete-circle-outline"
+                  size={24}
+                  color="#fff"
+                />
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {editMode ? (
           <TouchableOpacity
             style={{
               width: "15%",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "white",
+              //  height:'15%',
               borderWidth: 1,
+              borderRadius: 8,
+              borderColor: "#3ea3a3",
+              marginLeft: "40%",
+              // justifyContent: 'flex-end',
+              alignItems: "center",
+              paddingTop: "1%",
+              backgroundColor: "#3ea3a3",
             }}
             onPress={() => setEditMode(false)}
           >
-            <Text>Done</Text>
+            {/* <AntDesign name="checkcircle" size={24} color="#3ea3a3" /> */}
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "500",
+                alignSelf: "center",
+                paddingBottom: "2%",
+                paddingLeft: "3%",
+              }}
+            >
+              DONE
+            </Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={{
               width: "15%",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "white",
+              //  height:'15%',
               borderWidth: 1,
+              borderRadius: 8,
+              borderColor: "#3ea3a3",
+              marginLeft: "50%",
+              // justifyContent: 'flex-end',
+              alignItems: "center",
+              paddingTop: "1%",
+              backgroundColor: "#3ea3a3",
             }}
             onPress={() => setEditMode(true)}
           >
-            <Text>Edit</Text>
+            {/* <FontAwesome5 name="edit" size={24} color="#fff" /> */}
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "500",
+                alignSelf: "center",
+                paddingBottom: "2%",
+                paddingLeft: "3%",
+              }}
+            >
+              EDIT
+            </Text>
           </TouchableOpacity>
         )}
+        {/* {editMode && (
+        <Button
+          title="Delete All"
+          onPress={() => {
+            setSelectedFriend("ALL");
+            setModal(true);
+          }}
+          color="red"
+        />
+      )} */}
       </View>
-
       {friends.length > 0 ? (
         <SafeAreaView
           style={{
             paddingTop: "2%",
-            // backgroundColor: "white",
+            backgroundColor: "#e3e3e3",
             height: "55%",
-            borderRadius: 30,
-            width: "90%",
-            marginLeft: "5%",
+            // borderRadius: 30,
+            width: "100%",
+            flex: 1,
+           // marginLeft: "1%",
+
             // borderColor:'#20365F',
             // borderWidth:1
           }}
@@ -415,93 +642,126 @@ export default function FriendsList(props) {
             <FlatList
               data={friends}
               keyExtractor={(item) => String(item.id)}
-              style={{ borderWidth: 1, borderColor: "#20365F" }}
+              style={{
+                borderWidth: 1,
+                borderColor: "#185a9d",
+                width: "98%",
+                marginLeft: "1%",
+              }}
               //contentContainerStyle={{alignItems:'flex-start', justifyContent:'space-around'}}
               renderItem={({ item, index }) => (
-                <ListItem
-                  key={item.id}
-                  leftAvatar={{ source: { uri: item.photoURL } }}
-                  // leftAvatar={
-                  //   <FontAwesome5
-                  //     name="user-friends"
-                  //     size={30}
-                  //     color="#20365F"
-                  //   />
-                  //  <AntDesign name="adduser" size={35} color="#20365F" />
-                  // }
-                  rightElement={
-                    editMode && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setSelectedFriend(item);
-                          setModal(true);
+                <TouchableOpacity>
+                  <ListItem
+                    key={item.id}
+                    leftAvatar={{ source: { uri: item.photoURL } }}
+                    leftIcon={
+                      <Badge
+                        status="warning"
+                        containerStyle={{
+                          position: "absolute",
+                          bottom: "78%",
+                          right: "62%",
+                          width: "2%",
                         }}
-                      >
-                        <MaterialCommunityIcons
-                          name="delete-forever-outline"
-                          size={30}
-                          color="#1B2D4F"
-                        />
-                        {/* <Feather name="x-circle" size={30} color="black" /> */}
-                      </TouchableOpacity>
-                    )
-                  }
-                  rightIcon={
-                    // <TouchableOpacity
-                    //   onPress={() =>
-                    //     props.navigation.navigate("FriendsChat", {
-                    //       friend: item,
-                    //     })
-                    //   }
-                    // >
+                        value={item.notifications}
+                      />
+                    }
+                    // leftAvatar={
                     //   <FontAwesome5
-                    //     name="rocketchat"
-                    //     size={24}
-                    //     color="#1B2D4F"
+                    //     name="user-friends"
+                    //     size={30}
+                    //     color="#20365F"
                     //   />
-                    //   {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
-                    // </TouchableOpacity>
+                    //  <AntDesign name="adduser" size={35} color="#20365F" />
+                    // }
+                    rightElement={
+                      editMode && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setSelectedFriend(item);
+                            setModal(true);
+                          }}
+                        >
+                          <MaterialCommunityIcons
+                            name="delete-forever-outline"
+                            size={30}
+                            color="#901616"
+                          />
+                          {/* <Feather name="x-circle" size={30} color="black" /> */}
+                        </TouchableOpacity>
+                      )
+                    }
+                    // rightIcon={
+                    //   // <TouchableOpacity
+                    //   //   onPress={() =>
+                    //   //     props.navigation.navigate("FriendsChat", {
+                    //   //       friend: item,
+                    //   //     })
+                    //   //   }
+                    //   // >
+                    //   //   <FontAwesome5
+                    //   //     name="rocketchat"
+                    //   //     size={24}
+                    //   //     color="#1B2D4F"
+                    //   //   />
+                    //   //   {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
+                    //   // </TouchableOpacity>
 
-                    // <FontAwesome5 name="rocketchat" size={24} color="black" />
+                    //   // <FontAwesome5 name="rocketchat" size={24} color="black" />
 
-                    <View>
-                      <Text>{item.status}</Text>
-                    </View>
-                  }
-                  title={item.displayName + " " + item.notifications}
-                  titleStyle={{ fontSize: 20 }}
-                  subtitle={
-                    // if more than 1 \n
-                    item.lastMessage.split("\n").length > 0
-                      ? // if first line more than 32 chars
-                        item.lastMessage.split("\n")[0].length > numOfChars
+                    //   <View>
+                    //     {item.status === "offline" ? (
+                    //       <Text style={{ color: "darkgrey", fontWeight: "600" ,marginRight:'10%'}}>
+                    //         {item.status}
+                    //       </Text>
+                    //     ) : (
+                    //       <Text style={{ color: "green", fontWeight: "600" }}>
+                    //         {item.status}
+                    //       </Text>
+                    //     )}
+                    //   </View>
+                    // }
+                    title={item.displayName}
+                    titleStyle={{ fontSize: 20 }}
+                    rightSubtitle={item.status}
+                    rightSubtitleStyle={
+                      item.status === "offline"
+                        ? { color: "darkgrey", fontWeight: "600" }
+                        : { color: "green", fontWeight: "600" }
+                    }
+                    subtitle={
+                      // if more than 1 \n
+                      item.lastMessage.split("\n").length > 0
+                        ? // if first line more than 32 chars
+                          item.lastMessage.split("\n")[0].length > numOfChars
+                          ? // message limited to 32 chars with .....
+                            item.lastMessage
+                              .split("\n")[0]
+                              .substring(0, numOfChars) + "......"
+                          : // first line showed
+                            item.lastMessage.split("\n")[0]
+                        : // else
+                        // if message more than 32 chars
+                        item.lastMessage.length > numOfChars
                         ? // message limited to 32 chars with .....
-                          item.lastMessage
-                            .split("\n")[0]
-                            .substring(0, numOfChars) + "......"
-                        : // first line showed
-                          item.lastMessage.split("\n")[0]
-                      : // else
-                      // if message more than 32 chars
-                      item.lastMessage.length > numOfChars
-                      ? // message limited to 32 chars with .....
-                        item.lastMessage.trim().substring(0, numOfChars) +
-                        "......"
-                      : // message showed
-                        item.lastMessage.trim()
-                  }
-                  //subtitle={item.status + " to add you"}
-                  subtitleStyle={{ fontSize: 12, color: "grey" }}
-                  bottomDivider
-                  onPress={
-                    editMode
-                      ? false
-                      : () =>
-                          props.navigation.navigate("FriendsChat", {
-                            friend: item,
-                          })
-                  }
-                />
+                          item.lastMessage.trim().substring(0, numOfChars) +
+                          "......"
+                        : // message showed
+                          item.lastMessage.trim()
+                    }
+                    //subtitle={item.status + " to add you"}
+                    subtitleStyle={{ fontSize: 12, color: "grey" }}
+                    bottomDivider
+                    onPress={
+                      editMode
+                        ? false
+                        : () =>
+                            props.navigation.navigate("FriendsChat", {
+                              friend: item,
+                            })
+                    }
+                  />
+                </TouchableOpacity>
               )}
             />
           </ScrollView>
@@ -526,69 +786,6 @@ export default function FriendsList(props) {
         </View>
       )}
 
-      {editMode && (
-        <Button
-          title="Delete All My Friends"
-          onPress={() => {
-            setSelectedFriend("ALL");
-            setModal(true);
-          }}
-          color="red"
-        />
-      )}
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 100,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 10,
-        }}
-        onPress={() => props.navigation.navigate("FriendsSearch")}
-      >
-        <Ionicons name="md-person-add" size={28} color="#20365F" />
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Add Friends
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#fff",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
-
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 30,
-          marginLeft: "20%",
-          marginEnd: "20%",
-          borderRadius: 10,
-          marginBottom: 50,
-        }}
-        onPress={() => props.navigation.navigate("FriendsRequest")}
-      >
-        <FontAwesome name="users" size={24} color="#20365F" />
-        {/* <Ionicons name="md-person-add" size={28} color="#20365F" /> */}
-        <Text style={{ color: "#20365F", fontSize: 22, paddingLeft: "5%" }}>
-          Friends Requests
-        </Text>
-      </TouchableOpacity>
-
       {/* ---------------------------------MODAL--------------------------------- */}
       <Modal transparent={true} visible={modal} animationType="slide">
         <View
@@ -600,6 +797,7 @@ export default function FriendsList(props) {
             marginTop: 22,
             // ---This is for Width---
             width: "80%",
+            color: "grey",
           }}
         >
           <View
@@ -609,6 +807,7 @@ export default function FriendsList(props) {
               borderRadius: 20,
               padding: 35,
               alignItems: "center",
+              alignSelf: "center",
               shadowColor: "#000",
               shadowOffset: {
                 width: 0,
@@ -620,19 +819,42 @@ export default function FriendsList(props) {
               justifyContent: "center",
               // ---This is for Height---
               height: "30%",
+              width: "100%",
             }}
           >
             {selectedFriend === "ALL" ? (
-              <Text>Are you sure you want to DELETE ALL your friends?</Text>
+              <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                Are you sure you want to{" "}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#901616",
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  {" "}
+                  DELETE ALL{" "}
+                </Text>{" "}
+                your friends?
+              </Text>
             ) : (
-              <Text>
-                Are you sure you want to DELETE{" "}
-                {selectedFriend && selectedFriend.displayName} from your
-                friends?
+              <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                Are you sure you want to{" "}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#901616",
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  DELETE {selectedFriend && selectedFriend.displayName}
+                </Text>{" "}
+                from your friends?
               </Text>
             )}
-            <Text></Text>
-            <Text></Text>
+            <Text>{"\n"}</Text>
             <View
               style={{
                 //   borderWidth: 1,
@@ -646,9 +868,12 @@ export default function FriendsList(props) {
               {/* ---------------------------------CONFIRM--------------------------------- */}
               <TouchableOpacity
                 style={{
-                  borderWidth: 1,
-                  width: "30%",
-                  height: "100%",
+                  borderWidth: 2,
+                  borderColor: "#901616",
+                  width: "35%",
+                  height: "110%",
+                  backgroundColor: "#901616",
+                  borderRadius: 8,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -662,20 +887,31 @@ export default function FriendsList(props) {
                   }
                 }}
               >
-                <Text>Confirm</Text>
+                <Text
+                  style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                >
+                  Confirm
+                </Text>
               </TouchableOpacity>
               {/* ---------------------------------CANCEL--------------------------------- */}
               <TouchableOpacity
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
+                  borderWidth: 2,
+                  borderColor: "#3ea3a3",
+                  width: "35%",
+                  height: "110%",
+                  backgroundColor: "#3ea3a3",
+                  borderRadius: 8,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
                 onPress={() => setModal(false)}
               >
-                <Text>Cancel</Text>
+                <Text
+                  style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -688,7 +924,25 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: "15%",
-    backgroundColor: "#20365F",
+    //   paddingTop: "15%",
+    backgroundColor: "#185a9d",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#000",
+    paddingBottom: 10,
+  },
+  inputStyle: {
+    flex: 1,
   },
 });
+
+FriendsList.navigationOptions = {
+  //header: null,
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+  tabBarIcon: () => {
+    <Icon name="news" type="font-awesome" size={24} color={"black"} />;
+  },
+};

@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import LottieView from "lottie-react-native";
+import * as Device from "expo-device";
 
 import {
   Feather,
@@ -24,12 +25,18 @@ import db from "../../../db";
 import firebase from "firebase";
 import "firebase/auth";
 import Car from "./Car";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { ScrollView } from "react-native-gesture-handler";
 const { width, height } = Dimensions.get("screen");
 
 export default function CarsScreen(props) {
   const [cars, setCars] = useState([]);
-
+  const [deviceType, setDeviceType] = useState(0);
+  // const size = PixelRatio.getPixelSizeForLayoutSize(140);
   const getUserCars = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -51,6 +58,13 @@ export default function CarsScreen(props) {
     props.setCarsModal(false);
     props.navigation.navigate("AddCars");
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   return (
     <Modal transparent={true} visible={props.carsModal}>
@@ -65,42 +79,56 @@ export default function CarsScreen(props) {
             }}
             onPress={() => props.setCarsModal(false)}
           >
-            <AntDesign name="close" size={25} style={{ color: "#224229" }} />
+            <AntDesign
+              name="close"
+              size={deviceType === 1 ? 20 : 40}
+              style={{ color: "#224229" }}
+            />
           </TouchableOpacity>
 
           <View
             style={{
               flex: 5,
-              borderColor: "black",
-              borderBottomWidth: 2,
+              // borderColor: "black",
+              // borderBottomWidth: 2,
             }}
           >
             <ScrollView>
               {cars.length === 0 ? (
                 <View style={styles.header}>
                   <LottieView
-                    source={require("../../../assets/872-empty-list.json")}
+                    source={require("../../../assets/17723-waitting.json")}
                     autoPlay
                     loop
                     style={{
                       position: "relative",
-                      width: "100%",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
                     }}
                   />
                   <Text
+                    style={
+                      deviceType === 1
+                        ? { fontSize: responsiveScreenFontSize(2) }
+                        : {
+                            fontSize: responsiveScreenFontSize(5),
+                          }
+                    }
                     style={{
-                      paddingTop: "15%",
-                      fontSize: 20,
-                      color: "darkred",
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(2),
+                      color: "darkgray",
                       fontWeight: "bold",
                     }}
                   >
-                    No vehicles added
+                    No vehicles
                   </Text>
                 </View>
               ) : (
                 <View>
-                  <Text style={styles.title}> My Vehicles</Text>
+                  <Text style={{ ...styles.title }}> My Vehicles</Text>
 
                   <FlatList
                     data={cars}
@@ -119,7 +147,7 @@ export default function CarsScreen(props) {
               justifyContent: "center",
             }}
           >
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{
                 flex: 0.4,
               }}
@@ -133,6 +161,42 @@ export default function CarsScreen(props) {
                 }}
               >
                 + Add a New Vehicle
+              </Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity
+              style={{
+                // flex: 0.2,
+                backgroundColor: "#2E9E9B",
+                height: responsiveScreenHeight(5),
+                width: responsiveScreenWidth(40),
+                // alignSelf: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                // marginStart: "2%",
+                // marginEnd: "2%",
+                borderRadius: 10,
+                // marginBottom: 10,
+              }}
+              // style={{ alignItems: "center", justifyContent: "center" }}
+              onPress={handleNavigate}
+            >
+              {/* <Image
+            source={require("../../../assets/images/addcard.png")}
+            style={{ height: 60, width: 60 }}
+          /> */}
+              <Text
+                style={{
+                  // height: 60,
+                  // backgroundColor: "red",
+                  // width: "60%",
+                  textAlign: "center",
+                  fontSize: responsiveScreenFontSize(2),
+                  // fontWeight: "bold",
+                  color: "white",
+                }}
+              >
+                + New Vehicle
               </Text>
             </TouchableOpacity>
           </View>
@@ -183,8 +247,8 @@ const styles = StyleSheet.create({
   },
   title: {
     // alignItems: "flex-end",
-    fontSize: 20,
-    color: "black",
+    fontSize: responsiveScreenFontSize(2),
+    color: "#005c9d",
     textAlign: "center",
     fontWeight: "bold",
     textTransform: "capitalize",
