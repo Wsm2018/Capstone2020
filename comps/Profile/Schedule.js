@@ -20,11 +20,16 @@ import "firebase/auth";
 import db from "../../db";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
-import { ListItem } from "react-native-elements";
+import { ListItem, getIconType } from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import ActionButton from "react-native-action-button";
-
+import { Ionicons } from "@expo/vector-icons";
+import {
+  Collapse,
+  CollapseHeader,
+  CollapseBody,
+} from "accordion-collapse-react-native";
 export default function Schedule(props) {
   const [user, setUser] = useState({});
   const [services, setServices] = useState({});
@@ -262,7 +267,9 @@ export default function Schedule(props) {
                     }}
                   >
                     <MaterialCommunityIcons
-                      name="worker"
+                      name={
+                        services.filter((s) => s.id === service)[0].serviceIcon
+                      }
                       size={33}
                       color="white"
                     />
@@ -283,96 +290,314 @@ export default function Schedule(props) {
             ))}
         </View>
 
-        <TouchableOpacity
-          style={{ borderWidth: 2, padding: 3, width: 100 }}
-          onPress={() => props.navigation.navigate("ScheduleCompleted")}
-        >
-          <Text>view completed</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{ borderWidth: 2, padding: 3, width: 100 }}
           onPress={() => setToday(true)}
         >
           <Text>Today</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        <Text>Next: </Text>
         {next ? (
-          <View>
-            <ListItem
-              key={next.id}
-              title={next.dateTime.split("T")[1]}
-              rightTitle={next.serviceBooking.service.name}
-              subtitle={next.serviceBooking.assetBooking.asset.description}
-              rightSubtitle={next.serviceBooking.assetBooking.asset.name}
-              titleStyle={{ color: "black", fontWeight: "bold" }}
-              rightTitleStyle={{ color: "black", fontWeight: "bold" }}
-              subtitleStyle={{ color: "gray" }}
-              rightSubtitleStyle={{ color: "gray" }}
-              bottomDivider
-            />
+          <View style={styles.two2}>
+            <Text style={styles.cardTitle}>Next</Text>
 
-            <TouchableOpacity
-              style={{ borderWidth: 2, padding: 3, width: 100 }}
-              onPress={() =>
-                props.navigation.navigate("ScheduleMap", {
-                  assetDestination: {
-                    coords: {
-                      latitude: parseFloat(
-                        next.serviceBooking.assetBooking.asset.location.U
-                      ),
-                      longitude: parseFloat(
-                        next.serviceBooking.assetBooking.asset.location.k
-                      ),
+            <View style={styles.text}>
+              <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+                Time
+              </Text>
+              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+                {next.dateTime.split("T")[1]}
+              </Text>
+            </View>
+            <View style={styles.text}>
+              <Text style={{ fontSize: 16, color: "black" }}>Service</Text>
+              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+                {next.serviceBooking.service.name}
+              </Text>
+            </View>
+            <View style={styles.text}>
+              <Text style={{ fontSize: 16, color: "black" }}>Parking Name</Text>
+              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+                {next.serviceBooking.assetBooking.asset.name}
+              </Text>
+            </View>
+            <View style={styles.text}>
+              <Text style={{ fontSize: 16, color: "black" }}>Description</Text>
+              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+                {next.serviceBooking.assetBooking.asset.description}
+              </Text>
+            </View>
+            <View
+              style={{
+                // width: "100%",
+                // height: "5%",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                alignSelf: "center",
+                flexDirection: "row",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#949494",
+                  height: 40,
+                  width: "38%",
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginStart: "2%",
+                  marginEnd: "2%",
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}
+                onPress={() =>
+                  props.navigation.navigate("ScheduleMap", {
+                    assetDestination: {
+                      coords: {
+                        latitude: parseFloat(
+                          next.serviceBooking.assetBooking.asset.location.U
+                        ),
+                        longitude: parseFloat(
+                          next.serviceBooking.assetBooking.asset.location.k
+                        ),
+                      },
                     },
-                  },
-                })
-              }
-            >
-              <Text>view in map</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ borderWidth: 2, padding: 3, width: 100 }}
-              onPress={() => setModalVisible(true)}
-            >
-              <Text>Completed</Text>
-            </TouchableOpacity>
+                  })
+                }
+              >
+                <Text style={{ color: "white" }}>View in Map</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#949494",
+                  height: 40,
+                  width: "38%",
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginStart: "2%",
+                  marginEnd: "2%",
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={{ color: "white" }}> Completed?</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (
-          <Text>All Done</Text>
+          <View style={styles.two2}>
+            <Text style={styles.cardTitle}>Next</Text>
+
+            <View style={styles.text}>
+              <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+                All Done
+              </Text>
+            </View>
+          </View>
         )}
 
+        {/* <View>
+          {next ? (
+            <View>
+              <ListItem
+                key={next.id}
+                title={next.dateTime.split("T")[1]}
+                rightTitle={next.serviceBooking.service.name}
+                subtitle={next.serviceBooking.assetBooking.asset.description}
+                rightSubtitle={next.serviceBooking.assetBooking.asset.name}
+                titleStyle={{ color: "black", fontWeight: "bold" }}
+                rightTitleStyle={{ color: "black", fontWeight: "bold" }}
+                subtitleStyle={{ color: "gray" }}
+                rightSubtitleStyle={{ color: "gray" }}
+                bottomDivider
+              />
+
+              <TouchableOpacity
+                style={{ borderWidth: 2, padding: 3, width: 100 }}
+                onPress={() =>
+                  props.navigation.navigate("ScheduleMap", {
+                    assetDestination: {
+                      coords: {
+                        latitude: parseFloat(
+                          next.serviceBooking.assetBooking.asset.location.U
+                        ),
+                        longitude: parseFloat(
+                          next.serviceBooking.assetBooking.asset.location.k
+                        ),
+                      },
+                    },
+                  })
+                }
+              >
+                <Text>view in map</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ borderWidth: 2, padding: 3, width: 100 }}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text>Completed</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <Text>All Done</Text>
+          )}
+          </View> */}
         {today ? (
           <View>
             {todaySchedule.length > 0 ? (
-              <View>
-                <Text style={{ fontSize: 26 }}>
-                  {todaySchedule[0].dateTime.split("T")[0]}
-                </Text>
-                <View>
-                  {todaySchedule.map((s) => (
-                    <ListItem
-                      key={s.id}
-                      title={s.dateTime.split("T")[1]}
-                      rightTitle={s.serviceBooking.service.name}
-                      subtitle={s.serviceBooking.assetBooking.asset.description}
-                      rightSubtitle={s.serviceBooking.assetBooking.asset.name}
-                      titleStyle={{ color: "black", fontWeight: "bold" }}
-                      rightTitleStyle={{ color: "black", fontWeight: "bold" }}
-                      subtitleStyle={{ color: "gray" }}
-                      rightSubtitleStyle={{ color: "gray" }}
-                      bottomDivider
-                    />
-                  ))}
-                </View>
+              <View style={styles.two2}>
+                <Collapse>
+                  <CollapseHeader>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        //justifyContent: "space-between",
+                        // paddingLeft: 20,
+                        paddingRight: "5%",
+                      }}
+                      // Platform.isPad ? styles.arrowIpad : styles.arrowPhone
+                    >
+                      <Text style={styles.cardTitle}>
+                        {todaySchedule[0].dateTime.split("T")[0]}
+                      </Text>
+                      <Ionicons
+                        name="md-arrow-dropdown"
+                        size={30}
+                        color="#5c5b5b"
+                      />
+                    </View>
+                  </CollapseHeader>
+                  <CollapseBody>
+                    <View>
+                      {/* <Text style={{ fontSize: 26 }}>
+                           {todaySchedule[0].dateTime.split("T")[0]}
+                         </Text> */}
+                      <View>
+                        {todaySchedule.map((s) => (
+                          <ListItem
+                            key={s.id}
+                            title={s.dateTime.split("T")[1]}
+                            rightTitle={s.serviceBooking.service.name}
+                            subtitle={
+                              s.serviceBooking.assetBooking.asset.description
+                            }
+                            rightSubtitle={
+                              s.serviceBooking.assetBooking.asset.name
+                            }
+                            titleStyle={{ color: "black", fontWeight: "bold" }}
+                            rightTitleStyle={{
+                              color: "black",
+                              fontWeight: "bold",
+                            }}
+                            subtitleStyle={{ color: "gray" }}
+                            rightSubtitleStyle={{ color: "gray" }}
+                            bottomDivider
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </CollapseBody>
+                </Collapse>
               </View>
             ) : (
-              <Text>No Scheduled Bookings</Text>
+              <View style={styles.two}>
+                <Collapse>
+                  <CollapseHeader>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        //justifyContent: "space-between",
+                        // paddingLeft: 20,
+                        paddingRight: "5%",
+                      }}
+                      // Platform.isPad ? styles.arrowIpad : styles.arrowPhone
+                    >
+                      <Text style={styles.cardTitle}>No Scheduled Booking</Text>
+                    </View>
+                  </CollapseHeader>
+                </Collapse>
+              </View>
             )}
           </View>
         ) : (
           <View>
+            <View style={styles.two2}>
+              <Collapse>
+                <CollapseHeader>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      //justifyContent: "space-between",
+                      // paddingLeft: 20,
+                      paddingRight: "5%",
+                    }}
+                    // Platform.isPad ? styles.arrowIpad : styles.arrowPhone
+                  >
+                    <Text style={styles.cardTitle}>
+                      {show &&
+                        show.filter((s) => s.dateTime.split("T")[0] === date)
+                          .length > 0 &&
+                        show
+                          .filter((s) => s.dateTime.split("T")[0] === date)[0]
+                          .dateTime.split("T")[0]}
+                    </Text>
+                    <Ionicons
+                      name="md-arrow-dropdown"
+                      size={30}
+                      color="#5c5b5b"
+                    />
+                  </View>
+                </CollapseHeader>
+                <CollapseBody>
+                  <View>
+                    {/* <Text style={{ fontSize: 26 }}>
+                           {todaySchedule[0].dateTime.split("T")[0]}
+                         </Text> */}
+                    <View>
+                      {show.filter((o) => o.dateTime.split("T")[0] === date)
+                        .length > 0 ? (
+                        show.map((s) =>
+                          s.dateTime.split("T")[0] === date ? (
+                            <ListItem
+                              key={s.id}
+                              title={s.dateTime.split("T")[1]}
+                              rightTitle={s.serviceBooking.service.name}
+                              subtitle={
+                                s.serviceBooking.assetBooking.asset.description
+                              }
+                              rightSubtitle={
+                                s.serviceBooking.assetBooking.asset.name
+                              }
+                              titleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                              rightTitleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                              }}
+                              subtitleStyle={{ color: "gray" }}
+                              rightSubtitleStyle={{ color: "gray" }}
+                              bottomDivider
+                            />
+                          ) : (
+                            <Text>try2</Text>
+                          )
+                        )
+                      ) : (
+                        <Text style={styles.cardTitle}>
+                          No Booked Scheduled at this date!
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </CollapseBody>
+              </Collapse>
+            </View>
+
+            {/* 
             <Text style={{ fontSize: 26 }}>
               {show &&
                 show.filter((s) => s.dateTime.split("T")[0] === date).length >
@@ -398,9 +623,18 @@ export default function Schedule(props) {
                   />
                 ) : null
               )}
-            </View>
+            </View> */}
           </View>
         )}
+        <Text></Text>
+        <TouchableOpacity
+          style={styles.blueButton}
+          onPress={() => props.navigation.navigate("ScheduleCompleted")}
+        >
+          <Text style={{ color: "white" }}>View Completed Work</Text>
+        </TouchableOpacity>
+
+        <Text></Text>
         <Modal
           animationType="fade"
           transparent={true}
@@ -409,40 +643,86 @@ export default function Schedule(props) {
             setModalVisible(false);
           }}
         >
-          <View style={{ marginTop: 22 }}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+              alignSelf: "center",
+              alignItems: "center",
+              marginTop: 22,
+              // ---This is for Width---
+              width: "80%",
+            }}
+          >
             <View
               style={{
-                marginTop: 22,
-                backgroundColor: "#919191",
-                margin: "5%",
-                padding: "5%",
-                // paddingTop: "1%",
-                justifyContent: "center",
+                margin: 20,
+                backgroundColor: "white",
+                borderRadius: 20,
+                padding: 35,
                 alignItems: "center",
-                borderRadius: 5,
-                ...Platform.select({
-                  ios: {
-                    paddingTop: 50,
-                    margin: "15%",
-                    minHeight: 300,
-                    width: "70%",
-                  },
-                  android: {
-                    minHeight: 200,
-                  },
-                }),
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                justifyContent: "center",
+                alignContent: "center",
+                alignSelf: "center",
+                alignItems: "center",
+                // ---This is for Height---
+                height: "50%",
               }}
             >
-              <Text>Did you complete the service</Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  textAlign: "center",
+                }}
+              >
+                Did you complete the service
+              </Text>
+              <Text></Text>
+              <Text></Text>
+              <View
+                style={{
+                  width: "100%",
+                  height: "5%",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                  alignSelf: "center",
+                  flexDirection: "row",
+                }}
+              >
+                {/* ---------------------------------CONFIRM--------------------------------- */}
+                <TouchableOpacity
+                  onPress={() => handleComplete(next)}
+                  style={styles.greenButton}
+                >
+                  <Text style={{ color: "white" }}> Yes</Text>
+                </TouchableOpacity>
+                {/* ---------------------------------CANCEL--------------------------------- */}
+                <TouchableOpacity
+                  style={styles.redButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={{ color: "white" }}>No</Text>
+                </TouchableOpacity>
+              </View>
+              {/* 
               <Button title="yes" onPress={() => handleComplete(next)} />
-              <Button title="no" onPress={() => setModalVisible(false)} />
+              <Button title="no" onPress={() => setModalVisible(false)} /> */}
             </View>
           </View>
         </Modal>
       </ScrollView>
       <ActionButton
         buttonColor={"#3ea3a3"}
-        size={50}
+        size={80}
         //  style={styles.actionButtonIcon2}
         // icon={responsiveScreenFontSize(10)}
         buttonTextStyle={{ fontSize: 20 }}
@@ -483,7 +763,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     // backgroundColor: "red",
     width: "100%",
-    height: 50,
+    height: 25,
     color: "#185a9d",
     fontWeight: "bold",
   },
@@ -499,12 +779,25 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     marginTop: "3%",
-    padding: "5%",
+    padding: "3%",
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: "lightgray",
     flexDirection: "row",
     flexWrap: "wrap",
+    // justifyContent: "space-between",
+  },
+  two2: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "3%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    // flexDirection: "row",
+    //flexWrap: "wrap",
+    borderBottomColor: "white",
     // justifyContent: "space-between",
   },
   surface: {
@@ -530,5 +823,49 @@ const styles = StyleSheet.create({
     //height: 22,
     // width: 22,
     fontSize: 20,
+  },
+  text: {
+    fontSize: 80,
+    // marginLeft: "1%",
+    // marginRight: "1%",
+    marginBottom: "1%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  blueButton: {
+    backgroundColor: "#185a9d",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  greenButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  redButton: {
+    backgroundColor: "#901616",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });
