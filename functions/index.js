@@ -595,7 +595,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
         data.role === "manager" || data.role.slice(-7) === "handler"
           ? `${data.role} (request)`
           : `${data.role} (incomplete)`,
-      qrCode: "",
+      qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${account.uid}`,
       displayName: data.displayName,
       phone: null,
       referralCode,
