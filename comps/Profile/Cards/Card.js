@@ -125,7 +125,7 @@ export default function Card(props) {
               <TouchableOpacity onPress={() => handleDeleteAlert()}>
                 <Octicons
                   name="trashcan"
-                  size={deviceType === 1 ? 20 : 40}
+                  size={deviceType === 1 ? 23 : 40}
                   color="#ede9eb"
                 />
               </TouchableOpacity>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   card: {
-    backgroundColor: "rgb(26,148,149)",
+    backgroundColor: "#20365F",
     borderWidth: 0,
     borderRadius: 20,
   },
@@ -191,6 +191,6 @@ const styles = StyleSheet.create({
 });
 
 Card.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

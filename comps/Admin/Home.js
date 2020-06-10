@@ -41,7 +41,7 @@ export default function Home(props) {
   const items = [
     {
       name: "Users",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Users"),
       image: require("../../assets/images/adminpic/list.jpg"),
       height: 120,
@@ -49,7 +49,7 @@ export default function Home(props) {
     },
     {
       name: "Statistics",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Statistics"),
       image: require("../../assets/images/adminpic/charts.jpg"),
       height: 120,
@@ -58,7 +58,7 @@ export default function Home(props) {
 
     {
       name: "Booking",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Types"),
       image: require("../../assets/images/adminpic/bookings.jpg"),
       height: 120,
@@ -66,7 +66,7 @@ export default function Home(props) {
     },
     {
       name: "Make Admin",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("MakeAdmin"),
       image: require("../../assets/images/adminpic/admin.jpg"),
       height: 120,
@@ -75,7 +75,7 @@ export default function Home(props) {
 
     {
       name: "Promotion",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Promotion"),
       image: require("../../assets/images/adminpic/promotion.jpg"),
       height: 120,
@@ -183,7 +183,7 @@ export default function Home(props) {
         //verticalOrientation="down"
       >
         <ActionButton.Item
-          buttonColor="#9b59b6"
+          buttonColor="#185a9d"
           title="Change Role"
           onPress={handleChangeRole}
         >
@@ -194,7 +194,7 @@ export default function Home(props) {
           />
         </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="#3498db"
+          buttonColor="#901616"
           title="Logout"
           onPress={() => {
             firebase.auth().signOut();
@@ -258,9 +258,10 @@ const styles = StyleSheet.create({
     height: 150,
   },
   itemName: {
-    fontSize: 16,
+    fontSize: responsiveScreenFontSize(1.9),
+    fontWeight: "bold",
     color: "#fff",
-    fontWeight: "600",
+    // fontWeight: "600",
   },
   itemCode: {
     fontWeight: "600",

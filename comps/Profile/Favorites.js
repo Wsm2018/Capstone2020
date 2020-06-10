@@ -243,7 +243,7 @@ export default function Favorites({
           >
             <AntDesign
               name="close"
-              size={deviceType === 1 ? 20 : 40}
+              size={deviceType === 1 ? 25 : 40}
               style={{ color: "#224229" }}
             />
           </TouchableOpacity>
@@ -314,24 +314,38 @@ export default function Favorites({
                 </View>
               </View>
             ) : (
-              <View>
-                <Text
+              <View
+                style={{
+                  // flex: 0.5,
+                  flex: 0.5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
                   style={{
-                    // paddingTop: "15%",
-
-                    fontSize: 20,
-                    color: "#005c9d",
-                    fontWeight: "bold",
+                    // flex: 0.5,
+                    flex: 0.2,
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  My Favorites
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      color: "#185a9d",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    My Favorites
+                  </Text>
+                </View>
                 {favoriteAssets.map((item, index) => (
                   <View
                     width={Dimensions.get("window").width / 1.2}
                     style={{
-                      flex: 0.1,
-                      marginTop: "5%",
+                      flex: 1,
+                      marginTop: "10%",
                       // backgroundColor: "red",
                       justifyContent: "center",
                       alignItems: "center",
@@ -384,7 +398,7 @@ export default function Favorites({
                               flex: 0.2,
                               justifyContent: "center",
                               alignItems: "center",
-                              // marginEnd: 15,
+                              marginEnd: 15,
                               // backgroundColor: "yellow",
 
                               // marginTop: 15,
@@ -393,8 +407,8 @@ export default function Favorites({
                           >
                             <FontAwesome
                               name="remove"
-                              size={24}
-                              color="darkgray"
+                              size={28}
+                              color="#901616"
                             />
                           </TouchableOpacity>
                           {/* <Button
@@ -411,36 +425,26 @@ export default function Favorites({
                               setSelectedAsset(item);
                             }}
                             style={{
-                              flex: 0.4,
-
-                              // position: "relative",
-                              // width: "100%",
-                              // flex: 1,
-                              // height: "100%",
-                              // backgroundColor: "blue",
+                              backgroundColor: "#2E9E9B",
+                              height: responsiveScreenHeight(4),
+                              width: responsiveScreenWidth(25),
+                              alignSelf: "center",
                               justifyContent: "center",
                               alignItems: "center",
+                              marginEnd: 15,
+                              borderRadius: 10,
+                              // marginBottom: 10,
                             }}
                           >
-                            <Image
-                              width={Dimensions.get("window").width / 5}
-                              source={require("../../assets/images/bookit2.png")}
-                              autoPlay
-                              // onPress={() => setCarsModal(true)}
-                              // loop
-                              style={
-                                {
-                                  // position: "relative",
-                                  // width: "70%",
-                                  // height: "75%",
-                                  // flex: 1,
-                                  // backgroundColor: "blue",
-                                  // justifyContent: "center",
-                                  // alignItems: "center",
-                                  // paddingTop: "5%",
-                                }
-                              }
-                            />
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                fontSize: responsiveScreenFontSize(2),
+                                color: "white",
+                              }}
+                            >
+                              Book Now
+                            </Text>
                           </TouchableOpacity>
                         </View>
                         <Text
@@ -448,7 +452,7 @@ export default function Favorites({
                             fontSize: 20,
                             paddingStart: 10,
                             fontWeight: "bold",
-                            color: "#20365F",
+                            color: "#185a9d",
                             // fontVariant: 4,
                             // backgroundColor: "green",
                             // backgroundColor: "blue",
@@ -554,18 +558,15 @@ export default function Favorites({
               >
                 <TouchableOpacity
                   style={{
-                    flex: 0.5,
-                    backgroundColor: "#20365F",
-                    // borderWidth: 4,
-                    // height: 20,
-                    width: "40%",
-                    // alignSelf: "center",
+                    backgroundColor: "#2E9E9B",
+                    height: responsiveScreenHeight(4),
+                    width: responsiveScreenWidth(25),
+                    alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
-                    //marginStart: "2%",
-                    //marginEnd: "2%",
+                    marginEnd: 15,
                     borderRadius: 10,
-                    //marginBottom: 10,
+                    // marginBottom: 10,
                   }}
                   // style={{ flex: 0.5, backgroundColor: "yellow" }}
                   onPress={() => handleBooking()}
@@ -575,7 +576,7 @@ export default function Favorites({
                       textAlign: "center",
                       fontSize: 16,
                       color: "white",
-                      fontWeight: "bold",
+                      // fontWeight: "bold",
                     }}
                   >
                     Book
@@ -626,7 +627,7 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 1.3,
+    height: height / 1.6,
     width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
@@ -635,7 +636,7 @@ const styles = StyleSheet.create({
       height: 1,
       width: 1,
     },
-    borderRadius: 20,
+    borderRadius: 10,
     // padding: 35,
     // justifyContent: "center",
     // alignItems: "center",

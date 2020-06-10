@@ -140,93 +140,97 @@ export default function AddCard(props) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            flex: 3,
-            width: "90%",
-            marginTop: "15%",
-            justifyContent: "center",
-          }}
-        >
-          <CreditCardInput
-            elevation={5}
-            labels={labels}
-            requiresName={true}
-            onChange={handleCard}
-            allowScroll={true}
-            // labelStyle={{ fontSize: responsiveScreenFontSize(2) }}
-            inputStyle={{
-              //
-              borderWidth: 1,
-              backgroundColor: "white",
-              height: responsiveScreenHeight(5.5),
-              width: responsiveScreenWidth(80),
-
-              fontSize: responsiveScreenFontSize(2),
-              paddingStart: 10,
-              // marginStart: 2,
-              // borderRadius: 5,
-              // textAlign: "center",
-            }}
-            inputContainerStyle={
-              {
-                // marginTop: 60,
-              }
-            }
-            labelStyle={{ color: "gray" }}
-            cardImageFront={require("../../../assets/images/dark1.jpg")}
-            cardImageBack={require("../../../assets/images/dark2.png")}
-          />
-        </View>
-        <View
-          width={Dimensions.get("screen").width}
-          style={{
-            flex: 1,
-            // width: "30%",
-            // backgroundColor: "red",
-
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
+      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+        <View style={{ backgroundColor: "white", flex: 1, margin: 10 }}>
+          <View
             style={{
-              backgroundColor: "#3d9478",
-              // height: 40,
-              // width: "30%",
-              height: responsiveScreenHeight(6),
-              width: responsiveScreenWidth(35),
-              alignSelf: "center",
-              justifyContent: "center",
+              flex: 1,
               alignItems: "center",
-              borderRadius: 10,
-              marginBottom: 10,
             }}
-            onPress={handleAddCard}
           >
-            <Text
+            <View
               style={{
-                textAlign: "center",
-                fontSize: responsiveScreenFontSize(2.5),
-                // fontWeight: "bold",
-                color: "white",
+                flex: 3,
+                width: "90%",
+                marginTop: "15%",
+                justifyContent: "center",
               }}
             >
-              Save
-            </Text>
-          </TouchableOpacity>
+              <CreditCardInput
+                elevation={5}
+                labels={labels}
+                requiresName={true}
+                onChange={handleCard}
+                allowScroll={true}
+                // labelStyle={{ fontSize: responsiveScreenFontSize(2) }}
+                inputStyle={{
+                  //
+                  borderBottomWidth: 1,
+                  backgroundColor: "white",
+                  height: responsiveScreenHeight(5.5),
+                  width: responsiveScreenWidth(70),
+
+                  fontSize: responsiveScreenFontSize(1.5),
+                  paddingStart: 10,
+                  // marginStart: 2,
+                  // borderRadius: 5,
+                  // 4796416651443066177
+                }}
+                inputContainerStyle={
+                  {
+                    // marginTop: 60,
+                  }
+                }
+                labelStyle={{ color: "gray" }}
+                cardImageFront={require("../../../assets/images/dark1.jpg")}
+                cardImageBack={require("../../../assets/images/dark2.png")}
+              />
+            </View>
+            <View
+              width={Dimensions.get("screen").width}
+              style={{
+                flex: 1,
+                // width: "30%",
+                // backgroundColor: "red",
+
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#3d9478",
+                  // height: 40,
+                  // width: "30%",
+                  height: responsiveScreenHeight(5),
+                  width: responsiveScreenWidth(30),
+                  alignSelf: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 10,
+                  marginBottom: 10,
+                }}
+                onPress={handleAddCard}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: responsiveScreenFontSize(2),
+                    // fontWeight: "bold",
+                    color: "white",
+                  }}
+                >
+                  Save
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
   );
 }
 AddCard.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

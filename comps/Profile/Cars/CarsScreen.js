@@ -116,12 +116,12 @@ export default function CarsScreen(props) {
                             fontSize: responsiveScreenFontSize(5),
                           }
                     }
-                    // style={{
-                    //   // paddingTop: "15%",
-                    //   fontSize: 20,
-                    //   color: "darkgray",
-                    //   fontWeight: "bold",
-                    // }}
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(2),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
                   >
                     No vehicles
                   </Text>
