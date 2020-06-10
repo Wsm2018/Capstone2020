@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Button, TouchableOpacity, Image, TextInput, Alert, Modal, StyleSheet, Dimensions } from "react-native";
+import {
+    Platform, View, Text, Button, TouchableOpacity, Image, TextInput, Alert, Modal, StyleSheet, Dimensions
+} from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -86,15 +88,17 @@ export default function ServiceManagement(props) {
     }, [])
 
     const handleSelectService = (s) => {
-        if(serviceWorkHoursDays ){
+        if (serviceWorkHoursDays) {
             var addWD = serviceWorkHoursDays.filter(w => w.service.id == s.id)[0]
             //console.log("add wd" , addWD , s)
             //setSelectedService()
             var temp = { service: addWD.service, workingDays: addWD.workingDays }
             setSelectedService(temp)
+            setShowEdit(false)
+            setShowAdd(false)
             setUpdate(!update)
         }
-       
+
     }
 
     useEffect(() => {
@@ -115,7 +119,7 @@ export default function ServiceManagement(props) {
 
 
     const getServices = () => {
-        
+
         db.collection("services").onSnapshot((snapshot) => {
             const temp = []
             snapshot.forEach(doc => {
@@ -137,7 +141,6 @@ export default function ServiceManagement(props) {
     }
 
     useEffect(() => {
-         console.log(" Ahaaaaaaaaaaaaaaaaa")
         if (services.length > 0) {
             //setServiceWorkHoursDays([])
             setServiceWorkHoursDays([])
@@ -152,12 +155,9 @@ export default function ServiceManagement(props) {
                 });
                 // console.log("here", i)
             }
-            if(selectedService){
-                console.log(" haaalaalujs", services.filter( i => selectedService.service.id == i.id)[0] )
-                handleSelectService(services.filter( i => selectedService.service.id == i.id)[0])
-            }
+
         }
-       
+
     }, [services])
 
 
@@ -171,11 +171,11 @@ export default function ServiceManagement(props) {
         }
         temp.push({ service, workingDays: workingAt })
         setServiceWorkHoursDays(temp)
-        setServiceWorkHoursDaysBackUp(temp)
+       // setServiceWorkHoursDaysBackUp(temp)
     }
 
     const handleDB = async () => {
-     
+
         const manageServices = firebase.functions().httpsCallable("manageServices");
         if (showAdd) {
             setShowAdd(false)
@@ -192,7 +192,7 @@ export default function ServiceManagement(props) {
                 weekDays: weekDays.current,
                 obj
             });
-            
+
         }
         else if (showEdit) {
             setShowEdit(false)
@@ -217,9 +217,9 @@ export default function ServiceManagement(props) {
             var serv = s.data()
             serv.id = selectedService.service.id
             //getServices()
-             
+
             setSelectedService()
-            
+
             //handleSelectService(serv)
             weekDays.current = [{ day: "Saturday", hours: [] }, { day: "Sunday", hours: [] }, { day: "Monday", hours: [] }, { day: "Tuesday", hours: [] }, { day: "Wednesday", hours: [] }, { day: "Thursday", hours: [] }, { day: "Friday", hours: [] }]
         }
@@ -244,7 +244,7 @@ export default function ServiceManagement(props) {
 
         var found = []
         if (selectedService) {
-            console.log(selectedService.service.id , selectedService.workingDays)
+            console.log(selectedService.service.id, selectedService.workingDays)
             found = serviceWorkHoursDays.filter(f => f.service.id == selectedService.service.id)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
         }
         else {
@@ -255,12 +255,9 @@ export default function ServiceManagement(props) {
 
     const addDay = (day, hour) => {
         if (selectedService) {
-            //add to service working hours -- edit --
+
             var temp = serviceWorkHoursDays
-            //console.log(" aha?", selectedService.service)
-            serviceWorkHoursDays.forEach(f => {
-                // console.log("aha?????????????????????????????????", f.service , f.workingDays )
-            })
+           
             var found = serviceWorkHoursDays.filter(f => f.service == selectedService.service)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
             if (found.length > 0) {
 
@@ -354,7 +351,7 @@ export default function ServiceManagement(props) {
 
 
         if (status == "delete") {
-            Alert.alert("Remove Worker ",
+            Alert.alert("Remove Employee ",
                 u.email + " from " + selectedService.service.name + " ?", [
                 { text: "Yes", onPress: () => removeWorker(u) },
                 { text: "No", onPress: () => console.log("NOO") }
@@ -368,18 +365,28 @@ export default function ServiceManagement(props) {
             const response = await manageServiceWorkers({
                 user: temp
             });
+            
+            Alert.alert("Emplyee ",
+                u.email + " is Assigned for " + selectedService.service.name + ".", [
+                { text: "OK", onPress: () => console.log("NOO") }
+
+            ], { cancelable: true });
             setSelectedUser()
             setFilteredWorkers([])
-            setOpenWorkersModal(false)
+            
+            setShowWorkers(false)
+            setSelectedService()
+            //setServices([])
+            getServices()
         }
-        setServices([])
-        getServices()
+
+
         setUpdate(!update)
 
     }
 
     const removeWorker = async (u) => {
-        console.log("deleting" , u)
+        console.log("deleting", u)
         const manageServiceWorkers = firebase.functions().httpsCallable("manageServiceWorkers");
         u.services = u.services.filter(s => s != selectedService.service.id)
         const response = await manageServiceWorkers({
@@ -388,6 +395,9 @@ export default function ServiceManagement(props) {
         setSelectedUser()
         setFilteredWorkers([])
         setOpenWorkersModal(false)
+        setSelectedService()
+        setServices([])
+        getServices()
     }
 
     const filterWorkers = () => {
@@ -424,7 +434,7 @@ export default function ServiceManagement(props) {
                     <MaterialCommunityIcons
                         name={"plus-box"}
                         size={25}
-                        color={"#609e9f"}
+                        color={"#a6a6a6"}
                         onPress={() => setShowAdd(true) || setSelectedService()}
                     />
 
@@ -435,28 +445,55 @@ export default function ServiceManagement(props) {
                             <TouchableOpacity onPress={() => handleSelectService(s)} style={{
                                 flexDirection: "row",
                                 marginBottom: "1%",
-                                width: "46%",
-                                height: 36,
-                                margin: "1%"
+                                width: "30%",
+                                height: 50,
+                                margin: "1%",
+                                padding: 4,
+                                backgroundColor: selectedService && selectedService.service == s ? "#2E9E9B" : "white",
+                                borderColor: "#2E9E9B",
+                                borderWidth: 1,
+                                borderRadius: 5
 
                             }}>
-                                <MaterialCommunityIcons
-                                    name={s.serviceIcon}
-                                    size={25}
-                                    color={"#609e9f"}
-                                    onPress={() => setShowAdd(true)}
-                                    style={{
-                                        width: "25%",
-                                        marginRight: "3%",
-                                        marginLeft: "1%"
-                                    }}
-                                />
+
                                 <View style={{
-                                    marginBottom: "auto",
-                                    marginTop: "auto",
+                                    marginLeft: "auto",
+                                    marginRight: "auto",
+                                    // backgroundColor: "blue",
+                                    height: "100%",
+                                    width: "100%",
+                                    // flexDirection: "row"
                                 }}>
-                                    <Text style={{
-                                    }}>{s.name}</Text>
+                                    <View style={{
+                                        marginLeft: "auto",
+                                        marginRight: "auto",
+                                        // backgroundColor: "green",
+                                        marginBottom: "auto",
+                                        marginTop: "auto",
+                                        flexDirection: "row"
+                                    }}>
+                                        <MaterialCommunityIcons
+                                            name={s.serviceIcon}
+                                            size={25}
+                                            color={selectedService && selectedService.service == s ? "white" : "#609e9f"}
+                                            onPress={() => setShowAdd(true)}
+                                            style={{
+                                                marginBottom: "auto",
+                                                marginTop: "auto",
+                                                width: "20%",
+                                                marginRight: "3%",
+                                                marginLeft: "1%",
+                                                // backgroundColor: "yellow"
+                                            }}
+                                        />
+
+                                        <Text style={{
+                                            marginBottom: "auto",
+                                            marginTop: "auto",
+                                            // backgroundColor: "red"
+                                            color: selectedService && selectedService.service == s ? "white" : "#609e9f"
+                                        }}>{s.name}</Text>
+                                    </View>
                                 </View>
 
 
@@ -490,19 +527,19 @@ export default function ServiceManagement(props) {
                             <MaterialCommunityIcons
                                 name={"delete"}
                                 size={20}
-                                color={"#609e9f"}
+                                color={"#185a9d"}
                                 onPress={() => handleDB()}
                                 style={{ width: "15%" }}
                             />
                             <MaterialCommunityIcons
                                 name={"square-edit-outline"}
                                 size={20}
-                                color={"#609e9f"}
+                                color={"#185a9d"}
                                 onPress={() =>
                                     setShowEdit(true) ||
                                     setShowAdd(false) ||
-                                    setMaxBookings(selectedService.service.maxBookings) ||
-                                    setPrice(selectedService.service.price) ||
+                                    setMaxBookings(parseInt(selectedService.service.maxBookings)) ||
+                                    setPrice(parseInt(selectedService.service.price)) ||
                                     setName(selectedService.service.name) ||
                                     setServiceIcon(selectedService.service.serviceIcon)
                                     //console.log("ehhh", selectedService)
@@ -538,8 +575,18 @@ export default function ServiceManagement(props) {
                                 <Text>{selectedService.service.rating}</Text>
                             </View>
 
-                            <Button title="Schedule" onPress={() => setShowSchedule(true)} />
-                            {/* <Button title="Workers" onPress={() => setShowWorkers(true) || filterWorkers()} /> */}
+
+                            <TouchableOpacity
+                                onPress={() => setShowSchedule(true)}
+                                style={{
+                                    backgroundColor: "#609e9f",
+                                    width: 170,
+                                    marginTop: "2%",
+                                    borderRadius: 5,
+                                    padding: 15,
+                                }}
+                            ><Text style={{ marginLeft: "auto", marginRight: "auto", color: "white", fontSize: 15 }}>Schedule</Text></TouchableOpacity>
+
 
                         </View>
 
@@ -558,7 +605,7 @@ export default function ServiceManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"plus-box"}
                                     size={25}
-                                    color={"#609e9f"}
+                                    color={"#a6a6a6"}
                                     onPress={() => filterWorkers() || setShowWorkers(true)}
                                     style={{ position: "absolute", left: "90%" }}
                                 />
@@ -569,8 +616,6 @@ export default function ServiceManagement(props) {
                                         {
                                             workers.map(w =>
                                                 <View style={{ flexDirection: "row", borderBottomColor: "gray", borderBottomWidth: 1 }}>
-
-                                                    <TouchableOpacity style={{ width: "80%" }} onPress={() => setSelectedUser(w)}><Text>{w.email}</Text></TouchableOpacity>
                                                     <MaterialCommunityIcons
                                                         name={"account-remove-outline"}
                                                         size={25}
@@ -578,6 +623,13 @@ export default function ServiceManagement(props) {
                                                         onPress={() => manageWorker("delete", w)}
                                                         style={{ margin: "1%" }}
                                                     />
+                                                    <TouchableOpacity style={{ width: "80%" }}
+                                                        onPress={() => setSelectedUser(w)}>
+                                                        <Text style={{ marginBottom: "auto", marginTop: "auto" }}>
+                                                            {w.email}
+                                                        </Text>
+                                                    </TouchableOpacity>
+
                                                 </View>
 
                                             )}
@@ -853,12 +905,7 @@ export default function ServiceManagement(props) {
                     null
             }
 
-
-
-
-
-
-            {
+{
                 showEdit || showAdd ?
                     <View style={styles.two3}>
                         <View style={{ flexDirection: "row", width: "100%" }}>
@@ -870,10 +917,10 @@ export default function ServiceManagement(props) {
                                 width: "70%",
                                 height: 50,
                                 color: "gray",
-                            }}>Add / edit</Text>
+                            }}>{ showAdd ? "Add New Service" : "Edit "+ selectedService.service.name}</Text>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "30%" }}>
 
-                                
+
                                 <MaterialCommunityIcons
                                     name={"close"}
                                     size={20}
@@ -900,9 +947,9 @@ export default function ServiceManagement(props) {
                             <TextInput
                                 onChangeText={setPrice}
                                 placeholder="Price"
-                                value={price}
+                                value={parseInt(price)}
                                 style={styles.textInputs}
-                                keyboardType={'numeric'} 
+                                keyboardType={'numeric'}
                                 min={1}
                             />
                         </View>
@@ -912,9 +959,9 @@ export default function ServiceManagement(props) {
                             <TextInput
                                 onChangeText={setMaxBookings}
                                 placeholder="Max Bookings Per Day"
-                                value={maxBookings}
+                                value={parseInt(maxBookings)}
                                 style={styles.textInputs}
-                                keyboardType={'numeric'} 
+                                keyboardType={'numeric'}
                                 min={1}
                             />
                         </View>
@@ -1083,40 +1130,33 @@ export default function ServiceManagement(props) {
                             null
                         }
 
-{showAdd ?
-                                    <MaterialCommunityIcons
-                                        name={"plus"}
-                                        size={20}
-                                        color={"gray"}
-                                        onPress={() => handleDB()}
-                                    //style={{ position: "absolute", left: "100%", marginTop: "3%" }}
-                                    />
-
-                                    :
-                                    <MaterialCommunityIcons
-                                        name={"square-edit-outline"}
-                                        size={20}
-                                        color={"gray"}
-                                        onPress={() => handleDB()}
-                                    //style={{ position: "absolute", left: "100%", marginTop: "3%" }}
-                                    />
-
-                                }
-
-
+                     
+                            
+                            <TouchableOpacity
+                            onPress={() => handleDB()}
+                            style={{
+                                backgroundColor: "#609e9f",
+                                width: 170,
+                                marginTop: "2%",
+                                borderRadius: 2,
+                               padding: 10,
+                               marginLeft: "auto",
+                                marginRight: "auto",
+                            }}
+                        ><Text style={{ marginLeft: "auto", marginRight: "auto", color: "white", fontSize: 18 ,height:20}}>{showAdd ? "Add" : "Edit"}</Text></TouchableOpacity>
                     </View>
-
-
-
                     :
                     null
             }
-
         </ScrollView >
     );
 }
 
-
+ServiceManagement.navigationOptions = {
+    title: "Service Management",
+    headerStyle: { backgroundColor: "#185a9d" },
+    headerTintColor: "white",
+};
 const styles = StyleSheet.create({
     container: {
         flex: 1,

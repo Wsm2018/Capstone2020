@@ -15,7 +15,7 @@ import {
     Modal,
     CheckBox,
     Dimensions,
-    Alert
+    Alert , KeyboardAvoidingView
 } from "react-native";
 
 
@@ -29,6 +29,7 @@ import { ColorPicker, TriangleColorPicker } from 'react-native-color-picker'
 import SketchPicker from "react-color"
 import { ColorWheel } from 'react-native-color-wheel';
 require("firebase/firestore");
+const { width, height } = Dimensions.get("window");
 
 export default function AssetManagement(props) {
     const [latLong, setLatLong] = useState("");
@@ -67,6 +68,7 @@ export default function AssetManagement(props) {
     const [lat, setLat] = useState(0.0)
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [deleting, setDeleting] = useState(false)
+
 
     const icons = [
         "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
@@ -281,7 +283,7 @@ export default function AssetManagement(props) {
                     <MaterialCommunityIcons
                         name={"plus-box"}
                         size={25}
-                        color={"#185a9d"}
+                        color={"#a6a6a6"}
                         onPress={() => setShowAddType(true)}
 
                     />
@@ -403,8 +405,8 @@ export default function AssetManagement(props) {
                         </View>
 
                         <TouchableOpacity style={{
-                            backgroundColor: "#185a9d",
-                            width: "40%",
+                            backgroundColor: "#609e9f",
+                            width: 170,
                             marginTop: "2%",
                             borderRadius: 5,
                             padding: 15,
@@ -422,16 +424,17 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"plus-box"}
                                     size={25}
-                                    color={"#185a9d"}
+                                    color={"#a6a6a6"}
                                     onPress={() => setShowAddSection(true)}
                                     style={{ position: "absolute", left: "100%" }}
                                 />
 
                             </View>
+                            <View style={{width:"100%" , flexWrap:"wrap"  , flexDirection:"row"}}>
                             {
                                 sections.map((t, i) =>
                                     t.assetType == selectedType.id ?
-                                        <View style={{ width: "33%", alignItems: "center" }} key={i}>
+                                        <View style={{  alignItems: "center" }} key={i}>
                                             <TouchableOpacity
                                                 onPress={() => setSelectedSection(t)}
                                                 style={{
@@ -479,6 +482,7 @@ export default function AssetManagement(props) {
                                         null
 
                                 )}
+                                </View>
                         </View>
                     </View>
                     :
@@ -569,64 +573,67 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"plus-box"}
                                     size={25}
-                                    color={"#185a9d"}
+                                    color={"#a6a6a6"}
                                     onPress={() => setShowAddAsset(true)}
                                     style={{ position: "absolute", left: "100%" }}
                                 />
 
                             </View>
 
-                            {
+<View style={{width:"100%" , flexWrap:"wrap" , flexDirection:"row"}}>
+{
 
-                                assets.map((t, i) =>
-                                    t.assetSection == selectedSection.id ?
-                                        <View key={i}>
-                                            <TouchableOpacity
-                                                onPress={() => setSelectedAsset(t)}
-                                                style={{
-                                                    backgroundColor:
-                                                        selectedSection === t ? "#20365F" : "#e3e3e3",
-                                                    width: 80,
-                                                    height: 80,
-                                                    margin: 5,
-                                                    alignItems: "center",
-                                                    flexDirection: "row",
-                                                    //elevation: 12,
-                                                    borderWidth: 2,
-                                                    borderColor: "#20365F",
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        // height: "20%",
-                                                        width: "100%",
-                                                        justifyContent: "center",
-                                                        textAlign: "center",
-                                                        alignContent: "center",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <MaterialCommunityIcons
-                                                        name={selectedType.assetIcon}
-                                                        size={40}
-                                                        color={"#20365F"}
-                                                    />
-                                                    <Text
-                                                        style={{
-                                                            textAlign: "center",
-                                                            color: "#20365F",
-                                                            fontSize: 20,
-                                                        }}
-                                                    >
-                                                        {t.code}
-                                                    </Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        </View>
-                                        :
-                                        null
-                                )}
+assets.map((t, i) =>
+    t.assetSection == selectedSection.id ?
+        <View key={i}>
+            <TouchableOpacity
+                onPress={() => setSelectedAsset(t)}
+                style={{
+                    backgroundColor:
+                        selectedSection === t ? "#20365F" : "#e3e3e3",
+                    width: 80,
+                    height: 80,
+                    margin: 5,
+                    alignItems: "center",
+                    flexDirection: "row",
+                    //elevation: 12,
+                    borderWidth: 2,
+                    borderColor: "#20365F",
+                }}
+            >
+                <View
+                    style={{
+                        // height: "20%",
+                        width: "100%",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        alignContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    <MaterialCommunityIcons
+                        name={selectedType.assetIcon}
+                        size={40}
+                        color={"#20365F"}
+                    />
+                    <Text
+                        style={{
+                            textAlign: "center",
+                            color: "#20365F",
+                            fontSize: 20,
+                        }}
+                    >
+                        {t.code}
+                    </Text>
+                </View>
+            </TouchableOpacity>
+        </View>
+        :
+        null
+)}
 
+</View>
+                            
                         </View>
                     </View>
                     :
@@ -747,6 +754,7 @@ export default function AssetManagement(props) {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
+                                
 
                                 <MaterialCommunityIcons
                                     name={"close"}
@@ -976,9 +984,21 @@ export default function AssetManagement(props) {
                     null
             }
 
+{/* <KeyboardAvoidingView
+        
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{
+          width: "100%",
+          flex: 1,
+          backgroundColor: "#20365F",
+         height: "100%",
+        }}
+        // keyboardVerticalOffset={-100}
+      ></KeyboardAvoidingView> */}
 
             {
                 showAddAsset || showEditAsset ?
+                
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -986,7 +1006,9 @@ export default function AssetManagement(props) {
                             Alert.alert("Modal has been closed.");
                         }}
                     >
+                       
                         <View style={styles.centeredView}>
+                        
                             <View style={styles.modalView}>
                                 <MaterialCommunityIcons
                                     name={"close"}
@@ -995,7 +1017,14 @@ export default function AssetManagement(props) {
                                     onPress={() => setShowAddAsset(false) || cancelAll()}
                                     style={{ position: "absolute", left: "110%", marginTop: "4%" }}
                                 />
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <KeyboardAvoidingView
+        
+        behavior={Platform.OS === "ios" ? "position" : "padding"}
+        style={{
+ 
+        }}
+      ><ScrollView>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Name</Text>
                                     <TextInput
                                         onChangeText={setName}
@@ -1006,7 +1035,7 @@ export default function AssetManagement(props) {
                                 </View>
 
 
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Code</Text>
                                     <TextInput
                                         onChangeText={setCode}
@@ -1016,7 +1045,7 @@ export default function AssetManagement(props) {
                                     />
                                 </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Price</Text>
                                     <TextInput
                                         onChangeText={setPrice}
@@ -1026,7 +1055,7 @@ export default function AssetManagement(props) {
                                     />
                                 </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Type</Text>
                                     <TextInput
                                         onChangeText={setType}
@@ -1036,7 +1065,7 @@ export default function AssetManagement(props) {
                                     />
                                 </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Number of People</Text>
                                     <TextInput
                                         onChangeText={setNumOfPeople}
@@ -1045,7 +1074,7 @@ export default function AssetManagement(props) {
                                         style={styles.textInputs}
                                     />
                                 </View>
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Location</Text>
                                     <View style={{ width: "70%", margin: "1%" }}>
                                         <Text>Longitude</Text>
@@ -1075,7 +1104,7 @@ export default function AssetManagement(props) {
                                         />
                                     </View></View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
                                     <Text style={styles.inputTitles}>Description</Text>
                                     <TextInput
                                         onChangeText={setDescription}
@@ -1121,7 +1150,7 @@ export default function AssetManagement(props) {
                                         description,
                                         type
                                     }, selectedAsset.id)}
-                                    style={{ marginBottom: "4%" }}
+                                    style={{ marginBottom: "4%" , marginLeft:"auto" , marginRight:"auto"}}
                                 />
                                 {/* <Button title="Add" onPress={() => handleAdd("assets", {
                                     assetSection: selectedSection.id,
@@ -1136,10 +1165,13 @@ export default function AssetManagement(props) {
                                     description,
                                     type
                                 })} disabled={!name || !code || !price || !description} /> */}
-
+</ScrollView></KeyboardAvoidingView>
                             </View>
+                            
                         </View>
+                       
                     </Modal>
+                   
                     :
                     null
             }
@@ -1196,7 +1228,6 @@ export default function AssetManagement(props) {
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        //visible={}
                         onRequestClose={() => {
                             Alert.alert("Modal has been closed.");
                         }}
@@ -1235,21 +1266,16 @@ export default function AssetManagement(props) {
                     null
             }
 
-
-
-
-
         </ScrollView>
     );
 }
 
 AssetManagement.navigationOptions = (props) => ({
     title: "Asset Management",
-    headerStyle: { backgroundColor: "white" },
+    headerStyle: { backgroundColor: "#185a9d" },
     headerTintColor: "black",
     headerTintStyle: { fontWeight: "bold" }
 })
-
 
 const styles = StyleSheet.create({
     container: {
@@ -1345,16 +1371,18 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 22,
+        marginTop: 60,
         //width : "70%"
     },
     modalView: {
-        margin: 20,
+        height: height / 1.35,
+    width: width / 1.2,
+        // margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
-        paddingTop: 35,
-        paddingLeft: 35,
-        paddingRight: 35,
+        padding: 38,
+        // paddingLeft: 35,
+        // paddingRight: 35,
 
         alignItems: "center",
         shadowColor: "#000",
@@ -1365,7 +1393,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-        width: "75%"
+        // width: "75%"
     },
     openButton: {
         backgroundColor: "#F194FF",
@@ -1402,7 +1430,7 @@ const styles = StyleSheet.create({
         //backgroundColor: "blue"
     },
     inputTitles: {
-        width: "35%",
+        width: "28%",
         marginBottom: "auto",
         marginTop: "auto",
         //backgroundColor:"red"
