@@ -226,10 +226,12 @@ export default function CheckOut(props) {
     var u = user.data();
     u.id = firebase.auth().currentUser.uid;
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
+    var temp = assetBooking.asset;
+    temp.assetBookings = [];
 
     const response = await handleBooking({
-      user: user.data(),
-      asset: assetBooking.asset,
+      user: u,
+      asset: temp,
       startDateTime: assetBooking.startDateTime,
       endDateTime: assetBooking.endDateTime,
       card: {
@@ -657,6 +659,7 @@ export default function CheckOut(props) {
                   assetBooking: assetBooking,
                   serviceBooking: serviceBooking,
                   totalAmount: totalAmount,
+                  tName,
                 })
               }
               style={styles.payButton}

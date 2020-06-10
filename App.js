@@ -468,6 +468,7 @@ export default function App(props) {
             switch (activeRole) {
               case "admin":
                 return <AdminAppContainer />;
+              // return <FriendsStack />;
 
               case "manager":
                 return <ManagersStack />;

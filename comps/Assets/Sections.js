@@ -38,6 +38,7 @@ import Review from "./Review";
 
 import { set } from "react-native-reanimated";
 import { Avatar, Card, Title, Paragraph } from "react-native-paper";
+import * as Animatable from "react-native-animatable";
 
 export default function Sections(props) {
   // const [fromFav, setFromFav] = useState(false);
@@ -98,14 +99,19 @@ export default function Sections(props) {
     "10:00 PM",
     "11:00 PM",
   ]);
+
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [assetTotal, setAssetTotal] = useState(0);
+  const [serviceTotal, setServiceTotal] = useState(0);
+
   const fav = props.navigation.getParam("flag", false);
   console.log(fav);
 
   useEffect(() => {
-    // setShowSections(false);
-    // setSelectedList("");
-    // setAssetList([]);
-    // setSelectedSection(null);
+    setShowSections(false);
+    setSelectedList("");
+    setAssetList("");
+    setSelectedSection(null);
   }, [startDate, endDate]);
 
   useEffect(() => {
@@ -468,6 +474,108 @@ export default function Sections(props) {
     setTempEndDate(d);
     endTimeModal === false && setEndTimeModal(true);
   };
+
+  ////////////////////////////////Front-End///////////////////////////////////////
+  useEffect(() => {
+    if (selectedList) {
+      countAssetTotal();
+      setTotalAmount(assetTotal + serviceTotal);
+      // console.log("111111111111111111111111");
+    }
+    // console.log("222222222222222222");
+  });
+
+  // useEffect(() => {
+  //   setTotalAmount(assetTotal + serviceTotal);
+  // }, [assetTotal]);
+
+  // useEffect(() => {
+  //   if (selectedList) {
+  //     setTotalAmount(assetTotal + serviceTotal);
+  //   }
+  // }, [serviceTotal]);
+
+  const countAssetTotal = () => {
+    if (startDate && endDate) {
+      var start = "";
+      var end = "";
+      var startHour = "";
+      var endHour = "";
+      // console.log("origin", startDate, endDate);
+      var tempStart = startDate;
+      var tempEnd = endDate;
+      if (startDate.split(" ")[3] == "PM") {
+        tempStart =
+          startDate.split(" ")[0] +
+          " T " +
+          (parseInt(startDate.split(" ")[2].split(":")[0]) + 12) +
+          ":00:00";
+      } else {
+        tempStart =
+          startDate.split(" ")[0] + " T " + startDate.split(" ")[2] + ":00";
+      }
+      if (endDate.split(" ")[3] == "PM") {
+        tempEnd =
+          endDate.split(" ")[0] +
+          " T " +
+          (parseInt(endDate.split(" ")[2].split(":")[0]) + 12) +
+          ":00:00";
+      } else {
+        tempEnd = endDate.split(" ")[0] + " T " + endDate.split(" ")[2] + ":00";
+      }
+      //now is 24 h
+      console.log("temp end", tempEnd, "start", tempStart);
+      //digits
+      if (tempStart.split(" ")[2].split(":")[0].split("").length == 1) {
+        startHour = "0" + tempStart.split(" ")[2].split(":")[0].split("")[0];
+        start = tempStart.split(" ")[0] + "T" + startHour + ":00:00";
+      } else {
+        start = tempStart.split(" ").join("");
+      }
+      if (tempEnd.split(" ")[2].split(":")[0].split("").length == 1) {
+        endHour = "0" + tempEnd.split(" ")[2].split(":")[0].split("")[0];
+        end = tempEnd.split(" ")[0] + "T" + endHour + ":00:00";
+      } else {
+        end = tempEnd.split(" ").join("");
+      }
+
+      // count days and total
+      var s = new Date(start);
+      var e = new Date(end);
+      var diff = (e.getTime() - s.getTime()) / 1000;
+
+      diff /= 60 * 60;
+
+      var assetTotal =
+        Math.round(diff * parseInt(selectedList.price) * 100) / 100;
+
+      // var serviceTotal = 0;
+      // if (serviceBooking.length > 0) {
+      //   for (let i = 0; i < serviceBooking.length; i++) {
+      //     serviceTotal = serviceTotal + parseInt(serviceBooking[i].service.price);
+      //   }
+      // }
+      // setTotalAmount(assetTotal + serviceTotal);
+      setAssetTotal(assetTotal);
+    }
+  };
+
+  const countServiceTotal = (serviceBooking) => {
+    // console.log(serviceBooking, "----------------");
+    console.log(
+      " here in count serviiiiiiiiiiiicccccccccccccccccceeeeeeeeeeeessssssssssss"
+    );
+    var serviceTotal = 0;
+    if (serviceBooking.length > 0) {
+      for (let i = 0; i < serviceBooking.length; i++) {
+        serviceTotal = serviceTotal + parseInt(serviceBooking[i].service.price);
+      }
+    }
+    // setTotalAmount(assetTotal + serviceTotal);
+    setServiceTotal(serviceTotal);
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <View style={styles.container}>
@@ -860,7 +968,7 @@ export default function Sections(props) {
         </View>
         <View style={styles.three}>
           {showInMap ? (
-            <View style={{ flexDirection: "row", width: "100%" }}>
+            <View style={{ flexDirection: "row", width: "100%", height: 40 }}>
               <TouchableOpacity
                 // style={styles.cardTitle}
                 onPress={() => setMapGridFlag(false)}
@@ -1003,45 +1111,52 @@ export default function Sections(props) {
                   </View>
                 ))
               ) : showInMap === true ? (
-                <MapView
-                  style={{ height: 250, width: "100%" }}
-                  showsUserLocation={true}
-                  followsUserLocation={focus}
-                  region={{
-                    latitude: selectedSection.location.latitude,
-                    longitude: selectedSection.location.longitude,
-                    latitudeDelta: 0.002,
-                    longitudeDelta: 0.002,
-                  }}
-                  mapType={"satellite"}
-                >
-                  <TouchableOpacity onPress={() => setFocus(!focus)}>
+                <View style={{ width: "100%" }}>
+                  <MapView
+                    style={{ height: 500, width: "100%" }}
+                    showsUserLocation={true}
+                    followsUserLocation={focus}
+                    region={{
+                      latitude: selectedSection.location.latitude,
+                      longitude: selectedSection.location.longitude,
+                      latitudeDelta: 0.002,
+                      longitudeDelta: 0.002,
+                    }}
+                    mapType={"satellite"}
+                  >
+                    {/* <TouchableOpacity onPress={() => setFocus(!focus)}>
                     <Text style={{ color: "white" }}>
                       Focus is {focus ? "On" : "Off"}
                     </Text>
-                  </TouchableOpacity>
-                  {finalAssets.length > 0 ? (
-                    finalAssets.map((l, i) => (
-                      <Marker
-                        onPress={() =>
-                          setSelectedList(l) || setDetailsView(true)
-                        }
-                        key={i}
-                        style={{ width: 20, height: 20 }}
-                        image={
-                          l.status === true
-                            ? require("../../assets/images/green.jpg")
-                            : require("../../assets/images/red.jpg")
-                        }
-                        coordinate={l.location}
-                        title={`parking No.${l.name}`}
-                        description={`Press here to reserve parking number ${l.description}`}
-                      />
-                    ))
-                  ) : (
-                    <Text>Loading</Text>
-                  )}
-                </MapView>
+                  </TouchableOpacity> */}
+                    {finalAssets.length > 0 ? (
+                      finalAssets.map((l, i) => (
+                        <Marker
+                          onPress={() =>
+                            setSelectedList(l) || setDetailsView(true)
+                          }
+                          key={i}
+                          style={{ width: 20, height: 20 }}
+                          image={
+                            l.status === true
+                              ? require("../../assets/images/green.jpg")
+                              : require("../../assets/images/red.jpg")
+                          }
+                          coordinate={l.location}
+                          title={`parking No.${l.name}`}
+                          description={`Press here to reserve parking number ${l.description}`}
+                        />
+                      ))
+                    ) : (
+                      <Text>Loading</Text>
+                    )}
+                  </MapView>
+                  {/* <TouchableOpacity onPress={() => setFocus(!focus)}>
+                    <Text style={{ color: "black" }}>
+                      Focus is {focus ? "On" : "Off"}
+                    </Text>
+                  </TouchableOpacity> */}
+                </View>
               ) : (
                 <Text>there is no map for this item</Text>
               )
@@ -1088,6 +1203,7 @@ export default function Sections(props) {
                       navigation={props.navigation}
                       assetIcon={assetIcon}
                       sectionIcon={sectionIcon}
+                      countServiceTotal={countServiceTotal}
                     />
                   </View>
                 )}
@@ -1105,6 +1221,59 @@ export default function Sections(props) {
 
         {/* <View style={{ height: 15 }}></View> */}
       </ScrollView>
+      {selectedList === "" ? null : (
+        <Animatable.View
+          animation="fadeInRight"
+          style={{
+            minWidth: 100,
+            // minHeight: 50,
+            backgroundColor: "white",
+            position: "absolute",
+            top: 100,
+            right: 0,
+            borderWidth: 1,
+            borderColor: "#901616",
+            borderRightWidth: 0,
+            borderBottomWidth: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            // shadowColor: "#000",
+            // shadowOffset: {
+            //   width: 1,
+            //   height: 2,
+            // },
+            // shadowOpacity: 1,
+            // shadowRadius: 3.84,
+            // elevation: 5,
+          }}
+        >
+          <Text
+            style={{
+              color: "#185a9d",
+              fontWeight: "bold",
+              fontSize: 20,
+              padding: 5,
+            }}
+          >
+            {totalAmount}
+            <Text style={{ fontSize: 14, color: "#185a9d" }}> QR</Text>
+          </Text>
+
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              backgroundColor: "#901616",
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            TOTAL
+          </Text>
+
+          {/* <Text style={{ color: "white" }}>0 Points</Text> */}
+        </Animatable.View>
+      )}
     </View>
   );
 }
