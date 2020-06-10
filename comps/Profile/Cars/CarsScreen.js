@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import LottieView from "lottie-react-native";
+import * as Device from "expo-device";
 
 import {
   Feather,
@@ -78,7 +79,11 @@ export default function CarsScreen(props) {
             }}
             onPress={() => props.setCarsModal(false)}
           >
-            <AntDesign name="close" size={25} style={{ color: "#224229" }} />
+            <AntDesign
+              name="close"
+              size={deviceType === 1 ? 20 : 40}
+              style={{ color: "#224229" }}
+            />
           </TouchableOpacity>
 
           <View
@@ -111,19 +116,19 @@ export default function CarsScreen(props) {
                             fontSize: responsiveScreenFontSize(5),
                           }
                     }
-                    // style={{
-                    //   // paddingTop: "15%",
-                    //   fontSize: 20,
-                    //   color: "darkgray",
-                    //   fontWeight: "bold",
-                    // }}
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(2),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
                   >
                     No vehicles
                   </Text>
                 </View>
               ) : (
                 <View>
-                  <Text style={styles.title}> My Vehicles</Text>
+                  <Text style={{ ...styles.title }}> My Vehicles</Text>
 
                   <FlatList
                     data={cars}
@@ -163,8 +168,8 @@ export default function CarsScreen(props) {
               style={{
                 // flex: 0.2,
                 backgroundColor: "#2E9E9B",
-                height: 40,
-                width: "50%",
+                height: responsiveScreenHeight(5),
+                width: responsiveScreenWidth(40),
                 // alignSelf: "center",
                 justifyContent: "center",
                 alignItems: "center",
@@ -186,7 +191,7 @@ export default function CarsScreen(props) {
                   // backgroundColor: "red",
                   // width: "60%",
                   textAlign: "center",
-                  fontSize: 18,
+                  fontSize: responsiveScreenFontSize(2),
                   // fontWeight: "bold",
                   color: "white",
                 }}
@@ -242,7 +247,7 @@ const styles = StyleSheet.create({
   },
   title: {
     // alignItems: "flex-end",
-    fontSize: 20,
+    fontSize: responsiveScreenFontSize(2),
     color: "#005c9d",
     textAlign: "center",
     fontWeight: "bold",

@@ -170,7 +170,7 @@ export default function Details(props) {
       });
 
     db.collection("users")
-      .where("role", "==", "service employee")
+      .where("role", "==", "services employee")
       .onSnapshot((snapshot) => {
         var worker = "";
         snapshot.forEach((doc) => {
@@ -419,7 +419,7 @@ export default function Details(props) {
 
       setServiceBooking([...temp]);
     }
-
+    props.countServiceTotal(serviceBooking);
     orderList();
     getAvailableTimings();
   };
@@ -572,7 +572,9 @@ export default function Details(props) {
       checkToDelete(toDelete[i].show, service);
     }
   };
-
+  useEffect(() => {
+    props.countServiceTotal(serviceBooking);
+  }, [serviceBooking]);
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 15 }}>
@@ -802,192 +804,196 @@ export default function Details(props) {
           <View style={{ height: "92%" }}>
             <ScrollView>
               <View style={{}}>
-                {services ? (
-                  services.map((s) => (
-                    <View>
-                      <TouchableOpacity
-                        onPress={
-                          expand === s
-                            ? () => setExpand([])
-                            : () => setSelectedService(s) || setExpand(s)
-                        }
-                        // onPress={() => setSelectedService(s)}
-                        style={{
-                          // borderWidth: 1,
-                          // borderBottomWidth: 1,
-                          // borderColor: "#20365F",
-                          backgroundColor: "#f5f5f5",
-                          flexDirection: "row",
-                          padding: 10,
-                          // borderRadius: 5,
-                          marginBottom: expand === s ? 0 : 10,
-                        }}
-                      >
-                        <View
+                {services
+                  ? services.map((s) => (
+                      <View>
+                        <TouchableOpacity
+                          onPress={
+                            expand === s
+                              ? () => setExpand([])
+                              : () => setSelectedService(s) || setExpand(s)
+                          }
+                          // onPress={() => setSelectedService(s)}
                           style={{
-                            width: "80%",
-                            flexDirection: "row",
-                            alignItems: "center",
-                          }}
-                        >
-                          <MaterialCommunityIcons
-                            name={s.serviceIcon}
-                            size={25}
-                            color="#185a9d"
-                          />
-                          <Text> {s.name}</Text>
-                        </View>
-                        <View style={{ width: "20%", alignItems: "flex-end" }}>
-                          <Text style={{}}>
-                            {expand === s ? (
-                              <MaterialIcons
-                                name="expand-less"
-                                size={20}
-                                color="#185a9d"
-                              />
-                            ) : (
-                              <MaterialIcons
-                                name="expand-more"
-                                size={20}
-                                color="#185a9d"
-                              />
-                            )}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                      {expand === s && showTimings ? (
-                        <View
-                          style={{
+                            // borderWidth: 1,
+                            // borderBottomWidth: 1,
+                            // borderColor: "#20365F",
                             backgroundColor: "#f5f5f5",
+                            flexDirection: "row",
                             padding: 10,
-                            marginBottom: 10,
+                            // borderRadius: 5,
+                            marginBottom: expand === s ? 0 : 10,
                           }}
                         >
-                          {userDays.map((d, dayindex) => (
-                            <View
-                              style={
-                                {
-                                  // marginBottom: d.timesList.length > 0 && 5,
-                                }
-                              }
-                            >
-                              {/* {console.log(d, dayindex)} */}
-
-                              {/* {d.timesList.length === 0 &&
-                                dayindex === userDays.length - 1 && (
-                                  <Text>No services available</Text>
-                                )} */}
-                              {d.timesList.length > 0 && (
-                                <Text>{getDay(d.day)}</Text>
+                          <View
+                            style={{
+                              width: "80%",
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <MaterialCommunityIcons
+                              name={s.serviceIcon}
+                              size={25}
+                              color="#185a9d"
+                            />
+                            <Text> {s.name}</Text>
+                          </View>
+                          <View
+                            style={{ width: "20%", alignItems: "flex-end" }}
+                          >
+                            <Text style={{}}>
+                              {expand === s ? (
+                                <MaterialIcons
+                                  name="expand-less"
+                                  size={20}
+                                  color="#185a9d"
+                                />
+                              ) : (
+                                <MaterialIcons
+                                  name="expand-more"
+                                  size={20}
+                                  color="#185a9d"
+                                />
                               )}
-                              {d.timesList.length > 0 ? (
-                                <View
-                                  style={{
-                                    flexDirection: "row",
-                                    flexWrap: "wrap",
-                                    marginBottom: 10,
-                                  }}
-                                >
-                                  {d.timesList.length > 0
-                                    ? d.timesList.map((t, timeindex) =>
-                                        checkHour(timeindex, dayindex) ==
-                                        "green" ? (
-                                          <TouchableOpacity
-                                            style={{
-                                              // borderWidth: 2,
-                                              borderColor: "#185a9d",
-                                              backgroundColor: "#185a9d",
-                                              borderRadius: 5,
-                                              padding: 5,
-                                              width: "23%",
-                                              margin: 3,
-                                              alignItems: "center",
-                                              justifyContent: "center",
-                                            }}
-                                            onPress={() =>
-                                              book(dayindex, timeindex)
-                                            }
-                                          >
-                                            <Text
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                        {expand === s && showTimings ? (
+                          <View
+                            style={{
+                              backgroundColor: "#f5f5f5",
+                              padding: 10,
+                              marginBottom: 10,
+                            }}
+                          >
+                            {userDays.map((d, dayindex) => (
+                              <View
+                                style={
+                                  {
+                                    // marginBottom: d.timesList.length > 0 && 5,
+                                  }
+                                }
+                              >
+                                {/* {d.timesList.length > 0 && ( */}
+                                <Text>{getDay(d.day)}</Text>
+                                {/* )} */}
+                                {d.timesList.length > 0 ? (
+                                  <View
+                                    style={{
+                                      flexDirection: "row",
+                                      flexWrap: "wrap",
+                                      marginBottom: 10,
+                                    }}
+                                  >
+                                    {d.timesList.length > 0
+                                      ? d.timesList.map((t, timeindex) =>
+                                          checkHour(timeindex, dayindex) ==
+                                          "green" ? (
+                                            <TouchableOpacity
                                               style={{
-                                                color: "white",
-                                                fontSize: 13,
-                                                textAlign: "center",
+                                                // borderWidth: 2,
+                                                borderColor: "#185a9d",
+                                                backgroundColor: "#185a9d",
+                                                borderRadius: 5,
+                                                padding: 5,
+                                                width: "23%",
+                                                margin: 3,
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                              }}
+                                              onPress={() =>
+                                                book(dayindex, timeindex)
+                                              }
+                                            >
+                                              <Text
+                                                style={{
+                                                  color: "white",
+                                                  fontSize: 13,
+                                                  textAlign: "center",
+                                                }}
+                                              >
+                                                {t.show}
+                                              </Text>
+                                            </TouchableOpacity>
+                                          ) : checkHour(timeindex, dayindex) ==
+                                            "white" ? (
+                                            <TouchableOpacity
+                                              style={{
+                                                borderWidth: 2,
+                                                borderColor: "#185a9d",
+                                                backgroundColor: "white",
+                                                borderRadius: 5,
+                                                padding: 5,
+                                                width: "23%",
+                                                margin: 3,
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                              }}
+                                              onPress={() =>
+                                                book(dayindex, timeindex)
+                                              }
+                                            >
+                                              <Text
+                                                style={{
+                                                  color: "#185a9d",
+                                                  fontSize: 13,
+                                                  textAlign: "center",
+                                                }}
+                                              >
+                                                {t.show}
+                                              </Text>
+                                            </TouchableOpacity>
+                                          ) : (
+                                            <View
+                                              style={{
+                                                borderWidth: 2,
+                                                borderColor: "gray",
+                                                backgroundColor: "transparent",
+                                                borderRadius: 5,
+                                                padding: 5,
+                                                width: "23%",
+                                                margin: 3,
+                                                alignItems: "center",
+                                                justifyContent: "center",
                                               }}
                                             >
-                                              {t.show}
-                                            </Text>
-                                          </TouchableOpacity>
-                                        ) : checkHour(timeindex, dayindex) ==
-                                          "white" ? (
-                                          <TouchableOpacity
-                                            style={{
-                                              borderWidth: 2,
-                                              borderColor: "#185a9d",
-                                              backgroundColor: "white",
-                                              borderRadius: 5,
-                                              padding: 5,
-                                              width: "23%",
-                                              margin: 3,
-                                              alignItems: "center",
-                                              justifyContent: "center",
-                                            }}
-                                            onPress={() =>
-                                              book(dayindex, timeindex)
-                                            }
-                                          >
-                                            <Text
-                                              style={{
-                                                color: "#185a9d",
-                                                fontSize: 13,
-                                                textAlign: "center",
-                                              }}
-                                            >
-                                              {t.show}
-                                            </Text>
-                                          </TouchableOpacity>
-                                        ) : (
-                                          <View
-                                            style={{
-                                              borderWidth: 2,
-                                              borderColor: "gray",
-                                              backgroundColor: "transparent",
-                                              borderRadius: 5,
-                                              padding: 5,
-                                              width: "23%",
-                                              margin: 3,
-                                              alignItems: "center",
-                                              justifyContent: "center",
-                                            }}
-                                          >
-                                            <Text
-                                              style={{
-                                                color: "gray",
-                                                fontSize: 13,
-                                                textAlign: "center",
-                                              }}
-                                            >
-                                              {t.show}
-                                            </Text>
-                                          </View>
+                                              <Text
+                                                style={{
+                                                  color: "gray",
+                                                  fontSize: 13,
+                                                  textAlign: "center",
+                                                }}
+                                              >
+                                                {t.show}
+                                              </Text>
+                                            </View>
+                                          )
                                         )
-                                      )
-                                    : // <Text>
-                                      //   No services available for this day
-                                      // </Text>
-                                      null}
-                                </View>
-                              ) : // <Text>No Available Services</Text>
-                              null}
-                            </View>
-                          ))}
-                        </View>
-                      ) : null}
-                    </View>
-                  ))
-                ) : (
-                  <Text>No Available Services</Text>
-                )}
+                                      : // <Text>
+                                        //   No services available for this day
+                                        // </Text>
+
+                                        null}
+                                  </View>
+                                ) : (
+                                  <Text
+                                    style={{
+                                      marginBottom: 10,
+                                      color: "#901616",
+                                    }}
+                                  >
+                                    No services available for this day
+                                  </Text>
+                                )}
+                              </View>
+                            ))}
+                          </View>
+                        ) : null}
+                      </View>
+                    ))
+                  : // <Text>No Available Services</Text>
+                    null}
               </View>
             </ScrollView>
           </View>

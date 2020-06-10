@@ -1,5 +1,25 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
+// import { View, Text, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Dimensions,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+} from "react-native";
+import Image from "react-native-scalable-image";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
+import { Divider, Card as Cards } from "react-native-elements";
+import { Octicons } from "@expo/vector-icons";
+import * as Device from "expo-device";
 import moment from "moment";
 import db from "../../../db";
 import firebase from "firebase";
@@ -29,17 +49,128 @@ export default function Code(props) {
   // ---------------------------------- RETURN -----------------------------------------
 
   return (
-    <View style={{ borderWidth: 1 }}>
-      <Text>Code</Text>
-      <Text>{promotion.code}</Text>
+    <View style={styles.container}>
+      <ScrollView>
+        <Cards
+          width={Dimensions.get("window").width / 1.4}
+          containerStyle={styles.card}
+        >
+          <View
+            style={{
+              alignItems: "flex-end",
+            }}
+          >
+            <View
+              style={{
+                marginEnd: 30,
+                // marginTop: -10,
+              }}
+            >
+              <Text style={{ marginTop: -10 }}>You Get</Text>
+            </View>
 
-      <Text>Expiry Date</Text>
-      <Text>{moment(promotion.expiryDate.toDate()).format("YYYY/MM/DD")}</Text>
+            <View
+              style={{
+                backgroundColor: "#185a9d",
+                height: 45,
+                width: 45,
+                borderRadius: 30,
+                justifyContent: "center",
+                position: "absolute",
+                top: -25,
+                right: -25,
+              }}
+            >
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 20, color: "white" }}>
+                  {promotion.percentage}%
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                // backgroundColor: "red",
+              }}
+            >
+              <Image
+                width={Dimensions.get("window").width / 3.5}
+                source={require("../../../assets/images/discountt.png")}
+              />
+              <View style={{ flex: 1, justifyContent: "space-between" }}>
+                <View style={{ flex: 0.1, alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: 30,
+                      color: "#185a9d",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {promotion.code}
+                  </Text>
+                </View>
 
-      <Text>Percentage</Text>
-      <Text>{promotion.percentage}</Text>
-
-      <Button title="Delete" onPress={() => handleDelete()} />
+                <View
+                  style={{
+                    flex: 0.1,
+                    alignItems: "center",
+                  }}
+                >
+                  <View style={{ flex: 0.2 }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        color: "gray",
+                      }}
+                    >
+                      Valid Through:
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: "#5c5c5c",
+                      fontSize: 18,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {moment(promotion.expiryDate.toDate()).format("YYYY/MM/DD")}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Cards>
+      </ScrollView>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e3e3e3",
+  },
+  card: {
+    borderWidth: 0,
+    borderRadius: 10,
+  },
+
+  time: {
+    fontSize: responsiveScreenFontSize(2.5),
+    color: "white",
+  },
+  notes: {
+    fontSize: responsiveScreenFontSize(2),
+    color: "white",
+    textTransform: "capitalize",
+  },
+  two: {
+    alignItems: "center",
+    width: "100%",
+  },
+});

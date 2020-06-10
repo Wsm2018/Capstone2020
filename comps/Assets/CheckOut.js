@@ -23,6 +23,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { CheckBox } from "react-native-elements";
 import LottieView from "lottie-react-native";
 import { Card } from "react-native-paper";
+import { Notifications } from "expo";
 
 export default function CheckOut(props) {
   const [disable, setDisable] = useState(false);
@@ -226,10 +227,12 @@ export default function CheckOut(props) {
     var u = user.data();
     u.id = firebase.auth().currentUser.uid;
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
+    var temp = assetBooking.asset;
+    temp.assetBookings = [];
 
     const response = await handleBooking({
       user: u,
-      asset: assetBooking.asset,
+      asset: temp,
       startDateTime: assetBooking.startDateTime,
       endDateTime: assetBooking.endDateTime,
       card: {
@@ -248,6 +251,21 @@ export default function CheckOut(props) {
       status: false,
       serviceBooking,
     });
+
+    let localNotification = {
+      title: null,
+      body: null,
+      ios: {
+        sound: true,
+        _displayInForeground: true,
+      },
+      android: {
+        vibrate: true,
+      },
+    };
+    localNotification.title = "Booking Complete (Unpaid)";
+    localNotification.body = `Total of ${totalAmount} QAR is still pending and the ${tName} was booked successfully!`;
+    Notifications.presentLocalNotificationAsync(localNotification);
 
     props.navigation.navigate("Types");
   };
@@ -657,6 +675,7 @@ export default function CheckOut(props) {
                   assetBooking: assetBooking,
                   serviceBooking: serviceBooking,
                   totalAmount: totalAmount,
+                  tName,
                 })
               }
               style={styles.payButton}

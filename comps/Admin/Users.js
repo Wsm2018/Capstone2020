@@ -307,10 +307,11 @@ export default function Users() {
           <View
             elevation={5}
             style={{
-              height: height / 2.2,
+              height: height / 2.5,
               width: width / 1.6,
               backgroundColor: "#fff",
               shadowOpacity: 1,
+              padding: 5,
               shadowRadius: 2,
               shadowOffset: {
                 height: 1,
@@ -337,13 +338,20 @@ export default function Users() {
             >
               <View style={{ marginBottom: "10%", marginTop: 20 }}>
                 <Text
-                  style={{ fontSize: 16, color: "#005c9d", fontWeight: "bold" }}
+                  style={{ fontSize: 16, color: "black", textAlign: "center" }}
                 >
                   Are you sure you want to update {user.displayName}'s password?
                 </Text>
               </View>
               <View>
-                <Text style={{ fontSize: 16, color: "#901616" }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: "#901616",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
                   Note: This will update the account password and will download
                   a pdf after the changes.
                 </Text>
@@ -383,7 +391,7 @@ export default function Users() {
                 {/* -------------------------CONFIRM RESET PASS------------------------- */}
                 <TouchableOpacity
                   style={{
-                    flex: 0.3,
+                    flex: 0.4,
                     backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
                     height: 40,
@@ -413,7 +421,7 @@ export default function Users() {
                 {/* -------------------------CANCEL RESET PASS-------------------------- */}
                 <TouchableOpacity
                   style={{
-                    flex: 0.3,
+                    flex: 0.4,
                     backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
                     height: 40,
@@ -450,75 +458,124 @@ export default function Users() {
           style={{
             flex: 1,
             justifyContent: "center",
-            // alignItems: "center",
+            alignItems: "center",
             alignSelf: "center",
             marginTop: 22,
             // ---This is for Width---
-            width: "80%",
+            // width: "80%",
           }}
         >
           <View
+            elevation={5}
             style={{
-              margin: 20,
-              backgroundColor: "white",
+              height: height / 3.5,
+              width: width / 1.6,
+              backgroundColor: "#fff",
+              shadowOpacity: 1,
+              shadowRadius: 2,
+              shadowOffset: {
+                height: 1,
+                width: 1,
+              },
               borderRadius: 20,
-              padding: 35,
-              alignItems: "center",
+              // padding: 35,
+              // justifyContent: "center",
+              // alignItems: "center",
               shadowColor: "#000",
               shadowOffset: {
                 width: 0,
                 height: 2,
               },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              justifyContent: "center",
-              // ---This is for Height---
-              height: "50%",
             }}
           >
-            <Text>
-              Are you sure you want to DELETE {user.displayName}'s account?
-            </Text>
-            <Text></Text>
-            <Text>This action can't be undone!</Text>
-            <Text></Text>
-            <Text></Text>
             <View
               style={{
-                //   borderWidth: 1,
-                width: "100%",
-                height: "10%",
-                justifyContent: "space-around",
+                justifyContent: "center",
+                alignItems: "center",
+                flex: 0.5,
+                marginStart: 10,
+              }}
+            >
+              <View style={{ marginBottom: "10%", marginTop: 20 }}>
+                <Text
+                  style={{ fontSize: 16, color: "black", textAlign: "center" }}
+                >
+                  Are you sure you want to delete {user.displayName}'s account?
+                </Text>
+              </View>
+
+              <Text
+                style={{ fontSize: 16, color: "#901616", fontWeight: "bold" }}
+              >
+                This action can't be undone!
+              </Text>
+            </View>
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "red",
+                justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "row",
               }}
             >
-              {/* -----------------------------CONFIRM DELETE------------------------- */}
+              {/* -------------------------CONFIRM RESET PASS------------------------- */}
               <TouchableOpacity
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
+                  flex: 0.3,
+                  backgroundColor: "#901616",
+                  // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
+                  // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
+                  //marginStart: "2%",
+                  marginEnd: "3%",
+                  borderRadius: 10,
+                  //marginBottom: 10,
                 }}
                 onPress={handleDelete}
               >
-                <Text>CONFIRM</Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Delete
+                </Text>
               </TouchableOpacity>
               {/* -----------------------------CANCEL DELETE------------------------- */}
               <TouchableOpacity
                 style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "100%",
+                  flex: 0.3,
+                  backgroundColor: "#2E9E9B",
+                  // borderWidth: 4,
+                  height: 40,
+                  // width: "30%",
+                  // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
+                  //marginStart: "2%",
+                  marginEnd: "3%",
+                  borderRadius: 10,
+                  //marginBottom: 10,
                 }}
                 onPress={() => setModal2(false)}
               >
-                <Text>Cancel</Text>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 16,
+                    color: "white",
+                    // fontWeight: "bold",
+                  }}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1029,39 +1086,57 @@ export default function Users() {
               style={{
                 flex: 1,
                 justifyContent: "center",
-                // alignItems: "center",
+                alignItems: "center",
                 alignSelf: "center",
                 marginTop: 22,
                 // ---This is for Width---
-                width: "80%",
+                // width: "80%",
               }}
             >
               <View
+                elevation={5}
                 style={{
-                  margin: 20,
-                  backgroundColor: "white",
+                  height: height / 3.5,
+                  width: width / 1.6,
+                  backgroundColor: "#fff",
+                  shadowOpacity: 1,
+                  padding: 5,
+                  shadowRadius: 2,
+                  shadowOffset: {
+                    height: 1,
+                    width: 1,
+                  },
                   borderRadius: 20,
-                  padding: 35,
-                  alignItems: "center",
+                  // padding: 35,
+                  // justifyContent: "center",
+                  // alignItems: "center",
                   shadowColor: "#000",
                   shadowOffset: {
                     width: 0,
                     height: 2,
                   },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  elevation: 5,
-                  justifyContent: "center",
-                  // ---This is for Height---
-                  height: "50%",
                 }}
               >
-                <Text>
-                  Are you sure you want to END {user.displayName}'s
-                  Subscription?
-                </Text>
-                <Text></Text>
-                <Text></Text>
+                <View
+                  style={{
+                    marginBottom: "10%",
+                    marginTop: 20,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flex: 0.5,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "black",
+                      textAlign: "center",
+                    }}
+                  >
+                    Are you sure you want to END {user.displayName}'s
+                    Subscription?
+                  </Text>
+                </View>
                 <View
                   style={{
                     //   borderWidth: 1,
@@ -1075,28 +1150,60 @@ export default function Users() {
                   {/* -----------------------------CONFIRM DELETE------------------------- */}
                   <TouchableOpacity
                     style={{
-                      borderWidth: 1,
-                      width: "25%",
-                      height: "100%",
+                      flex: 0.3,
+                      backgroundColor: "#901616",
+                      // borderWidth: 4,
+                      height: 40,
+                      // width: "30%",
+                      // alignSelf: "center",
                       justifyContent: "center",
                       alignItems: "center",
+                      //marginStart: "2%",
+                      marginEnd: "3%",
+                      borderRadius: 10,
+                      //marginBottom: 10,
                     }}
                     onPress={() => endSubscription()}
                   >
-                    <Text>CONFIRM</Text>
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      End it
+                    </Text>
                   </TouchableOpacity>
                   {/* -----------------------------CANCEL DELETE------------------------- */}
                   <TouchableOpacity
                     style={{
-                      borderWidth: 1,
-                      width: "25%",
-                      height: "100%",
+                      flex: 0.3,
+                      backgroundColor: "#2E9E9B",
+                      // borderWidth: 4,
+                      height: 40,
+                      // width: "30%",
+                      // alignSelf: "center",
                       justifyContent: "center",
                       alignItems: "center",
+                      //marginStart: "2%",
+                      marginEnd: "3%",
+                      borderRadius: 10,
+                      //marginBottom: 10,
                     }}
                     onPress={() => setModal3(false)}
                   >
-                    <Text>Cancel</Text>
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        color: "white",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      Cancel
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>

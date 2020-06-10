@@ -78,7 +78,7 @@ export default function indexUH(props) {
       nav: () => props.navigation.navigate("EmployeesAllowed"),
       // change this image when needed
       image: require("../../assets/images/form.png"),
-     // image: require("../../assets/images/emp.png"),
+      // image: require("../../assets/images/emp.png"),
       height: 120,
       width: 200,
     },
@@ -442,7 +442,7 @@ export default function indexUH(props) {
         //verticalOrientation="down"
       >
         <ActionButton.Item
-          buttonColor="#901616"
+          buttonColor="#3498db"
           title="Change Role"
           onPress={handleChangeRole}
         >
@@ -453,7 +453,7 @@ export default function indexUH(props) {
           />
         </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="#3498db"
+          buttonColor="#901616"
           title="Logout"
           onPress={() => {
             firebase.auth().signOut();
