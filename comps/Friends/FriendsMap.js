@@ -80,6 +80,15 @@ export default function FriendsMap() {
 
     let location = await Location.getCurrentPositionAsync({});
     setLocation(location);
+
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+      });
   };
 
   // ------------------------------TOGGLE LOCATION------------------------------------

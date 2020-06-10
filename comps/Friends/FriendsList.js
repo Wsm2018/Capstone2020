@@ -8,6 +8,7 @@ import {
   ScrollView,
   FlatList,
   TextInput,
+  Modal,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
@@ -40,6 +41,11 @@ export default function FriendsList(props) {
 
   const [search, setSearch] = useState("");
 
+  const [editMode, setEditMode] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const numOfChars = 30;
+
   const unsubUsers = useRef();
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -69,6 +75,7 @@ export default function FriendsList(props) {
                 notifications: 0,
                 dateTime: new Date(0),
                 status: "offline",
+                lastMessage: "",
               });
             }
           });
@@ -177,6 +184,7 @@ export default function FriendsList(props) {
           friend.dateTime = new Date(
             moment(chat[0].dateTime.toDate()).format()
           );
+          friend.lastMessage = chat[0].text;
           let notifications = chat.filter(
             (c) =>
               c.status === "unread" &&
@@ -254,7 +262,7 @@ export default function FriendsList(props) {
     if (allFriends && chats && users) {
       handleFriendsMessages();
     }
-  }, [allFriends, chats, users]);
+  }, [chats, users]);
 
   // ---------------------------------USE EFFECT---------------------------------
   // Runs when something is entered in the search bar
@@ -296,6 +304,29 @@ export default function FriendsList(props) {
       .delete();
   };
 
+  // -------------------------------REMOVE ALL-----------------------------------
+  const removeAllFriends = async () => {
+    if (allFriends.length > 0) {
+      let tempFriendsId = allFriends.map((friend) => {
+        return (friend = friend.id);
+      });
+
+      tempFriendsId.forEach((id) => {
+        db.collection("users")
+          .doc(id)
+          .collection("friends")
+          .doc(firebase.auth().currentUser.uid)
+          .delete();
+
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("friends")
+          .doc(id)
+          .delete();
+      });
+    }
+  };
+
   return !friends ? (
     <View
       style={{
@@ -331,12 +362,42 @@ export default function FriendsList(props) {
       {/* <Text>Friends List</Text> */}
       {/* <Button title="TEST" onPress={() => props.navigation.navigate("Test")} /> */}
       {/* <Button title="Delete All" onPress={deleteAll} /> */}
-      <TextInput
-        style={{ borderWidth: 1, borderColor: "white" }}
-        placeholder="Search here..."
-        onChangeText={setSearch}
-        value={search}
-      />
+      <View style={{ flexDirection: "row" }}>
+        <TextInput
+          style={{ borderWidth: 1, borderColor: "white", width: "85%" }}
+          placeholder="Search here..."
+          onChangeText={setSearch}
+          value={search}
+        />
+        {editMode ? (
+          <TouchableOpacity
+            style={{
+              width: "15%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+              borderWidth: 1,
+            }}
+            onPress={() => setEditMode(false)}
+          >
+            <Text>Done</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={{
+              width: "15%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+              borderWidth: 1,
+            }}
+            onPress={() => setEditMode(true)}
+          >
+            <Text>Edit</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {friends.length > 0 ? (
         <SafeAreaView
           style={{
@@ -369,38 +430,77 @@ export default function FriendsList(props) {
                   //  <AntDesign name="adduser" size={35} color="#20365F" />
                   // }
                   rightElement={
-                    <TouchableOpacity onPress={() => removeFriend(item)}>
-                      <MaterialCommunityIcons
-                        name="delete-forever-outline"
-                        size={30}
-                        color="#1B2D4F"
-                      />
-                      {/* <Feather name="x-circle" size={30} color="black" /> */}
-                    </TouchableOpacity>
+                    editMode && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedFriend(item);
+                          setModal(true);
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name="delete-forever-outline"
+                          size={30}
+                          color="#1B2D4F"
+                        />
+                        {/* <Feather name="x-circle" size={30} color="black" /> */}
+                      </TouchableOpacity>
+                    )
                   }
                   rightIcon={
-                    <TouchableOpacity
-                      onPress={() =>
-                        props.navigation.navigate("FriendsChat", {
-                          friend: item,
-                        })
-                      }
-                    >
-                      <FontAwesome5
-                        name="rocketchat"
-                        size={24}
-                        color="#1B2D4F"
-                      />
-                      {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
-                    </TouchableOpacity>
+                    // <TouchableOpacity
+                    //   onPress={() =>
+                    //     props.navigation.navigate("FriendsChat", {
+                    //       friend: item,
+                    //     })
+                    //   }
+                    // >
+                    //   <FontAwesome5
+                    //     name="rocketchat"
+                    //     size={24}
+                    //     color="#1B2D4F"
+                    //   />
+                    //   {/* <Ionicons name="ios-chatboxes" size={30} color="black" /> */}
+                    // </TouchableOpacity>
+
                     // <FontAwesome5 name="rocketchat" size={24} color="black" />
+
+                    <View>
+                      <Text>{item.status}</Text>
+                    </View>
                   }
                   title={item.displayName + " " + item.notifications}
                   titleStyle={{ fontSize: 20 }}
-                  subtitle={item.status}
+                  subtitle={
+                    // if more than 1 \n
+                    item.lastMessage.split("\n").length > 0
+                      ? // if first line more than 32 chars
+                        item.lastMessage.split("\n")[0].length > numOfChars
+                        ? // message limited to 32 chars with .....
+                          item.lastMessage
+                            .split("\n")[0]
+                            .substring(0, numOfChars) + "......"
+                        : // first line showed
+                          item.lastMessage.split("\n")[0]
+                      : // else
+                      // if message more than 32 chars
+                      item.lastMessage.length > numOfChars
+                      ? // message limited to 32 chars with .....
+                        item.lastMessage.trim().substring(0, numOfChars) +
+                        "......"
+                      : // message showed
+                        item.lastMessage.trim()
+                  }
                   //subtitle={item.status + " to add you"}
                   subtitleStyle={{ fontSize: 12, color: "grey" }}
                   bottomDivider
+                  onPress={
+                    editMode
+                      ? false
+                      : () =>
+                          props.navigation.navigate("FriendsChat", {
+                            friend: item,
+                          })
+                  }
                 />
               )}
             />
@@ -424,6 +524,17 @@ export default function FriendsList(props) {
             Your friend list is empty
           </Text>
         </View>
+      )}
+
+      {editMode && (
+        <Button
+          title="Delete All My Friends"
+          onPress={() => {
+            setSelectedFriend("ALL");
+            setModal(true);
+          }}
+          color="red"
+        />
       )}
 
       <TouchableOpacity
@@ -477,6 +588,99 @@ export default function FriendsList(props) {
           Friends Requests
         </Text>
       </TouchableOpacity>
+
+      {/* ---------------------------------MODAL--------------------------------- */}
+      <Modal transparent={true} visible={modal} animationType="slide">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            // alignItems: "center",
+            alignSelf: "center",
+            marginTop: 22,
+            // ---This is for Width---
+            width: "80%",
+          }}
+        >
+          <View
+            style={{
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              justifyContent: "center",
+              // ---This is for Height---
+              height: "30%",
+            }}
+          >
+            {selectedFriend === "ALL" ? (
+              <Text>Are you sure you want to DELETE ALL your friends?</Text>
+            ) : (
+              <Text>
+                Are you sure you want to DELETE{" "}
+                {selectedFriend && selectedFriend.displayName} from your
+                friends?
+              </Text>
+            )}
+            <Text></Text>
+            <Text></Text>
+            <View
+              style={{
+                //   borderWidth: 1,
+                width: "100%",
+                height: "20%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* ---------------------------------CONFIRM--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "30%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  if (selectedFriend === "ALL") {
+                    removeAllFriends();
+                    setModal(false);
+                  } else {
+                    removeFriend(selectedFriend);
+                    setModal(false);
+                  }
+                }}
+              >
+                <Text>Confirm</Text>
+              </TouchableOpacity>
+              {/* ---------------------------------CANCEL--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  width: "25%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => setModal(false)}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

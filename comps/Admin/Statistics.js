@@ -10,13 +10,22 @@ import AnimatedLoader from "react-native-animated-loader";
 import LottieView from "lottie-react-native";
 import { BarChart, Grid, YAxis, XAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
+import Swiper from "react-native-swiper";
 export default function Statistics(props) {
   // --------------------------------------- STATE VARIABLES -------------------------
 
   // --------------------------------------- USER STATES -----------------------------
 
   const [totalUsers, setTotalUsers] = useState([]);
-  const [userChart, setUserChart] = useState(null);
+  const [userChart, setUserChart] = useState([]);
+  const [labels, setLabels] = useState([
+    "Admins",
+    "Customers",
+    "User Handlers",
+    "Managers",
+    "Customer Support",
+    "Services Employee",
+  ]);
 
   // --------------------------------------- ASSETS STATES --------------------------
 
@@ -178,8 +187,10 @@ export default function Statistics(props) {
   const getUserChart = () => {
     const tempUsers = [...totalUsers];
     const admins = tempUsers.filter((user) => user.role === "admin");
+
     const customers = tempUsers.filter((user) => user.role === "customer");
     const managers = tempUsers.filter((user) => user.role === "manager");
+    console.log(managers);
     const userHandlers = tempUsers.filter(
       (user) => user.role === "user handler"
     );
@@ -193,60 +204,26 @@ export default function Statistics(props) {
       (user) => user.role === "services employee"
     );
 
-    // const result = {
-    //   labels: [
-    //     "admin",
-    //     "customer",
-    //     "manager",
-    //     "user handler",
-    //     "asset handler",
-    //     "customer support",
-    //     "services employee",
-    //   ],
-    //   datasets: [
-    //     {
-    //       data: [
-    //         admins.length,
-    //         customers.length,
-    //         managers.length,
-    //         userHandlers.length,
-    //         assetHandler.length,
-    //         customerSupport.length,
-    //         serviceEmployee.length,
-    //       ],
-    //     },
-    //   ],
-    // };
     const data = [
-      {
-        value: admins.length,
-        label: "Admins",
-      },
-      {
-        value: customers.length,
-        label: "Customers",
-      },
-      {
-        value: userHandlers.length,
-        label: "User Handlers",
-      },
-      {
-        value: managers.length,
-        label: "Managers",
-      },
-      {
-        value: customerSupport.length,
-        label: "Customer Support",
-      },
-      {
-        value: serviceEmployee.length,
-        label: "Services Employee",
-      },
+      admins.length,
+      customers.length,
+      userHandlers.length,
+      managers.length,
+      customerSupport.length,
+      serviceEmployee.length,
+    ];
+    const label = [
+      "Admins",
+      "Customers",
+      "User Handlers",
+      "Managers",
+      "Customer Support",
+      "Services Employee",
     ];
 
-    // console.log(result);
-
-    setUserChart(data);
+    console.log(data);
+    setLabels([...label]);
+    setUserChart([...data]);
   };
   // --------------------------------------- USE EFFECTS --------------------------------------------
 
@@ -272,120 +249,208 @@ export default function Statistics(props) {
   // ----------------------------------------- VIEW -------------------------------------------------
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
-      {userChart ? (
-        <View style={{ alignItems: "center", flex: 3 }}>
-          <Text style={{ fontSize: 30 }}>Total Users</Text>
+    <Swiper showsButtons={false}>
+      <View style={styles.slide1}>
+        {userChart.length !== 0 ? (
           <View
             style={{
-              flexDirection: "row",
-              height: 200,
-              paddingVertical: 16,
-              width: Dimensions.get("window").width / 1.5,
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
+              // backgroundColor: "red",
             }}
           >
-            <YAxis
-              data={userChart}
-              yAccessor={({ index }) => index}
-              // scale={scale.scaleBand}
-              contentInset={{ top: 10, bottom: 10 }}
-              spacing={0.2}
-              formatLabel={(item, index) => index}
-            />
-            <BarChart
-              style={{ flex: 1, marginLeft: 8 }}
-              data={userChart}
-              // horizontal={true}
-              yAccessor={({ item }) => item.value}
-              svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
-              contentInset={{ top: 10, bottom: 10 }}
-              spacing={0.2}
-              gridMin={0}
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
             >
-              <Grid direction={Grid.Direction.VERTICAL} />
-            </BarChart>
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                Total Users
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                height: "50%",
+                width: Dimensions.get("window").width / 1.3,
+              }}
+            >
+              <BarChart
+                svg={{
+                  fill: "#800020",
+                  stroke: "#450011",
+                  strokeWidth: 1,
+                }}
+                contentInset={{ top: 30, bottom: 30 }}
+                spacingInner={0}
+                spacingOuter={0}
+                style={{ flex: 1, height: "100%" }}
+                data={userChart}
+              />
+
+              <XAxis
+                style={{ marginHorizontal: -10, marginTop: 15 }}
+                data={labels}
+                formatLabel={(value, index) => index}
+                contentInset={{ left: 30, right: 30 }}
+              />
+            </View>
           </View>
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <LottieView
-            width={Dimensions.get("window").width / 3}
-            source={require("../../assets/loadingAnimations/5437-loading.json")}
-            autoPlay
-            loop
+        ) : (
+          <View
             style={{
-              position: "relative",
-              width: "100%",
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
-        </View>
-      )}
+          >
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View style={styles.slide2}>
+        {/* <Text style={styles.text}>Beautiful</Text> */}
 
-      {/* <Text>{totalUsers}</Text> */}
-
-      {/* <Text>All Asset Bookings</Text>
-      <Text>{allBookings.length}</Text> */}
-
-      {assetChartData.length !== 0 ? (
-        <View style={{ alignItems: "center", flex: 1 }}>
-          <Text style={{ fontSize: 30 }}>All Assets Bookings</Text>
-          <PieChart
-            data={assetChartData}
-            width={screenWidth}
-            height={220}
-            chartConfig={chartConfig}
-            accessor="booking"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <LottieView
-            width={Dimensions.get("window").width / 3}
-            source={require("../../assets/loadingAnimations/5437-loading.json")}
-            autoPlay
-            loop
+        {assetChartData.length !== 0 ? (
+          <View
             style={{
-              position: "relative",
-              width: "100%",
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
             }}
-          />
-        </View>
-      )}
+          >
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                All Assets Bookings
+              </Text>
+            </View>
+            <View>
+              <PieChart
+                data={assetChartData}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="booking"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
+            </View>
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View style={styles.slide3}>
+        {/* <Text style={styles.text}>And simple</Text> */}
 
-      {serviceChartData.length !== 0 ? (
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 30 }}>All Services Bookings</Text>
-          <PieChart
-            data={serviceChartData}
-            width={screenWidth}
-            height={220}
-            chartConfig={chartConfig}
-            accessor="booking"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
-        </View>
-      ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text>Loading</Text>
-        </View>
-      )}
-
-      <Button
+        {serviceChartData.length !== 0 ? (
+          <View
+            style={{
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "flex-start",
+            }}
+          >
+            <View
+              style={{
+                flex: 0.5,
+                // backgroundColor: "blue",
+                justifyContent: "center",
+                // flexDirection: "row",
+                // height: 200,
+                // paddingVertical: 16,
+                // width: Dimensions.get("window").width / 1.5,
+              }}
+            >
+              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+                All Services Bookings
+              </Text>
+            </View>
+            <View>
+              <PieChart
+                data={serviceChartData}
+                width={screenWidth}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="booking"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
+            </View>
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
+          </View>
+        )}
+      </View>
+      {/* <Button
         title="GENERATE RANDOM COLOR"
         onPress={() => generateRandomColor()}
-      />
-    </ScrollView>
+      /> */}
+    </Swiper>
+
+    // </View>
   );
 }
 
@@ -394,4 +459,29 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
+  wrapper: {
+    // color: "red",
+  },
+  slide1: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ebe8e8",
+  },
+  slide2: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ebe8e8",
+  },
+  slide3: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ebe8e8",
+  },
 });
+Statistics.navigationOptions = {
+  headerStyle: { backgroundColor: "#20365F" },
+  headerTintColor: "white",
+};

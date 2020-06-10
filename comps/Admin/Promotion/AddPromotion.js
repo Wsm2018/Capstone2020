@@ -13,10 +13,13 @@ import {
 } from "react-native";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
-import db from "../../db";
+import db from "../../../db";
+import firebase from "firebase";
+import "firebase/functions";
+import "firebase/auth";
 // import { KeyboardAvoidingView } from "react-native";
 
-export default function Promotion(props) {
+export default function AddPromotion(props) {
   //-------------------------------------------- USE STATE ----------------------------------
 
   const [code, setCode] = useState("");
@@ -53,9 +56,18 @@ export default function Promotion(props) {
     return res;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validate()) {
-      alert("ge");
+      console.log("we in");
+      const addPromotion = firebase.functions().httpsCallable("addPromotion");
+      const response = await addPromotion({
+        code: code,
+        expiry: expiry,
+        percentage: parseInt(percentage),
+      });
+      if (response) {
+        alert("Promotion Code Added");
+      }
     }
   };
 
@@ -73,21 +85,50 @@ export default function Promotion(props) {
         behavior={Platform.OS === "ios" ? "padding " : null}
         style={{ flex: 1 }}
       >
-        <View style={{ alignItems: "center", flex: 0.5 }}>
-          <Text style={{ fontSize: 20 }}>Promotion Code</Text>
-        </View>
-        <View style={{ justifyContent: "space-around", flex: 6 }}>
-          <View>
-            <TextInput
-              value={code}
-              onChangeText={(c) => {
-                setCode(c);
-                setCodeErr("");
-                setShowCodeErr(false);
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              flex: 0.5,
+
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text>Promotion Create</Text>
+          </View>
+          <View style={{ width: "80%" }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                alignItems: "center",
+
+                flexDirection: "column",
+                // paddingLeft: 6,
+                // width: "80%",
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 10,
+                marginBottom: 10,
               }}
-              placeholder="Code"
-              style={{ borderWidth: 1, borderColor: "black" }}
-            />
+            >
+              <TextInput
+                style={{ height: 50, width: "80%" }}
+                value={code}
+                onChangeText={(c) => {
+                  setCode(c);
+                  setCodeErr("");
+                  setShowCodeErr(false);
+                }}
+                placeholder="Code"
+              />
+            </View>
+
             {showCodeErr ? (
               <Text
                 style={codeErr ? { color: "red" } : { color: "transparent" }}
@@ -96,9 +137,15 @@ export default function Promotion(props) {
               </Text>
             ) : null}
           </View>
-          <View>
+          <View style={{ width: "80%" }}>
             <DatePicker
-              style={{ width: Dimensions.get("window").width }}
+              style={{
+                width: "100%",
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 10,
+                marginBottom: 10,
+              }}
               date={expiry}
               mode="date"
               placeholder="Select Expiry Date"
@@ -112,9 +159,6 @@ export default function Promotion(props) {
                   left: 0,
                   top: 4,
                   marginLeft: 0,
-                },
-                dateInput: {
-                  marginLeft: 36,
                 },
               }}
               onDateChange={(date) => {
@@ -131,18 +175,35 @@ export default function Promotion(props) {
               </Text>
             ) : null}
           </View>
-          <View>
-            <TextInput
-              style={{ borderWidth: 1, borderColor: "black" }}
-              value={percentage}
-              onChangeText={(percent) => {
-                setPercentage(percent);
-                setPercentageErr("");
-                setShowPercentageErr(false);
+
+          <View style={{ width: "80%" }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                alignItems: "center",
+
+                flexDirection: "column",
+                // paddingLeft: 6,
+                // width: "80%",
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 10,
+                marginBottom: 10,
               }}
-              keyboardType="number-pad"
-              placeholder="Percentage"
-            />
+            >
+              <TextInput
+                style={{ height: 50, width: "80%" }}
+                value={percentage}
+                onChangeText={(percent) => {
+                  setPercentage(percent);
+                  setPercentageErr("");
+                  setShowPercentageErr(false);
+                }}
+                placeholder="Percentage"
+                keyboardType="numeric"
+              />
+            </View>
+
             {showPercentageErr ? (
               <Text
                 style={
@@ -153,9 +214,36 @@ export default function Promotion(props) {
               </Text>
             ) : null}
           </View>
-          <View>
-            <Button title="Submit" onPress={handleSubmit} />
-          </View>
+        </View>
+
+        <View
+          style={{
+            flex: 0.5,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#20365F",
+              height: 40,
+              width: "40%",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 30,
+            }}
+            onPress={handleSubmit}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 16,
+                color: "white",
+              }}
+            >
+              Submit
+            </Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

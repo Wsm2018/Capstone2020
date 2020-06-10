@@ -74,6 +74,7 @@ export default function Payment(props) {
   const [usedBalance, setUsedBalance] = useState(0);
   const [useBalance, setUseBalance] = useState(false);
   const [subscription, setSubscription] = useState(false);
+  const [pointsChart, setPointsChart] = useState([]);
 
   useEffect(() => {
     console.log("totalllllllllllll", total);
@@ -126,6 +127,14 @@ export default function Payment(props) {
       });
   };
   useEffect(() => {
+    db.collection("pointsChart").onSnapshot((querySnapshot) => {
+      const pointsChart = [];
+      querySnapshot.forEach((doc) => {
+        pointsChart.push({ id: doc.id, ...doc.data() });
+      });
+      setPointsChart([...pointsChart]);
+    });
+
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("subscription")
@@ -187,22 +196,21 @@ export default function Payment(props) {
       usedBalance,
       firebase.auth().currentUser.uid
     );
+
     let u = user.data();
     u.id = firebase.auth().currentUser.uid;
     u.balance = u.balance - usedBalance;
+
     const subscriptionType =
       subscription && subscription[0] && subscription[0].type
         ? subscription[0].type
-        : "none";
+        : "normal";
 
-    const points =
-      subscriptionType === "sliver"
-        ? 20
-        : subscriptionType === "gold"
-        ? 25
-        : subscriptionType === "bronze"
-        ? 15
-        : 10;
+    const pointsChartE = pointsChart.filter(
+      (p) => p.subscriptionType === subscriptionType
+    )[0];
+
+    const points = (total / pointsChartE.spentValue) * pointsChartE.points;
     u.points = u.points + points;
     if (partial != "not found") {
       console.log("177");
