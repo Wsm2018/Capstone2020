@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Button, TouchableOpacity, TextInput, Alert, Modal, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Button, TouchableOpacity, Image, TextInput, Alert, Modal, StyleSheet, Dimensions } from "react-native";
 import db from "../../db";
 import firebase from "firebase";
 import "firebase/auth";
@@ -86,14 +86,19 @@ export default function ServiceManagement(props) {
     }, [])
 
     const handleSelectService = (s) => {
-        var addWD = serviceWorkHoursDays.filter(w => w.service.id == s.id)[0]
-        setSelectedService()
-        var temp = { service: addWD.service, workingDays: addWD.workingDays }
-        setSelectedService(temp)
+        if(serviceWorkHoursDays ){
+            var addWD = serviceWorkHoursDays.filter(w => w.service.id == s.id)[0]
+            //console.log("add wd" , addWD , s)
+            //setSelectedService()
+            var temp = { service: addWD.service, workingDays: addWD.workingDays }
+            setSelectedService(temp)
+            setUpdate(!update)
+        }
+       
     }
 
     useEffect(() => {
-        if (selectedService) {
+        if (selectedService != null) {
             var temp = []
             for (let i = 0; i < users.length; i++) {
                 if (users[i].services) {
@@ -102,7 +107,6 @@ export default function ServiceManagement(props) {
                         temp.push(users[i])
                     }
                 }
-
             }
             setWorkers(temp)
         }
@@ -111,7 +115,7 @@ export default function ServiceManagement(props) {
 
 
     const getServices = () => {
-        setServiceWorkHoursDays([])
+        
         db.collection("services").onSnapshot((snapshot) => {
             const temp = []
             snapshot.forEach(doc => {
@@ -122,7 +126,6 @@ export default function ServiceManagement(props) {
             setServices(temp)
         })
 
-
         db.collection("users").onSnapshot((snap) => {
             let users = [];
             snap.forEach((doc) => {
@@ -131,13 +134,13 @@ export default function ServiceManagement(props) {
             });
             setUsers(users);
         });
-
     }
 
     useEffect(() => {
-        // console.log("services",services)
+         console.log(" Ahaaaaaaaaaaaaaaaaa")
         if (services.length > 0) {
             //setServiceWorkHoursDays([])
+            setServiceWorkHoursDays([])
             var temp = services
             for (let i = 0; i < services.length; i++) {
                 db.collection('services').doc(services[i].id).collection("workingDays").onSnapshot((snapshot) => {
@@ -147,34 +150,35 @@ export default function ServiceManagement(props) {
                     })
                     manageDays(services[i], weekDays)
                 });
-               // console.log("here", i)
-
+                // console.log("here", i)
+            }
+            if(selectedService){
+                console.log(" haaalaalujs", services.filter( i => selectedService.service.id == i.id)[0] )
+                handleSelectService(services.filter( i => selectedService.service.id == i.id)[0])
             }
         }
-
-
+       
     }, [services])
 
 
     const manageDays = (service, weekDays) => {
         var temp = serviceWorkHoursDays
-      
         var workingAt = []
         for (let i = 0; i < week.length; i++) {
             var findDay = weekDays.filter(w => w.day === week[i])[0]
             // console.log(" found", findDay)
             workingAt.push({ day: week[i], hours: findDay ? findDay.hours : [] })
         }
-
         temp.push({ service, workingDays: workingAt })
         setServiceWorkHoursDays(temp)
         setServiceWorkHoursDaysBackUp(temp)
     }
 
     const handleDB = async () => {
+     
         const manageServices = firebase.functions().httpsCallable("manageServices");
         if (showAdd) {
-
+            setShowAdd(false)
             var obj = {
                 name,
                 price,
@@ -188,10 +192,10 @@ export default function ServiceManagement(props) {
                 weekDays: weekDays.current,
                 obj
             });
-            setShowAdd(false)
+            
         }
         else if (showEdit) {
-
+            setShowEdit(false)
             if (!serviceIcon) {
                 setServiceIcon("help")
             }
@@ -209,10 +213,14 @@ export default function ServiceManagement(props) {
                 serviceWorkHoursDays,
             });
 
+            var s = await db.collection("services").doc(selectedService.service.id).get()
+            var serv = s.data()
+            serv.id = selectedService.service.id
+            //getServices()
+             
+            setSelectedService()
             
-            getServices()
-            handleSelectService(selectedService.service)
-            setShowEdit(false)
+            //handleSelectService(serv)
             weekDays.current = [{ day: "Saturday", hours: [] }, { day: "Sunday", hours: [] }, { day: "Monday", hours: [] }, { day: "Tuesday", hours: [] }, { day: "Wednesday", hours: [] }, { day: "Thursday", hours: [] }, { day: "Friday", hours: [] }]
         }
         else {
@@ -236,7 +244,7 @@ export default function ServiceManagement(props) {
 
         var found = []
         if (selectedService) {
-           
+            console.log(selectedService.service.id , selectedService.workingDays)
             found = serviceWorkHoursDays.filter(f => f.service.id == selectedService.service.id)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
         }
         else {
@@ -249,9 +257,13 @@ export default function ServiceManagement(props) {
         if (selectedService) {
             //add to service working hours -- edit --
             var temp = serviceWorkHoursDays
+            //console.log(" aha?", selectedService.service)
+            serviceWorkHoursDays.forEach(f => {
+                // console.log("aha?????????????????????????????????", f.service , f.workingDays )
+            })
             var found = serviceWorkHoursDays.filter(f => f.service == selectedService.service)[0].workingDays.filter(d => d.day == day)[0].hours.filter(t => t == hour)
             if (found.length > 0) {
-            
+
                 var tempHours = []
                 for (let i = 0; i < serviceWorkHoursDays.length; i++) {
                     if (serviceWorkHoursDays[i].service == selectedService.service) {
@@ -260,18 +272,18 @@ export default function ServiceManagement(props) {
                                 for (let j = 0; j < serviceWorkHoursDays[i].workingDays[k].hours.length; j++) {
                                     if (serviceWorkHoursDays[i].workingDays[k].hours[j] != hour) {
                                         tempHours.push(serviceWorkHoursDays[i].workingDays[k].hours[j])
-                                    
+
                                     }
                                 }
                                 temp[i].workingDays[k].hours = tempHours
-                            
+
                             }
 
                         }
 
                     }
                 }
-            
+
                 setServiceWorkHoursDays(temp)
             }
             else {
@@ -285,9 +297,10 @@ export default function ServiceManagement(props) {
                         }
                     }
                 }
-                
+
             }
             setServiceWorkHoursDays(temp)
+            setUpdate(!update)
         }
         else {
             //--add to week days -- add/create
@@ -302,11 +315,11 @@ export default function ServiceManagement(props) {
                     }
                     else {
                         var tempHours = []
-                       
+
                         for (let k = 0; k < weekDays.current[i].hours.length; k++) {
-                      
+
                             if (weekDays.current[i].hours[k] != hour) {
-                          
+
                                 tempHours.push(weekDays.current[i].hours[k])
                             }
                         }
@@ -314,7 +327,7 @@ export default function ServiceManagement(props) {
                     }
                 }
                 weekDays.current = temp
-      
+
             }
             else {
                 //add to list
@@ -322,14 +335,13 @@ export default function ServiceManagement(props) {
                 var index = weekDays.current.findIndex(w => w.day == day)
                 temp[index].hours.push(hour)
                 weekDays.current = temp
-          
+
             }
+            setUpdate(!update)
 
         }
-        var update = timesList
-        setTimesList([])
-        setTimesList(update)
     }
+
 
     const display = (hour) => {
         var time = timesList.filter(t => t.time == hour)[0]
@@ -339,20 +351,40 @@ export default function ServiceManagement(props) {
     const manageWorker = async (status, u) => {
         const manageServiceWorkers = firebase.functions().httpsCallable("manageServiceWorkers");
         var temp = selectedUser
+
+
         if (status == "delete") {
-            temp.services = temp.services.filter(s => s != selectedService.service.id)
-            const response = await manageServiceWorkers({
-                user: temp
-            });
+            Alert.alert("Remove Worker ",
+                u.email + " from " + selectedService.service.name + " ?", [
+                { text: "Yes", onPress: () => removeWorker(u) },
+                { text: "No", onPress: () => console.log("NOO") }
+
+            ],
+                { cancelable: true });
         }
         else if (status == "add") {
-           
             temp = u
             temp.services.push(selectedService.service.id)
             const response = await manageServiceWorkers({
                 user: temp
             });
+            setSelectedUser()
+            setFilteredWorkers([])
+            setOpenWorkersModal(false)
         }
+        setServices([])
+        getServices()
+        setUpdate(!update)
+
+    }
+
+    const removeWorker = async (u) => {
+        console.log("deleting" , u)
+        const manageServiceWorkers = firebase.functions().httpsCallable("manageServiceWorkers");
+        u.services = u.services.filter(s => s != selectedService.service.id)
+        const response = await manageServiceWorkers({
+            user: u
+        });
         setSelectedUser()
         setFilteredWorkers([])
         setOpenWorkersModal(false)
@@ -372,6 +404,15 @@ export default function ServiceManagement(props) {
         setOpenWorkersModal(true)
     }
 
+    const cancelAll = () => {
+        setShowAdd(false)
+        setShowEdit(false)
+        setServiceWorkHoursDays(serviceWorkHoursDaysBackUp)
+        setName()
+        setPrice()
+        setMaxBookings()
+        setServiceIcon()
+    }
 
 
     return (
@@ -433,9 +474,9 @@ export default function ServiceManagement(props) {
 
 
             {
-                selectedService && selectedService.service && !showEdit ?
+                selectedService && selectedService.service ?
                     <View style={styles.three}>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row", width: "100%" }}>
                             <Text style={{
                                 fontSize: 18,
                                 //backgroundColor: "red",
@@ -475,8 +516,6 @@ export default function ServiceManagement(props) {
                                 onPress={() => setSelectedService()}
                                 style={{ width: "15%" }}
                             />
-                            {/* </View> */}
-
                         </View>
 
                         <View>
@@ -498,115 +537,64 @@ export default function ServiceManagement(props) {
                                 <Text style={styles.listNames}>Rating</Text>
                                 <Text>{selectedService.service.rating}</Text>
                             </View>
+
                             <Button title="Schedule" onPress={() => setShowSchedule(true)} />
-                            <Button title="Workers" onPress={()=> setShowWorkers(true) || filterWorkers()}/>
-                            <Text>Workers</Text>
-                            {/* <Button title="add" onPress={() => } /> */}
-                            
-
-                            {/* {
-                                openWorkersModal ?
-                                    <Modal
-                                        animationType="slide"
-                                        transparent={true}
-                                        //visible={addServices}
-                                        onRequestClose={() => {
-                                            Alert.alert("Modal has been closed.");
-                                        }}
-                                    >
-                                        <View style={styles.centeredView}>
-                                            <View style={styles.modalView}>
-                                                
-                                                
-
-
-                                            </View>
-                                        </View>
-                                    </Modal>
-                                    :
-                                    null
-                            } */}
+                            {/* <Button title="Workers" onPress={() => setShowWorkers(true) || filterWorkers()} /> */}
 
                         </View>
-                    </View>
-                    :
-                    null}
 
-            {
-                showWorkers ?
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        //visible={addServices}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
-                    >
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
+
+                        <View style={{
+                            marginTop: "4%", width: "100%", borderTopWidth: 0.5,
+                            borderTopColor: "gray",
+                        }}>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={{
+                                    fontSize: 18,
+                                    height: 40,
+                                    color: "gray",
+                                    marginTop: "1%"
+                                }}>Assigned Workers</Text>
                                 <MaterialCommunityIcons
-                                    name={"close"}
-                                    size={20}
-                                    color={"#901616"}
-                                    onPress={() => setShowWorkers(false)}
-                                    style={{ width: "15%" }}
+                                    name={"plus-box"}
+                                    size={25}
+                                    color={"#609e9f"}
+                                    onPress={() => filterWorkers() || setShowWorkers(true)}
+                                    style={{ position: "absolute", left: "90%" }}
                                 />
-                           <Text style={{
-                                fontSize: 18,
-                                //backgroundColor: "red",
-                                width: "100%",
-                                height: 40,
-                                color: "gray",
-                                borderBottomWidth:1,
-                                borderBottomColor:"gray"
-                            }}>
-
-                                Assigned Workers</Text>
-                                    
-                                    {
+                            </View>
+                            {
                                 workers ?
                                     <View>
-
                                         {
                                             workers.map(w =>
+                                                <View style={{ flexDirection: "row", borderBottomColor: "gray", borderBottomWidth: 1 }}>
 
-                                                <TouchableOpacity onPress={() => setSelectedUser(w)}><Text>{w.email}</Text></TouchableOpacity>
+                                                    <TouchableOpacity style={{ width: "80%" }} onPress={() => setSelectedUser(w)}><Text>{w.email}</Text></TouchableOpacity>
+                                                    <MaterialCommunityIcons
+                                                        name={"account-remove-outline"}
+                                                        size={25}
+                                                        color={"grey"}
+                                                        onPress={() => manageWorker("delete", w)}
+                                                        style={{ margin: "1%" }}
+                                                    />
+                                                </View>
 
                                             )}
                                     </View>
                                     :
                                     <Text>No Assigned Workers</Text>
                             }
-                                {/* {filteredWorkers ?
-                                                    filteredWorkers.map(f =>
-                                                        <View>
-                                                            <Text>{f.email}</Text>
-                                                            <Button title="Assign" onPress={() => manageWorker("add", f)} />
-                                                            <Button title="Cancel" onPress={() => setOpenWorkersModal(false)} />
-                                                        </View>
-                                                    )
-                                                    :
-                                                    <Text>No Available Workers</Text>
-                                                } */}
-                                                
-                                                
-                            </View>
                         </View>
-                    </Modal>
+                    </View>
                     :
-
-                    null
-            }
+                    null}
 
             {
                 showSchedule ?
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        //visible={addServices}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
@@ -621,32 +609,50 @@ export default function ServiceManagement(props) {
                                     fontSize: 18,
                                     // backgroundColor: "red",
                                     //width: "85%",
-                                    
+
                                     marginBottom: "9%",
                                     color: "gray",
-                                    marginLeft: "auto", 
+                                    marginLeft: "auto",
                                     marginRight: "auto"
                                 }}>Working Hours</Text>
                                 {
                                     selectedService.workingDays.map(w =>
-                                        <View style={{ width: "100%"}}>
+                                        <View style={{ width: "100%" }}>
                                             <View style={{
                                                 //backgroundColor: isCollapsed != w.day ? "#EAFAF1" : "#D4EFDF",
                                                 margin: "1%",
                                                 padding: 6,
                                                 borderRadius: isCollapsed != w.day ? 2 : 15,
+                                                borderBottomWidth: 1,
+                                                borderBottomColor: "#0B5345"
                                             }}>
-                                                <TouchableOpacity style={{ margin: "1%", }} 
-                                                onPress={() =>  isCollapsed == w.day ? setIsCollapsed(): setIsCollapsed(w.day)}>
+                                                <TouchableOpacity style={{ margin: "1%", flexDirection: "row" }}
+                                                    onPress={() => isCollapsed == w.day ? setIsCollapsed() : setIsCollapsed(w.day)}>
                                                     <Text
-                                                    style={{
-                                                        fontSize: 15,
-                                                        // backgroundColor: "red",
-                                                        width: "85%",
-                                                        marginBottom: "4%",
-                                                        color: "black", 
-                                                    }}
+                                                        style={{
+                                                            fontSize: 15,
+                                                            // backgroundColor: "red",
+                                                            width: "85%",
+                                                            marginBottom: "4%",
+                                                            color: "#395e60",
+                                                        }}
                                                     >{w.day}</Text>
+                                                    {
+                                                        isCollapsed == w.day ?
+                                                            <MaterialCommunityIcons
+                                                                name={"chevron-up"}
+                                                                size={20}
+                                                                color={"grey"}
+                                                            />
+                                                            :
+                                                            <MaterialCommunityIcons
+                                                                name={"chevron-down"}
+                                                                size={20}
+                                                                color={"grey"}
+                                                            />
+
+                                                    }
+
                                                 </TouchableOpacity>
                                                 <Collapsible collapsed={isCollapsed != w.day}>
                                                     {
@@ -664,12 +670,16 @@ export default function ServiceManagement(props) {
                                                                         borderColor: "#0B5345",
                                                                         backgroundColor: "white"
                                                                     }}>
-                                                                        <Text style={{ marginLeft: "auto", marginRight: "auto" }}>{display(h)}</Text>
+
+                                                                        <Text style={{ color: "#0B5345", marginLeft: "auto", marginRight: "auto" }}>{display(h)}</Text>
+
                                                                     </View>
                                                                 )}
                                                             </View>
                                                             :
-                                                            <Text>No Working Hours</Text>
+
+                                                            <Text style={{ color: "red", marginLeft: "auto", marginRight: "auto" }}>No Working Hours</Text>
+
                                                     }
                                                 </Collapsible>
                                             </View>
@@ -683,20 +693,63 @@ export default function ServiceManagement(props) {
                     null
             }
             {
-                selectedUser && !openWorkersModal ?
+                selectedUser ?
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        //visible={addServices}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
                     >
                         <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                <Text>{selectedUser.email}</Text>
-                                <Button title="Remove Worker" onPress={() => manageWorker("delete")} />
-                                <Button title="Back" onPress={() => setSelectedUser()} />
+                            <View style={styles.modalView3}>
+
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"grey"}
+                                    onPress={() => setSelectedUser()}
+                                    style={{ width: "15%", position: "absolute", left: "90%", marginTop: "3%" }}
+                                />
+                                <Image
+                                    style={{ width: "30%", height: "30%", marginBottom: "5%" }}
+                                    source={{ uri: selectedUser.photoURL }}
+                                />
+
+
+                                <View style={styles.info}>
+                                    <MaterialCommunityIcons
+                                        name={"face-profile"}
+                                        size={20}
+                                        color={"grey"}
+                                        style={{ width: "10%", margin: "3%" }}
+                                    />
+                                    <Text style={{ width: "80%", marginLeft: "3%" }}>{selectedUser.displayName}</Text>
+                                </View>
+
+                                <View style={styles.info}>
+                                    <MaterialCommunityIcons
+                                        name={"phone"}
+                                        size={20}
+                                        color={"grey"}
+                                        style={{ width: "10%", margin: "3%", }}
+                                    />
+                                    <Text style={{ width: "80%", marginLeft: "3%" }}>{selectedUser.phone}</Text>
+                                </View>
+
+                                <View style={styles.info}>
+                                    <MaterialCommunityIcons
+                                        name={"email"}
+                                        size={20}
+                                        color={"grey"}
+                                        style={{ width: "10%", margin: "3%" }}
+                                    />
+                                    <Text style={{ width: "80%", marginLeft: "3%" }}>{selectedUser.email}</Text>
+                                </View>
+
+
+
+
+
+
+
                             </View>
                         </View>
                     </Modal>
@@ -704,198 +757,362 @@ export default function ServiceManagement(props) {
                     null
             }
 
+            {
+                showWorkers ?
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                    >
+                        <ScrollView>
+                            <View style={styles.centeredView}>
+                                <View style={styles.modalView2}>
+                                    <MaterialCommunityIcons
+                                        name={"close"}
+                                        size={20}
+                                        color={"gray"}
+                                        onPress={() => setShowWorkers(false)}
+                                        style={{ position: "absolute", left: "90%", marginTop: "3%" }}
+                                    />
 
+                                    <Text style={{
+                                        fontSize: 20,
+                                        color: "gray",
+                                        marginBottom: "3%"
+                                    }}>Workers</Text>
 
-            {showEdit || showAdd ?
-                <View>
-                    <TextInput
-                        onChangeText={setName}
-                        placeholder="Name"
-                        value={name}
-                    />
-                    <TextInput
-                        onChangeText={setPrice}
-                        placeholder="Price"
-                        value={price}
-                    />
-                    <TextInput
-                        onChangeText={setMaxBookings}
-                        placeholder="Max Bookings Per Day"
-                        value={maxBookings}
-                    />
-                    <TouchableOpacity onPress={() => setShowIcons(true)}>
-                        <Text>Asset Icon</Text>
-                        <MaterialCommunityIcons
-                            name={serviceIcon ? serviceIcon : "help"}
-                            size={30}
-                            color={"#20365F"}
-
-                        />
-                    </TouchableOpacity>
-
-                    <Text>Working Hours</Text>
-
-                    {
-                        week.map((w) =>
-                            <View style={{ width: "80%" }}>
-                                <TouchableOpacity onPress={() => collaps == w ? setCollaps() :
-                                    setCollaps(w)}><Text >{w}</Text>
-                                </TouchableOpacity>
-
-                                {collaps == w ?
-                                    <Modal
-                                        animationType="slide"
-                                        transparent={true}
-                                        //visible={addServices}
-                                        onRequestClose={() => {
-                                            Alert.alert("Modal has been closed.");
-                                        }}
-                                    >
-                                        <View style={styles.centeredView}>
-                                            <View style={styles.modalView}>
-                                                <Text>{w}</Text>
+                                    {filteredWorkers.length > 0 ?
+                                        filteredWorkers.map(f =>
+                                            <View style={{
+                                                width: "100%",
+                                                flexDirection: "row",
+                                                backgroundColor: "#eff5f5",
+                                                borderColor: "#e0ebeb",
+                                                borderWidth: 2,
+                                                marginBottom: 5,
+                                                padding: 10
+                                            }}>
+                                                <Image
+                                                    style={{ width: "20%", height: "100%" }}
+                                                    source={{ uri: f.photoURL }}
+                                                />
                                                 <View style={{
-                                                    flexDirection: "row",
-                                                    //width:"80%", 
+                                                    width: "70%",
+                                                    // backgroundColor: "blue"
                                                 }}>
-                                                    {
-                                                        timesList.map((t, index) =>
-                                                            index < 6 ?
-                                                                color(w, t.time) ?
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}>
-                                                                        <Text style={{ backgroundColor: "green", borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                    :
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}>
-                                                                        <Text style={{ borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                :
-                                                                null
-                                                        )
-                                                    }
-
-                                                </View>
-
-                                                <View style={{ flexDirection: "row" }}>
-                                                    {
-                                                        timesList.map((t, index) =>
-                                                            index >= 6 && index < 12 ?
-
-                                                                color(w, t.time) ?
-
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ backgroundColor: "green", borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                    :
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                :
-                                                                null
-                                                        )
-                                                    }
-                                                </View>
-
-                                                <View style={{ flexDirection: "row" }}>
-                                                    {
-                                                        timesList.map((t, index) =>
-                                                            index >= 12 && index < 18 ?
-
-                                                                color(w, t.time) ?
-
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ backgroundColor: "green", borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                    :
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                :
-                                                                null
-                                                        )
-                                                    }
-                                                </View>
-
-                                                <View style={{ flexDirection: "row" }}>
-                                                    {
-                                                        timesList.map((t, index) =>
-                                                            index >= 18 && index < 24 ?
-
-                                                                color(w, t.time) ?
-
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ backgroundColor: "green", borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                    :
-                                                                    <TouchableOpacity onPress={() => addDay(w, t.time)}><Text style={{ borderColor: "black", borderWidth: 1 }}>{t.show}</Text>
-                                                                    </TouchableOpacity>
-                                                                :
-                                                                null
-                                                        )
-                                                    }
-                                                </View>
-                                                <Button title="OK" onPress={() => setCollaps()} />
-                                            </View>
-                                        </View>
-                                    </Modal>
-                                    :
-                                    null}
-                            </View>
-                        )
-                    }
-
-                    {/* {icons modal} */}
-                    {showIcons ?
-                        <Modal
-                            animationType="slide"
-                            transparent={true}
-                            //visible={}
-                            onRequestClose={() => {
-                                Alert.alert("Modal has been closed.");
-                            }}
-                        >
-                            <ScrollView>
-                                <View style={styles.centeredView}>
-                                    <View style={styles.modalView}>
-                                        <View style={{
-                                            width: "100%", flexDirection: "row",
-                                            flexWrap: "wrap"
-                                        }}>
-                                            {
-                                                icons.map((i, index) =>
-                                                    <View
-                                                        style={{
-                                                            width: "20%",
-                                                            alignItems: "center",
-                                                            marginBottom: 15,
-                                                        }}
-                                                    >
-                                                        <TouchableOpacity onPress={() => setServiceIcon(i) || setShowIcons(false)}>
-                                                            <MaterialCommunityIcons
-                                                                name={i}
-                                                                size={30}
-                                                                color={"#20365F"}
-                                                            />
-                                                        </TouchableOpacity>
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <MaterialCommunityIcons
+                                                            name={"face-profile"}
+                                                            size={20}
+                                                            color={"grey"}
+                                                        />
+                                                        <Text style={{ width: "90%", marginLeft: "3%" }}>{f.displayName}</Text>
                                                     </View>
-                                                )}
-                                        </View>
-                                    </View>
-                                </View>
-                            </ScrollView>
-                        </Modal>
-                        :
-                        null
-                    }
 
-                    {showAdd ?
-                        <Button title={"Add"} onPress={() => handleDB()} />
-                        :
-                        <Button title={"Edit"} onPress={() => handleDB()} />
-                    }
-                    <Button title={"Cancel"} onPress={() => setShowEdit(false) || setServiceWorkHoursDays(serviceWorkHoursDaysBackUp)} />
-                </View>
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <MaterialCommunityIcons
+                                                            name={"phone"}
+                                                            size={20}
+                                                            color={"grey"}
+                                                        />
+                                                        <Text style={{ width: "90%", marginLeft: "3%" }}>{f.phone}</Text>
+                                                    </View>
 
-                :
-                null
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <MaterialCommunityIcons
+                                                            name={"email"}
+                                                            size={20}
+                                                            color={"grey"}
+                                                        />
+                                                        <Text style={{ width: "90%", marginLeft: "3%" }}>{f.email}</Text>
+                                                    </View>
+
+
+
+                                                </View>
+                                                <MaterialCommunityIcons
+                                                    name={"plus"}
+                                                    size={20}
+                                                    color={"grey"}
+                                                    onPress={() => manageWorker("add", f)}
+                                                    style={{ marginTop: "auto", marginBottom: "auto" }}
+                                                />
+
+                                            </View>
+                                        )
+                                        :
+                                        <Text>No Available Workers</Text>
+                                    }
+
+
+
+                                </View >
+                            </View >
+                        </ScrollView>
+                    </Modal >
+                    :
+                    null
             }
 
-        </ScrollView>
+
+
+
+
+
+            {
+                showEdit || showAdd ?
+                    <View style={styles.two3}>
+                        <View style={{ flexDirection: "row", width: "100%" }}>
+
+
+                            <Text style={{
+                                fontSize: 18,
+                                // backgroundColor: "red",
+                                width: "70%",
+                                height: 50,
+                                color: "gray",
+                            }}>Add / edit</Text>
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "30%" }}>
+
+                                
+                                <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"gray"}
+                                    onPress={() => cancelAll()}
+                                //style={{ position: "absolute", left: "100%", marginTop: "3%" }}
+                                />
+                            </View>
+                        </View>
+
+
+                        <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                            <Text style={styles.inputTitles}>Name</Text>
+                            <TextInput
+                                onChangeText={setName}
+                                placeholder="Name"
+                                value={name}
+                                style={styles.textInputs}
+                            />
+                        </View>
+
+                        <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                            <Text style={styles.inputTitles}>Price</Text>
+                            <TextInput
+                                onChangeText={setPrice}
+                                placeholder="Price"
+                                value={price}
+                                style={styles.textInputs}
+                                keyboardType={'numeric'} 
+                                min={1}
+                            />
+                        </View>
+
+                        <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                            <Text style={styles.inputTitles}>Max Bookings Per Day</Text>
+                            <TextInput
+                                onChangeText={setMaxBookings}
+                                placeholder="Max Bookings Per Day"
+                                value={maxBookings}
+                                style={styles.textInputs}
+                                keyboardType={'numeric'} 
+                                min={1}
+                            />
+                        </View>
+
+                        <View style={{ flexDirection: "row", marginBottom: "1%" }}>
+                            <Text style={styles.inputTitles}>Icon</Text>
+                            <View style={{
+                                // borderWidth: 1,
+                                // borderColor: "#D4EFDF",
+                                width: "70%",
+                                padding: 5,
+                                margin: "1%",
+                            }}>
+                                <TouchableOpacity style={{
+                                    borderWidth: 1,
+                                    borderColor: "#D4EFDF",
+                                    width: "30%",
+                                    alignItems: "center"
+                                }} onPress={() => setShowIcons(true)}>
+
+
+                                    <MaterialCommunityIcons
+                                        name={serviceIcon ? serviceIcon : "help"}
+                                        size={30}
+                                        color={"#20365F"}
+
+                                    />
+
+
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <Text>Working Hours</Text>
+
+                        {
+                            week.map((w) =>
+                                <View style={{
+                                    //backgroundColor: isCollapsed != w.day ? "#EAFAF1" : "#D4EFDF",
+                                    margin: "1%",
+                                    padding: 6,
+                                    borderRadius: isCollapsed != w.day ? 2 : 15,
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: "#0B5345",
+
+                                }}>
+                                    <TouchableOpacity onPress={() => collaps == w ? setCollaps() : setCollaps(w)} style={{ flexDirection: "row" }}>
+                                        <Text style={{
+                                            fontSize: 15,
+                                            //backgroundColor: "red",
+                                            width: "80%",
+                                            marginBottom: "4%",
+                                            color: "#395e60",
+                                        }}>{w}</Text>
+                                        {
+                                            collaps == w ?
+                                                <MaterialCommunityIcons
+                                                    name={"chevron-up"}
+                                                    size={20}
+                                                    color={"grey"}
+                                                    style={{
+                                                        fontSize: 15,
+                                                        // backgroundColor: "blue",
+                                                        width: "10%"
+                                                    }}
+                                                />
+                                                :
+                                                <MaterialCommunityIcons
+                                                    name={"chevron-down"}
+                                                    size={20}
+                                                    color={"grey"}
+                                                    style={{
+                                                        fontSize: 15,
+                                                        //backgroundColor: "blue", 
+                                                        width: "10%"
+                                                    }}
+                                                />
+
+                                        }
+                                    </TouchableOpacity>
+
+                                    <Collapsible collapsed={collaps != w}>
+
+                                        <View style={{
+                                            flexDirection: "row",
+                                            flexWrap: "wrap",
+                                            width: "100%",
+                                            //backgroundColor:"yellow"
+                                        }}>
+                                            {
+                                                timesList.map((t, index) =>
+
+                                                    color(w, t.time) ?
+                                                        <TouchableOpacity onPress={() => addDay(w, t.time)} style={{
+                                                            margin: 1,
+                                                            borderWidth: 2,
+                                                            borderRadius: 7,
+                                                            padding: 2,
+                                                            width: 72,
+                                                            borderColor: "#0B5345",
+                                                            backgroundColor: "#0B5345"
+                                                        }}>
+                                                            <Text style={{ color: "white", marginLeft: "auto", marginRight: "auto" }}>{t.show}</Text>
+                                                        </TouchableOpacity>
+                                                        :
+                                                        <TouchableOpacity onPress={() => addDay(w, t.time)} style={{
+                                                            margin: 1,
+                                                            borderWidth: 3,
+                                                            borderRadius: 7,
+                                                            padding: 2,
+                                                            width: 72,
+                                                            borderColor: "gray",
+                                                            backgroundColor: "white"
+                                                        }}>
+                                                            <Text style={{ color: "gray", marginLeft: "auto", marginRight: "auto" }}>{t.show}</Text>
+                                                        </TouchableOpacity>
+
+                                                )
+                                            }
+
+                                        </View>
+
+                                    </Collapsible>
+                                </View>
+                            )
+                        }
+
+
+                        {/* {icons modal} */}
+                        {showIcons ?
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                            >
+                                <ScrollView>
+                                    <View style={styles.centeredView}>
+                                        <View style={styles.modalView}>
+                                            <View style={{
+                                                width: "100%", flexDirection: "row",
+                                                flexWrap: "wrap"
+                                            }}>
+                                                {
+                                                    icons.map((i, index) =>
+                                                        <View
+                                                            style={{
+                                                                width: "20%",
+                                                                alignItems: "center",
+                                                                marginBottom: 15,
+                                                            }}
+                                                        >
+                                                            <TouchableOpacity onPress={() => setServiceIcon(i) || setShowIcons(false)}>
+                                                                <MaterialCommunityIcons
+                                                                    name={i}
+                                                                    size={30}
+                                                                    color={"#20365F"}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    )}
+                                            </View>
+                                        </View>
+                                    </View>
+                                </ScrollView>
+                            </Modal>
+                            :
+                            null
+                        }
+
+{showAdd ?
+                                    <MaterialCommunityIcons
+                                        name={"plus"}
+                                        size={20}
+                                        color={"gray"}
+                                        onPress={() => handleDB()}
+                                    //style={{ position: "absolute", left: "100%", marginTop: "3%" }}
+                                    />
+
+                                    :
+                                    <MaterialCommunityIcons
+                                        name={"square-edit-outline"}
+                                        size={20}
+                                        color={"gray"}
+                                        onPress={() => handleDB()}
+                                    //style={{ position: "absolute", left: "100%", marginTop: "3%" }}
+                                    />
+
+                                }
+
+
+                    </View>
+
+
+
+                    :
+                    null
+            }
+
+        </ScrollView >
     );
 }
 
@@ -934,6 +1151,19 @@ const styles = StyleSheet.create({
         borderColor: "lightgray",
         flexDirection: "row",
         flexWrap: "wrap",
+
+        // justifyContent: "space-between",
+    },
+    two3: {
+        backgroundColor: "white",
+        width: "100%",
+        marginTop: "3%",
+        padding: "5%",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: "lightgray",
+        // flexDirection: "row",
+        //flexWrap: "wrap",
 
         // justifyContent: "space-between",
     },
@@ -1016,6 +1246,44 @@ const styles = StyleSheet.create({
         elevation: 5,
         width: "85%"
     },
+    modalView2: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingTop: 35,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: "95%"
+    },
+    modalView3: {
+        //margin: 20,
+        backgroundColor: "#eff5f5",
+        borderRadius: 20,
+        paddingTop: 35,
+        paddingLeft: 10,
+        paddingRight: 10,
+        //paddingBottom: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: "70%"
+    },
     openButton: {
         backgroundColor: "#F194FF",
         borderRadius: 20,
@@ -1035,7 +1303,7 @@ const styles = StyleSheet.create({
     listNames: {
         fontSize: 15,
         //backgroundColor: "red",
-        width: "30%",
+        width: "50%",
         height: 40,
         color: "#566573",
         alignItems: "center",
@@ -1045,7 +1313,7 @@ const styles = StyleSheet.create({
     textInputs: {
         borderWidth: 1,
         borderColor: "#D4EFDF",
-        width: "70%",
+        width: "60%",
         padding: 5,
         margin: "1%",
         //backgroundColor: "blue"
@@ -1054,6 +1322,15 @@ const styles = StyleSheet.create({
         width: "35%",
         marginBottom: "auto",
         marginTop: "auto",
-        //backgroundColor:"red"
+        // backgroundColor:"red"
+    },
+    info: {
+        flexDirection: "row",
+        marginBottom: "1%",
+        borderColor: "#e0ebeb",
+        borderBottomWidth: 2,
+        width: "80%",
+        marginLeft: "auto",
+        marginRight: "auto"
     }
 });

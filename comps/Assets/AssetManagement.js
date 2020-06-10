@@ -14,7 +14,8 @@ import {
     View,
     Modal,
     CheckBox,
-    Dimensions
+    Dimensions,
+    Alert
 } from "react-native";
 
 
@@ -65,6 +66,7 @@ export default function AssetManagement(props) {
     const [long, setLong] = useState(0.0)
     const [lat, setLat] = useState(0.0)
     const [showColorPicker, setShowColorPicker] = useState(false)
+    const [deleting, setDeleting] = useState(false)
 
     const icons = [
         "alpha-a", "alpha-b", "alpha-c", "alpha-d", "alpha-e", "alpha-f", "alpha-g", "alpha-h", "alpha-i", "alpha-j", "alpha-k", "alpha-l",
@@ -206,12 +208,33 @@ export default function AssetManagement(props) {
     }
 
     const handleDelete = async (collection, doc) => {
+        var deleteIt = false
+        Alert.alert("Delete " + (selectedAsset ? selectedAsset.code : selectedSection ? selectedSection.name : selectedType.name) + " ?",
+            "", [
+            { text: "Yes", onPress: () => deleteDoc(collection, doc) },
+            { text: "No", onPress: () => console.log("NOO") }
+
+        ],
+            { cancelable: true });
+
+        // const assetManager = firebase.functions().httpsCallable("assetManager");
+        // if( deleting){
+        //     const response = await assetManager({
+        //         collection, doc, type: "delete"
+        //     });
+        // }
+
+        cancelAll()
+
+
+    }
+
+    const deleteDoc = async (collection, doc) => {
         const assetManager = firebase.functions().httpsCallable("assetManager");
+
         const response = await assetManager({
             collection, doc, type: "delete"
         });
-        cancelAll()
-
         if (selectedAsset) {
             setSelectedAsset()
             setUpdate(!update)
@@ -222,6 +245,7 @@ export default function AssetManagement(props) {
         else if (selectedType) {
             setSelectedType()
         }
+        cancelAll()
     }
 
     const cancelAll = () => {
@@ -245,18 +269,19 @@ export default function AssetManagement(props) {
         setLong(0.0)
         setLat(0.0)
         setUri()
+        setDeleting(false)
     }
 
     return (
         <ScrollView>
 
             <View style={styles.two}>
-                <View style={{ flexDirection: "row" }}>
+                <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%"}}>
                     <Text style={styles.cardTitle}>Asset Types</Text>
                     <MaterialCommunityIcons
                         name={"plus-box"}
                         size={25}
-                        color={"#609e9f"}
+                        color={"#185a9d"}
                         onPress={() => setShowAddType(true)}
 
                     />
@@ -312,7 +337,7 @@ export default function AssetManagement(props) {
             {
                 selectedType && sections ?
                     <View style={styles.details}>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%", marginBottom:"2%"}}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -329,14 +354,14 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"delete"}
                                     size={20}
-                                    color={"#609e9f"}
-                                    //onPress={() => handleDelete("assetTypes", selectedType.id)}
+                                    color={"#185a9d"}
+                                    onPress={() => handleDelete("assetTypes", selectedType.id)}
                                     style={{ width: "15%" }}
                                 />
                                 <MaterialCommunityIcons
                                     name={"square-edit-outline"}
                                     size={20}
-                                    color={"#609e9f"}
+                                    color={"#185a9d"}
                                     onPress={() => setShowEditType(true)}
                                     style={{ width: "15%" }}
                                 />
@@ -376,10 +401,19 @@ export default function AssetManagement(props) {
                                 color={selectedType.showInMap ? "#2ECC71" : "#20365F"}
                             />
                         </View>
-                        <View style={{ width: "40%", marginTop: "2%" }}>
-                            <Button title="Manage Services" onPress={() => props.navigation.navigate("ServiceManagement", { assetType: selectedType })} />
-                        </View>
 
+                        <TouchableOpacity style={{
+                            backgroundColor: "#185a9d",
+                            width: "40%",
+                            marginTop: "2%",
+                            borderRadius: 5,
+                            padding: 15,
+                        }}
+                            onPress={() => props.navigation.navigate("ServiceManagement", { assetType: selectedType })}>
+                            <Text style={{ marginLeft: "auto", marginRight: "auto", color: "white", fontSize: 15 }}>
+                                Manage Services
+                            </Text>
+                        </TouchableOpacity>
 
                         <View style={styles.two2}>
                             <View style={{ flexDirection: "row" }}>
@@ -388,7 +422,7 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"plus-box"}
                                     size={25}
-                                    color={"#609e9f"}
+                                    color={"#185a9d"}
                                     onPress={() => setShowAddSection(true)}
                                     style={{ position: "absolute", left: "100%" }}
                                 />
@@ -402,7 +436,7 @@ export default function AssetManagement(props) {
                                                 onPress={() => setSelectedSection(t)}
                                                 style={{
                                                     backgroundColor:
-                                                        selectedSection === t ? "#20365F" : "#e3e3e3",
+                                                        selectedSection === t ? "#2E9E9B" : "#e3e3e3",
                                                     width: 100,
                                                     height: 100,
                                                     margin: 5,
@@ -410,7 +444,7 @@ export default function AssetManagement(props) {
                                                     flexDirection: "row",
                                                     //elevation: 12,
                                                     borderWidth: 2,
-                                                    borderColor: "#20365F",
+                                                    borderColor: "#2E9E9B",
                                                 }}
                                             >
                                                 <View
@@ -426,12 +460,12 @@ export default function AssetManagement(props) {
                                                     <MaterialCommunityIcons
                                                         name={selectedType.sectionIcon}
                                                         size={40}
-                                                        color={selectedSection === t ? "white" : "#20365F"}
+                                                        color={selectedSection === t ? "white" : "#2E9E9B"}
                                                     />
                                                     <Text
                                                         style={{
                                                             textAlign: "center",
-                                                            color: selectedSection === t ? "white" : "#20365F",
+                                                            color: selectedSection === t ? "white" : "#2E9E9B",
                                                             fontSize: 20,
                                                         }}
                                                     >
@@ -455,7 +489,7 @@ export default function AssetManagement(props) {
             {
                 selectedSection && assets ?
                     <View style={styles.three}>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%" , marginBottom:"3%"}}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -474,8 +508,8 @@ export default function AssetManagement(props) {
                             <MaterialCommunityIcons
                                 name={"delete"}
                                 size={20}
-                                color={"#20365F"}
-                                // onPress={() => handleDelete("assetSections", selectedSection.id)}
+                                color={"#185a9d"}
+                                onPress={() => handleDelete("assetSections", selectedSection.id)}
                                 // style={{ marginRight: "5%" }}
                                 style={{ width: "15%" }}
                             />
@@ -483,7 +517,7 @@ export default function AssetManagement(props) {
                             <MaterialCommunityIcons
                                 name={"square-edit-outline"}
                                 size={20}
-                                color={"#20365F"}
+                                color={"#185a9d"}
                                 onPress={() => setShowEditSection(true) ||
                                     setName(selectedSection.name)}
                                 style={{ width: "15%" }}
@@ -535,7 +569,7 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"plus-box"}
                                     size={25}
-                                    color={"#609e9f"}
+                                    color={"#185a9d"}
                                     onPress={() => setShowAddAsset(true)}
                                     style={{ position: "absolute", left: "100%" }}
                                 />
@@ -605,7 +639,7 @@ export default function AssetManagement(props) {
             {
                 selectedAsset ?
                     <View style={styles.details}>
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row", borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%" , marginBottom:"3%" }}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -622,14 +656,14 @@ export default function AssetManagement(props) {
                                 <MaterialCommunityIcons
                                     name={"delete"}
                                     size={20}
-                                    color={"#20365F"}
-                                    //onPress={() => handleDelete("assets", selectedAsset.id)}
+                                    color={"#185a9d"}
+                                    onPress={() => handleDelete("assets", selectedAsset.id)}
                                     style={{ width: "15%" }}
                                 />
                                 <MaterialCommunityIcons
                                     name={"square-edit-outline"}
                                     size={20}
-                                    color={"#20365F"}
+                                    color={"#185a9d"}
                                     onPress={() => setShowEditAsset(true) ||
                                         setName(selectedAsset.name) ||
                                         setPrice(selectedAsset.price) ||
@@ -1047,12 +1081,14 @@ export default function AssetManagement(props) {
                                         onChangeText={setDescription}
                                         placeholder="Description"
                                         value={description}
-                                        style={{borderWidth: 1,
+                                        style={{
+                                            borderWidth: 1,
                                             borderColor: "#D4EFDF",
                                             width: "70%",
                                             //height:"150%",
                                             padding: 5,
-                                            margin: "1%",}}
+                                            margin: "1%",
+                                        }}
                                     />
                                 </View>
 
@@ -1072,7 +1108,7 @@ export default function AssetManagement(props) {
                                         location: { Latitude: lat, Longitude: long },
                                         description,
                                         type
-                                    }) : handleEdit("assets",{
+                                    }) : handleEdit("assets", {
                                         assetSection: selectedSection.id,
                                         name,
                                         code,
@@ -1084,8 +1120,8 @@ export default function AssetManagement(props) {
                                         location: { Latitude: lat, Longitude: long },
                                         description,
                                         type
-                                    } , selectedAsset.id ) }  
-                                    style={{  marginBottom: "4%" }}
+                                    }, selectedAsset.id)}
+                                    style={{ marginBottom: "4%" }}
                                 />
                                 {/* <Button title="Add" onPress={() => handleAdd("assets", {
                                     assetSection: selectedSection.id,

@@ -454,13 +454,14 @@ exports.sendMessage = functions.https.onCall((data, context) => {
 exports.handleBooking = functions.https.onCall(async (data, context) => {
   //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later), totalAmount
   //create booking
-  console.log(" in functions");
+  console.log(" in functions",data.asset.id);
   var assetBooking = {
     user: data.user,
     asset: data.asset,
     startDateTime: data.startDateTime,
     endDateTime: data.endDateTime,
   };
+  console.log(" asset bookinggg", assetBooking)
   var bId = "";
   var getId = await db
     .collection("assets")
