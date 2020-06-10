@@ -170,6 +170,7 @@ export default function Payment(props) {
         // console.log(cards);
         setCards([...cards]);
         setChecked(cards[0] ? cards[0].id : 1);
+        setOther(cards[0] ? false : true);
       });
 
     var years = [];
@@ -269,14 +270,28 @@ export default function Payment(props) {
         // status: true,
         serviceBooking: serviceBooking,
       });
+      let localNotification = {
+        title: null,
+        body: null,
+        ios: {
+          sound: true,
+          _displayInForeground: true,
+        },
+        android: {
+          // icon:
+          //   "https://med.virginia.edu/cme/wp-content/uploads/sites/262/2015/10/free-vector-parking-available-sign-clip-art_116878_Parking_Available_Sign_clip_art_hight.png",
+          // color: "#276b9c",
+          vibrate: true,
+        },
+      };
+      localNotification.title = "Payment complete";
+      localNotification.body = `Your payment of ${totalAmount} QAR for the ${tName} was completed successfully!`;
+      Notifications.presentLocalNotificationAsync(localNotification);
       props.navigation.navigate("Types");
     }
     db.collection("users").doc(user.id).update(u);
     console.log("192");
-    // let localNotification = { title: "", body: "" };
-    // localNotification.title = "Payment complete";
-    // localNotification.body = `Your payment of ${totalAmount} QAR for the ${tName} was completed successfully!`;
-    // Notifications.presentLocalNotificationAsync(localNotification);
+
     // props.navigation.navigate("Types");
   };
   const handleCardSelect = (card) => {
@@ -356,7 +371,7 @@ export default function Payment(props) {
             }}
           >
             <Text style={{ fontSize: 27, fontWeight: "bold" }}>
-              {user.balance - usedBalance}
+              {user.balance}
               <Text style={{ fontSize: 18 }}> QAR</Text>
             </Text>
             <Text
@@ -690,7 +705,7 @@ export default function Payment(props) {
                     setUsedBalance(text)
                   }
                   placeholder="Enter Amount to Deduct"
-                  value={cardNumber}
+                  value={usedBalance}
                 />
                 {/* <Button
                 title="Use"
@@ -912,10 +927,10 @@ export default function Payment(props) {
                 >
                   {total}
                 </Text>{" "}
-                {total - (total * promotion.percentage) / 100}
+                {totalAmount}
               </Text>
             ) : (
-              total
+              totalAmount
             )}{" "}
             QAR
           </Text>
