@@ -22,6 +22,8 @@ const FriendsStack = createAppContainer(
     },
     {
       headerMode: null,
+      headerStyle: { backgroundColor: "#185a9d" },
+      headerTintColor: "white",
       // defaultNavigationOptions: ({ navigation }) => {
       //   if (navigation.state.routeName === "FriendsList") {
       //     return {

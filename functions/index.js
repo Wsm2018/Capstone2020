@@ -752,7 +752,7 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
       .collection("users")
       .doc(data.uid)
       .collection("favorites")
-      .doc(data.asset.id)
+      .doc(data.asset)
       .set({ asset: data.asset });
     console.log("response ", response);
     return response;

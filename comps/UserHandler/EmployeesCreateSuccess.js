@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   Button,
   ScrollView,
+  Image,
 } from "react-native";
+import LottieView from "lottie-react-native";
 
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -45,31 +47,74 @@ export default function EmployeeHandlerCreate(props) {
 
   return (
     <View style={styles.container}>
-      <Text>EmployeeHandlerSuccess</Text>
-      <Text></Text>
-      <Text>Account Successfully Created</Text>
-      <Text>{email}</Text>
-      <TouchableOpacity
-        style={{
-          borderWidth: 1,
-          width: "100%",
-          // height: "10%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        onPress={handleDownload}
-      >
-        <Text>Download PDF</Text>
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <LottieView
+          source={require("../../assets/images/done.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "30%",
+            backgroundColor: "white",
+            alignItems: "center",
+            justifyContent: "center",
+            alignContent: "center",
+            alignSelf: "center",
+          }}
+        />
+      </View>
+      <View style={styles.body}>
+        <Text style={styles.title}>{email}</Text>
+        <Text style={styles.subtitle}>
+          Employee Handler Account Successfully Created
+        </Text>
+
+        <TouchableOpacity style={styles.payButton} onPress={handleDownload}>
+          <Text style={{ color: "white" }}>Download PDF</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
-
+EmployeeHandlerCreate.navigationOptions = (props) => ({
+  title: "Employee Create Success",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+});
 const styles = StyleSheet.create({
   container: {
-    // borderWidth: 1,
-    // flex: 1,
-    margin: 20,
-    // height: "100%",
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "white",
+  },
+  header: {
+    backgroundColor: "white",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    flex: 0.2,
+    // marginTop: "5%",
+  },
+  body: {
+    flex: 0.6,
+    justifyContent: "flex-start",
+    width: "100%",
+    marginTop: "3%",
+  },
+  title: {
+    alignSelf: "center",
+    fontSize: 20,
+    marginBottom: "2%",
+  },
+  subtitle: { alignSelf: "center", fontSize: 16 },
+  payButton: {
+    backgroundColor: "#185a9d",
+    height: 40,
+    width: "55%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "4%",
+    borderRadius: 10,
+    marginBottom: 10,
   },
 });

@@ -17,6 +17,7 @@ import db from "../../db";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
+import { FontAwesome5, MaterialCommunityIcons, AntDesign, Ionicons } from "@expo/vector-icons";
 
 export default function EmployeesAllowed(props) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -123,27 +124,73 @@ export default function EmployeesAllowed(props) {
     let word = "employee handler (incomplete)";
     console.log(word.slice(-12));
   };
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
 
   return users ? (
     <View style={styles.container}>
-      <Text>Employees Index</Text>
-      <TextInput
-        placeholder="Search Here"
-        onChangeText={setSearch}
-        value={search}
-        style={{ borderWidth: 1, padding: 1 }}
-      />
-      <Text></Text>
-      <ScrollView>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          height: "10%",
+          // width:'100%'
+          //paddingTop:'2%',
+        }}
+      >
+        {/* <Text>Employees Index</Text> */}
+        {/* <AntDesign name="leftcircleo" size={30} color="#fff" /> */}
+        <TouchableOpacity onPress={handleChangeRole}> 
+        <Ionicons name="ios-arrow-back" size={40} color="#fff" style={{paddingRight:'2%'}} />
+        </TouchableOpacity>
+        
+        <TextInput
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "#185a9d",
+            borderWidth: 2,
+            borderRadius:4,
+            width: "75%",
+            height: "50%",
+            marginLeft: 10,
+            marginRight: 10,
+          }}
+          placeholder="Search for Employees Here"
+          onChangeText={setSearch}
+          value={search}
+        />
+        <FontAwesome5 name="search" size={25} color="#fff" />
+      </View>
+
+      <ScrollView style={{paddingTop:'2%'}}>
         {users.map((user, i) => (
           <ListItem
             key={i}
-            // leftAvatar={{ source: { uri: l.avatar_url } }}
+            leftAvatar={
+              <MaterialCommunityIcons
+                name="account-circle"
+                size={45}
+                color="#185a9d"
+              />
+            }
             title={user.firstName + " " + user.lastName}
+            titleStyle={{ fontSize: 20 }}
             subtitle={
               user.role[0].toUpperCase() +
               user.role.slice(1, user.role.length - 10)
             }
+            subtitleStyle={{ color: "darkgrey" }}
+            topDivider
+            // rightAvatar={<MaterialCommunityIcons name="account-details" size={25} color="#185a9d" />}
             bottomDivider
             chevron
             onPress={() =>
@@ -163,6 +210,6 @@ export default function EmployeesAllowed(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    //   margin: 20,
   },
 });

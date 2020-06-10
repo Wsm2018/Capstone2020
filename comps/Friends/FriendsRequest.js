@@ -115,8 +115,8 @@ export default function FriendsList(props) {
           alignContent: "center",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#20365F",
-          borderTopColor: "#20365F",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
           //paddingTop:'2%',
         }}
       >
@@ -153,14 +153,14 @@ export default function FriendsList(props) {
                   key={item.id}
                   //leftAvatar={{ source: { uri: item.photoURL } }}
                   leftAvatar={
-                    <AntDesign name="adduser" size={35} color="#20365F" />
+                    <AntDesign name="adduser" size={35} color="#185a9d" />
                   }
                   rightIcon={
                     <TouchableOpacity
                       style={{
                         borderWidth: 1,
-                        borderColor: "#20365F",
-                        backgroundColor: "#344C7A",
+                        borderColor: "#3ea3a3",
+                        backgroundColor: "#3ea3a3",
                         padding: "2%",
                         borderRadius: 8,
                         alignItems: "center",
@@ -178,8 +178,8 @@ export default function FriendsList(props) {
                     <TouchableOpacity
                       style={{
                         borderWidth: 1,
-                        borderColor: "#344C7A",
-                        backgroundColor: "#9AA5B6",
+                        borderColor: "#901616",
+                        backgroundColor: "#901616",
                         padding: "2%",
                         borderRadius: 8,
                         alignItems: "center",
@@ -194,7 +194,7 @@ export default function FriendsList(props) {
                     </TouchableOpacity>
                   }
                   title={item.displayName}
-                  titleStyle={{ fontSize: 18 }}
+                  titleStyle={{ fontSize: 22 }}
                   subtitle={item.status}
                   //subtitle={item.status + " to add you"}
                   subtitleStyle={{ fontSize: 12, color: "grey" }}
@@ -247,5 +247,6 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'#e3e3e3'
   },
 });

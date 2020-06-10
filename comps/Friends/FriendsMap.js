@@ -16,8 +16,9 @@ import "firebase/functions";
 
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function FriendsMap() {
+export default function FriendsMap(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -116,15 +117,6 @@ export default function FriendsMap() {
     location &&
     friends && (
       <View style={styles.container}>
-        <View style={{ flexDirection: "row-reverse" }}>
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={(value) => toggleLocation(value)}
-            value={isEnabled}
-          />
-        </View>
         <MapView
           showsUserLocation
           initialRegion={{
@@ -140,7 +132,7 @@ export default function FriendsMap() {
               key={friend.id}
               coordinate={friend.location}
               title={friend.displayName}
-              //   image={friend.photoURL}
+              //  image={friend.photoURL}
               //   description={marker.description}
             >
               <View>
@@ -156,6 +148,43 @@ export default function FriendsMap() {
               </View>
             </Marker>
           ))}
+          <View
+            style={{
+              flexDirection: "row-reverse",
+              backgroundColor: null,
+              height: "8%",
+            }}
+          >
+            <Switch
+              trackColor={{ false: "#767577", true: "#185a9d" }}
+              thumbColor={isEnabled ? "#fff" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={(value) => toggleLocation(value)}
+              value={isEnabled}
+              style={{ marginTop: "5%", marginRight: "5%" }}
+            />
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Text
+                style={{
+                  paddingRight: "58%",
+                  paddingTop: "3.5%",
+                  color: "#185a9d",
+                  fontSize: 26,
+                }}
+              >
+                {" "}
+                Back
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Ionicons
+                name="md-arrow-round-back"
+                size={35}
+                color="#185a9d"
+                style={{ paddingLeft: "1%", paddingTop: "3%" }}
+              />
+            </TouchableOpacity>
+          </View>
         </MapView>
       </View>
     )

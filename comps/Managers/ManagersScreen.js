@@ -12,7 +12,7 @@ import ManagersHome from "./ManagersHome";
 const ManagersStack = createAppContainer(
   createStackNavigator(
     {
-      ManagersHome: ManagersHome,
+    //  ManagersHome: ManagersHome,
       ManagersRequest: ManagersRequest,
       ManagersRequestDetail: ManagersRequestDetail,
     },
@@ -22,7 +22,7 @@ const ManagersStack = createAppContainer(
       defaultNavigationOptions: {
         // header: null,
         headerStyle: {
-          backgroundColor: "#006cab",
+          backgroundColor: "#185a9d",
         },
         headerTintColor: "#fff",
         headerTitleStyle: {

@@ -43,6 +43,7 @@ export default function Details(props) {
   ///////////////////Front-End///////////////////////////
   const [modalAddReview, setModalAddReview] = useState(false);
   const [modalViewReview, setModalViewReview] = useState(false);
+  const [avgRating, setAvgRating] = useState(0);
 
   /////////////////////////////////////////////////////////
 
@@ -69,17 +70,30 @@ export default function Details(props) {
 
   const getReviews = async () => {
     const temp = [];
-
+    // const avgRating = [];
     db.collection("assets")
       .doc(asset.id)
       .collection("reviews")
       .onSnapshot((snapshot) => {
         snapshot.forEach((doc) => {
           temp.push({ id: doc.id, ...doc.data() });
+          // avgRating.push(doc.rating);
+          // console.log(doc.rating, "-------------------------");
         });
 
         // console.log(temp);
+        let sum = 0;
+        // console.log(sum, "+");
+        for (let i = 0; i < temp.length; i++) {
+          sum = sum + temp[i].rating;
+          // console.log(sum, "----123---------------------");
+        }
         setReviews(temp);
+        console.log("summmmmmmmmmmm", sum);
+        if (sum === 0) {
+        } else {
+          setAvgRating(parseFloat(sum / temp.length));
+        }
       });
   };
 
@@ -126,14 +140,15 @@ export default function Details(props) {
                 <View style={{ flexDirection: "row", padding: 5 }}>
                   <View
                     style={{
-                      width: "25%",
+                      width: "23%",
                       // backgroundColor: "red",
                       alignItems: "center",
+                      // justifyContent: "center",
                     }}
                   >
                     <TouchableOpacity
                       style={{
-                        backgroundColor: "#20365F",
+                        backgroundColor: "#185a9d",
                         width: 70,
                         height: 70,
                         margin: 5,
@@ -141,7 +156,7 @@ export default function Details(props) {
                         flexDirection: "row",
                         //elevation: 12,
                         borderWidth: 2,
-                        borderColor: "#20365F",
+                        borderColor: "#185a9d",
                       }}
                       disabled
                     >
@@ -156,7 +171,8 @@ export default function Details(props) {
                         }}
                       >
                         <MaterialCommunityIcons
-                          name="car"
+                          // name="car"
+                          name={props.assetIcon}
                           size={30}
                           color={"white"}
                         />
@@ -172,10 +188,16 @@ export default function Details(props) {
                       </View>
                     </TouchableOpacity>
                   </View>
-                  <View style={{ width: "75%", justifyContent: "center" }}>
+                  <View
+                    style={{
+                      width: "70%",
+                      justifyContent: "center",
+                      // backgroundColor: "yellow",
+                    }}
+                  >
                     <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                       <Text style={{ fontWeight: "bold" }}>Price: </Text>
-                      <Text>{asset.price} QR</Text>
+                      <Text>{asset.price}QR/Hour</Text>
                     </View>
                     <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                       <Text style={{ fontWeight: "bold" }}>Description: </Text>
@@ -185,23 +207,54 @@ export default function Details(props) {
                       <Text style={{ fontWeight: "bold" }}>
                         Average Rating:
                       </Text>
-                      <Text>{asset.rating ? asset.rating : " N/A"}</Text>
+                      {/* <Text> {asset.rating ? asset.rating : "N/A"}</Text> */}
+                      <Text> {avgRating}</Text>
+
                       {/* {console.log(
                         "-------------------------------------------",
                         asset
                       )} */}
                     </View>
                   </View>
+                  <View
+                    style={{
+                      // backgroundColor: "red",
+                      justifyContent: "center",
+                      // alignItems: "flex-start",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => props.handleAddFavorite(asset)}
+                      style={{ justifyContent: "center" }}
+                    >
+                      <MaterialCommunityIcons
+                        name={
+                          props.favoriteAssets.includes(asset.id)
+                            ? "heart"
+                            : "heart-outline"
+                        }
+                        size={26}
+                        color={
+                          props.favoriteAssets.includes(asset.id)
+                            ? "#c44949"
+                            : "lightgray"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => props.handleAddFavorite(asset)}
                   style={{
                     justifyContent: "center",
                     alignItems: "center",
                     height: 30,
                     marginTop: 5,
-                    backgroundColor: "#20365F",
+                    backgroundColor: props.favoriteAssets.includes(asset.id)
+                      ? "#185a9d"
+                      : "#3ea3a3",
+                    // backgroundColor: "#185a9d",
                     flexDirection: "row",
                     // padding: 3,
                   }}
@@ -229,7 +282,7 @@ export default function Details(props) {
                   ) : (
                     <Text style={{ color: "white" }}> Add to Favorites</Text>
                   )}
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               {/* <Text> {asset.description}</Text> */}
@@ -243,7 +296,9 @@ export default function Details(props) {
             )} */}
 
               <View style={{ marginTop: 15, marginBottom: 10 }}>
-                <Text style={{ color: "gray" }}>Latest Review</Text>
+                <Text style={{ color: "#6b6b6b", fontWeight: "bold" }}>
+                  Latest Review
+                </Text>
 
                 {reviews.length > 0 ? (
                   reviews.map(
@@ -313,10 +368,11 @@ export default function Details(props) {
                             <TouchableOpacity
                               style={{
                                 // width: "70%",
-                                backgroundColor: "#20365F",
+                                backgroundColor: "#3ea3a3",
                                 justifyContent: "center",
                                 alignItems: "center",
                                 padding: 5,
+                                borderRadius: 8,
                               }}
                               onPress={() => setModalViewReview(true)}
                             >
@@ -401,7 +457,7 @@ export default function Details(props) {
                   <MaterialCommunityIcons
                     name="close"
                     size={22}
-                    color={"#20365F"}
+                    color={"#3ea3a3"}
                     onPress={() => setModalAddReview(false)}
                   />
                 </View>
@@ -449,7 +505,7 @@ export default function Details(props) {
                     onPress={handleAddReview}
                     style={{
                       width: "30%",
-                      backgroundColor: "#20365F",
+                      backgroundColor: "#3ea3a3",
                       padding: 5,
                       justifyContent: "center",
                       alignItems: "center",
@@ -492,7 +548,7 @@ export default function Details(props) {
                   <MaterialCommunityIcons
                     name="close"
                     size={22}
-                    color={"#20365F"}
+                    color={"#3ea3a3"}
                     onPress={() => setModalViewReview(false)}
                   />
                 </View>
