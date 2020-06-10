@@ -175,8 +175,8 @@ export default function AdvertismentsPage(props) {
       db.collection("advertisements")
         .add({
           title: title,
-          startDate: new Date(date),
-          endDate: new Date(endDate),
+          startDate: new Date(date.value),
+          endDate: new Date(endDate.value),
           image: null,
           description: description,
           user: user,
@@ -248,11 +248,16 @@ export default function AdvertismentsPage(props) {
           <View style={{ flex: 10 }}>
             {advertisements.map((item, index) => (
               <View key={index}>
-                <Text>{item.title}</Text>
-                <Text>{item.description}</Text>
-                <Text>{item.link}</Text>
-                <Text>{moment(item.endDate.toDate()).format("L")}</Text>
-                <Text>{moment(item.startDate.toDate()).format("L")}</Text>
+                <Text>Title: {item.title}</Text>
+                <Text>Description: {item.description}</Text>
+                <Text>Link: {item.link}</Text>
+                <Text>
+                  Start Date: {moment(item.startDate.toDate()).format("L")}
+                </Text>
+                <Text>
+                  End Date: {moment(item.endDate.toDate()).format("L")}
+                </Text>
+
                 {item.image != null ? (
                   <Image
                     source={{ uri: item.image }}
@@ -299,7 +304,9 @@ export default function AdvertismentsPage(props) {
               />
               <Text
                 style={
-                  title.error
+                  title === null
+                    ? null
+                    : title.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -325,7 +332,9 @@ export default function AdvertismentsPage(props) {
               />
               <Text
                 style={
-                  link.error
+                  link === null
+                    ? null
+                    : link.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -351,7 +360,9 @@ export default function AdvertismentsPage(props) {
               />
               <Text
                 style={
-                  description.error
+                  description === null
+                    ? null
+                    : description.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -384,7 +395,7 @@ export default function AdvertismentsPage(props) {
                     justifyContent: "flex-start",
                     //backgroundColor: "lightgray",
                   }}
-                  date={date.value}
+                  date={date === null ? null : date.value}
                   mode="date"
                   placeholder="Select Published Date"
                   format="YYYY-MM-DD"
@@ -421,7 +432,9 @@ export default function AdvertismentsPage(props) {
                 />
                 <Text
                   style={
-                    date.error
+                    date === null
+                      ? null
+                      : date.error
                       ? {
                           color: "red",
                         }
@@ -454,7 +467,7 @@ export default function AdvertismentsPage(props) {
                     justifyContent: "flex-start",
                     //backgroundColor: "lightgray",
                   }}
-                  date={endDate.value}
+                  date={endDate === null ? null : endDate.value}
                   mode="date"
                   placeholder="Select End Date"
                   format="YYYY-MM-DD"
@@ -491,7 +504,11 @@ export default function AdvertismentsPage(props) {
                 />
                 <Text
                   style={
-                    endDate.error ? { color: "red" } : { color: "transparent" }
+                    endDate === null
+                      ? null
+                      : endDate.error
+                      ? { color: "red" }
+                      : { color: "transparent" }
                   }
                 >
                   * Select a Date

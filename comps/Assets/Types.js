@@ -52,6 +52,25 @@ export default function Types(props) {
     getTheme();
   }, []);
 
+  const [ads, setAds] = useState([]);
+
+  useEffect(() => {
+    db.collection("advertisements")
+      .where("status", "==", "approved")
+      .onSnapshot((querySnapshot) => {
+        const adsBox = [];
+        querySnapshot.forEach((doc) => {
+          adsBox.push({
+            title: doc.data().title,
+            uri: doc.data().image,
+            text: doc.data().description,
+          });
+        });
+        console.log("adssss", adsBox);
+        setAds(adsBox);
+      });
+  }, []);
+
   const changeTheme = async (x) => {
     const theme = await AsyncStorage.setItem("theme", x);
     getTheme();
@@ -124,24 +143,30 @@ export default function Types(props) {
   return (
     <View style={theme === "light" ? styles.container : styles.container2}>
       <ScrollView>
-        <View style={{ height: Dimensions.get("window").height / 4 }}>
-          <TouchableOpacity
-            style={{ height: "100%" }}
-            onPress={() => console.log("ad clicked")}
-          >
-            <TimedSlideshow
-              items={items}
-              progressBarDirection="middle"
-              progressBarColor="#3ea3a3"
-              // renderCloseIcon=
-              // onPress={() => console.log("Close Clickedddddd")}
-              // renderCloseIcon={null}
-              renderCloseIcon={() => null}
-              // imageStyle={{ backgroundColor: "black", width: 20 }}
-              // renderIcon
-            />
-          </TouchableOpacity>
-        </View>
+        {ads.length === 0 ? null : (
+          <View style={{ height: Dimensions.get("window").height / 4 }}>
+            <TouchableOpacity
+              style={{ height: "100%" }}
+              onPress={() => {
+                () => {
+                  Linking.openURL(ads[0].link);
+                };
+              }}
+            >
+              <TimedSlideshow
+                items={ads}
+                progressBarDirection="middle"
+                progressBarColor="#3ea3a3"
+                // renderCloseIcon=
+                // onPress={() => console.log("Close Clickedddddd")}
+                // renderCloseIcon={null}
+                renderCloseIcon={() => null}
+                // imageStyle={{ backgroundColor: "black", width: 20 }}
+                // renderIcon
+              />
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View
           style={{
