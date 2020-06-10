@@ -160,7 +160,7 @@ export default function NewsPage() {
       </TouchableOpacity>
     </View>
   ) : (
-    <View style={styles.container}>
+    <View style={styles.container2}>
       <View
         style={{
           // /  paddingTop: "15%",
@@ -168,7 +168,7 @@ export default function NewsPage() {
           borderRadius: 20,
           borderColor: "#185a9d",
           width: "90%",
-          height: "90%",
+          height: "95%",
           alignContent: "center",
           alignItems: "center",
           flexDirection: "column",
@@ -179,7 +179,7 @@ export default function NewsPage() {
             // paddingTop: "15%",
             borderBottomWidth: 1,
             borderTopRightRadius: 18,
-            borderTopLeftRadius:18,
+            borderTopLeftRadius: 18,
             borderColor: "#185a9d",
             width: "100%",
             // height: "10%",
@@ -187,7 +187,7 @@ export default function NewsPage() {
             alignItems: "center",
             flexDirection: "column",
             marginBottom: "5%",
-            backgroundColor:'#185a9d'
+            backgroundColor: "#185a9d",
           }}
         >
           <TouchableOpacity onPress={() => setCreateFlag(!createFlag)}>
@@ -213,6 +213,7 @@ export default function NewsPage() {
             height: "17%",
             alignContent: "center",
             alignItems: "center",
+            position: "relative",
           }}
         >
           {image != null ? (
@@ -224,7 +225,7 @@ export default function NewsPage() {
             <TouchableOpacity onPress={_pickImage}>
               <MaterialCommunityIcons
                 name="image-plus"
-                size={80}
+                size={70}
                 color="darkgrey"
                 style={{ paddingTop: "8%" }}
               />
@@ -252,6 +253,7 @@ export default function NewsPage() {
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
+            backgroundColor: "white",
           }}
         >
           <Input
@@ -418,7 +420,7 @@ export default function NewsPage() {
               borderRadius: 8,
               borderWidth: 1.5,
               borderColor: "#185a9d",
-              height: "50%",
+              height: "30%",
               width: "80%",
               alignSelf: "center",
               //justifyContent:'center',
@@ -460,38 +462,46 @@ export default function NewsPage() {
             // paddingTop: "15%",
             borderBottomWidth: 0,
             borderBottomRightRadius: 18,
-            borderBottomLeftRadius:18,
+            borderBottomLeftRadius: 18,
             borderColor: "#185a9d",
             width: "100%",
             height: "10%",
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
-         //   marginBottom: "5%",185a9d
-            backgroundColor:'#fff'
+            //   marginBottom: "5%",185a9d
+            backgroundColor: "#fff",
+            justifyContent: "center",
           }}
         >
-      
-          <TouchableOpacity  
-           style={{
-            backgroundColor: "#3ea3a3",
-            // height: '20%',
-            width: "26%",
-            alignSelf: "center",
-            justifyContent: "center",
-            alignItems: "center",
-            marginStart: "2%",
-            marginEnd: "3%",
-             paddingBottom:'3%',
-            borderRadius: 8,
-            borderColor:'#185a9d',
-            // marginBottom: 0,
-             marginTop: '4%',
-          }}
-          onPress={submitNews}>
-            <Text style={{  fontSize: 20, color: "#fff",paddingBottom:'10%' }}>Upload</Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#3ea3a3",
+              // height: '20%',
+              width: "26%",
+              alignSelf: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              marginStart: "2%",
+              marginEnd: "3%",
+              paddingBottom: "3%",
+              borderRadius: 8,
+              borderColor: "#185a9d",
+              // marginBottom: 0,
+              // marginTop: "4%",
+            }}
+            onPress={submitNews}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#fff",
+                //  paddingBottom: "10%"
+              }}
+            >
+              Upload
+            </Text>
           </TouchableOpacity>
-        
         </View>
       </View>
     </View>
@@ -502,6 +512,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e3e3e3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  container2: {
+    flex: 1,
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },

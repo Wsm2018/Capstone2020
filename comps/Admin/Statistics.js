@@ -546,6 +546,6 @@ const styles = StyleSheet.create({
   },
 });
 Statistics.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

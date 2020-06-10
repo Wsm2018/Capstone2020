@@ -177,8 +177,14 @@ export default function Home(props) {
         </TouchableOpacity> */}
       </View>
       <ActionButton
+        // buttonColor={"#3ea3a3"}
+        // size={deviceType === 1 ? 60 : 80}
         buttonColor={"#3ea3a3"}
-        size={deviceType === 1 ? 60 : 80}
+        size={responsiveScreenFontSize(8)}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+
         // position="left"
         //verticalOrientation="down"
       >

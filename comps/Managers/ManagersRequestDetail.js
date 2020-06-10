@@ -67,7 +67,7 @@ export default function ManagersRequestDetail(props) {
         style={{
           // paddingTop: "1%",
           paddingLeft: "15%",
-          marginTop:'3%',
+          marginTop: "3%",
           borderWidth: 2,
           borderRadius: 8,
           borderColor: "#185a9d",
@@ -290,7 +290,7 @@ export default function ManagersRequestDetail(props) {
             <View
               style={{
                 margin: 20,
-                backgroundColor: "e3e3e3",
+                backgroundColor: "white",
                 borderRadius: 20,
                 padding: 35,
                 alignItems: "center",
@@ -307,8 +307,8 @@ export default function ManagersRequestDetail(props) {
                 // ---This is for Height---
                 height: "30%",
                 width: "100%",
-                borderWidth:3,
-                borderColor:'#185a9d'
+                borderWidth: 3,
+                borderColor: "#185a9d",
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: "500" }}>
@@ -393,7 +393,6 @@ export default function ManagersRequestDetail(props) {
               // ---This is for Width---
               width: "80%",
               color: "grey",
-             
             }}
           >
             <View
@@ -405,7 +404,7 @@ export default function ManagersRequestDetail(props) {
                 alignItems: "center",
                 alignSelf: "center",
                 shadowColor: "#000",
-                
+
                 shadowOffset: {
                   width: 0,
                   height: 2,
@@ -417,8 +416,8 @@ export default function ManagersRequestDetail(props) {
                 // ---This is for Height---
                 height: "30%",
                 width: "100%",
-                borderWidth:3,
-                borderColor:'#185a9d'
+                borderWidth: 3,
+                borderColor: "#185a9d",
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: "500" }}>
@@ -499,7 +498,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e3e3e3",
-    
   },
 });
 

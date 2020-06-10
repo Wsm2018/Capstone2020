@@ -434,10 +434,10 @@ export default function indexUH(props) {
       </View> */}
       <ActionButton
         buttonColor={"#3ea3a3"}
-        size={responsiveScreenFontSize(10)}
+        size={responsiveScreenFontSize(8)}
         //  style={styles.actionButtonIcon2}
         // icon={responsiveScreenFontSize(10)}
-        buttonTextStyle={{ fontSize: responsiveScreenFontSize(5) }}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
         // position="left"
         //verticalOrientation="down"
       >

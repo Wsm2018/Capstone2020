@@ -30,6 +30,11 @@ import {
   CollapseHeader,
   CollapseBody,
 } from "accordion-collapse-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 export default function Schedule(props) {
   const [user, setUser] = useState({});
   const [services, setServices] = useState({});
@@ -721,13 +726,18 @@ export default function Schedule(props) {
         </Modal>
       </ScrollView>
       <ActionButton
-        buttonColor={"#3ea3a3"}
-        size={80}
-        //  style={styles.actionButtonIcon2}
-        // icon={responsiveScreenFontSize(10)}
-        buttonTextStyle={{ fontSize: 20 }}
+        // buttonColor={"#3ea3a3"}
+        // size={80}
+        // //  style={styles.actionButtonIcon2}
+        // // icon={responsiveScreenFontSize(10)}
+        // buttonTextStyle={{ fontSize: 20 }}
         // position="left"
         //verticalOrientation="down"
+        buttonColor={"#3ea3a3"}
+        size={responsiveScreenFontSize(8)}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
       >
         <ActionButton.Item
           buttonColor="#3498db"
