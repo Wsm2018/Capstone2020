@@ -643,6 +643,7 @@ export default function Sections(props) {
                     // ... You can check the source to find the other keys.
                   }}
                   onDateChange={setStartDate}
+                  // minuteInterval={30}
                 />
               ) : (
                 <DatePicker
