@@ -14,6 +14,12 @@ import "firebase/auth";
 import db from "../../db";
 import { FlatGrid } from "react-native-super-grid";
 import ActionButton from "react-native-action-button";
+import * as Device from "expo-device";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 // import LottieView from "lottie-react-native";
@@ -21,13 +27,21 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 // import { Item } from "react-native-paper/lib/typescript/src/components/List/List";
 
 export default function Home(props) {
+  const [deviceType, setDeviceType] = useState(0);
   const handleLogout = () => {
     firebase.auth().signOut();
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   const items = [
     {
       name: "Users",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Users"),
       image: require("../../assets/images/adminpic/list.jpg"),
       height: 120,
@@ -35,7 +49,7 @@ export default function Home(props) {
     },
     {
       name: "Statistics",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Statistics"),
       image: require("../../assets/images/adminpic/charts.jpg"),
       height: 120,
@@ -44,7 +58,7 @@ export default function Home(props) {
 
     {
       name: "Booking",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Types"),
       image: require("../../assets/images/adminpic/bookings.jpg"),
       height: 120,
@@ -52,7 +66,7 @@ export default function Home(props) {
     },
     {
       name: "Make Admin",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("MakeAdmin"),
       image: require("../../assets/images/adminpic/admin.jpg"),
       height: 120,
@@ -61,7 +75,7 @@ export default function Home(props) {
 
     {
       name: "Promotion",
-      code: "#216380",
+      code: "#005c9d",
       nav: () => props.navigation.navigate("Promotion"),
       image: require("../../assets/images/adminpic/promotion.jpg"),
       height: 120,
@@ -164,23 +178,23 @@ export default function Home(props) {
       </View>
       <ActionButton
         buttonColor={"#3ea3a3"}
-        size={60}
+        size={deviceType === 1 ? 60 : 80}
         // position="left"
         //verticalOrientation="down"
       >
         <ActionButton.Item
-          buttonColor="#9b59b6"
+          buttonColor="#185a9d"
           title="Change Role"
           onPress={handleChangeRole}
         >
           <SimpleLineIcons
             name="people"
-            size={20}
+            size={deviceType === 1 ? 60 : 80}
             style={styles.actionButtonIcon}
           />
         </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="#3498db"
+          buttonColor="#901616"
           title="Logout"
           onPress={() => {
             firebase.auth().signOut();
@@ -189,7 +203,6 @@ export default function Home(props) {
         >
           <MaterialCommunityIcons
             name="logout"
-            size={20}
             style={styles.actionButtonIcon}
           />
         </ActionButton.Item>
@@ -245,9 +258,10 @@ const styles = StyleSheet.create({
     height: 150,
   },
   itemName: {
-    fontSize: 16,
+    fontSize: responsiveScreenFontSize(1.9),
+    fontWeight: "bold",
     color: "#fff",
-    fontWeight: "600",
+    // fontWeight: "600",
   },
   itemCode: {
     fontWeight: "600",
@@ -255,7 +269,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   actionButtonIcon: {
-    fontSize: 20,
+    fontSize: responsiveScreenFontSize(2),
     height: 22,
     color: "white",
   },

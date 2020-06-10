@@ -521,7 +521,7 @@ export default function ProfileScreen(props) {
                 >
                   <AntDesign
                     name="close"
-                    size={25}
+                    size={deviceType === 1 ? 25 : 40}
                     style={{ color: "#224229" }}
                   />
                 </TouchableOpacity>
@@ -557,7 +557,7 @@ export default function ProfileScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "#28456B",
                         fontWeight: "bold",
                       }}
@@ -587,7 +587,7 @@ export default function ProfileScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "#28456B",
                         fontWeight: "bold",
                       }}
@@ -674,21 +674,25 @@ export default function ProfileScreen(props) {
                     )}
                     <Input
                       inputContainerStyle={{
-                        width: "100%",
+                        // width: "100%",
                         borderColor: "black",
-                        height: 40,
+                        // height: 40,
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(60),
                         // backgroundColor: "green",
                         // alignItems: "center",
                         justifyContent: "center",
                         // flexDirection: "row",
                         paddingLeft: 6,
                         // width: "60%",
+
                         borderColor: "gray",
                         borderWidth: 2,
                         borderRadius: 5,
                         // marginBottom: 10,
                       }}
                       label="Display Name"
+                      // labelStyle={(fontSize = responsiveScreenFontSize(2))}
                       value={editDisplayName}
                       onChangeText={(name) => {
                         setEditDisplayName(name);
@@ -734,7 +738,8 @@ export default function ProfileScreen(props) {
                           backgroundColor: "#2E9E9B",
                           borderRadius: 10,
                           // borderWidth: 4,
-                          height: 40,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
                           // width: "30%",
                           // alignSelf: "center",
                           justifyContent: "center",
@@ -749,7 +754,7 @@ export default function ProfileScreen(props) {
                           <Text
                             style={{
                               textAlign: "center",
-                              fontSize: 16,
+                              fontSize: responsiveScreenFontSize(2),
                               color: "white",
                             }}
                           >
@@ -762,8 +767,8 @@ export default function ProfileScreen(props) {
                           flex: 0.4,
                           backgroundColor: "#901616",
                           // borderWidth: 4,
-                          height: 40,
-                          // width: "30%",
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
@@ -784,7 +789,7 @@ export default function ProfileScreen(props) {
                           <Text
                             style={{
                               textAlign: "center",
-                              fontSize: 16,
+                              fontSize: responsiveScreenFontSize(2),
                               color: "white",
                             }}
                           >
@@ -803,9 +808,8 @@ export default function ProfileScreen(props) {
                           // backgroundColor: "#2E9E9B",
                           borderRadius: 10,
                           // borderWidth: 4,
-                          height: 40,
-                          // height: 40,
-                          width: "80%",
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(60),
                           // alignSelf: "center",
                           justifyContent: "center",
                           alignItems: "center",
@@ -819,7 +823,7 @@ export default function ProfileScreen(props) {
                           <Text
                             style={{
                               textAlign: "center",
-                              fontSize: 16,
+                              fontSize: responsiveScreenFontSize(2),
                               color: "darkgray",
                               fontWeight: "bold",
                             }}
@@ -1201,7 +1205,7 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     height: height / 1.5,
-    width: width / 1.2,
+    width: width / 1.4,
     backgroundColor: "#fff",
     shadowOpacity: 1,
     shadowRadius: 2,
