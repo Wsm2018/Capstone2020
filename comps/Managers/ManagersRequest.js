@@ -138,8 +138,8 @@ export default function EmployeesAllowed(props) {
           alignContent: "center",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#006cab",
-          borderTopColor: "#006cab",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
           height: "10%",
           // width:'100%'
           //paddingTop:'2%',
@@ -156,7 +156,7 @@ export default function EmployeesAllowed(props) {
             backgroundColor: "white",
             fontSize: 18,
             paddingLeft: "2%",
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             borderWidth: 2,
             borderRadius:4,
             width: "75%",
@@ -179,7 +179,7 @@ export default function EmployeesAllowed(props) {
               <MaterialCommunityIcons
                 name="account-circle"
                 size={45}
-                color="#006cab"
+                color="#185a9d"
               />
             }
             title={user.firstName + " " + user.lastName}
@@ -190,7 +190,7 @@ export default function EmployeesAllowed(props) {
             }
             subtitleStyle={{ color: "darkgrey" }}
             topDivider
-            // rightAvatar={<MaterialCommunityIcons name="account-details" size={25} color="#006cab" />}
+            // rightAvatar={<MaterialCommunityIcons name="account-details" size={25} color="#185a9d" />}
             bottomDivider
             chevron
             onPress={() =>

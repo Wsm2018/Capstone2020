@@ -22,7 +22,9 @@ import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { AsyncStorage } from "react-native";
 import ExtendServices from "./ExtendServices";
-import { getIconType } from "react-native-elements";
+import { getIconType, Header, Card, Divider } from "react-native-elements";
+import { FlatList } from "react-native";
+import { FontAwesome5, Fontisto, Ionicons, AntDesign } from "@expo/vector-icons";
 
 export default function BookingHistory(props) {
   const [assetBookings, setAssetBookings] = useState([]);
@@ -440,6 +442,7 @@ export default function BookingHistory(props) {
   const getType = (s) => {
     var section = assetSections.filter((o) => o.id == s)[0];
     var type = assetTypes.filter((o) => o.id == section.assetType)[0];
+    console.log('Type Name: ', type.name)
     return type.name;
   };
 
@@ -508,217 +511,325 @@ export default function BookingHistory(props) {
   };
 
   return (
-    <ScrollView>
-      {accepted && viewDetails ? (
-        <View>
-          <Text>total : {totalAmount}</Text>
-          <Text>total Asset : {assetBookingTotal} </Text>
-        </View>
-      ) : null}
+    <View
+      style={{
+        backgroundColor: "#e3e3e3",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        flex: 1,
+      }}
+    >
+      <Header
+        containerStyle={{ backgroundColor: "#185a9d" }}
+        //leftComponent={{ icon: 'menu', color: '#fff' }}
+        centerComponent={{
+          text: "My Bookings History",
+          style: { color: "#fff", fontSize: 22 },
+        }}
+        // rightComponent={{ icon: 'home', color: '#fff' }}
+      />
+      <ScrollView
+        style={{ backgroundColor: "#e3e3e3", width: "100%" }}
+        // contentContainerStyle={{
+        //   alignItems: "center",
+        //   justifyContent: "center",
+        // }}
+      >
+        {accepted && viewDetails ? (
+          <View style={{ backgroundColor: "red" }}>
+            <Text>total : {totalAmount}</Text>
+            <Text>total Asset : {assetBookingTotal} </Text>
+          </View>
+        ) : null}
 
-      {payments && !viewDetails ? (
-        payments.map((p) => (
-          <TouchableOpacity onPress={() => setViewDetails(p)}>
-            <Text>
-              Type{" "}
-              {assetSections.length > 0
-                ? getType(p.assetBooking.asset.assetSection)
-                : "Loading ..."}
-            </Text>
-            <Text>
-              Section{" "}
-              {assetSections.length > 0
-                ? getSection(p.assetBooking.asset.assetSection)
-                : "Loading ..."}
-            </Text>
-            <Text>{p.assetBooking.asset.code}</Text>
-            <Text>
-              {p.assetBooking.startDateTime.split(" ")[0]}{" "}
-              {converte(p.assetBooking.startDateTime)}
-            </Text>
-            <Text>
-              {p.assetBooking.endDateTime.split(" ")[0]}{" "}
-              {converte(p.assetBooking.endDateTime)}
-            </Text>
-            <Text>
-              {p.totalAmount} QR {!p.status ? "Not Payed" : "Payed"}
-            </Text>
-            <Text></Text>
-          </TouchableOpacity>
-        ))
-      ) : (
-        <View>
-          {viewDetails ? (
-            <View>
-              {/* <Text>{viewDetails.id}</Text> */}
-              <Text>
-                Type{" "}
-                {assetSections.length > 0
-                  ? getType(viewDetails.assetBooking.asset.assetSection)
-                  : "Loading ..."}
-              </Text>
-              <Text>
-                Section{" "}
-                {assetSections.length > 0
-                  ? getSection(viewDetails.assetBooking.asset.assetSection)
-                  : "Loading ..."}
-              </Text>
-              <Text>From: {viewDetails.assetBooking.startDateTime}</Text>
-              <Text>To: {viewDetails.assetBooking.endDateTime}</Text>
-              <Text>
-                Total Amount: {viewDetails.totalAmount} QR{" "}
-                {!viewDetails.status ? "Not Payed" : "Payed"}
-              </Text>
-              <Text>To: {viewDetails.id}</Text>
+        {payments && !viewDetails ? (
+          <FlatList
+            data={payments}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => (
+              <Card containerStyle={{ width: "90%", marginLeft: "5%",borderRadius:8 }}>
+                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
 
-              {displayServices ? (
-                <View>
-                  <Text>Booked Services</Text>
-                  {displayServices.map((s, index) => (
-                    <View>
-                      <Text>Service: {s.service}</Text>
-                      <Text>Timing/s: </Text>
-                      {s.timings.map((h) => (
-                        <View style={{ flexDirection: "row" }}>
-                          <Text>
-                            {h.split("T")[0]} {converte(h)}
-                          </Text>
-                          {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
-                        </View>
-                      ))}
-                    </View>
-                  ))}
+                {/* <Text>
+                  {getType(item.assetBooking.asset.assetSection) ===
+                  "Parking" ? (
+                    <FontAwesome5 name="car" size={24} color="black" />
+                  ) : (
+                    <Fontisto name="room" size={24} color="black" />
+                  )}
+                </Text> */}
+                <Text style={{fontSize:18, fontWeight:'bold',color:'#185a9d'}}>
+                  {/* {' '}Type{" "} */}
+                  {assetSections.length > 0
+                    ? getType(item.assetBooking.asset.assetSection)
+                    : "Loading ..."}
+                </Text>
+               
                 </View>
-              ) : (
-                <Text>No Booked Services</Text>
-              )}
+                {/* <Text></Text>
+                <Divider/>
+                <Text></Text> */}
+                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
 
-              {new Date().getTime() <
-              new Date(
-                viewDetails.assetBooking.startDateTime.split(" ").join("")
-              ).getTime() ? (
+                {/* <Text>
+                  {getType(item.assetBooking.asset.assetSection) ===
+                  "Parking" ? (
+                    <FontAwesome5 name="car" size={24} color="black" />
+                  ) : (
+                    <Fontisto name="room" size={24} color="black" />
+                  )}
+                </Text> */}
+               <Ionicons
+            name="ios-time"
+            size={16}
+            color="#B9B9B9"
+            style={{ paddingTop: "2%" }}
+          />
+                <Text style={{ paddingLeft: "1%", fontSize: 14, color: "#B9B9B9",paddingTop: "1.8%" }}>
+             {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+             {converte(item.assetBooking.startDateTime)} 
+          </Text>
+          <TouchableOpacity style={{backgroundColor:'#fff', width:'10%',marginLeft:'70%', borderRadius:8,paddingBottom:'5%'}}>
+                <AntDesign name="caretdown" size={30} color="#3ea3a3" style={{paddingLeft:'15%'}}/>
+
+                </TouchableOpacity>
+                </View>
+                {/* <Text>
+                  Section{" "}
+                  {assetSections.length > 0
+                    ? getSection(item.assetBooking.asset.assetSection)
+                    : "Loading ..."}
+                </Text>
+                <Text>{item.assetBooking.asset.code}</Text>
+                <Text>
+                  {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                  {converte(item.assetBooking.startDateTime)}
+                </Text>
+                <Text>
+                  {item.assetBooking.endDateTime.split(" ")[0]}{" "}
+                  {converte(item.assetBooking.endDateTime)}
+                </Text>
+                <Text style={{ backgroundColor: "red" }}>
+                  {item.totalAmount} QR {!item.status ? "Not Payed" : "Payed"}
+                </Text>
+                <Text></Text> */}
+              </Card>
+            )}
+          />
+        ) : (
+          // payments.map((p) => (
+
+          //   <TouchableOpacity style={{backgroundColor:'green'}} onPress={() => setViewDetails(p)}>
+          //     <Text>
+          //       Type{" "}
+          //       {assetSections.length > 0
+          //         ? getType(p.assetBooking.asset.assetSection)
+          //         : "Loading ..."}
+          //     </Text>
+          //     <Text>
+          //       Section{" "}
+          //       {assetSections.length > 0
+          //         ? getSection(p.assetBooking.asset.assetSection)
+          //         : "Loading ..."}
+          //     </Text>
+          //     <Text>{p.assetBooking.asset.code}</Text>
+          //     <Text>
+          //       {p.assetBooking.startDateTime.split(" ")[0]}{" "}
+          //       {converte(p.assetBooking.startDateTime)}
+          //     </Text>
+          //     <Text>
+          //       {p.assetBooking.endDateTime.split(" ")[0]}{" "}
+          //       {converte(p.assetBooking.endDateTime)}
+          //     </Text>
+          //     <Text  style={{backgroundColor:'red'}} >
+          //       {p.totalAmount} QR {!p.status ? "Not Payed" : "Payed"}
+          //     </Text>
+          //     <Text></Text>
+          //   </TouchableOpacity>
+
+          // ))
+          <View>
+            {viewDetails ? (
+              <View>
+                {/* <Text>{viewDetails.id}</Text> */}
+                <Text>
+                  Type{" "}
+                  {assetSections.length > 0
+                    ? getType(viewDetails.assetBooking.asset.assetSection)
+                    : "Loading ..."}
+                </Text>
+                <Text>
+                  Section{" "}
+                  {assetSections.length > 0
+                    ? getSection(viewDetails.assetBooking.asset.assetSection)
+                    : "Loading ..."}
+                </Text>
+                <Text>From: {viewDetails.assetBooking.startDateTime}</Text>
+                <Text>To: {viewDetails.assetBooking.endDateTime}</Text>
+                <Text>
+                  Total Amount: {viewDetails.totalAmount} QR{" "}
+                  {!viewDetails.status ? "Not Payed" : "Payed"}
+                </Text>
+                <Text>To: {viewDetails.id}</Text>
+
+                {displayServices ? (
+                  <View>
+                    <Text>Booked Services</Text>
+                    {displayServices.map((s, index) => (
+                      <View>
+                        <Text>Service: {s.service}</Text>
+                        <Text>Timing/s: </Text>
+                        {s.timings.map((h) => (
+                          <View style={{ flexDirection: "row" }}>
+                            <Text>
+                              {h.split("T")[0]} {converte(h)}
+                            </Text>
+                            {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
+                          </View>
+                        ))}
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text>No Booked Services</Text>
+                )}
+
+                {new Date().getTime() <
+                new Date(
+                  viewDetails.assetBooking.startDateTime.split(" ").join("")
+                ).getTime() ? (
+                  <Button title={"cancel"} onPress={() => cancelBooking()} />
+                ) : null}
+
                 <Button title={"cancel"} onPress={() => cancelBooking()} />
-              ) : null}
-
-              <Button title={"cancel"} onPress={() => cancelBooking()} />
-              <Button title={"Back"} onPress={() => back()} />
-              {new Date().getTime() <
-              new Date(
-                viewDetails.assetBooking.endDateTime.split(" ").join("")
-              ).getTime() ? (
-                <Button title={"extend"} onPress={() => showDateInput(true)} />
-              ) : null}
-              {!viewDetails.status ? (
-                <Button
-                  title="Pay"
-                  onPress={() =>
-                    props.navigation.navigate("Payment", {
-                      partial: viewDetails,
-                    })
-                  }
-                />
-              ) : null}
-            </View>
-          ) : null}
-
-          {dateInput ? (
-            <DatePicker
-              style={{ width: 200 }}
-              //is24Hour
-              minuteInterval={15}
-              date={extension}
-              mode="datetime"
-              placeholder="select a Start date"
-              format="YYYY-MM-DD T hh:00 A"
-              minDate={viewDetails.assetBooking.endDateTime}
-              maxDate={moment().add(3, "month")}
-              minTime={moment(viewDetails.assetBooking.endDateTime).format()}
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  position: "absolute",
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0,
-                },
-                dateInput: {
-                  marginLeft: 36,
-                },
-                // ... You can check the source to find the other keys.
-              }}
-              onDateChange={setExtension}
-            />
-          ) : null}
-
-          {accepted && extension ? (
-            <View>
-              <Text>Extension Valid</Text>
-              <Button title="Services" onPress={() => setAddServices(true)} />
-              <Button title="Confirm" onPress={() => confirm()} />
-            </View>
-          ) : !accepted && extension ? (
-            <Text>Extension Not Valid</Text>
-          ) : null}
-
-          {addServices ? (
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={addServices}
-              onRequestClose={() => {
-                Alert.alert("Modal has been closed.");
-              }}
-            >
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                  <ExtendServices
-                    //sName={selectedSection.name}
-                    //tName={tName}
-                    oldDays={newUserDays}
-                    oldSb={newServiceBookings}
-                    oldSh={newShow}
-                    oldAvailable={updateAvailableTimings}
-                    serviceBookingArr={(
-                      bookings,
-                      show,
-                      days,
-                      updateAvailable
-                    ) =>
-                      getServiceBookings(bookings, show, days, updateAvailable)
-                    }
-                    asset={viewDetails.assetBooking.asset}
-                    startDateTime={viewDetails.assetBooking.endDateTime}
-                    endDateTime={extension}
-                    type={typeId}
-                    navigation={props.navigation}
+                <Button title={"Back"} onPress={() => back()} />
+                {new Date().getTime() <
+                new Date(
+                  viewDetails.assetBooking.endDateTime.split(" ").join("")
+                ).getTime() ? (
+                  <Button
+                    title={"extend"}
+                    onPress={() => showDateInput(true)}
                   />
-                </View>
+                ) : null}
+                {!viewDetails.status ? (
+                  <Button
+                    title="Pay"
+                    onPress={() =>
+                      props.navigation.navigate("Payment", {
+                        partial: viewDetails,
+                      })
+                    }
+                  />
+                ) : null}
               </View>
-            </Modal>
-          ) : null}
+            ) : null}
 
-          {newServiceBookings.length > 0 ? (
-            <View>
-              <Text>Booked Services</Text>
-              {newShow.map((s) => (
-                <View>
-                  <Text>Service: {s.service.name}</Text>
-                  <Text>Price Per Hour {s.service.price}</Text>
+            {dateInput ? (
+              <DatePicker
+                style={{ width: 200 }}
+                //is24Hour
+                minuteInterval={15}
+                date={extension}
+                mode="datetime"
+                placeholder="select a Start date"
+                format="YYYY-MM-DD T hh:00 A"
+                minDate={viewDetails.assetBooking.endDateTime}
+                maxDate={moment().add(3, "month")}
+                minTime={moment(viewDetails.assetBooking.endDateTime).format()}
+                confirmBtnText="Confirm"
+                cancelBtnText="Cancel"
+                customStyles={{
+                  dateIcon: {
+                    position: "absolute",
+                    left: 0,
+                    top: 4,
+                    marginLeft: 0,
+                  },
+                  dateInput: {
+                    marginLeft: 36,
+                  },
+                  // ... You can check the source to find the other keys.
+                }}
+                onDateChange={setExtension}
+              />
+            ) : null}
 
-                  <Text>Total: {s.service.price * s.hours.length}</Text>
-                  <Text>Bookings</Text>
-                  {s.hours.map((h) => (
-                    <Text>{h}</Text>
-                  ))}
+            {accepted && extension ? (
+              <View>
+                <Text>Extension Valid</Text>
+                <Button title="Services" onPress={() => setAddServices(true)} />
+                <Button title="Confirm" onPress={() => confirm()} />
+              </View>
+            ) : !accepted && extension ? (
+              <Text>Extension Not Valid</Text>
+            ) : null}
+
+            {addServices ? (
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={addServices}
+                onRequestClose={() => {
+                  Alert.alert("Modal has been closed.");
+                }}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <ExtendServices
+                      //sName={selectedSection.name}
+                      //tName={tName}
+                      oldDays={newUserDays}
+                      oldSb={newServiceBookings}
+                      oldSh={newShow}
+                      oldAvailable={updateAvailableTimings}
+                      serviceBookingArr={(
+                        bookings,
+                        show,
+                        days,
+                        updateAvailable
+                      ) =>
+                        getServiceBookings(
+                          bookings,
+                          show,
+                          days,
+                          updateAvailable
+                        )
+                      }
+                      asset={viewDetails.assetBooking.asset}
+                      startDateTime={viewDetails.assetBooking.endDateTime}
+                      endDateTime={extension}
+                      type={typeId}
+                      navigation={props.navigation}
+                    />
+                  </View>
                 </View>
-              ))}
-              <Text>Services Total Amount: {serviceBookingTotal}</Text>
-            </View>
-          ) : null}
-        </View>
-      )}
-    </ScrollView>
+              </Modal>
+            ) : null}
+
+            {newServiceBookings.length > 0 ? (
+              <View>
+                <Text>Booked Services</Text>
+                {newShow.map((s) => (
+                  <View>
+                    <Text>Service: {s.service.name}</Text>
+                    <Text>Price Per Hour {s.service.price}</Text>
+
+                    <Text>Total: {s.service.price * s.hours.length}</Text>
+                    <Text>Bookings</Text>
+                    {s.hours.map((h) => (
+                      <Text>{h}</Text>
+                    ))}
+                  </View>
+                ))}
+                <Text>Services Total Amount: {serviceBookingTotal}</Text>
+              </View>
+            ) : null}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 

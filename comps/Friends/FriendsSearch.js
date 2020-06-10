@@ -21,6 +21,7 @@ import {
   Feather,
   Ionicons,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import { BarCodeScanner } from "expo-barcode-scanner";
 
@@ -233,8 +234,8 @@ export default function FriendsList(props) {
           alignContent: "center",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#20365F",
-          borderTopColor: "#20365F",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
           //paddingTop:'2%',
         }}
       >
@@ -250,7 +251,7 @@ export default function FriendsList(props) {
             backgroundColor: "white",
             fontSize: 18,
             paddingLeft: "2%",
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             borderWidth: 2,
             width: "70%",
             height: "80%",
@@ -318,8 +319,8 @@ export default function FriendsList(props) {
                         <TouchableOpacity
                           style={{
                             borderWidth: 2,
-                            borderColor: "#344C7A",
-                            backgroundColor: "#9AA5B6",
+                            borderColor: "#547BA3",
+                            backgroundColor: "#547BA3",
                             padding: "2%",
                             borderRadius: 12,
                             flexDirection: "row",
@@ -346,16 +347,25 @@ export default function FriendsList(props) {
                         <TouchableOpacity
                           style={{
                             borderWidth: 2,
-                            borderColor: "#20365F",
-                            backgroundColor: "#344C7A",
+                            borderColor: "#3ea3a3",
+                            backgroundColor: "#3ea3a3",
                             padding: "2%",
                             borderRadius: 12,
                             minWidth: "27%",
                             maxWidth: "27%",
+                            flexDirection: "row",
                             alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
-                          <Text style={{ color: "white", fontWeight: "600" }}>
+                          <AntDesign name="check" size={18} color="white" />
+                          <Text
+                            style={{
+                              color: "white",
+                              fontWeight: "600",
+                              paddingRight: "10%",
+                            }}
+                          >
                             Added
                           </Text>
                         </TouchableOpacity>
@@ -379,7 +389,7 @@ export default function FriendsList(props) {
                         <TouchableOpacity
                           style={{
                             borderWidth: 2,
-                            borderColor: "#20365F",
+                            borderColor: "#3ea3a3",
                             padding: "2%",
                             borderRadius: 12,
                             flexDirection: "row",
@@ -390,8 +400,8 @@ export default function FriendsList(props) {
                           }}
                           onPress={() => addFriend(item, index)}
                         >
-                          <Ionicons name="md-add" size={18} color="black" />
-                          <Text style={{ color: "#20365F", fontWeight: "600" }}>
+                          <Ionicons name="md-add" size={18} color="#3ea3a3" />
+                          <Text style={{ color: "#3ea3a3", fontWeight: "600" }}>
                             {" "}
                             Add Friend
                           </Text>
@@ -445,7 +455,7 @@ export default function FriendsList(props) {
         flex: 1,
         flexDirection: "column",
         justifyContent: "flex-end",
-        paddingBottom:'10%'
+        paddingBottom: "10%",
       }}
     >
       <BarCodeScanner
@@ -453,7 +463,6 @@ export default function FriendsList(props) {
         style={StyleSheet.absoluteFillObject}
       />
 
-     
       <Button title="Cancel" onPress={() => setScan(false)} />
     </View>
   );
@@ -462,7 +471,7 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#e3e3e3",
   },
   searchSection: {
     flex: 1,

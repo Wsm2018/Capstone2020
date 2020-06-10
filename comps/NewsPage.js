@@ -119,7 +119,7 @@ export default function NewsPage() {
       </ScrollView>
       <TouchableOpacity
         style={{
-          backgroundColor: "#20365F",
+          backgroundColor: "#3ea3a3",
           height: 50,
           width: "60%",
           alignItems: "center",
@@ -132,7 +132,7 @@ export default function NewsPage() {
           marginTop: 10,
           // marginLeft: "20%",
           // marginEnd: "20%",
-          borderRadius: 25,
+          borderRadius: 8,
           marginBottom: 10,
         }}
         onPress={() => {
@@ -166,7 +166,7 @@ export default function NewsPage() {
           // /  paddingTop: "15%",
           borderWidth: 2,
           borderRadius: 20,
-          borderColor: "#34589C",
+          borderColor: "#185a9d",
           width: "90%",
           height: "90%",
           alignContent: "center",
@@ -180,14 +180,14 @@ export default function NewsPage() {
             borderBottomWidth: 1,
             borderTopRightRadius: 18,
             borderTopLeftRadius:18,
-            borderColor: "#34589C",
+            borderColor: "#185a9d",
             width: "100%",
             // height: "10%",
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
             marginBottom: "5%",
-            backgroundColor:'#34589C'
+            backgroundColor:'#185a9d'
           }}
         >
           <TouchableOpacity onPress={() => setCreateFlag(!createFlag)}>
@@ -208,7 +208,7 @@ export default function NewsPage() {
         <View
           style={{
             borderWidth: 2,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             width: "30%",
             height: "17%",
             alignContent: "center",
@@ -241,7 +241,7 @@ export default function NewsPage() {
             <MaterialCommunityIcons
               name="camera-plus"
               size={30}
-              color="#20365F"
+              color="#3ea3a3"
             />
           </Text>
         </TouchableOpacity>
@@ -263,7 +263,7 @@ export default function NewsPage() {
             containerStyle={{
               borderRadius: 8,
               borderWidth: 1.5,
-              borderColor: "#20365F",
+              borderColor: "#185a9d",
               height: "20%",
               width: "80%",
               // alignSelf: "center",
@@ -296,10 +296,10 @@ export default function NewsPage() {
               borderRadius: 8,
               borderWidth: 1.5,
               marginTop: "2%",
-              borderColor: "#20365F",
+              borderColor: "#185a9d",
               height: "20%",
               width: "80%",
-              color: "#20365F",
+              color: "#185a9d",
               fontSize: 18,
             }}
             date={date}
@@ -325,17 +325,17 @@ export default function NewsPage() {
               },
               dateInput: {
                 marginLeft: 36,
-                borderColor: "#20365F",
+                borderColor: "#185a9d",
                 borderRadius: 10,
                 borderWidth: 0,
                 width: "70%",
                 height: "80%",
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
                 paddingLeft: "1%",
               },
               dateText: {
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
                 paddingTop: "2%",
                 alignSelf: "flex-start",
@@ -350,10 +350,10 @@ export default function NewsPage() {
               borderRadius: 8,
               borderWidth: 1.5,
               marginTop: "2%",
-              borderColor: "#20365F",
+              borderColor: "#185a9d",
               height: "20%",
               width: "80%",
-              color: "#20365F",
+              color: "#185a9d",
               fontSize: 18,
               // paddingTop:'2%',
               //  alignSelf:'flex-start'
@@ -369,7 +369,7 @@ export default function NewsPage() {
             //   <MaterialCommunityIcons
             //     name="calendar-outline"
             //     size={30}
-            //     color="#20365F"
+            //     color="#185a9d"
             //     style={{alignSelf:'flex-start'}}
             //   />
             // }
@@ -388,17 +388,17 @@ export default function NewsPage() {
               },
               dateInput: {
                 marginLeft: 36,
-                borderColor: "#20365F",
+                borderColor: "#185a9d",
                 borderRadius: 10,
                 borderWidth: 0,
                 width: "70%",
                 height: "80%",
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
                 paddingLeft: "1%",
               },
               dateText: {
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
                 paddingTop: "2%",
                 alignSelf: "flex-start",
@@ -417,7 +417,7 @@ export default function NewsPage() {
             containerStyle={{
               borderRadius: 8,
               borderWidth: 1.5,
-              borderColor: "#20365F",
+              borderColor: "#185a9d",
               height: "50%",
               width: "80%",
               alignSelf: "center",
@@ -433,7 +433,7 @@ export default function NewsPage() {
             maxLength={400}
             label={"Add News"}
             labelStyle={{
-              color: "#20365F",
+              color: "#185a9d",
               fontSize: 18,
               textDecorationLine: "underline",
               alignSelf: "center",
@@ -458,23 +458,23 @@ export default function NewsPage() {
         <View
           style={{
             // paddingTop: "15%",
-            borderBottomWidth: 1,
+            borderBottomWidth: 0,
             borderBottomRightRadius: 18,
             borderBottomLeftRadius:18,
-            borderColor: "#34589C",
+            borderColor: "#185a9d",
             width: "100%",
             height: "10%",
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
-         //   marginBottom: "5%",34589C
-            backgroundColor:'#34589C'
+         //   marginBottom: "5%",185a9d
+            backgroundColor:'#fff'
           }}
         >
       
           <TouchableOpacity  
            style={{
-            backgroundColor: "#fff",
+            backgroundColor: "#3ea3a3",
             // height: '20%',
             width: "26%",
             alignSelf: "center",
@@ -483,13 +483,13 @@ export default function NewsPage() {
             marginStart: "2%",
             marginEnd: "3%",
              paddingBottom:'3%',
-            borderRadius: 10,
-            borderColor:'#20365F',
+            borderRadius: 8,
+            borderColor:'#185a9d',
             // marginBottom: 0,
              marginTop: '4%',
           }}
           onPress={submitNews}>
-            <Text style={{  fontSize: 20, color: "#20365F",paddingBottom:'9%' }}>Upload</Text>
+            <Text style={{  fontSize: 20, color: "#fff",paddingBottom:'10%' }}>Upload</Text>
           </TouchableOpacity>
         
         </View>
@@ -501,7 +501,7 @@ export default function NewsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#e3e3e3",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
 NewsPage.navigationOptions = {
   title: "News ",
   headerStyle: {
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
   },
   headerTintColor: "#fff",
   headerTitleStyle: {

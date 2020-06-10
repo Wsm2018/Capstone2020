@@ -67,11 +67,14 @@ export default function ManagersRequestDetail(props) {
         style={{
           // paddingTop: "1%",
           paddingLeft: "15%",
+          marginTop:'3%',
           borderWidth: 2,
-          borderRadius: 5,
-          borderColor: "#006cab",
-          width: "105%",
-          height: "100%",
+          borderRadius: 8,
+          borderColor: "#185a9d",
+          width: "95%",
+          height: "95%",
+          backgroundColor: "#fff",
+          // backgroundColor: "#185a9d",
           //   alignContent: 'flex-start',
           alignItems: "flex-start",
           justifyContent: "space-evenly",
@@ -82,10 +85,17 @@ export default function ManagersRequestDetail(props) {
         <MaterialCommunityIcons
           name="account-card-details"
           size={80}
-          color="#006cab"
-          style={{ alignSelf: "center" }}
+          color="#185a9d"
+          style={{ alignSelf: "center", paddingRight: "15%" }}
         />
-        <Text style={{ alignSelf: "center", fontSize: 22, fontWeight: "600" }}>
+        <Text
+          style={{
+            alignSelf: "center",
+            fontSize: 22,
+            fontWeight: "600",
+            paddingRight: "15%",
+          }}
+        >
           Request Detail
         </Text>
 
@@ -98,7 +108,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -119,7 +129,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -139,7 +149,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -160,7 +170,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -182,7 +192,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -204,7 +214,7 @@ export default function ManagersRequestDetail(props) {
             paddingTop: "1.5%",
             borderRadius: 8,
             borderWidth: 1.5,
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             height: "6%",
             width: "80%",
             color: "grey",
@@ -229,11 +239,11 @@ export default function ManagersRequestDetail(props) {
           <TouchableOpacity
             style={{
               borderWidth: 2,
-              borderColor: "#20365F",
+              borderColor: "#3ea3a3",
               width: "25%",
               height: "60%",
-              backgroundColor: "#3E7C9F",
-              borderRadius: 10,
+              backgroundColor: "#3ea3a3",
+              borderRadius: 8,
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -247,13 +257,14 @@ export default function ManagersRequestDetail(props) {
           <TouchableOpacity
             style={{
               borderWidth: 2,
-              borderColor: "#7A8B96",
+              borderColor: "#901616",
               width: "25%",
               height: "60%",
-              backgroundColor: "#A5B1B9",
-              borderRadius: 10,
+              backgroundColor: "#901616",
+              borderRadius: 8,
               justifyContent: "center",
               alignItems: "center",
+              marginRight: "20%",
             }}
             onPress={() => setModal2(true)}
           >
@@ -279,7 +290,7 @@ export default function ManagersRequestDetail(props) {
             <View
               style={{
                 margin: 20,
-                backgroundColor: "white",
+                backgroundColor: "e3e3e3",
                 borderRadius: 20,
                 padding: 35,
                 alignItems: "center",
@@ -296,11 +307,20 @@ export default function ManagersRequestDetail(props) {
                 // ---This is for Height---
                 height: "30%",
                 width: "100%",
+                borderWidth:3,
+                borderColor:'#185a9d'
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: "500" }}>
                 Are you sure you want to ALLOW the creation of
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#3ea3a3",
+                    textDecorationLine: "underline",
+                  }}
+                >
                   {" "}
                   {user.firstName} {user.lastName}{" "}
                 </Text>
@@ -321,11 +341,11 @@ export default function ManagersRequestDetail(props) {
                 <TouchableOpacity
                   style={{
                     borderWidth: 2,
-                    borderColor: "#125D30",
+                    borderColor: "#3ea3a3",
                     width: "35%",
                     height: "110%",
-                    backgroundColor: "#20A756",
-                    borderRadius: 10,
+                    backgroundColor: "#3ea3a3",
+                    borderRadius: 8,
                     justifyContent: "center",
                     alignItems: "center",
                   }}
@@ -341,11 +361,11 @@ export default function ManagersRequestDetail(props) {
                 <TouchableOpacity
                   style={{
                     borderWidth: 2,
-                    borderColor: "#901E10",
+                    borderColor: "#901616",
                     width: "35%",
                     height: "110%",
-                    backgroundColor: "#EC6757",
-                    borderRadius: 10,
+                    backgroundColor: "#901616",
+                    borderRadius: 8,
                     justifyContent: "center",
                     alignItems: "center",
                   }}
@@ -373,6 +393,7 @@ export default function ManagersRequestDetail(props) {
               // ---This is for Width---
               width: "80%",
               color: "grey",
+             
             }}
           >
             <View
@@ -384,6 +405,7 @@ export default function ManagersRequestDetail(props) {
                 alignItems: "center",
                 alignSelf: "center",
                 shadowColor: "#000",
+                
                 shadowOffset: {
                   width: 0,
                   height: 2,
@@ -395,11 +417,20 @@ export default function ManagersRequestDetail(props) {
                 // ---This is for Height---
                 height: "30%",
                 width: "100%",
+                borderWidth:3,
+                borderColor:'#185a9d'
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: "500" }}>
                 Are you sure you want to DENY the creation of{" "}
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "#901616",
+                    textDecorationLine: "underline",
+                  }}
+                >
                   {user.firstName} {user.lastName}
                 </Text>
                 's account?
@@ -419,11 +450,11 @@ export default function ManagersRequestDetail(props) {
                 <TouchableOpacity
                   style={{
                     borderWidth: 2,
-                    borderColor: "#125D30",
+                    borderColor: "#901616",
                     width: "35%",
                     height: "110%",
-                    backgroundColor: "#20A756",
-                    borderRadius: 10,
+                    backgroundColor: "#901616",
+                    borderRadius: 8,
                     justifyContent: "center",
                     alignItems: "center",
                   }}
@@ -439,11 +470,11 @@ export default function ManagersRequestDetail(props) {
                 <TouchableOpacity
                   style={{
                     borderWidth: 2,
-                    borderColor: "#901E10",
+                    borderColor: "#3ea3a3",
                     width: "35%",
                     height: "110%",
-                    backgroundColor: "#EC6757",
-                    borderRadius: 10,
+                    backgroundColor: "#3ea3a3",
+                    borderRadius: 8,
                     justifyContent: "center",
                     alignItems: "center",
                   }}
@@ -467,7 +498,8 @@ export default function ManagersRequestDetail(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    backgroundColor: "#e3e3e3",
+    
   },
 });
 

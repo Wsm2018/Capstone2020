@@ -115,13 +115,13 @@ export default ({ item }) => {
         }
         containerStyle={{
           backgroundColor: "#fff",
-          borderColor: "#20365F",
+          borderColor: "#185a9d",
           borderRadius: 10,
           width: "80%",
           shadowOpacity: 20,
-          shadowColor: "#20365F",
+          shadowColor: "#185a9d",
         }}
-        titleStyle={{ color: "#20365F" }}
+        titleStyle={{ color: "#185a9d" }}
       >
         <View
           style={{
@@ -134,10 +134,10 @@ export default ({ item }) => {
           <Ionicons
             name="ios-time"
             size={20}
-            color="#20365F"
+            color="#185a9d"
             style={{ paddingTop: "0.3%" }}
           />
-          <Text style={{ paddingLeft: "3%", fontSize: 18, color: "#20365F" }}>
+          <Text style={{ paddingLeft: "3%", fontSize: 18, color: "#185a9d" }}>
             {moment(item.datePublished.toDate()).format("LL")}
           </Text>
           {viewNews === true ? (
@@ -150,7 +150,7 @@ export default ({ item }) => {
                   borderWidth: 1,
                   marginLeft: "50%",
                   width: "9%",
-                  backgroundColor: "#20365F",
+                  backgroundColor: "#185a9d",
                 }}
               >
                 <MaterialIcons
@@ -181,7 +181,7 @@ export default ({ item }) => {
                   borderWidth: 1,
                   marginLeft: "50%",
                   width: "9%",
-                  backgroundColor: "#20365F",
+                  backgroundColor: "#185a9d",
                 }}
               >
                 <Ionicons
@@ -276,7 +276,7 @@ export default ({ item }) => {
             </TouchableOpacity>
             {/* <Text
               style={{
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
                 fontWeight: "bold",
                 paddingLeft: "15%",
@@ -291,15 +291,15 @@ export default ({ item }) => {
                         // color: "white",
                       }}
                       leftIcon={
-                        <Icon name="email-outline" size={20} color="#20365F" />
+                        <Icon name="email-outline" size={20} color="#185a9d" />
                       }
                       containerStyle={styles.Inputs}
                       onChangeText={setRegisterEmail}
                       placeholder="E-mail"
                       value={registerEmail}
-                      placeholderTextColor="#20365F"
+                      placeholderTextColor="#185a9d"
                       inputStyle={{
-                        color: "#20365F",
+                        color: "#185a9d",
                         fontSize: 16,
                       }}
                       errorMessage="* Invalid E-mail"
@@ -314,7 +314,7 @@ export default ({ item }) => {
               containerStyle={{
                 borderRadius: 8,
                 borderWidth: 1,
-                borderColor: "#20365F",
+                borderColor: "#185a9d",
                 height: "50%",
                 width: "50%",
                 alignSelf: "center",
@@ -329,7 +329,7 @@ export default ({ item }) => {
               maxLength={28}
               onChangeText={setTitleEdit}
               placeholder={"" + item.title}
-              placeholderTextColor={"#20365F"}
+              placeholderTextColor={"#185a9d"}
               value={titleEdit}
             />
           </View>
@@ -337,15 +337,15 @@ export default ({ item }) => {
         image={item.image == null ? null : { uri: item.image }}
         containerStyle={{
           backgroundColor: "#fff",
-          borderColor: "#20365F",
+          borderColor: "#185a9d",
           borderRadius: 10,
           width: "80%",
           shadowOpacity: 20,
-          shadowColor: "#20365F",
+          shadowColor: "#185a9d",
           borderWidth: 2,
         }}
         titleStyle={{
-          color: "#20365F",
+          color: "#185a9d",
           alignSelf: "center",
           paddingLeft: "5%",
         }}
@@ -366,7 +366,7 @@ export default ({ item }) => {
               <MaterialCommunityIcons
                 name="camera-plus"
                 size={30}
-                color="#20365F"
+                color="#3ea3a3"
               />
             </Text>
           </TouchableOpacity>
@@ -417,12 +417,12 @@ export default ({ item }) => {
 
               dateInput: {
                 // marginLeft: 36,
-                borderColor: "#20365F",
+                borderColor: "#185a9d",
                 borderRadius: 10,
                 borderWidth: 1,
                 width: "50%",
                 height: "80%",
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
               },
 
@@ -433,7 +433,7 @@ export default ({ item }) => {
                 backgroundColor: "white",
               },
               datePickerCon: {
-                backgroundColor: "#20365F",
+                backgroundColor: "#185a9d",
                 borderWidth: 1,
                 borderRadius: 25,
                 // height:'0%'
@@ -445,7 +445,7 @@ export default ({ item }) => {
               <MaterialCommunityIcons
                 name="calendar-today"
                 size={30}
-                color="#20365F"
+                color="#185a9d"
               />
             }
             onDateChange={(dateEdit) => setDateEdit(dateEdit)}
@@ -488,12 +488,12 @@ export default ({ item }) => {
               },
               dateInput: {
                 //  marginLeft: '3.3%',
-                borderColor: "#20365F",
+                borderColor: "#185a9d",
                 borderRadius: 10,
                 borderWidth: 1,
                 width: "70%",
                 height: "80%",
-                color: "#20365F",
+                color: "#185a9d",
                 fontSize: 18,
               },
               // ... You can check the source to find the other keys.
@@ -503,7 +503,7 @@ export default ({ item }) => {
               <MaterialCommunityIcons
                 name="calendar-outline"
                 size={30}
-                color="#20365F"
+                color="#185a9d"
               />
             }
             onDateChange={(endDateEdit) => setEndDateEdit(endDateEdit)}
@@ -521,7 +521,7 @@ export default ({ item }) => {
         >
           {/* <Text
             style={{
-              color: "#20365F",
+              color: "#185a9d",
               fontSize: 18,
               fontWeight: "bold",
               paddingTop: "2%",
@@ -537,7 +537,7 @@ export default ({ item }) => {
             containerStyle={{
               borderRadius: 8,
               borderWidth: 1,
-              borderColor: "#20365F",
+              borderColor: "#185a9d",
               height: "100%",
               width: "100%",
               alignSelf: "center",
@@ -560,7 +560,7 @@ export default ({ item }) => {
 
         <TouchableOpacity
           style={{
-            backgroundColor: "#20365F",
+            backgroundColor: "#3ea3a3",
             // height: '20%',
             width: "26%",
             alignSelf: "center",
@@ -568,7 +568,7 @@ export default ({ item }) => {
             alignItems: "center",
             marginStart: "2%",
             marginEnd: "3%",
-            borderRadius: 10,
+            borderRadius: 8,
             // marginBottom: 0,
             // marginTop: 20,
           }}

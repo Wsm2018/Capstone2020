@@ -22,7 +22,7 @@ const ManagersStack = createAppContainer(
       defaultNavigationOptions: {
         // header: null,
         headerStyle: {
-          backgroundColor: "#006cab",
+          backgroundColor: "#185a9d",
         },
         headerTintColor: "#fff",
         headerTitleStyle: {

@@ -178,9 +178,9 @@ export default function App(props) {
             />
           ),
           headerStyle: {
-            backgroundColor: "#20365F",
+            backgroundColor: "#185a9d",
           },
-          headerTitle: "Friends List",
+          headerTitle: "FRIENDS",
           headerTintColor: "white",
         };
       },
@@ -398,6 +398,7 @@ export default function App(props) {
     {
       Home: AdminHomeStack,
       Profile: ProfileStack,
+      BookingHistory: BookingHistory,
     },
     {
       tabBarOptions: {

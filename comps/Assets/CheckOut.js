@@ -228,7 +228,7 @@ export default function CheckOut(props) {
     //user, asset, startDateTime, endDateTime, card, promotionCode,dateTime, status(true for complete, false for pay later)
 
     const response = await handleBooking({
-      user: user.data(),
+      user: u,
       asset: assetBooking.asset,
       startDateTime: assetBooking.startDateTime,
       endDateTime: assetBooking.endDateTime,
