@@ -85,8 +85,8 @@ export default function AddPromotion(props) {
         behavior={Platform.OS === "ios" ? "padding " : null}
         style={{ flex: 1, backgroundColor: "#f5f0f0" }}
       >
-        <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 20 }}>
-          <View style={{ backgroundColor: "white", flex: 1, margin: 20 }}>
+        <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+          <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
             <View
               style={{
                 flex: 1,
@@ -108,7 +108,7 @@ export default function AddPromotion(props) {
                     color: "#005c9d",
                     justifyContent: "center",
                     alignSelf: "center",
-                    marginTop: "5%",
+                    // marginTop: "5%",
                     fontWeight: "bold",
                   }}
                 >
@@ -138,6 +138,7 @@ export default function AddPromotion(props) {
                       setShowCodeErr(false);
                     }}
                     placeholder="Code"
+                    maxLength={8}
                   />
                 </View>
 
@@ -177,6 +178,7 @@ export default function AddPromotion(props) {
                     }}
                     placeholder="Percentage"
                     keyboardType="numeric"
+                    maxLength={2}
                   />
                 </View>
 
@@ -200,7 +202,6 @@ export default function AddPromotion(props) {
                     borderWidth: 0.5,
                     borderRadius: 5,
                     backgroundColor: "white",
-                    // marginBottom: "5%",
                   }}
                   date={expiry}
                   mode="date"
@@ -211,10 +212,8 @@ export default function AddPromotion(props) {
                   cancelBtnText="Cancel"
                   customStyles={{
                     dateIcon: {
-                      // position: "absolute",
                       right: 0,
                       top: 0,
-                      // marginLeft: 0,
                     },
 
                     placeholderText: {
@@ -247,7 +246,6 @@ export default function AddPromotion(props) {
             <View
               style={{
                 flex: 0.5,
-                // backgroundColor: "red",
                 justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "row",
@@ -257,16 +255,11 @@ export default function AddPromotion(props) {
                 style={{
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
-                  // borderWidth: 4,
                   height: 40,
-                  // width: "30%",
-                  // alignSelf: "center",
                   justifyContent: "center",
                   alignItems: "center",
-                  //marginStart: "2%",
                   marginEnd: "3%",
                   borderRadius: 10,
-                  //marginBottom: 10,
                 }}
                 onPress={handleSubmit}
               >
@@ -287,3 +280,8 @@ export default function AddPromotion(props) {
     </TouchableWithoutFeedback>
   );
 }
+
+AddPromotion.navigationOptions = {
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+};

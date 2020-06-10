@@ -50,63 +50,101 @@ export default function Code(props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.two}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "height" : "padding"}
-          style={{ flex: 1 }}
+      <ScrollView>
+        <Cards
+          width={Dimensions.get("window").width / 1.4}
+          containerStyle={styles.card}
         >
-          <ScrollView>
-            <Cards
-              width={Dimensions.get("window").width / 1.3}
-              containerStyle={styles.card}
+          <View
+            style={{
+              alignItems: "flex-end",
+            }}
+          >
+            <View
+              style={{
+                marginEnd: 30,
+                // marginTop: -10,
+              }}
             >
-              <View
-                style={{
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                }}
-              >
-                <View>
-                  <Text>{promotion.percentage}</Text>
+              <Text style={{ marginTop: -10 }}>You Get</Text>
+            </View>
+
+            <View
+              style={{
+                backgroundColor: "#185a9d",
+                height: 45,
+                width: 45,
+                borderRadius: 30,
+                justifyContent: "center",
+                position: "absolute",
+                top: -25,
+                right: -25,
+              }}
+            >
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 20, color: "white" }}>
+                  {promotion.percentage}%
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                // backgroundColor: "red",
+              }}
+            >
+              <Image
+                width={Dimensions.get("window").width / 3.5}
+                source={require("../../../assets/images/discountt.png")}
+              />
+              <View style={{ flex: 1, justifyContent: "space-between" }}>
+                <View style={{ flex: 0.1, alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: 30,
+                      color: "#185a9d",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {promotion.code}
+                  </Text>
                 </View>
+
                 <View
                   style={{
-                    justifyContent: "center",
+                    flex: 0.1,
                     alignItems: "center",
-                    flexDirection: "row",
                   }}
                 >
-                  <Image
-                    width={Dimensions.get("window").width / 3}
-                    source={require("../../../assets/images/discountt.png")}
-                  />
-                  <View>
-                    <Text>Code{promotion.code}</Text>
-
-                    {/* <Text></Text> */}
-                    <Text>
-                      Expiry Date{" "}
-                      {moment(promotion.expiryDate.toDate()).format(
-                        "YYYY/MM/DD"
-                      )}
+                  <View style={{ flex: 0.2 }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        color: "gray",
+                      }}
+                    >
+                      Valid Through:
                     </Text>
                   </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: "#5c5c5c",
+                      fontSize: 18,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {moment(promotion.expiryDate.toDate()).format("YYYY/MM/DD")}
+                  </Text>
                 </View>
-
-                {/* <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text> */}
               </View>
-
-              <View style={{}}>
-                {/* <Text></Text> */}
-
-                {/* <Text></Text> */}
-
-                {/* <Button title="Delete" onPress={() => handleDelete()} /> */}
-              </View>
-            </Cards>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
+            </View>
+          </View>
+        </Cards>
+      </ScrollView>
     </View>
   );
 }
@@ -115,11 +153,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#e3e3e3",
   },
   card: {
-    backgroundColor: "gray",
     borderWidth: 0,
-    borderRadius: 20,
+    borderRadius: 10,
   },
 
   time: {

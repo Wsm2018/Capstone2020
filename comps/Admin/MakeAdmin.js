@@ -145,8 +145,6 @@ export default function MakeAdmin(props) {
         ) : null}
         <View
           style={{
-            // flex: 1,
-            // backgroundColor: "red",
             marginTop: 5,
             justifyContent: "center",
             alignItems: "center",
@@ -155,17 +153,12 @@ export default function MakeAdmin(props) {
         >
           <TouchableOpacity
             style={{
-              backgroundColor: "#20365F",
-              // borderWidth: 4,
+              backgroundColor: "#2E9E9B",
               height: 40,
               width: "30%",
-              // alignSelf: "center",
               justifyContent: "center",
               alignItems: "center",
-              //marginStart: "2%",
-              //marginEnd: "2%",
-              borderRadius: 15,
-              //marginBottom: 10,
+              borderRadius: 5,
             }}
             onPress={handleSubmit}
           >
