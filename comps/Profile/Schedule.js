@@ -21,6 +21,9 @@ import db from "../../db";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { ListItem } from "react-native-elements";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import ActionButton from "react-native-action-button";
 
 export default function Schedule(props) {
   const [user, setUser] = useState({});
@@ -154,43 +157,132 @@ export default function Schedule(props) {
   };
 
   return (
-    <View>
+    <View View style={styles.container}>
       <ScrollView>
-        <Text>Schedule</Text>
-        <View>
-          <Text>My services </Text>
+        <Text
+          style={{
+            fontSize: 20,
+            color: "#185a9d",
+            justifyContent: "center",
+            alignSelf: "center",
+            marginTop: "5%",
+            fontWeight: "bold",
+          }}
+        >
+          My Schedule
+        </Text>
+
+        <View
+          style={{
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#185a9d",
+            height: 50,
+            width: "87%",
+            alignSelf: "center",
+            // opacity: 0.8,
+            paddingLeft: "3%",
+            marginTop: 20,
+            // flexDirection: "row-reverse",
+            // justifyContent: "space-between",
+            backgroundColor: "white",
+          }}
+        >
+          <DatePicker
+            style={{
+              width: "100%",
+              color: "#667085",
+              justifyContent: "flex-start",
+            }}
+            //is24Hour
+            date={date}
+            mode="date"
+            placeholder="View my schedule in.."
+            format="YYYY-MM-DD"
+            //minDate={moment()}
+            // maxDate={moment().add(3,"month")}
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                // // width: 1,
+                // // height: 1,
+                // left: true,
+              },
+              dateInput: {
+                borderWidth: 0,
+                color: "#698eb3",
+                alignItems: "flex-start",
+                fontSize: 12,
+                // marginRight: "68%",
+                backgroundColor: "white",
+              },
+              placeholderText: {
+                fontSize: 16,
+                color: "#698eb3",
+                backgroundColor: "white",
+              },
+              dateText: {
+                fontSize: 15,
+                color: "#698eb3",
+              },
+            }}
+            onDateChange={(t) => setDate(t) || setToday(false)}
+          />
+        </View>
+
+        <View style={styles.two}>
+          <Text style={styles.cardTitle}>My services</Text>
           {user.services &&
-            services &&
+            services.length > 0 &&
             user.services.map((service) => (
-              <Text>{services.filter((s) => s.id === service)[0].name}</Text>
+              <View style={{ width: "33%", alignItems: "center" }}>
+                <TouchableOpacity
+                  // onPress={}
+                  style={{
+                    backgroundColor: "#185a9d",
+                    width: 100,
+                    height: 100,
+                    margin: 5,
+                    alignItems: "center",
+                    flexDirection: "row",
+                    //elevation: 12,
+                    borderWidth: 2,
+                    borderColor: "#185a9d",
+                  }}
+                >
+                  <View
+                    style={{
+                      // height: "20%",
+                      width: "100%",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      alignContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="worker"
+                      size={33}
+                      color="white"
+                    />
+
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        color: "white",
+                        marginBottom: "2%",
+                        // fontWeight: "bold",
+                      }}
+                    >
+                      {services.filter((s) => s.id === service)[0].name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             ))}
         </View>
 
-        <DatePicker
-          style={{ width: 200 }}
-          //is24Hour
-          date={date}
-          mode="date"
-          placeholder="View my schedule in.."
-          format="YYYY-MM-DD"
-          //minDate={moment()}
-          // maxDate={moment().add(3,"month")}
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-            dateIcon: {
-              position: "absolute",
-              left: 0,
-              top: 4,
-              marginLeft: 0,
-            },
-            dateInput: {
-              marginLeft: 36,
-            },
-            // ... You can check the source to find the other keys.
-          }}
-          onDateChange={(t) => setDate(t) || setToday(false)}
-        />
         <TouchableOpacity
           style={{ borderWidth: 2, padding: 3, width: 100 }}
           onPress={() => props.navigation.navigate("ScheduleCompleted")}
@@ -348,6 +440,95 @@ export default function Schedule(props) {
           </View>
         </Modal>
       </ScrollView>
+      <ActionButton
+        buttonColor={"#3ea3a3"}
+        size={50}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: 20 }}
+        // position="left"
+        //verticalOrientation="down"
+      >
+        <ActionButton.Item
+          buttonColor="#3498db"
+          title="Logout"
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={20}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+      </ActionButton>
     </View>
   );
 }
+Schedule.navigationOptions = (props) => ({
+  title: "Schedule",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#e3e3e3",
+    //width: Dimensions.get("window").width,
+    // height: Math.round(Dimensions.get("window").height),
+  },
+  cardTitle: {
+    fontSize: 18,
+    // backgroundColor: "red",
+    width: "100%",
+    height: 50,
+    color: "#185a9d",
+    fontWeight: "bold",
+  },
+  cardTitleInactive: {
+    fontSize: 18,
+    // backgroundColor: "red",
+    width: "100%",
+    height: 50,
+    color: "#6b6b6b",
+    // fontWeight: "bold",
+  },
+  two: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "5%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    // justifyContent: "space-between",
+  },
+  surface: {
+    flex: 0.3,
+    marginTop: "2%",
+    //  backgroundColor: "blue",
+    // width: "50%",
+    // height: "100%",
+    // alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    // alignItems: "center",
+    justifyContent: "space-evenly",
+
+    // justifyContent: "space-between",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    // height: 40,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    //height: 22,
+    // width: 22,
+    fontSize: 20,
+  },
+});

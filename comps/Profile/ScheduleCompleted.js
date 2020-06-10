@@ -111,7 +111,7 @@ export default function ScheduleCompleted(props) {
 
   return (
     <View>
-      <Text>Schedule</Text>
+      <Text>Scheduleeeeeee</Text>
 
       <DatePicker
         style={{ width: 200 }}
