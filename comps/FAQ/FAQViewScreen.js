@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
-import { Overlay } from "react-native-elements";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView,
+} from "react-native";
+import { Overlay, ButtonGroup } from "react-native-elements";
 
 import Create from "./FAQCreate";
 import Update from "./FAQUpdate";
@@ -10,14 +18,19 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/storage";
 
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { Divider } from "react-native-elements";
+
 export default function FAQViewScreen(props) {
   const [user, setUser] = useState(null);
   const [visibleCreate, setVisibleCreate] = useState(false);
   const [visibleUpdate, setVisibleUpdate] = useState(false);
-  const [questionList, setQuestionList] = useState(null);
+  const [questionList, setQuestionList] = useState([]);
 
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
+  const [selectedValue, setSelectedValue] = useState(0);
   const toggleOverlayCreate = () => {
     setVisibleCreate(!visibleCreate);
   };
@@ -27,14 +40,13 @@ export default function FAQViewScreen(props) {
     setVisibleUpdate(!visibleUpdate);
   };
   useEffect(() => {
-    let temp = [];
     db.collection("faq").onSnapshot((Snap) => {
+      let temp = [];
       Snap.forEach((doc) => {
         temp.push({ id: doc.id, ...doc.data() });
-        console.log(doc.id, "==>", doc.data());
-      });
+      }),
+        setQuestionList(temp);
     });
-    setQuestionList(temp);
   }, []);
 
   useEffect(() => {
@@ -53,42 +65,476 @@ export default function FAQViewScreen(props) {
 
   const IgnoreQuestion = async (id) => {
     const add = firebase.functions().httpsCallable("FAQ");
-    const response = await add({ query: "delete" });
+    const response = await add({ id, query: "delete" });
   };
+
+  const buttons1 = ["Q & A", "My Questions"];
+  const buttons2 = ["Q & A", "Pending"];
   return (
     <View style={styles.container}>
-      <Button title="Ask a Question" onPress={toggleOverlayCreate} />
-
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          bottom: 30,
+          right: 20,
+          zIndex: 10,
+        }}
+        onPress={toggleOverlayCreate}
+      >
+        <MaterialCommunityIcons
+          name="pencil-plus"
+          size={50}
+          color={"white"}
+          style={{
+            backgroundColor: "#3ea3a3",
+            textAlign: "center",
+            alignSelf: "flex-end",
+            justifyContent: "center",
+            borderRadius: 10,
+            margin: 5,
+          }}
+        />
+      </TouchableOpacity>
       <Overlay isVisible={visibleCreate} onBackdropPress={toggleOverlayCreate}>
         <Create toggle={toggleOverlayCreate} user={user} />
       </Overlay>
       <Overlay isVisible={visibleUpdate} onBackdropPress={toggleOverlayUpdate}>
         <Update toggle={toggleOverlayUpdate} q={selectedQuestion} />
       </Overlay>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontSize: 34 }}>Ask us a Question? </Text>
+      </View>
+      <ScrollView style={{ width: "100%" }}>
+        {user ? (
+          user.role != "admin" ? (
+            <View>
+              <ButtonGroup
+                onPress={setSelectedValue}
+                selectedIndex={selectedValue}
+                buttons={buttons1}
+                containerStyle={{
+                  height: 50,
+                  alignSelf: "center",
+                  width: "100%",
+                }}
+                selectedButtonStyle={{ backgroundColor: "#3ea3a3" }}
+              />
+              {selectedValue == 0 ? (
+                <ScrollView>
+                  {questionList
+                    ? questionList.map((item, index) =>
+                        item.status == "approved" ? (
+                          <View
+                            key={index}
+                            style={{
+                              width: "90%",
+                              padding: 10,
+                              margin: 10,
+                              alignSelf: "center",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "red" }}>
+                                Q.{" "}
+                              </Text>
+                              <Text
+                                style={{
+                                  width: "90%",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {item.question}
+                              </Text>
+                            </View>
+                            <Divider style={{ backgroundColor: "blue" }} />
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "green" }}>
+                                A.{" "}
+                              </Text>
+                              <Text
+                                style={{
+                                  width: "90%",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {item.answer}
+                              </Text>
+                            </View>
 
-      {questionList
-        ? questionList.map((item, index) => (
-            <View
-              style={{ borderWidth: 1, width: "100%", padding: 10, margin: 10 }}
-            >
-              <Text>
-                User: {item.userDisplayName} Question: {item.question}
-              </Text>
-              {user.activeRole == "admin" && item.status == "pending" ? (
-                <>
-                  <Button
-                    title="Answer"
-                    onPress={() => toggleOverlayUpdate(item)}
-                  />
-                  <Button
-                    title="Ignore"
-                    onPress={() => IgnoreQuestion(item.id)}
-                  />
-                </>
-              ) : null}
+                            {user.role == "admin" ? (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignSelf: "flex-end",
+                                }}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => toggleOverlayUpdate(item)}
+                                >
+                                  <MaterialCommunityIcons
+                                    name="update"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#3ea3a3",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => IgnoreQuestion(item.id)}
+                                >
+                                  <FontAwesome
+                                    name="remove"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#901616",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                              </View>
+                            ) : null}
+                          </View>
+                        ) : null
+                      )
+                    : null}
+                </ScrollView>
+              ) : (
+                <ScrollView>
+                  {questionList
+                    ? questionList.map((item, index) =>
+                        item.userId == firebase.auth().currentUser.uid ? (
+                          <View
+                            key={index}
+                            style={{
+                              width: "90%",
+                              padding: 10,
+                              margin: 10,
+                              alignSelf: "center",
+                              paddingRight: 10,
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "red" }}>
+                                Q.{" "}
+                              </Text>
+                              <Text
+                                style={{
+                                  width: "90%",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {item.question}
+                              </Text>
+                            </View>
+                            <Divider style={{ backgroundColor: "blue" }} />
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "green" }}>
+                                A.{" "}
+                              </Text>
+                              <Text
+                                style={{
+                                  width: "90%",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {item.answer}
+                              </Text>
+                            </View>
+
+                            {user.role == "admin" ? (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignSelf: "flex-end",
+                                }}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => toggleOverlayUpdate(item)}
+                                >
+                                  <MaterialCommunityIcons
+                                    name="update"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#3ea3a3",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => IgnoreQuestion(item.id)}
+                                >
+                                  <FontAwesome
+                                    name="remove"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#901616",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                              </View>
+                            ) : null}
+                          </View>
+                        ) : null
+                      )
+                    : null}
+                </ScrollView>
+              )}
             </View>
-          ))
-        : null}
+          ) : (
+            <View>
+              <ButtonGroup
+                onPress={setSelectedValue}
+                selectedIndex={selectedValue}
+                buttons={buttons2}
+                containerStyle={{
+                  height: 50,
+                  alignSelf: "center",
+                  width: "100%",
+                }}
+                selectedButtonStyle={{ backgroundColor: "#3ea3a3" }}
+              />
+              {selectedValue == 0 ? (
+                <ScrollView>
+                  {questionList
+                    ? questionList.map((item, index) =>
+                        item.status == "approved" ? (
+                          <View
+                            key={index}
+                            style={{
+                              width: "100%",
+                              padding: 10,
+                              margin: 10,
+                              alignSelf: "center",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "red" }}>
+                                Q.{" "}
+                              </Text>
+                              <Text
+                                style={{ width: "90%", alignSelf: "center" }}
+                              >
+                                {item.question}
+                              </Text>
+                            </View>
+                            <Divider style={{ backgroundColor: "blue" }} />
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "green" }}>
+                                A.{" "}
+                              </Text>
+                              <Text
+                                style={{ width: "90%", alignSelf: "center" }}
+                              >
+                                {item.answer}
+                              </Text>
+                            </View>
+
+                            {user.role == "admin" ? (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignSelf: "flex-end",
+                                }}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => toggleOverlayUpdate(item)}
+                                >
+                                  <MaterialCommunityIcons
+                                    name="update"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#3ea3a3",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => IgnoreQuestion(item.id)}
+                                >
+                                  <FontAwesome
+                                    name="remove"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#901616",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                              </View>
+                            ) : null}
+                          </View>
+                        ) : null
+                      )
+                    : null}
+                </ScrollView>
+              ) : (
+                <ScrollView>
+                  {questionList
+                    ? questionList.map((item, index) =>
+                        item.status == "pending" ? (
+                          <View
+                            key={index}
+                            style={{
+                              width: "100%",
+                              padding: 10,
+                              margin: 10,
+                              alignSelf: "center",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "red" }}>
+                                Q.{" "}
+                              </Text>
+                              <Text
+                                style={{ width: "90%", alignSelf: "center" }}
+                              >
+                                {item.question}
+                              </Text>
+                            </View>
+                            <Divider style={{ backgroundColor: "blue" }} />
+                            <View
+                              style={{
+                                flexDirection: "row",
+                              }}
+                            >
+                              <Text style={{ fontSize: 32, color: "green" }}>
+                                A.{" "}
+                              </Text>
+                              <Text
+                                style={{ width: "90%", alignSelf: "center" }}
+                              >
+                                {item.answer}
+                              </Text>
+                            </View>
+
+                            {user.role == "admin" ? (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignSelf: "flex-end",
+                                }}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => toggleOverlayUpdate(item)}
+                                >
+                                  <MaterialCommunityIcons
+                                    name="update"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#3ea3a3",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => IgnoreQuestion(item.id)}
+                                >
+                                  <FontAwesome
+                                    name="remove"
+                                    size={25}
+                                    color={"white"}
+                                    style={{
+                                      backgroundColor: "#901616",
+                                      textAlign: "center",
+                                      alignSelf: "flex-end",
+                                      justifyContent: "center",
+                                      borderRadius: 5,
+                                      margin: 5,
+                                      padding: 1,
+                                    }}
+                                  />
+                                </TouchableOpacity>
+                              </View>
+                            ) : null}
+                          </View>
+                        ) : null
+                      )
+                    : null}
+                </ScrollView>
+              )}
+            </View>
+          )
+        ) : null}
+      </ScrollView>
     </View>
   );
 }
@@ -96,8 +542,6 @@ export default function FAQViewScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    width: Dimensions.get("window").width,
   },
 });

@@ -306,13 +306,11 @@ exports.assetManager = functions.https.onCall(async (data, context) => {
 exports.editBooking = functions.https.onCall(async (data, context) => {
   var newAssetBooking = data.assetBooking;
   newAssetBooking.endDateTime = data.endDateTime;
-  db.collection("payments")
-    .doc(data.paymentId)
-    .update({
-      totalAmount: data.totalAmount,
-      assetBooking: newAssetBooking,
-      status: data.status,
-    });
+  db.collection("payments").doc(data.paymentId).update({
+    totalAmount: data.totalAmount,
+    assetBooking: newAssetBooking,
+    status: data.status,
+  });
   db.collection("assets")
     .doc(data.assetBooking.asset.id)
     .collection("assetBookings")
@@ -924,18 +922,22 @@ exports.FAQ = functions.https.onCall(async (data, context) => {
   if (data.query === "update") {
     db.collection("faq").doc(data.id).update({
       answer: data.answer,
+      answeredBy: data.answeredBy,
       status: "approved",
     });
-  } else if (data.query === "create") {
+  }
+  if (data.query === "create") {
     db.collection("faq").add({
       date: new Date(),
       question: data.question,
-      userId: data.user.uid,
+      userId: data.user.id,
       userDisplayName: data.user.displayName,
       answer: "",
+      answeredBy: "",
       status: "pending",
     });
-  } else if (data.query === "delete") {
+  }
+  if (data.query === "delete") {
     db.collection("faq").doc(data.id).delete();
   }
 });

@@ -211,9 +211,11 @@ export default function Payment(props) {
       usedBalance,
       firebase.auth().currentUser.uid
     );
+
     let u = user.data();
     u.id = firebase.auth().currentUser.uid;
     u.balance = u.balance - usedBalance;
+
     const subscriptionType =
       subscription && subscription[0] && subscription[0].type
         ? subscription[0].type
@@ -224,7 +226,6 @@ export default function Payment(props) {
     )[0];
 
     const points = (total / pointsChartE.spentValue) * pointsChartE.points;
-
     u.points = u.points + points;
     if (partial != "not found") {
       console.log("177");
