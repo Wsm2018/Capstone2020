@@ -21,8 +21,8 @@ import TicketCustomerScreen from "./TicketCustomerScreen";
 const TicketStack = createAppContainer(
   createStackNavigator(
     {
-      Agent: TicketAgentScreen,
       Customer: TicketCustomerScreen,
+      Agent: TicketAgentScreen,
       Chat: SupportChat,
       Details: TicketDetailScreen,
     },
