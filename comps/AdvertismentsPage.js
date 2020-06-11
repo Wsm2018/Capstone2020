@@ -26,7 +26,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
 export default function AdvertismentsPage(props) {
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState({ value: null, error: false });
 
   const [flag, setFlag] = useState(0);
 
@@ -50,7 +50,6 @@ export default function AdvertismentsPage(props) {
   const [description, setDescription] = useState({ text: "", error: false });
   const [endDate, setEndDate] = useState({ value: null, error: false });
   const [date, setDate] = useState({ value: null, error: false });
-
   const [advertisements, setAdvertisements] = useState([]);
   const [adsBox, setAdsBox] = useState([]);
   const [adsNum, setAdsNum] = useState(0);
@@ -71,7 +70,7 @@ export default function AdvertismentsPage(props) {
         quality: 1,
       });
       if (!result.cancelled) {
-        setImage(result.uri);
+        setImage({ value: result.uri, error: false });
       }
 
       console.log(result);
@@ -80,7 +79,7 @@ export default function AdvertismentsPage(props) {
     }
   };
   const uploadImage = async (id) => {
-    const response = await fetch(image);
+    const response = await fetch(image.value);
     const blob = await response.blob();
     const upload = await firebase
       .storage()
@@ -111,8 +110,8 @@ export default function AdvertismentsPage(props) {
     setUser(useracc.data());
   };
   const calculation = () => {
-    let a = moment(date);
-    let b = moment(endDate);
+    let a = moment(date.value);
+    let b = moment(endDate.value);
     if (b.diff(a, "days") == 0) {
       setAmount(30);
     } else {
@@ -141,7 +140,7 @@ export default function AdvertismentsPage(props) {
 
     if (description.text === "") {
       console.log("desc bad");
-      setDescription({ value: description.value, error: true });
+      setDescription({ text: description.text, error: true });
     } else {
       console.log("desc good");
       count++;
@@ -162,8 +161,16 @@ export default function AdvertismentsPage(props) {
       count++;
     }
 
+    if (!image.value) {
+      console.log("image bad");
+      setImage({ value: image.value, error: true });
+    } else {
+      console.log("image good");
+      count++;
+    }
+    // rer
     console.log(count);
-    if (count === 5) {
+    if (count === 6) {
       return true;
     } else {
       return false;
@@ -172,29 +179,32 @@ export default function AdvertismentsPage(props) {
 
   const submit = async () => {
     if (await validated()) {
+      console.log("we got through validation");
       db.collection("advertisements")
         .add({
-          title: title,
+          title: title.text,
           startDate: new Date(date.value),
           endDate: new Date(endDate.value),
           image: null,
-          description: description,
+          description: description.text,
           user: user,
-          link: link,
+          link: link.text,
           status: "pending",
           clickers: 0,
           amount: amount,
+          // dunno: "WHYYY",
         })
         .then((doc) => {
+          console.log("we make it here?");
           uploadImage(doc.id);
         });
-      setTitle(null);
-      setDate(null);
-      setEndDate(null);
-      setImage(null);
-      setDescription(null);
-      setAmount(30);
-      setLink("");
+      //   setTitle(null);
+      //   setDate(null);
+      //   setEndDate(null);
+      //   setImage(null);
+      //   setDescription(null);
+      //   setAmount(30);
+      //   setLink("");
     }
   };
 
@@ -206,7 +216,7 @@ export default function AdvertismentsPage(props) {
         querySnapshot.forEach((doc) => {
           advertisements.push({ id: doc.id, ...doc.data() });
         });
-
+        console.log("advertisements.length", advertisements.length);
         setAdvertisements([...advertisements]);
       });
   }, []);
@@ -241,37 +251,41 @@ export default function AdvertismentsPage(props) {
   return (
     <View style={styles.container}>
       <View>
-        <Button onPress={() => setFlag(flag + 1)}>switch</Button>
+        {/* <Button onPress={() => setFlag(flag + 1)} title={`switch ${flag}`}>
+          switch
+        </Button> */}
       </View>
       {
         flag == 0 ? (
           <View style={{ flex: 10 }}>
-            {advertisements.map((item, index) => (
-              <View key={index}>
-                <Text>Title: {item.title}</Text>
-                <Text>Description: {item.description}</Text>
-                <Text>Link: {item.link}</Text>
-                <Text>
-                  Start Date: {moment(item.startDate.toDate()).format("L")}
-                </Text>
-                <Text>
-                  End Date: {moment(item.endDate.toDate()).format("L")}
-                </Text>
-
-                {item.image != null ? (
-                  <Image
-                    source={{ uri: item.image }}
-                    style={{ width: 100, height: 100 }}
-                  />
-                ) : null}
-                <TouchableOpacity onPress={() => approve(item.id, "approved")}>
-                  <Text>approve</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => approve(item.id, "denied")}>
-                  <Text>denied</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
+            <ScrollView>
+              {advertisements &&
+                advertisements.map((item, index) => (
+                  <View key={index}>
+                    <Text>{item.title}</Text>
+                    <Text>{item.description}</Text>
+                    <Text>{item.link}</Text>
+                    <Text>{moment(item.endDate.toDate()).format("L")}</Text>
+                    <Text>{moment(item.startDate.toDate()).format("L")}</Text>
+                    {item.image != null ? (
+                      <Image
+                        source={{ uri: item.image }}
+                        style={{ width: 100, height: 100 }}
+                      />
+                    ) : null}
+                    <TouchableOpacity
+                      onPress={() => approve(item.id, "approved")}
+                    >
+                      <Text>approve</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => approve(item.id, "denied")}
+                    >
+                      <Text>denied</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+            </ScrollView>
           </View>
         ) : flag == 1 ? (
           <View style={styles.container}>
@@ -293,20 +307,21 @@ export default function AdvertismentsPage(props) {
                   borderBottomWidth: 0,
                 }}
                 containerStyle={styles.Inputs}
-                onChangeText={setTitle}
+                onChangeText={(text) => setTitle({ text, error: false })}
                 placeholder="Enter Title"
                 value={title}
+                maxLength={20}
                 // placeholderTextColor="black"
                 inputStyle={{
                   // color: "#185a9d",
                   fontSize: 16,
+                  textTransform: "capitalize",
                 }}
+                textstyle
               />
               <Text
                 style={
-                  title === null
-                    ? null
-                    : title.error
+                  title.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -314,14 +329,14 @@ export default function AdvertismentsPage(props) {
                     : { color: "transparent" }
                 }
               >
-                * title is Required
+                * Title is Required
               </Text>
               <Input
                 inputContainerStyle={{
                   borderBottomWidth: 0,
                 }}
                 containerStyle={styles.Inputs}
-                onChangeText={setLink}
+                onChangeText={(text) => setLink({ text, error: false })}
                 placeholder="Enter Link"
                 value={link}
                 //  placeholderTextColor="#185a9d"
@@ -332,9 +347,7 @@ export default function AdvertismentsPage(props) {
               />
               <Text
                 style={
-                  link === null
-                    ? null
-                    : link.error
+                  link.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -342,17 +355,18 @@ export default function AdvertismentsPage(props) {
                     : { color: "transparent" }
                 }
               >
-                * link is Required
+                * Link is Required
               </Text>
               <Input
                 inputContainerStyle={{
                   borderBottomWidth: 0,
                 }}
                 containerStyle={styles.Inputs}
-                onChangeText={setDescription}
+                onChangeText={(text) => setDescription({ text, error: false })}
                 placeholder="Enter Description"
                 value={description}
                 // placeholderTextColor="black"
+                maxLength={40}
                 inputStyle={{
                   //  color: "#",
                   fontSize: 16,
@@ -360,9 +374,7 @@ export default function AdvertismentsPage(props) {
               />
               <Text
                 style={
-                  description === null
-                    ? null
-                    : description.error
+                  description.error
                     ? {
                         color: "red",
                         marginLeft: "9%",
@@ -370,7 +382,7 @@ export default function AdvertismentsPage(props) {
                     : { color: "transparent" }
                 }
               >
-                * description is Required
+                * Description is Required
               </Text>
               <View
                 style={{
@@ -380,11 +392,8 @@ export default function AdvertismentsPage(props) {
                   height: 50,
                   width: "87%",
                   alignSelf: "center",
-                  // opacity: 0.8,
                   paddingLeft: "3%",
                   marginTop: 20,
-                  // flexDirection: "row-reverse",
-                  // justifyContent: "space-between",
                   backgroundColor: "white",
                 }}
               >
@@ -393,9 +402,8 @@ export default function AdvertismentsPage(props) {
                     width: "100%",
                     color: "#667085",
                     justifyContent: "flex-start",
-                    //backgroundColor: "lightgray",
                   }}
-                  date={date === null ? null : date.value}
+                  date={date.value}
                   mode="date"
                   placeholder="Select Published Date"
                   format="YYYY-MM-DD"
@@ -406,7 +414,6 @@ export default function AdvertismentsPage(props) {
                     dateIcon: {
                       // // width: 1,
                       // // height: 1,
-                      // left: true,
                     },
                     dateInput: {
                       borderWidth: 0,
@@ -432,18 +439,18 @@ export default function AdvertismentsPage(props) {
                 />
                 <Text
                   style={
-                    date === null
-                      ? null
-                      : date.error
+                    date.error
                       ? {
                           color: "red",
+                          marginTop: "2%",
                         }
                       : { color: "transparent" }
                   }
                 >
-                  * date is Required
+                  * Date is Required
                 </Text>
               </View>
+              <Text></Text>
               <View
                 style={{
                   borderRadius: 8,
@@ -467,7 +474,7 @@ export default function AdvertismentsPage(props) {
                     justifyContent: "flex-start",
                     //backgroundColor: "lightgray",
                   }}
-                  date={endDate === null ? null : endDate.value}
+                  date={endDate.value}
                   mode="date"
                   placeholder="Select End Date"
                   format="YYYY-MM-DD"
@@ -504,10 +511,8 @@ export default function AdvertismentsPage(props) {
                 />
                 <Text
                   style={
-                    endDate === null
-                      ? null
-                      : endDate.error
-                      ? { color: "red" }
+                    endDate.error
+                      ? { color: "red", marginTop: "2%" }
                       : { color: "transparent" }
                   }
                 >
@@ -576,6 +581,18 @@ export default function AdvertismentsPage(props) {
                   </Text>
                 </View>
               </TouchableOpacity>
+              <Text
+                style={
+                  image.error
+                    ? {
+                        color: "red",
+                        left: "36.5%",
+                      }
+                    : { color: "transparent" }
+                }
+              >
+                * Image is Required
+              </Text>
               <View
                 style={{
                   flex: 1,
@@ -592,9 +609,9 @@ export default function AdvertismentsPage(props) {
                     justifyContent: "center",
                   }}
                 >
-                  {image != null ? (
+                  {image.value != null ? (
                     <Image
-                      source={{ uri: image }}
+                      source={{ uri: image.value }}
                       style={{
                         width: 150,
                         height: 100,
@@ -790,7 +807,7 @@ const styles = StyleSheet.create({
     marginStart: "2%",
     marginEnd: "2%",
     borderRadius: 5,
-    marginBottom: 10,
+    marginBottom: 15,
     //flexDirection: "row",
   },
 });

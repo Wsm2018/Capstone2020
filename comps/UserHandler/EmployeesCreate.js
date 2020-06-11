@@ -20,7 +20,13 @@ import { Input, Tooltip } from "react-native-elements";
 import Spinner from "react-native-loading-spinner-overlay";
 import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import * as Print from "expo-print";
 import CountryPicker from "react-native-country-picker-modal";
 import DatePicker from "react-native-datepicker";
@@ -40,6 +46,7 @@ export default function EmployeeHandlerCreate(props) {
   const [spinner, setSpinner] = useState(false);
   const [role, setRole] = useState({ value: "-1", error: false });
   const [rolepicker, setRolePicker] = useState(null);
+  const [deviceType, setDeviceType] = useState(0);
 
   const [modal, setModal] = useState(false);
   const [modal2, setModal2] = useState(false);
@@ -295,7 +302,13 @@ export default function EmployeeHandlerCreate(props) {
       }
     }
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // -------------------------------DELETE-----------------------------------
   const handleDelete = async () => {
     let query = await db
@@ -332,7 +345,7 @@ export default function EmployeeHandlerCreate(props) {
       {/* <Text>EmployeeHandlerCreate</Text> */}
       <Text
         style={{
-          fontSize: 20,
+          fontSize: responsiveFontSize(2),
           color: "#185a9d",
           justifyContent: "center",
           alignSelf: "center",
@@ -364,9 +377,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="First Name"
           onChangeText={(text) => setFirstName({ text, error: false })}
           value={firstName}
-          placeholderTextColor="#185a9d"
+          //placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#185a9d",
+            //  color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -380,9 +393,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="Last Name"
           onChangeText={(text) => setLastName({ text, error: false })}
           value={lastName}
-          placeholderTextColor="#185a9d"
+          //   placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#185a9d",
+            //    color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -436,9 +449,9 @@ export default function EmployeeHandlerCreate(props) {
         placeholder="Display Name"
         onChangeText={(text) => setDisplayName({ text, error: false })}
         value={displayName}
-        placeholderTextColor="#185a9d"
+        // placeholderTextColor="#185a9d"
         inputStyle={{
-          color: "#185a9d",
+          //   color: "#185a9d",
           fontSize: 16,
         }}
       />
@@ -463,9 +476,9 @@ export default function EmployeeHandlerCreate(props) {
           placeholder="Email"
           onChangeText={(text) => setEmail({ text, error: false })}
           value={email.text}
-          placeholderTextColor="#185a9d"
+          //  placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#185a9d",
+            //   color: "#185a9d",
             fontSize: 16,
           }}
         />
@@ -476,9 +489,9 @@ export default function EmployeeHandlerCreate(props) {
           containerStyle={styles.Inputs}
           placeholder="Company"
           value={company}
-          placeholderTextColor="#185a9d"
+          // placeholderTextColor="#185a9d"
           inputStyle={{
-            color: "#185a9d",
+            //   color: "#185a9d",
             fontSize: 16,
           }}
           disabled
@@ -540,7 +553,7 @@ export default function EmployeeHandlerCreate(props) {
             borderRadius: 8,
             borderWidth: 1,
             backgroundColor: "white",
-            borderColor: "#185a9d",
+            // borderColor: "#185a9d",
             height: 50,
             width: "87%",
             alignSelf: "center",
@@ -553,18 +566,15 @@ export default function EmployeeHandlerCreate(props) {
             //mode="dropdown"
             //itemStyle={{ color: "red" }}
             selectedValue={role.value}
-            style={styles.picker}
+            //  style={styles.picker}
             onValueChange={(itemValue, itemIndex) =>
               setRole({ value: itemValue, error: false })
             }
-            itemStyle={{
-              color: "#698eb3",
-            }}
           >
             <Picker.Item
               label="Select a role"
               value="-1"
-              itemStyle={{ textAlign: "center", color: "#698eb3" }}
+              itemStyle={{ textAlign: "center" }}
             />
             {roles.map((role, index) => (
               <Picker.Item label={role} value={role} key={index} />
@@ -581,7 +591,7 @@ export default function EmployeeHandlerCreate(props) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#185a9d",
+            //  borderColor: "#185a9d",
             height: 50,
             width: "87%",
             alignSelf: "center",
@@ -599,7 +609,7 @@ export default function EmployeeHandlerCreate(props) {
             }}
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 17, color: "#667085" }}>
+            <Text style={{ fontSize: 17 }}>
               {role.value === "-1" ? "Select a role" : role.value}
             </Text>
             <Ionicons
@@ -632,7 +642,7 @@ export default function EmployeeHandlerCreate(props) {
         style={{
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: "#185a9d",
+          // borderColor: "#185a9d",
           height: 50,
           width: "87%",
           alignSelf: "center",
@@ -642,7 +652,7 @@ export default function EmployeeHandlerCreate(props) {
           flexDirection: "row",
           justifyContent: "center",
           backgroundColor: "white",
-          color: "#698eb3",
+          //  color: "#698eb3",
           // alignItems: "center",
           // alignSelf: "center",
           // alignContent: "center",
@@ -662,7 +672,7 @@ export default function EmployeeHandlerCreate(props) {
             // alignSelf: "center",
             alignContent: "center",
             //color: "#185a9d",
-            color: "#698eb3",
+            //  color: "#698eb3",
           }}
           onPress={() => setCountryPicker(true)}
         >
@@ -680,10 +690,10 @@ export default function EmployeeHandlerCreate(props) {
               backgroundColor: "lightgrey",
               marginLeft: 0,
               paddingLeft: 15,
-              color: "#698eb3",
+              //   color: "#698eb3",
             }}
             //itemStyle={{ textAlign: "center", color: "#698eb3" }}
-            itemTextStyle={{ fontSize: 18, color: "#698eb3" }}
+            itemTextStyle={{ fontSize: 18 }}
             style={styles.picker}
             //    style={{ flex: 1, color: "#445870" }}
             onClose={() => setCountryPicker(false)}
@@ -712,7 +722,7 @@ export default function EmployeeHandlerCreate(props) {
         style={{
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: "#185a9d",
+          //  borderColor: "#185a9d",
           height: 50,
           width: "87%",
           alignSelf: "center",
@@ -728,7 +738,7 @@ export default function EmployeeHandlerCreate(props) {
           // style={{ width: 200 }}
           style={{
             width: "100%",
-            color: "#667085",
+            // color: "#667085",
             justifyContent: "flex-start",
             //backgroundColor: "lightgray",
           }}
@@ -748,7 +758,7 @@ export default function EmployeeHandlerCreate(props) {
             },
             dateInput: {
               borderWidth: 0,
-              color: "#698eb3",
+              //   color: "#698eb3",
               alignItems: "flex-start",
               fontSize: 12,
               // marginRight: "68%",
@@ -756,12 +766,12 @@ export default function EmployeeHandlerCreate(props) {
             },
             placeholderText: {
               fontSize: 16,
-              color: "#698eb3",
+              //    color: "#698eb3",
               backgroundColor: "white",
             },
             dateText: {
               fontSize: 15,
-              color: "#698eb3",
+              //  color: "#698eb3",
             },
           }}
           onDateChange={(date) => {
@@ -790,7 +800,7 @@ export default function EmployeeHandlerCreate(props) {
       >
         <Text
           style={{
-            fontSize: 17,
+            fontSize: responsiveFontSize(2),
             color: "white",
           }}
         >
@@ -884,7 +894,11 @@ export default function EmployeeHandlerCreate(props) {
                 style={styles.payButton}
                 onPress={() => props.navigation.goBack()}
               >
-                <Text style={{ color: "white" }}>OK</Text>
+                <Text
+                  style={{ color: "white", fontSize: responsiveFontSize(1.8) }}
+                >
+                  OK
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -930,7 +944,7 @@ export default function EmployeeHandlerCreate(props) {
           >
             <Text
               style={{
-                fontSize: 16,
+                fontSize: responsiveFontSize(1.8),
                 textAlign: "center",
               }}
             >
@@ -957,14 +971,22 @@ export default function EmployeeHandlerCreate(props) {
                   setModal2(false);
                 }}
               >
-                <Text style={{ color: "white" }}>Confirm</Text>
+                <Text
+                  style={{ color: "white", fontSize: responsiveFontSize(1.8) }}
+                >
+                  Confirm
+                </Text>
               </TouchableOpacity>
               {/* ---------------------------------CANCEL--------------------------------- */}
               <TouchableOpacity
                 style={styles.redButton}
                 onPress={() => setModal2(false)}
               >
-                <Text style={{ color: "white" }}>Cancel</Text>
+                <Text
+                  style={{ color: "white", fontSize: responsiveFontSize(1.8) }}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -988,7 +1010,7 @@ const styles = StyleSheet.create({
   },
   greenButton: {
     backgroundColor: "#3ea3a3",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",
@@ -1003,7 +1025,7 @@ const styles = StyleSheet.create({
   Inputs: {
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#185a9d",
+    // borderColor: "#185a9d",
     height: 50,
     width: "43%",
     alignSelf: "center",
@@ -1016,7 +1038,7 @@ const styles = StyleSheet.create({
   },
   redButton: {
     backgroundColor: "#901616",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",
@@ -1030,7 +1052,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#185a9d",
+    //  borderColor: "#185a9d",
     height: 50,
     width: "87%",
     alignSelf: "center",
@@ -1045,14 +1067,14 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: "99%",
-    borderColor: "black",
+    //borderColor: "black",
     borderWidth: 1,
-    color: "#698eb3",
+    // color: "#698eb3",
     borderStyle: "solid",
   },
   payButton: {
     backgroundColor: "#3ea3a3",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "50%",
     alignSelf: "center",
     justifyContent: "center",
