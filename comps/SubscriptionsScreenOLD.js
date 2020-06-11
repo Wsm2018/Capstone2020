@@ -539,123 +539,100 @@ export default function SubscriptionsScreen(props) {
             //   </View>
             // )
           ) : (
-              null
+
               ////////////////////////////////////////////////////////////////////////////////////
-              // <View style={{
-              //   flex: 1,
-              //   justifyContent: "center",
-              //   alignItems: "center",
-              // }}>
-              //   <Text>
-              //     Subscription will end at:{" "}
-              //     {moment(userSubscription.endDate.toDate()).format("L")}
-              //   </Text>
-              //   <Text>your subscription level is: {levels[levels.findIndex(l => l.level == userSubscription.type)].level}</Text>
-              //   <Image
-              //     width={Dimensions.get("window").width / 2}
-              //     source={levelPics[levels.findIndex(l => l.level == userSubscription.type)]}
-              //   />
+              <View style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+                <Text>
+                  Subscription will end at:{" "}
+                  {moment(userSubscription.endDate.toDate()).format("L")}
+                </Text>
+                <Text>your subscription level is: {levels[levels.findIndex(l => l.level == userSubscription.type)].level}</Text>
+                <Image
+                  width={Dimensions.get("window").width / 3.3}
+                  source={levelPics[levels.findIndex(l => l.level == userSubscription.type)]}
+                />
 
-              //   <View
-              //     style={{
-              //       flex: 1,
-              //       position: "absolute",
-              //       top: 0,
-              //       left: 0,
-              //       right: 0,
-              //       bottom: 0,
-              //       justifyContent: "center",
-              //       alignItems: "center",
-              //       // marginTop: "10%",
-              //     }}
-              //   >
-              //     <View
-              //       width={Dimensions.get("window").width / 4}
-              //       style={{
-              //         flex: 2,
-              //         alignItems: "center",
-              //         justifyContent: "center",
-              //         paddingTop: "35%"
-              //         // backgroundColor: "red",
-              //         // justifyContent: "center",
-              //         // alignItems: "flex-end",
-              //         // marginTop: "-12%",
-              //         // marginEnd: "-3%",
-              //       }}
-              //     >
-              //       <Text
-              //         style={
-              //           deviceType === 1
-              //             ? { ...styles.levelPrice, fontSize: responsiveScreenFontSize(3.5) }
-              //             : {
-              //               ...styles.levelPrice,
-              //               fontSize: responsiveScreenFontSize(3.5),
-              //             }
-              //         }
-              //       >
-              //         {levels[levels.findIndex(l => l.level == userSubscription.type)].price} QAR
-              //       </Text>
-              //     </View>
-              //     <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "15%" }}>
-              //       <Text
-              //         style={
-              //           deviceType === 1
-              //             ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(3) }
-              //             : {
-              //               ...styles.levelDescription,
-              //               fontSize: responsiveScreenFontSize(3.5),
-              //             }
-              //         }
-              //       >
-              //         Points: {levels[levels.findIndex(l => l.level == userSubscription.type)].points}
-              //       </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // marginTop: "10%",
+                  }}
+                >
+                  <View
+                    width={Dimensions.get("window").width / 4}
+                    style={{
+                      flex: 2,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingTop: "35%"
+                      // backgroundColor: "red",
+                      // justifyContent: "center",
+                      // alignItems: "flex-end",
+                      // marginTop: "-12%",
+                      // marginEnd: "-3%",
+                    }}
+                  >
+                    <Text
+                      style={
+                        deviceType === 1
+                          ? { ...styles.levelPrice, fontSize: responsiveScreenFontSize(3.5) }
+                          : {
+                            ...styles.levelPrice,
+                            fontSize: responsiveScreenFontSize(3.5),
+                          }
+                      }
+                    >
+                      {levels[levels.findIndex(l => l.level == userSubscription.type)].price} QAR
+                    </Text>
+                  </View>
+                  <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "15%" }}>
+                    <Text
+                      style={
+                        deviceType === 1
+                          ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(3) }
+                          : {
+                            ...styles.levelDescription,
+                            fontSize: responsiveScreenFontSize(3.5),
+                          }
+                      }
+                    >
+                      Points: {levels[levels.findIndex(l => l.level == userSubscription.type)].points}
+                    </Text>
 
-              //     </View>
-              //     <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "13%" }}>
-              //       <TouchableOpacity onPress={() => { subscribe("update") }} style={{ width: "100%", height: "100%" }}>
-              //         <Text
-              //           style={
-              //             deviceType === 1
-              //               ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2) }
-              //               : {
-              //                 ...styles.levelDescription,
-              //                 fontSize: responsiveScreenFontSize(3.5),
-              //               }
-              //           }
-              //         >
-              //           renew/upgrade
-              //       </Text>
-              //       </TouchableOpacity>
+                  </View>
+                  <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "13%" }}>
+                    <TouchableOpacity onPress={() => { subscribe("update") }} style={{ width: "100%", height: "100%" }}>
+                      <Text
+                        style={
+                          deviceType === 1
+                            ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2) }
+                            : {
+                              ...styles.levelDescription,
+                              fontSize: responsiveScreenFontSize(3.5),
+                            }
+                        }
+                      >
+                        renew/upgrade
+                    </Text>
+                    </TouchableOpacity>
 
-              //     </View>
-              //   </View>
+                  </View>
+                </View>
+              </View>
 
 
 
-              // </View>
-              // <View
-              //   style={{
-              //     flex: 1,
-              //     justifyContent: "center",
-              //     alignItems: "baseline",
-              //   }}
-              // >
-              //   <ScrollView>
-              //     <Text>
-              //       Subscription will end at:{" "}
-              //       {moment(userSubscription.endDate.toDate()).format("L")}
-              //     </Text>
-              //     <Text>your subscription level is: {levels[levels.findIndex(l => l.level == userSubscription.type)].level}</Text>
-              //     <TouchableOpacity
-
-              // onPress={() => {
-              //   subscribe("update");
-              // }}
-              //     >
-              //       <Text>renew and upgrade</Text>
-              //     </TouchableOpacity>
-              //   </ScrollView>
-              // </View>
             )}
           {/* ------------------------------------------------------------------------------------------------ */}
         </View>
