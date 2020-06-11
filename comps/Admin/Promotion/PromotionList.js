@@ -42,8 +42,8 @@ export default function PromotionList(props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 15 }}>
-        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
+      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 5 }}>
           <View
             style={{
               flex: 1,

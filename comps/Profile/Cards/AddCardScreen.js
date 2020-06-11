@@ -199,7 +199,7 @@ export default function AddCard(props) {
             >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#3d9478",
+                  backgroundColor: "#2E9E9B",
                   // height: 40,
                   // width: "30%",
                   height: responsiveScreenHeight(5),

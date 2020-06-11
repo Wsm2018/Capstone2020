@@ -28,25 +28,63 @@ export default function NewsPage() {
   const [endDate, setEndDate] = useState();
   const [description, setDescription] = useState();
   const [news, setNews] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const askPermission = async () => {
     const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
     setHasCameraRollPermission(status === "granted");
   };
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     askPermission();
+    getUser();
   }, []);
+
+  const getUser = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((querySnap) => {
+        setUser(querySnap.data());
+      });
+  };
 
   useEffect(() => {
     callNews();
+  }, [promotions]);
+
+  useEffect(() => {
+    db.collection("promotionCodes").onSnapshot((query) => {
+      let codes = [];
+      query.forEach((doc) => {
+        codes.push({
+          datePublished: doc.data().expiryDate,
+          endDate: doc.data().expiryDate,
+          title: `Promotion Code ${doc.data().code}`,
+          description: `${doc.data().percentage}% OFF!`,
+          image:
+            "https://firebasestorage.googleapis.com/v0/b/capstone2020-b64fd.appspot.com/o/advertisements%2Fpromotion.jpg?alt=media&token=c8dbaa7b-311f-4030-a374-1aa772bdfdaf",
+          isPromo: true,
+        });
+      });
+      setPromotions(codes);
+    });
   }, []);
 
   const callNews = () => {
     db.collection("news").onSnapshot((onSnapshot) => {
       let data = [];
       onSnapshot.forEach((doc) => {
-        data.push(doc.data());
+        data.push({ id: doc.id, ...doc.data(), isPromo: false });
       });
+      // if (user && (user.role !== "admin" || user.role !== "manager")) {
+      promotions.forEach((p) => {
+        console.log("promo", p);
+
+        data.push(p);
+      });
+      // }
+
+      // console.log("promotions", promotions);
       setNews(data);
     });
   };
@@ -113,51 +151,59 @@ export default function NewsPage() {
       {/* <Text>Header</Text> */}
 
       <ScrollView style={{ flex: 1, width: "125%" }} horizontal={false}>
-        {news.map((item, i) => (
-          <News key={i} item={item} />
-        ))}
+        {news.map((item, i) =>
+          user.role === "admin" ? (
+            !item.isPromo ? (
+              <News key={i} item={item} user={user} />
+            ) : null
+          ) : (
+            <News key={i} item={item} user={user} />
+          )
+        )}
       </ScrollView>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#3ea3a3",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
+      {user && (user.role === "admin" || user.role === "manager") ? (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#3ea3a3",
+            height: 50,
+            width: "60%",
+            alignItems: "center",
+            alignContent: "center",
 
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 10,
-          // marginLeft: "20%",
-          // marginEnd: "20%",
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-        onPress={() => {
-          setCreateFlag(!createFlag);
-        }}
-      >
-        <Text
-          style={{
-            color: "#fff",
-            fontSize: 22,
-            paddingLeft: "5%",
-            paddingBottom: "2%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignSelf: "center",
+            // paddingLeft: 0,
+            marginTop: 10,
+            // marginLeft: "20%",
+            // marginEnd: "20%",
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+          onPress={() => {
+            setCreateFlag(!createFlag);
           }}
         >
-          Create News
-        </Text>
-        <Text
-          style={{
-            paddingBottom: "1%",
-          }}
-        >
-          {"  "}
-          <MaterialIcons name="create" size={25} color="white" />
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 22,
+              paddingLeft: "5%",
+              paddingBottom: "2%",
+            }}
+          >
+            Create News
+          </Text>
+          <Text
+            style={{
+              paddingBottom: "1%",
+            }}
+          >
+            {"  "}
+            <MaterialIcons name="create" size={25} color="white" />
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   ) : (
     <View style={styles.container2}>

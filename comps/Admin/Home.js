@@ -81,6 +81,14 @@ export default function Home(props) {
       height: 120,
       width: 200,
     },
+    {
+      name: "News",
+      code: "#005c9d",
+      nav: () => props.navigation.navigate("News"),
+      image: require("../../assets/images/adminpic/promotion.jpg"),
+      height: 120,
+      width: 200,
+    },
 
     // {
     //   name: "Change Role",

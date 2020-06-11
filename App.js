@@ -12,6 +12,7 @@ import {
   AppState,
   Dimensions,
 } from "react-native";
+
 import LottieView from "lottie-react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
@@ -509,19 +510,30 @@ export default function App(props) {
         return (
           <View
             style={{
-              flex: 1,
+              flex: 2,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
+            <Image
+              width={Dimensions.get("window").width / 6}
+              source={require("./assets/images/mylogo.png")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "50%",
+                height: "30%",
+              }}
+            />
             <LottieView
-              width={Dimensions.get("window").width / 3}
+              width={Dimensions.get("window").width / 2}
               source={require("./assets/loadingAnimations/890-loading-animation.json")}
               autoPlay
               loop
               style={{
                 position: "relative",
-                width: "100%",
+                width: "50%",
               }}
             />
           </View>
@@ -532,19 +544,30 @@ export default function App(props) {
     return (
       <View
         style={{
-          flex: 1,
+          flex: 2,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
+        <Image
+          width={Dimensions.get("window").width / 6}
+          source={require("./assets/images/mylogo.png")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "50%",
+            height: "30%",
+          }}
+        />
         <LottieView
-          width={Dimensions.get("window").width / 3}
+          width={Dimensions.get("window").width / 2}
           source={require("./assets/loadingAnimations/890-loading-animation.json")}
           autoPlay
           loop
           style={{
             position: "relative",
-            width: "100%",
+            width: "50%",
           }}
         />
       </View>

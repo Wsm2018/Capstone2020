@@ -9,6 +9,20 @@ import {
   //   Input,
   Modal,
 } from "react-native";
+import {
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "react-native-vector-icons";
+import * as Device from "expo-device";
+
+// import ResponsiveImageView from "react-native-responsive-image-view";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
+
 import { Input, Tooltip } from "react-native-elements";
 
 import firebase, { firestore } from "firebase/app";
@@ -27,6 +41,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 export default function AdvertismentsPage(props) {
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [image, setImage] = useState(null);
+  const [deviceType, setDeviceType] = useState(0);
 
   const [flag, setFlag] = useState(0);
 
@@ -97,6 +112,14 @@ export default function AdvertismentsPage(props) {
       id,
     });
   };
+
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   useEffect(() => {
     getUserObject();
   }, []);
@@ -245,33 +268,235 @@ export default function AdvertismentsPage(props) {
       </View>
       {
         flag == 0 ? (
-          <View style={{ flex: 10 }}>
-            {advertisements.map((item, index) => (
-              <View key={index}>
-                <Text>Title: {item.title}</Text>
-                <Text>Description: {item.description}</Text>
-                <Text>Link: {item.link}</Text>
-                <Text>
-                  Start Date: {moment(item.startDate.toDate()).format("L")}
-                </Text>
-                <Text>
-                  End Date: {moment(item.endDate.toDate()).format("L")}
-                </Text>
+          <View style={{ flex: 1, backgroundColor: "white" }}>
+            <View style={{ backgroundColor: "white", flex: 1, margin: 5 }}>
+              <View
+                style={{ backgroundColor: "#e3e3e3", flex: 0.95, margin: 5 }}
+              >
+                <ScrollView>
+                  {advertisements.map((item, index) => (
+                    <View
+                      style={{
+                        flex: 1,
+                        height: 250,
+                        margin: 15,
+                        backgroundColor: "white",
+                        borderWidth: 3,
+                        borderColor: "#185a9d",
+                        padding: 5,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 2,
+                          // backgroundColor: "pink",
+                          // borderRadius: 20,
+                          flexDirection: "row",
+                        }}
+                        key={index}
+                      >
+                        <View style={{ flex: 1 }}>
+                          {item.image != null ? (
+                            <Image
+                              source={{ uri: item.image }}
+                              style={{
+                                width: 150,
+                                height: 175,
+                                borderWidth: 1,
+                                borderColor: "transparent",
+                                // resizeMode: "contain",
+                                // borderTopRightRadiusRadius: 10,
+                                // borderRadius: 5,
+                              }}
+                            />
+                          ) : null}
+                        </View>
 
-                {item.image != null ? (
-                  <Image
-                    source={{ uri: item.image }}
-                    style={{ width: 100, height: 100 }}
-                  />
-                ) : null}
-                <TouchableOpacity onPress={() => approve(item.id, "approved")}>
-                  <Text>approve</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => approve(item.id, "denied")}>
-                  <Text>denied</Text>
-                </TouchableOpacity>
+                        <View
+                          style={{
+                            flex: 1.5,
+
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: "lightblue",
+                          }}
+                        >
+                          <View
+                            // elevation={3}
+                            style={{
+                              flex: 0.3,
+                              width: "80%",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              // borderColor: "gray",
+                              // borderRadius: 5,
+                              // borderWidth: 1,
+                              // backgroundColor: "lightgray",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "#185a9d",
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                textTransform: "none",
+                              }}
+                            >
+                              {item.title}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 0.5,
+                              width: "90%",
+                              flexDirection: "row",
+                              justifyContent: "flex-start",
+                              alignItems: "flex-start",
+                              // backgroundColor: "#185a9d",
+                              borderColor: "#185a9d",
+                              borderWidth: 1,
+                              padding: 5,
+                            }}
+                          >
+                            {/* <Ionicons
+                              name="md-paper"
+                              size={22}
+                              color="darkred"
+                            /> */}
+                            <Text style={{ fontSize: 16 }}>
+                              {item.description}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flex: 0.2,
+                              flexDirection: "row",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              // backgroundColor: "pink",
+                            }}
+                          >
+                            <Feather name="link" size={20} color="gray" />
+                            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                              {" "}
+                              {item.link}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              flex: 0.2,
+                              width: "95%",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              // backgroundColor: "white",
+                              borderBottomWidth: 1,
+                              // flexDirection: "row",
+                            }}
+                          >
+                            {/* <View>
+                              <MaterialCommunityIcons
+                                name="timer-sand"
+                                size={22}
+                                color="darkred"
+                              />
+                            </View> */}
+                            <View>
+                              <Text style={{ fontSize: 15 }}>
+                                {moment(item.startDate.toDate()).format("L")}{" "}
+                                <Text
+                                  style={{
+                                    fontWeight: "bold",
+                                    color: "#185a9d",
+                                  }}
+                                >
+                                  {" "}
+                                  To{" "}
+                                </Text>{" "}
+                                {moment(item.endDate.toDate()).format("L")}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flex: 0.5,
+                          // backgroundColor: "red",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 0.3,
+                            backgroundColor: "#2E9E9B",
+                            // borderWidth: 4,
+                            height: 30,
+                            // width: "30%",
+                            // alignSelf: "center",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            //marginStart: "2%",
+                            // marginEnd: "3%",
+                            borderRadius: 10,
+                            //marginBottom: 10,
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() => approve(item.id, "approved")}
+                          >
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                fontSize: 16,
+                                color: "white",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Approve
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View
+                          style={{
+                            flex: 0.3,
+                            backgroundColor: "#901919",
+                            // borderWidth: 4,
+                            height: 30,
+                            // width: "30%",
+                            // alignSelf: "center",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            //marginStart: "2%",
+                            marginStart: "3%",
+                            borderRadius: 10,
+                            //marginBottom: 10,
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() => approve(item.id, "denied")}
+                          >
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                fontSize: 16,
+                                color: "white",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Reject
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
               </View>
-            ))}
+            </View>
           </View>
         ) : flag == 1 ? (
           <View style={styles.container}>
@@ -296,6 +521,7 @@ export default function AdvertismentsPage(props) {
                 onChangeText={setTitle}
                 placeholder="Enter Title"
                 value={title}
+                maxLength={25}
                 // placeholderTextColor="black"
                 inputStyle={{
                   // color: "#185a9d",
@@ -352,6 +578,7 @@ export default function AdvertismentsPage(props) {
                 onChangeText={setDescription}
                 placeholder="Enter Description"
                 value={description}
+                maxLength={50}
                 // placeholderTextColor="black"
                 inputStyle={{
                   //  color: "#",
@@ -737,6 +964,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e3e3e3",
+
     // alignItems: "center",
     // justifyContent: "center",
   },

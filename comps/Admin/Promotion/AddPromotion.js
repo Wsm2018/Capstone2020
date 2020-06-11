@@ -86,7 +86,7 @@ export default function AddPromotion(props) {
         style={{ flex: 1, backgroundColor: "#f5f0f0" }}
       >
         <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
-          <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
+          <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 5 }}>
             <View
               style={{
                 flex: 1,
