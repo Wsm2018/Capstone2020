@@ -148,8 +148,16 @@ export default function AdvertisementsForm(props) {
       console.log("link bad");
       setLink({ text: link.text, error: true });
     } else {
-      console.log("link good");
-      count++;
+      const urlRegEx = new RegExp(
+        "(https?://)?([w-])+.{1}([a-zA-Z]{2,63})([/w-]*)*/???([^#\n\r]*)?#?([^\n\r]*)"
+      );
+      if (urlRegEx.test(link)) {
+        console.log("link good");
+        count++;
+      } else {
+        alert("Invalid URL");
+        return;
+      }
     }
 
     if (description.text === "") {
