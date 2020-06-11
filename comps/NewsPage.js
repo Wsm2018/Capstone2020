@@ -76,13 +76,11 @@ export default function NewsPage() {
       onSnapshot.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data(), isPromo: false });
       });
-      // if (user && (user.role !== "admin" || user.role !== "manager")) {
       promotions.forEach((p) => {
         console.log("promo", p);
 
         data.push(p);
       });
-      // }
 
       // console.log("promotions", promotions);
       setNews(data);
