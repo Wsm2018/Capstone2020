@@ -80,7 +80,7 @@ export default function BookingHistory(props) {
         setServices([...p]);
       });
 
-    db.collection("users").where("role", "==", "service worker").onSnapshot((snapshot) => {
+    db.collection("users").where("role", "==", "services employee").onSnapshot((snapshot) => {
       var worker = ""
       snapshot.forEach((doc) => {
         worker = { ...doc.data(), id: doc.id }
@@ -389,7 +389,7 @@ if(viewDetails){
       }
     }
 
-    //back()
+    back()
 
   }
 
@@ -538,7 +538,7 @@ if(viewDetails){
 
             {new Date().getTime() < new Date(viewDetails.assetBooking.startDateTime.split(" ").join('')).getTime() ? <Button title={"cancel"} onPress={() => cancelBooking()} /> : null}
             
-             <Button title={"cancel"} onPress={() => cancelBooking()} />
+             {/* <Button title={"cancel"} onPress={() => cancelBooking()} /> */}
             <Button title={"Back"} onPress={() => back()} />
             {new Date().getTime() < new Date(viewDetails.assetBooking.endDateTime.split(" ").join('')).getTime() ? <Button title={"extend"} onPress={() => showDateInput(true)} /> : null}
             {!viewDetails.status ? <Button title="Pay" onPress={() => props.navigation.navigate("Payment", { partial: viewDetails })} /> : null}

@@ -554,29 +554,32 @@ export default function ServiceManagement(props) {
                                 style={{ width: "15%" }}
                             />
                         </View>
-
+                        <View style={{ padding: 5, backgroundColor: "#f2f2f2", borderRadius: 5  , width:"100%"}}>
                         <View>
                             <View style={{ flexDirection: "row" }}>
                                 <Text style={styles.listNames}>Name</Text>
-                                <Text>{selectedService.service.name}</Text>
+                                <Text style={styles.listDetails}>{selectedService.service.name}</Text>
                             </View>
 
                             <View style={{ flexDirection: "row" }}>
                                 <Text style={styles.listNames}>Price</Text>
-                                <Text>{selectedService.service.price}</Text>
+                                <Text style={styles.listDetails}>{selectedService.service.price} QR</Text>
                             </View>
 
                             <View style={{ flexDirection: "row" }}>
                                 <Text style={styles.listNames}>Max Booking Per Day</Text>
-                                <Text>{selectedService.service.maxBookings}</Text>
+                                <Text style={styles.listDetails}>{selectedService.service.maxBookings}</Text>
                             </View>
                             <View style={{ flexDirection: "row" }}>
                                 <Text style={styles.listNames}>Rating</Text>
-                                <Text>{selectedService.service.rating}</Text>
+                                <Text style={styles.listDetails}>{selectedService.service.rating}</Text>
+                            </View>
                             </View>
 
+                           
+                        </View>
 
-                            <TouchableOpacity
+                        <TouchableOpacity
                                 onPress={() => setShowSchedule(true)}
                                 style={{
                                     backgroundColor: "#609e9f",
@@ -588,7 +591,6 @@ export default function ServiceManagement(props) {
                             ><Text style={{ marginLeft: "auto", marginRight: "auto", color: "white", fontSize: 15 }}>Schedule</Text></TouchableOpacity>
 
 
-                        </View>
 
 
                         <View style={{
@@ -619,13 +621,13 @@ export default function ServiceManagement(props) {
                                                     <MaterialCommunityIcons
                                                         name={"account-remove-outline"}
                                                         size={25}
-                                                        color={"grey"}
+                                                        color={"#901616"}
                                                         onPress={() => manageWorker("delete", w)}
                                                         style={{ margin: "1%" }}
                                                     />
                                                     <TouchableOpacity style={{ width: "80%" }}
                                                         onPress={() => setSelectedUser(w)}>
-                                                        <Text style={{ marginBottom: "auto", marginTop: "auto" }}>
+                                                        <Text style={styles.listDetails2}>
                                                             {w.email}
                                                         </Text>
                                                     </TouchableOpacity>
@@ -994,8 +996,9 @@ export default function ServiceManagement(props) {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        <View style={{ borderRadius:5, borderWidth:1 , borderColor:"#b1cece" , padding:5 , backgroundColor:"#eff5f5"}}>
 
-                        <Text>Working Hours</Text>
+                        <Text style={{ color: "gray", marginLeft: "auto", marginRight: "auto", fontSize:18 , marginTop:"2%" }} >Working Hours</Text>
 
                         {
                             week.map((w) =>
@@ -1068,15 +1071,15 @@ export default function ServiceManagement(props) {
                                                         </TouchableOpacity>
                                                         :
                                                         <TouchableOpacity onPress={() => addDay(w, t.time)} style={{
-                                                            margin: 1,
+                                                            margin: 3,
                                                             borderWidth: 3,
                                                             borderRadius: 7,
                                                             padding: 2,
                                                             width: 72,
-                                                            borderColor: "gray",
+                                                            borderColor: "#0B5345",
                                                             backgroundColor: "white"
                                                         }}>
-                                                            <Text style={{ color: "gray", marginLeft: "auto", marginRight: "auto" }}>{t.show}</Text>
+                                                            <Text style={{ color: "#0B5345", marginLeft: "auto", marginRight: "auto" }}>{t.show}</Text>
                                                         </TouchableOpacity>
 
                                                 )
@@ -1086,6 +1089,7 @@ export default function ServiceManagement(props) {
 
                                     </Collapsible>
                                 </View>
+                                
                             )
                         }
 
@@ -1099,6 +1103,13 @@ export default function ServiceManagement(props) {
                                 <ScrollView>
                                     <View style={styles.centeredView}>
                                         <View style={styles.modalView}>
+                                        <MaterialCommunityIcons
+                                    name={"close"}
+                                    size={20}
+                                    color={"grey"}
+                                    onPress={() => setShowIcons(false)}
+                                    style={{ width: "15%", position: "absolute", left: "100%", marginTop: "3%" }}
+                                />
                                             <View style={{
                                                 width: "100%", flexDirection: "row",
                                                 flexWrap: "wrap"
@@ -1132,6 +1143,7 @@ export default function ServiceManagement(props) {
 
                      
                             
+                            </View>
                             <TouchableOpacity
                             onPress={() => handleDB()}
                             style={{
@@ -1144,6 +1156,7 @@ export default function ServiceManagement(props) {
                                 marginRight: "auto",
                             }}
                         ><Text style={{ marginLeft: "auto", marginRight: "auto", color: "white", fontSize: 18 ,height:20}}>{showAdd ? "Add" : "Edit"}</Text></TouchableOpacity>
+                    
                     </View>
                     :
                     null
@@ -1348,7 +1361,9 @@ const styles = StyleSheet.create({
         color: "#566573",
         alignItems: "center",
         //marginLeft: "auto",
-        marginRight: "2%"
+        marginRight: "2%",
+        borderRightColor: "#d9d9d9",
+        borderRightWidth: 1
     },
     textInputs: {
         borderWidth: 1,
@@ -1362,7 +1377,8 @@ const styles = StyleSheet.create({
         width: "35%",
         marginBottom: "auto",
         marginTop: "auto",
-        // backgroundColor:"red"
+       color:"#3b5e5e",
+       fontSize:15
     },
     info: {
         flexDirection: "row",
@@ -1372,5 +1388,15 @@ const styles = StyleSheet.create({
         width: "80%",
         marginLeft: "auto",
         marginRight: "auto"
+    },
+    listDetails: {
+        color: "#737373",
+    },
+    listDetails2: {
+        color: "#263e40",
+        marginBottom:"auto",
+        marginTop:"auto"
     }
+
+    
 });

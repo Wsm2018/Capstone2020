@@ -15,7 +15,7 @@ import {
     Modal,
     CheckBox,
     Dimensions,
-    Alert , KeyboardAvoidingView
+    Alert, KeyboardAvoidingView
 } from "react-native";
 
 
@@ -149,16 +149,28 @@ export default function AssetManagement(props) {
 
     const handleType = async (obj) => {
 
-        if (showAddType) {
-            var docId = ""
-            var type = await db.collection("assetTypes").add(obj).then(docRef => docId = docRef.id)
-            getUrl(docId)
+        if (!name || !title || !sectionIcon || !assetIcon) {
+            Alert.alert("Please Fill All Fields",
+                "", [
+                { text: "OK", onPress: () => console.log("NOO") },
+                { text: "No", onPress: () => console.log("NOO") }
+
+            ])
         }
         else {
-            db.collection("assetTypes").doc(selectedType.id).update(obj)
-            getUrl(selectedType.id)
+            if (showAddType) {
+                var docId = ""
+                var type = await db.collection("assetTypes").add(obj).then(docRef => docId = docRef.id)
+                getUrl(docId)
+            }
+            else {
+                db.collection("assetTypes").doc(selectedType.id).update(obj)
+                getUrl(selectedType.id)
+            }
+            cancelAll()
         }
-        cancelAll()
+
+
 
     }
 
@@ -190,7 +202,6 @@ export default function AssetManagement(props) {
         const response = await assetManager({
             collection, obj, type: "add"
         });
-
 
         cancelAll()
         setShowAddType(false)
@@ -278,13 +289,13 @@ export default function AssetManagement(props) {
         <ScrollView>
 
             <View style={styles.two}>
-                <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%"}}>
+                <View style={{ flexDirection: "row", borderBottomColor: "#CCD1D1", borderBottomWidth: 1, width: "100%" }}>
                     <Text style={styles.cardTitle}>Asset Types</Text>
                     <MaterialCommunityIcons
                         name={"plus-box"}
                         size={25}
                         color={"#a6a6a6"}
-                        onPress={() => setShowAddType(true)}
+                        onPress={() => setName() || setTitle() || setAssetIcon() || setSectionIcon() || setShowAddType(true)}
 
                     />
 
@@ -339,7 +350,7 @@ export default function AssetManagement(props) {
             {
                 selectedType && sections ?
                     <View style={styles.details}>
-                        <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%", marginBottom:"2%"}}>
+                        <View style={{ flexDirection: "row", borderBottomColor: "#CCD1D1", borderBottomWidth: 1, width: "100%", marginBottom: "2%" }}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -364,7 +375,14 @@ export default function AssetManagement(props) {
                                     name={"square-edit-outline"}
                                     size={20}
                                     color={"#185a9d"}
-                                    onPress={() => setShowEditType(true)}
+                                    onPress={() =>
+                                        setShowEditType(true) ||
+                                        setName(selectedType.name) ||
+                                        setTitle(selectedType.title) ||
+                                        setAssetIcon(selectedType.assetIcon) ||
+                                        setSectionIcon(selectedType.sectionIcon) ||
+                                        setUri(selectedType.image)
+                                    }
                                     style={{ width: "15%" }}
                                 />
                                 <MaterialCommunityIcons
@@ -377,33 +395,34 @@ export default function AssetManagement(props) {
                             </View>
 
                         </View>
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Name</Text>
-                            <Text>{selectedType.name}</Text>
-                        </View>
+                        <View style={{ padding: 5, backgroundColor: "#f2f2f2", borderRadius: 5 }}>
+                            <View style={{ flexDirection: "row", }}>
+                                <Text style={styles.listNames}>Name</Text>
+                                <Text style={styles.listDetails}>{selectedType.name}</Text>
+                            </View>
 
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Title</Text>
-                            <Text>{selectedType.Title}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Section Icon</Text>
-                            <Text>{selectedType.sectionIcon}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Asset Icon</Text>
-                            <Text>{selectedType.assetIcon}</Text>
-                        </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Title</Text>
+                                <Text style={styles.listDetails}>{selectedType.Title}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Section Icon</Text>
+                                <Text style={styles.listDetails}>{selectedType.sectionIcon}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Asset Icon</Text>
+                                <Text style={styles.listDetails}>{selectedType.assetIcon}</Text>
+                            </View>
 
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Show In Map</Text>
-                            <MaterialCommunityIcons
-                                name={selectedType.showInMap ? "check" : "close"}
-                                size={30}
-                                color={selectedType.showInMap ? "#2ECC71" : "#20365F"}
-                            />
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Show In Map</Text>
+                                <MaterialCommunityIcons
+                                    name={selectedType.showInMap ? "check" : "close"}
+                                    size={30}
+                                    color={selectedType.showInMap ? "#2ECC71" : "#20365F"}
+                                />
+                            </View>
                         </View>
-
                         <TouchableOpacity style={{
                             backgroundColor: "#609e9f",
                             width: 170,
@@ -430,59 +449,59 @@ export default function AssetManagement(props) {
                                 />
 
                             </View>
-                            <View style={{width:"100%" , flexWrap:"wrap"  , flexDirection:"row"}}>
-                            {
-                                sections.map((t, i) =>
-                                    t.assetType == selectedType.id ?
-                                        <View style={{  alignItems: "center" }} key={i}>
-                                            <TouchableOpacity
-                                                onPress={() => setSelectedSection(t)}
-                                                style={{
-                                                    backgroundColor:
-                                                        selectedSection === t ? "#2E9E9B" : "#e3e3e3",
-                                                    width: 100,
-                                                    height: 100,
-                                                    margin: 5,
-                                                    alignItems: "center",
-                                                    flexDirection: "row",
-                                                    //elevation: 12,
-                                                    borderWidth: 2,
-                                                    borderColor: "#2E9E9B",
-                                                }}
-                                            >
-                                                <View
+                            <View style={{ width: "100%", flexWrap: "wrap", flexDirection: "row" }}>
+                                {
+                                    sections.map((t, i) =>
+                                        t.assetType == selectedType.id ?
+                                            <View style={{ alignItems: "center" }} key={i}>
+                                                <TouchableOpacity
+                                                    onPress={() => setSelectedSection(t)}
                                                     style={{
-                                                        // height: "20%",
-                                                        width: "100%",
-                                                        justifyContent: "center",
-                                                        textAlign: "center",
-                                                        alignContent: "center",
+                                                        backgroundColor:
+                                                            selectedSection === t ? "#2E9E9B" : "#e3e3e3",
+                                                        width: 100,
+                                                        height: 100,
+                                                        margin: 5,
                                                         alignItems: "center",
+                                                        flexDirection: "row",
+                                                        //elevation: 12,
+                                                        borderWidth: 2,
+                                                        borderColor: "#2E9E9B",
                                                     }}
                                                 >
-                                                    <MaterialCommunityIcons
-                                                        name={selectedType.sectionIcon}
-                                                        size={40}
-                                                        color={selectedSection === t ? "white" : "#2E9E9B"}
-                                                    />
-                                                    <Text
+                                                    <View
                                                         style={{
+                                                            // height: "20%",
+                                                            width: "100%",
+                                                            justifyContent: "center",
                                                             textAlign: "center",
-                                                            color: selectedSection === t ? "white" : "#2E9E9B",
-                                                            fontSize: 20,
+                                                            alignContent: "center",
+                                                            alignItems: "center",
                                                         }}
                                                     >
-                                                        {t.name}
-                                                    </Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        </View>
+                                                        <MaterialCommunityIcons
+                                                            name={selectedType.sectionIcon}
+                                                            size={40}
+                                                            color={selectedSection === t ? "white" : "#2E9E9B"}
+                                                        />
+                                                        <Text
+                                                            style={{
+                                                                textAlign: "center",
+                                                                color: selectedSection === t ? "white" : "#2E9E9B",
+                                                                fontSize: 20,
+                                                            }}
+                                                        >
+                                                            {t.name}
+                                                        </Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            </View>
 
-                                        :
-                                        null
+                                            :
+                                            null
 
-                                )}
-                                </View>
+                                    )}
+                            </View>
                         </View>
                     </View>
                     :
@@ -493,7 +512,7 @@ export default function AssetManagement(props) {
             {
                 selectedSection && assets ?
                     <View style={styles.three}>
-                        <View style={{ flexDirection: "row" , borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%" , marginBottom:"3%"}}>
+                        <View style={{ flexDirection: "row", borderBottomColor: "#CCD1D1", borderBottomWidth: 1, width: "100%", marginBottom: "3%" }}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -540,31 +559,32 @@ export default function AssetManagement(props) {
                             {/* </View> */}
 
                         </View>
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Name</Text>
-                            <Text style={{ width: "70%" }}>{selectedSection.name}</Text>
-                        </View>
-
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Color</Text>
-                            <View style={{ width: "70%" }}>
-                                <Text style={{ width: "10%", backgroundColor: selectedSection.color }}></Text>
+                        <View style={{ padding: 5, backgroundColor: "#f2f2f2", borderRadius: 5 }}>
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Name</Text>
+                                <Text style={{ width: "70%", color: "#737373" }}>{selectedSection.name}</Text>
                             </View>
-
-
-                        </View>
-                        {selectedSection.location ?
 
                             <View style={{ flexDirection: "row" }}>
-                                <Text style={styles.listNames}>Location</Text>
-
-                                <Text style={{ width: "30%" }}>Longitude {selectedSection.location.longitude}</Text>
-                                <Text style={{ width: "30%" }}>Latitude {selectedSection.location.latitude}</Text>
+                                <Text style={styles.listNames}>Color</Text>
+                                <View style={{ width: "70%" }}>
+                                    <Text style={{ width: "10%", backgroundColor: selectedSection.color }}></Text>
+                                </View>
 
 
                             </View>
-                            : null}
+                            {selectedSection.location ?
 
+                                <View style={{ flexDirection: "row" }}>
+                                    <Text style={styles.listNames}>Location</Text>
+
+                                    <Text style={{ width: "30%", color: "#737373" }}>Longitude {selectedSection.location.longitude}</Text>
+                                    <Text style={{ width: "30%", color: "#737373" }}>Latitude {selectedSection.location.latitude}</Text>
+
+
+                                </View>
+                                : null}
+                        </View>
 
                         <View style={styles.two2}>
                             <View style={{ flexDirection: "row" }}>
@@ -580,60 +600,62 @@ export default function AssetManagement(props) {
 
                             </View>
 
-<View style={{width:"100%" , flexWrap:"wrap" , flexDirection:"row"}}>
-{
+                            <View style={{ width: "100%", flexWrap: "wrap", flexDirection: "row" }}>
+                                {
 
-assets.map((t, i) =>
-    t.assetSection == selectedSection.id ?
-        <View key={i}>
-            <TouchableOpacity
-                onPress={() => setSelectedAsset(t)}
-                style={{
-                    backgroundColor:
-                        selectedSection === t ? "#20365F" : "#e3e3e3",
-                    width: 80,
-                    height: 80,
-                    margin: 5,
-                    alignItems: "center",
-                    flexDirection: "row",
-                    //elevation: 12,
-                    borderWidth: 2,
-                    borderColor: "#20365F",
-                }}
-            >
-                <View
-                    style={{
-                        // height: "20%",
-                        width: "100%",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        alignContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <MaterialCommunityIcons
-                        name={selectedType.assetIcon}
-                        size={40}
-                        color={"#20365F"}
-                    />
-                    <Text
-                        style={{
-                            textAlign: "center",
-                            color: "#20365F",
-                            fontSize: 20,
-                        }}
-                    >
-                        {t.code}
-                    </Text>
-                </View>
-            </TouchableOpacity>
-        </View>
-        :
-        null
-)}
+                                    assets.map((t, i) =>
+                                        t.assetSection == selectedSection.id ?
+                                            <View key={i}>
+                                                <TouchableOpacity
+                                                    onPress={() => setSelectedAsset(t)}
+                                                    style={{
 
-</View>
-                            
+                                                        width: 80,
+                                                        height: 80,
+                                                        margin: 5,
+                                                        alignItems: "center",
+                                                        flexDirection: "row",
+                                                        //elevation: 12,
+                                                        borderWidth: 2,
+                                                        backgroundColor: selectedAsset === t ? "#2E9E9B" : "white",
+                                                        borderColor: "#2E9E9B",
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            // height: "20%",
+                                                            width: "100%",
+                                                            justifyContent: "center",
+                                                            textAlign: "center",
+                                                            alignContent: "center",
+                                                            alignItems: "center",
+                                                        }}
+                                                    >
+                                                        <MaterialCommunityIcons
+                                                            name={selectedType.assetIcon}
+                                                            size={40}
+                                                            color={selectedAsset === t ? "white" : "#2E9E9B"}
+                                                        />
+                                                        <Text
+                                                            style={{
+                                                                textAlign: "center",
+                                                                color: selectedAsset === t ? "white" : "#2E9E9B",
+                                                                fontSize: 20,
+                                                            }}
+                                                        >
+                                                            {t.code}
+                                                        </Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            </View>
+
+                                            :
+                                            null
+                                    )}
+
+                            </View>
+
+
                         </View>
                     </View>
                     :
@@ -646,7 +668,7 @@ assets.map((t, i) =>
             {
                 selectedAsset ?
                     <View style={styles.details}>
-                        <View style={{ flexDirection: "row", borderBottomColor:"#CCD1D1" , borderBottomWidth:1 , width:"100%" , marginBottom:"3%" }}>
+                        <View style={{ flexDirection: "row", borderBottomColor: "#CCD1D1", borderBottomWidth: 1, width: "100%", marginBottom: "3%" }}>
                             <Text style={{
                                 fontSize: 18,
                                 // backgroundColor: "red",
@@ -691,52 +713,52 @@ assets.map((t, i) =>
                                 />
                             </View>
                         </View>
-
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Code</Text>
-                            <Text style={{ width: "70%" }} >{selectedAsset.code}</Text>
-                        </View>
-
-
-
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Name</Text>
-                            <Text style={{ width: "70%" }}>{selectedType.name}</Text>
-                        </View>
-
-
-
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Price Per Hour</Text>
-                            <Text style={{ width: "70%" }}>{selectedAsset.price} QR</Text>
-                        </View>
-
-                        {selectedAsset.numOfPeople ?
+                        <View style={{ padding: 5, backgroundColor: "#f2f2f2", borderRadius: 5 }}>
                             <View style={{ flexDirection: "row" }}>
-                                <Text style={styles.listNames}>Number Of People</Text>
-                                <Text>{selectedAsset.numOfPeople}</Text>
+                                <Text style={styles.listNames}>Code</Text>
+                                <Text style={{ width: "70%", color: "#737373" }} >{selectedAsset.code}</Text>
                             </View>
-                            : null}
 
-                        <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.listNames}>Description</Text>
-                            <Text style={{ width: "70%" }}>{selectedAsset.description ? selectedAsset.description : null}</Text>
-                        </View>
 
-                        {selectedAsset.location ?
 
                             <View style={{ flexDirection: "row" }}>
-                                <Text style={styles.listNames}>Location</Text>
-
-                                <Text style={{ width: "30%" }}>Longitude {selectedAsset.location.longitude}</Text>
-                                <Text style={{ width: "30%" }}>Latitude {selectedAsset.location.latitude}</Text>
-
-
+                                <Text style={styles.listNames}>Name</Text>
+                                <Text style={{ width: "70%", color: "#737373" }}>{selectedType.name}</Text>
                             </View>
-                            : null}
 
+
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Price Per Hour</Text>
+                                <Text style={{ width: "70%", color: "#737373" }}>{selectedAsset.price} QR</Text>
+                            </View>
+
+                            {selectedAsset.numOfPeople ?
+                                <View style={{ flexDirection: "row" }}>
+                                    <Text style={styles.listNames}>Number Of People</Text>
+                                    <Text style={{ width: "70%", color: "#737373" }}>{selectedAsset.numOfPeople}</Text>
+                                </View>
+                                : null}
+
+                            <View style={{ flexDirection: "row" }}>
+                                <Text style={styles.listNames}>Description</Text>
+                                <Text style={{ width: "70%", color: "#737373" }}>{selectedAsset.description ? selectedAsset.description : null}</Text>
+                            </View>
+
+                            {selectedAsset.location ?
+
+                                <View style={{ flexDirection: "row" }}>
+                                    <Text style={styles.listNames}>Location</Text>
+
+                                    <Text style={{ width: "30%", color: "#737373" }}>Longitude {selectedAsset.location.longitude}</Text>
+                                    <Text style={{ width: "30%", color: "#737373" }}>Latitude {selectedAsset.location.latitude}</Text>
+
+
+                                </View>
+                                : null}
+
+                        </View>
                     </View>
-
                     :
 
                     null
@@ -754,7 +776,7 @@ assets.map((t, i) =>
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                
+
 
                                 <MaterialCommunityIcons
                                     name={"close"}
@@ -778,7 +800,7 @@ assets.map((t, i) =>
                                     <Text style={styles.inputTitles}>Title</Text>
                                     <TextInput
                                         onChangeText={setTitle}
-                                        placeholder="Name"
+                                        placeholder="Title"
                                         value={title}
                                         style={styles.textInputs}
                                     />
@@ -984,7 +1006,7 @@ assets.map((t, i) =>
                     null
             }
 
-{/* <KeyboardAvoidingView
+            {/* <KeyboardAvoidingView
         
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{
@@ -998,7 +1020,7 @@ assets.map((t, i) =>
 
             {
                 showAddAsset || showEditAsset ?
-                
+
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -1006,9 +1028,9 @@ assets.map((t, i) =>
                             Alert.alert("Modal has been closed.");
                         }}
                     >
-                       
+
                         <View style={styles.centeredView}>
-                        
+
                             <View style={styles.modalView}>
                                 <MaterialCommunityIcons
                                     name={"close"}
@@ -1018,141 +1040,141 @@ assets.map((t, i) =>
                                     style={{ position: "absolute", left: "110%", marginTop: "4%" }}
                                 />
                                 <KeyboardAvoidingView
-        
-        behavior={Platform.OS === "ios" ? "position" : "padding"}
-        style={{
- 
-        }}
-      ><ScrollView>
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Name</Text>
-                                    <TextInput
-                                        onChangeText={setName}
-                                        placeholder="Name"
-                                        value={name}
-                                        style={styles.textInputs}
-                                    />
-                                </View>
+
+                                    behavior={Platform.OS === "ios" ? "position" : "padding"}
+                                    style={{
+
+                                    }}
+                                ><ScrollView>
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Name</Text>
+                                            <TextInput
+                                                onChangeText={setName}
+                                                placeholder="Name"
+                                                value={name}
+                                                style={styles.textInputs}
+                                            />
+                                        </View>
 
 
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Code</Text>
-                                    <TextInput
-                                        onChangeText={setCode}
-                                        placeholder="code"
-                                        value={code}
-                                        style={styles.textInputs}
-                                    />
-                                </View>
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Code</Text>
+                                            <TextInput
+                                                onChangeText={setCode}
+                                                placeholder="code"
+                                                value={code}
+                                                style={styles.textInputs}
+                                            />
+                                        </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Price</Text>
-                                    <TextInput
-                                        onChangeText={setPrice}
-                                        placeholder="Price"
-                                        value={price}
-                                        style={styles.textInputs}
-                                    />
-                                </View>
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Price</Text>
+                                            <TextInput
+                                                onChangeText={setPrice}
+                                                placeholder="Price"
+                                                value={price}
+                                                style={styles.textInputs}
+                                            />
+                                        </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Type</Text>
-                                    <TextInput
-                                        onChangeText={setType}
-                                        placeholder="Type"
-                                        value={type}
-                                        style={styles.textInputs}
-                                    />
-                                </View>
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Type</Text>
+                                            <TextInput
+                                                onChangeText={setType}
+                                                placeholder="Type"
+                                                value={type}
+                                                style={styles.textInputs}
+                                            />
+                                        </View>
 
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Number of People</Text>
-                                    <TextInput
-                                        onChangeText={setNumOfPeople}
-                                        placeholder="Number of people"
-                                        value={numOfPeople}
-                                        style={styles.textInputs}
-                                    />
-                                </View>
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Location</Text>
-                                    <View style={{ width: "70%", margin: "1%" }}>
-                                        <Text>Longitude</Text>
-                                        <TextInput
-                                            onChangeText={setLong}
-                                            placeholder="Longitude"
-                                            value={long}
-                                            style={{
-                                                borderWidth: 1,
-                                                borderColor: "#D4EFDF",
-                                                padding: 5,
-                                                margin: "1%", width: "100%"
-                                            }}
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Number of People</Text>
+                                            <TextInput
+                                                onChangeText={setNumOfPeople}
+                                                placeholder="Number of people"
+                                                value={numOfPeople}
+                                                style={styles.textInputs}
+                                            />
+                                        </View>
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Location</Text>
+                                            <View style={{ width: "70%", margin: "1%" }}>
+                                                <Text>Longitude</Text>
+                                                <TextInput
+                                                    onChangeText={setLong}
+                                                    placeholder="Longitude"
+                                                    value={long}
+                                                    style={{
+                                                        borderWidth: 1,
+                                                        borderColor: "#D4EFDF",
+                                                        padding: 5,
+                                                        margin: "1%", width: "100%"
+                                                    }}
+                                                />
+                                                <Text>Latitude</Text>
+                                                <TextInput
+                                                    onChangeText={setLat}
+                                                    placeholder="Latitude"
+                                                    value={lat}
+                                                    style={{
+                                                        width: "100%", borderWidth: 1,
+                                                        borderColor: "#D4EFDF",
+
+                                                        padding: 5,
+                                                        margin: "1%",
+                                                    }}
+                                                />
+                                            </View></View>
+
+                                        <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
+                                            <Text style={styles.inputTitles}>Description</Text>
+                                            <TextInput
+                                                onChangeText={setDescription}
+                                                placeholder="Description"
+                                                value={description}
+                                                style={{
+                                                    borderWidth: 1,
+                                                    borderColor: "#D4EFDF",
+                                                    width: "70%",
+                                                    //height:"150%",
+                                                    padding: 5,
+                                                    margin: "1%",
+                                                }}
+                                            />
+                                        </View>
+
+                                        <MaterialCommunityIcons
+                                            name={showAddAsset ? "plus-circle-outline" : "square-edit-outline"}
+                                            size={30}
+                                            color={"#609e9f"}
+                                            onPress={() => showAddAsset ? handleAdd("assets", {
+                                                assetSection: selectedSection.id,
+                                                name,
+                                                code,
+                                                rate: 0,
+                                                price,
+                                                status: false,
+                                                lock: false,
+                                                numOfPeople,
+                                                location: { Latitude: lat, Longitude: long },
+                                                description,
+                                                type
+                                            }) : handleEdit("assets", {
+                                                assetSection: selectedSection.id,
+                                                name,
+                                                code,
+                                                rate: 0,
+                                                price,
+                                                status: false,
+                                                lock: false,
+                                                numOfPeople,
+                                                location: { Latitude: lat, Longitude: long },
+                                                description,
+                                                type
+                                            }, selectedAsset.id)}
+                                            style={{ marginBottom: "4%", marginLeft: "auto", marginRight: "auto" }}
                                         />
-                                        <Text>Latitude</Text>
-                                        <TextInput
-                                            onChangeText={setLat}
-                                            placeholder="Latitude"
-                                            value={lat}
-                                            style={{
-                                                width: "100%", borderWidth: 1,
-                                                borderColor: "#D4EFDF",
-
-                                                padding: 5,
-                                                margin: "1%",
-                                            }}
-                                        />
-                                    </View></View>
-
-                                <View style={{ flexDirection: "row", marginBottom: "0.5%" }}>
-                                    <Text style={styles.inputTitles}>Description</Text>
-                                    <TextInput
-                                        onChangeText={setDescription}
-                                        placeholder="Description"
-                                        value={description}
-                                        style={{
-                                            borderWidth: 1,
-                                            borderColor: "#D4EFDF",
-                                            width: "70%",
-                                            //height:"150%",
-                                            padding: 5,
-                                            margin: "1%",
-                                        }}
-                                    />
-                                </View>
-
-                                <MaterialCommunityIcons
-                                    name={showAddAsset ? "plus-circle-outline" : "square-edit-outline"}
-                                    size={30}
-                                    color={"#609e9f"}
-                                    onPress={() => showAddAsset ? handleAdd("assets", {
-                                        assetSection: selectedSection.id,
-                                        name,
-                                        code,
-                                        rate: 0,
-                                        price,
-                                        status: false,
-                                        lock: false,
-                                        numOfPeople,
-                                        location: { Latitude: lat, Longitude: long },
-                                        description,
-                                        type
-                                    }) : handleEdit("assets", {
-                                        assetSection: selectedSection.id,
-                                        name,
-                                        code,
-                                        rate: 0,
-                                        price,
-                                        status: false,
-                                        lock: false,
-                                        numOfPeople,
-                                        location: { Latitude: lat, Longitude: long },
-                                        description,
-                                        type
-                                    }, selectedAsset.id)}
-                                    style={{ marginBottom: "4%" , marginLeft:"auto" , marginRight:"auto"}}
-                                />
-                                {/* <Button title="Add" onPress={() => handleAdd("assets", {
+                                        {/* <Button title="Add" onPress={() => handleAdd("assets", {
                                     assetSection: selectedSection.id,
                                     name,
                                     code,
@@ -1165,13 +1187,13 @@ assets.map((t, i) =>
                                     description,
                                     type
                                 })} disabled={!name || !code || !price || !description} /> */}
-</ScrollView></KeyboardAvoidingView>
+                                    </ScrollView></KeyboardAvoidingView>
                             </View>
-                            
+
                         </View>
-                       
+
                     </Modal>
-                   
+
                     :
                     null
             }
@@ -1376,7 +1398,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         height: height / 1.35,
-    width: width / 1.2,
+        width: width / 1.2,
         // margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
@@ -1416,10 +1438,13 @@ const styles = StyleSheet.create({
         //backgroundColor: "red",
         width: "30%",
         height: 30,
-        color: "#566573",
+        color: "#3b5e5e",
         alignItems: "center",
         //marginLeft: "auto",
-        marginRight: "2%"
+        marginRight: "2%",
+        borderRightColor: "#d9d9d9",
+        borderRightWidth: 1
+
     },
     textInputs: {
         borderWidth: 1,
@@ -1433,6 +1458,10 @@ const styles = StyleSheet.create({
         width: "28%",
         marginBottom: "auto",
         marginTop: "auto",
+
         //backgroundColor:"red"
+    },
+    listDetails: {
+        color: "#737373",
     }
 });
