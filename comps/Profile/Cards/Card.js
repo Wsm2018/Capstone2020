@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,16 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import Image from "react-native-scalable-image";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
+import * as Device from "expo-device";
 const { width, height } = Dimensions.get("screen");
 
 import firebase from "firebase";
@@ -19,6 +26,8 @@ import { Divider, Card as Cards } from "react-native-elements";
 import { Octicons } from "@expo/vector-icons";
 
 export default function Card(props) {
+  const [deviceType, setDeviceType] = useState(0);
+
   const cardInfo = props.card;
   const images = [
     require("../../../assets/images/creditcards/visa.png"),
@@ -40,6 +49,15 @@ export default function Card(props) {
       alert("Card removed");
     }
   };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+
+  // ------------------------------------------------------ USE EFFECTS -------------------------------------------------
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   const handleDeleteAlert = () => {
     Alert.alert(
@@ -59,124 +77,120 @@ export default function Card(props) {
 
   return (
     <View style={styles.container}>
-      {/* // <View style={styles.container}>
-    //   <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}> */}
-      {/* <Cards
-    //       elevation={2}
-    //       style={{
-    //         width: "100%",
-    //         // flex: 1,
-    //         borderWidth: 1,
-    //         // borderTopWidth: 0,
-    //         borderColor: "darkgray",
-    //       }}
-    //     >
-    //       <Text>{cardInfo.cardNumber}</Text>
-    //       <TouchableOpacity onPress={() => handleDelete()}>
-    //         <Text>X</Text>
-    //       </TouchableOpacity>
-    //     </Cards> */}
-      <Cards
-        // height={Dimensions.get("window").height / 4}
-        width={Dimensions.get("window").width / 1.3}
-        containerStyle={styles.card}
-      >
-        <View
-          style={{
-            marginBottom: 10,
-            flexDirection: "row-reverse",
-            justifyContent: "space-between",
-          }}
+      <View style={styles.two}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "height" : "padding"}
+          style={{ flex: 1 }}
         >
-          {cardInfo && cardInfo.cardType === "visa" ? (
-            <Image
-              source={images[0]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "master-card" ? (
-            <Image
-              source={images[1]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "amex" ? (
-            <Image
-              source={images[2]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "discover" ? (
-            <Image
-              source={images[3]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : cardInfo && cardInfo.cardType === "diners" ? (
-            <Image
-              source={images[4]}
-              width={Dimensions.get("window").width / 8}
-            />
-          ) : (
-            cardInfo &&
-            cardInfo.cardType === "jcb"(<Image source={images[5]} />)
-          )}
+          <Cards
+            width={Dimensions.get("window").width / 1.3}
+            containerStyle={styles.card}
+          >
+            <View
+              style={{
+                marginBottom: 10,
+                flexDirection: "row-reverse",
+                justifyContent: "space-between",
+              }}
+            >
+              {cardInfo && cardInfo.cardType === "visa" ? (
+                <Image
+                  source={images[0]}
+                  width={Dimensions.get("window").width / 8}
+                />
+              ) : cardInfo && cardInfo.cardType === "master-card" ? (
+                <Image
+                  source={images[1]}
+                  width={Dimensions.get("window").width / 8}
+                />
+              ) : cardInfo && cardInfo.cardType === "american-express" ? (
+                <Image
+                  source={images[2]}
+                  width={Dimensions.get("window").width / 8}
+                />
+              ) : cardInfo && cardInfo.cardType === "discover" ? (
+                <Image
+                  source={images[3]}
+                  width={Dimensions.get("window").width / 8}
+                />
+              ) : cardInfo && cardInfo.cardType === "diners-club" ? (
+                <Image
+                  source={images[4]}
+                  width={Dimensions.get("window").width / 8}
+                />
+              ) : cardInfo && cardInfo.cardType === "jcb" ? (
+                <Image source={images[5]} />
+              ) : null}
 
-          <TouchableOpacity onPress={() => handleDeleteAlert()}>
-            {/* <Text style={styles.notes}>X</Text> */}
-            <Octicons name="trashcan" size={20} color="#ede9eb" />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            // flexDirection: "row",
-            justifyContent: "space-between",
-            // alignItems: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <Image
-            width={Dimensions.get("window").width / 9}
-            // style={{ marginTop: 5 }}
-            source={require("../../../assets/images/chip.png")}
-          />
-          <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
-        </View>
+              <TouchableOpacity onPress={() => handleDeleteAlert()}>
+                <Octicons
+                  name="trashcan"
+                  size={deviceType === 1 ? 23 : 40}
+                  color="#ede9eb"
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <Image
+                width={Dimensions.get("window").width / 9}
+                source={require("../../../assets/images/chip.png")}
+              />
+              <Text style={styles.time}>{cardInfo && cardInfo.cardNumber}</Text>
+            </View>
 
-        <Divider style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }} />
+            <Divider
+              style={{ backgroundColor: "#dfe6e9", marginVertical: 10 }}
+            />
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={styles.notes}>{cardInfo && cardInfo.holderName}</Text>
-          <Text style={styles.notes}>{cardInfo && cardInfo.expiryDate}</Text>
-        </View>
-      </Cards>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text style={styles.notes}>
+                {cardInfo && cardInfo.holderName}
+              </Text>
+              <Text style={styles.notes}>
+                {cardInfo && cardInfo.expiryDate}
+              </Text>
+            </View>
+          </Cards>
+        </KeyboardAvoidingView>
+      </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
   },
   card: {
-    // backgroundColor: "rgb(221,216,216)",
-    backgroundColor: "rgb(26,148,149)",
+    backgroundColor: "#20365F",
     borderWidth: 0,
     borderRadius: 20,
   },
 
   time: {
-    // marginTop: 5,
-    fontSize: 25,
+    fontSize: responsiveScreenFontSize(2.5),
     color: "white",
   },
   notes: {
-    // alignItems: "flex-end",
-    fontSize: 16,
+    fontSize: responsiveScreenFontSize(2),
     color: "white",
     textTransform: "capitalize",
+  },
+  two: {
+    alignItems: "center",
+    width: "100%",
   },
 });
 
 Card.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

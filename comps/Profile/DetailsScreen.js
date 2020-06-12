@@ -39,18 +39,20 @@ export default function DetailsScreen(props) {
         {/* width={Dimensions.get("window").width / 1.02}
         style={styles.container} */}
         <View style={{ flex: 1 }}>
-          <Card
-            elevation={2}
+          <View
+            //elevation={2}
             style={{
               width: "100%",
               flex: 1,
               borderWidth: 1,
               borderTopWidth: 0,
               borderColor: "darkgray",
+              // borderRadius: 0,
+              backgroundColor: "white",
             }}
           >
             <BalanceScreen navigation={props.navigation} />
-          </Card>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

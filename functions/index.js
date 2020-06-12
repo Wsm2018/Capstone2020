@@ -293,6 +293,117 @@ exports.sendMail = functions.https.onRequest((request, response) => {
   });
 });
 
+exports.assetManager = functions.https.onCall(async (data, context) => {
+  if (data.type === "add") {
+    db.collection(data.collection).add(data.obj);
+  } else if (data.type === "update") {
+    db.collection(data.collection).doc(data.doc).set(data.obj);
+  } else {
+    db.collection(data.collection).doc(data.doc).delete();
+  }
+});
+
+exports.editBooking = functions.https.onCall(async (data, context) => {
+  var newAssetBooking = data.assetBooking;
+  newAssetBooking.endDateTime = data.endDateTime;
+  db.collection("payments").doc(data.paymentId).update({
+    totalAmount: data.totalAmount,
+    assetBooking: newAssetBooking,
+    status: data.status,
+  });
+  db.collection("assets")
+    .doc(data.assetBooking.asset.id)
+    .collection("assetBookings")
+    .doc(data.assetBooking.id)
+    .update({ endDateTime: data.endDateTime });
+
+  for (let i = 0; i < data.serviceBooking.length; i++) {
+    var serviceBooking = {
+      service: data.serviceBooking[i].service,
+      assetBooking: newAssetBooking,
+      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+      worker: data.serviceBooking[i].worker,
+      completed: false,
+    };
+
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
+
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
+  }
+});
+
+exports.manageServices = functions.https.onCall(async (data, context) => {
+  if (data.status === "add") {
+    var sId = "";
+    let add = await db
+      .collection("services")
+      .add(data.obj)
+      .then((docRef) => (sId = docRef.id));
+    for (let i = 0; i < data.weekDays.length; i++) {
+      if (data.weekDays[i].hours.length > 0) {
+        db.collection("services")
+          .doc(sId)
+          .collection("workingDays")
+          .doc(data.weekDays.day)
+          .set({ hours: data.weekDays[i].hours });
+      }
+    }
+  }
+
+  if (data.status === "update") {
+    db.collection("services")
+      .doc(data.selectedService.service.id)
+      .update(data.obj);
+
+    for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
+      if (
+        data.serviceWorkHoursDays[i].service === data.selectedService.service
+      ) {
+        for (
+          let k = 0;
+          k < data.serviceWorkHoursDays[i].workingDays.length;
+          k++
+        ) {
+          if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .set({
+                hours: data.serviceWorkHoursDays[i].workingDays[k].hours,
+              });
+          } else {
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .delete();
+          }
+        }
+      }
+    }
+  }
+});
+
+exports.manageServiceWorkers = functions.https.onCall(async (data, context) => {
+  db.collection("users").doc(data.user.id).update(data.user);
+});
 exports.addFriend = functions.https.onCall(async (data, context) => {
   console.log("data", data);
   db.collection("users")
@@ -417,9 +528,9 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
     status: data.status,
     promotionCode: null,
   });
-  const u = data.user;
-  u.points = u.points + 10;
-  db.collection("users").doc(data.user.id).update(u);
+  // var u = data.user;
+  // u.points = u.points + 10;
+  db.collection("users").doc(data.user.id).update(data.user);
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
@@ -641,7 +752,7 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
       .collection("users")
       .doc(data.uid)
       .collection("favorites")
-      .doc(data.asset.id)
+      .doc(data.asset)
       .set({ asset: data.asset });
     console.log("response ", response);
     return response;
@@ -740,6 +851,140 @@ exports.deleteGuestUser = functions.https.onRequest(
     response.send("All done");
   }
 );
+//-------------Ticket---------------//
+exports.sendSupportMessage = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  db.collection("customerSupport")
+    .doc(data.ticket.id)
+    .collection("liveChat")
+    .add({
+      from: data.user.id,
+      name: data.user.displayName,
+      text: data.text,
+      dateTime: new Date(),
+    });
+});
+exports.addTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  const response = await db.collection("customerSupport").add({
+    userId: data.user.id,
+    title: data.title,
+    description: data.description,
+    dateOpen: new Date(),
+    dateClose: "",
+    target: data.selectedValue,
+    status: "pending",
+    state: "onView",
+    supportAgentUid: "",
+    agentsContributed: [],
+    extraInfo: data.other,
+    priority: data.priority,
+  });
+  response.collection("liveChat").add({
+    from: "Auto Reply",
+    name: "Support Bot",
+    text: "Please wait until a Support Agent Joins!",
+    dateTime: new Date(),
+  });
+  return response;
+});
+exports.updateTicket = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "take") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "in Process",
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  } else if (data.query === "Approve") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      reportedUserUid: data.target,
+      dateClose: new Date(),
+      status: "Closed",
+      state: "Approved",
+    });
+  } else if (data.query === "close") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      status: "Closed",
+      dateClose: new Date(),
+      state: "Approved",
+    });
+  } else if (data.query === "transfare") {
+    db.collection("customerSupport").doc(data.ticket.id).update({
+      supportAgentUid: data.user.id,
+      agentsContributed: data.agents,
+    });
+  }
+});
+//--------------FAQ---------------//
+exports.FAQ = functions.https.onCall(async (data, context) => {
+  console.log("data", data);
+  if (data.query === "update") {
+    db.collection("faq").doc(data.id).update({
+      answer: data.answer,
+      answeredBy: data.answeredBy,
+      status: "approved",
+    });
+  }
+  if (data.query === "create") {
+    db.collection("faq").add({
+      date: new Date(),
+      question: data.question,
+      userId: data.user.id,
+      userDisplayName: data.user.displayName,
+      answer: "",
+      answeredBy: "",
+      status: "pending",
+    });
+  }
+  if (data.query === "delete") {
+    db.collection("faq").doc(data.id).delete();
+  }
+});
+//----------Reputation------------//
+exports.ReputationCalculation = functions.pubsub
+  .schedule("every 43800 minutes")
+  .onRun(async (context) => {
+    let users = [];
+    const info = await db.collection("users").get();
+    info.forEach((doc) => {
+      users.push({ id: doc.id, reputation: doc.data().reputation });
+    });
+    console.log("Fetched Users", users);
+    users.forEach(async (user) => {
+      console.log("Fetched User", user);
+      const reports = await db
+        .collectionGroup("customerSupport")
+        .where("reportedUserId", "==", user.id)
+        .where("state", "==", "Approved")
+        .get();
+      console.log("Report Index", reports);
+      if (reports.size !== 0) {
+        reports.forEach(async (report) => {
+          let msDiff =
+            report.dateClosed.toDate().getTime() - new Date().getTime();
+          let calculatedDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+          if (calculatedDiff > -30) {
+            await db
+              .collection("users")
+              .doc(user.id)
+              .update({
+                reputation: user.reputation - 1,
+              });
+          }
+        });
+      } else {
+        await db
+          .collection("users")
+          .doc(user.id)
+          .update({
+            reputation: user.reputation + 1,
+          });
+      }
+    });
+    return null;
+  });
+//--------------------------------//
 
 exports.redeemGiftCode = functions.https.onRequest(
   async (request, response) => {
@@ -833,4 +1078,20 @@ exports.deleteCar = functions.https.onCall(async (data, context) => {
     .doc(data.carId)
     .delete();
   console.log(response);
+});
+
+exports.addPromotion = functions.https.onCall(async (data, context) => {
+  console.log("addPromotion", data);
+  const response = await db.collection("promotionCodes").add({
+    code: data.code,
+    expiryDate: new Date(data.expiry),
+    percentage: data.percentage,
+  });
+  return response;
+});
+
+exports.deletePromotion = functions.https.onCall(async (data, context) => {
+  console.log("delete promotion ", data);
+  const response = await db.collection("promotionCodes").doc(data.id).delete();
+  return response;
 });

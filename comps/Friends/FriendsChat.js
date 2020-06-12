@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -14,7 +14,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { Divider } from "react-native-elements";
+import { Divider, Avatar } from "react-native-elements";
 
 export default function FriendsList(props) {
   const friend = props.navigation.getParam("friend");
@@ -23,6 +23,9 @@ export default function FriendsList(props) {
   const [to, setTo] = useState(null);
   const [chats, setChats] = useState(null);
   const [text, setText] = useState("");
+  const [onPresent, setOnPresent] = useState(true);
+
+  const chatView = useRef();
 
   // const [unsubscribe, setUnsubscribe] = useState(null);
   // const [unsubscribe2, setUnsubscribe2] = useState(null);
@@ -35,13 +38,14 @@ export default function FriendsList(props) {
       .where("to", "==", friend.id)
       .onSnapshot((queryBySnapshot) => {
         let tempFrom = [];
+        tempFrom.fil;
         queryBySnapshot.forEach((doc) => {
           tempFrom.push({ id: doc.id, ...doc.data(), from: true });
         });
         // console.log(tempFrom);
         setFrom(tempFrom);
       });
-    screenListener(unsubscribe);
+    return unsubscribe;
   };
 
   // --------------------------------TO----------------------------------
@@ -62,35 +66,34 @@ export default function FriendsList(props) {
         // update into read using their id
         let unread = tempFrom.filter((message) => message.status === "unread");
         if (unread.length > 0) {
-          const update = firebase.functions().httpsCallable("updateToRead");
-          const response = await update({ messages: unread });
+          unread.forEach((message) =>
+            db.collection("chats").doc(message.id).update({ status: "read" })
+          );
         }
-        // console.log(response);
 
         setTo(tempFrom);
       });
-    screenListener(unsubscribe);
+    return unsubscribe;
   };
 
   // -------------------------------CHAT-----------------------------------
   const handleChat = () => {
     let tempChat = from.concat(to);
     tempChat = tempChat.sort(
-      (a, b) => a.dateTime.toDate() - b.dateTime.toDate()
+      (a, b) => b.dateTime.toDate() - a.dateTime.toDate()
     );
     setChats(tempChat);
   };
 
   // --------------------------------SEND----------------------------------
   const send = async () => {
-    const message = firebase.functions().httpsCallable("sendMessage");
-    const response = await message({
+    db.collection("chats").add({
       to: friend.id,
       from: firebase.auth().currentUser.uid,
       text,
+      status: "unread",
       dateTime: new Date(),
     });
-    console.log("response", response);
 
     setText("");
   };
@@ -118,8 +121,12 @@ export default function FriendsList(props) {
 
   // ------------------------------------------------------------------
   useEffect(() => {
-    handleFrom();
-    handleTo();
+    const unsubscribeFrom = handleFrom();
+    const unsubscribeTo = handleTo();
+    return () => {
+      unsubscribeFrom();
+      unsubscribeTo();
+    };
   }, []);
 
   // ------------------------------------------------------------------
@@ -150,21 +157,53 @@ export default function FriendsList(props) {
           //  marginBottom: 20,
           height: "8%",
           maxHeight: "8%",
-          backgroundColor: "#20365F",
+          backgroundColor: "#185a9d",
           justifyContent: "flex-start",
           flex: 1,
           flexWrap: "wrap",
           paddingLeft: "4%",
         }}
       >
-        <Ionicons name="ios-arrow-back" size={35} color="white" />
-        <Text style={{ color: "white", fontSize: 24, paddingLeft: "3%" }}>
+        <Ionicons
+          name="ios-arrow-back"
+          size={35}
+          color="white"
+          onPress={() => props.navigation.goBack()}
+        />
+        <Avatar
+          rounded
+          source={{
+            uri: friend.photoURL,
+          }}
+          size="medium"
+          avatarStyle={{ paddingLeft: "3%" }}
+          containerStyle={{ marginLeft: "3%" }}
+        />
+        <Text style={{ color: "white", fontSize: 24, paddingLeft: "1%" }}>
           {" "}
           {friend.displayName}
         </Text>
       </View>
 
-      <ScrollView>
+      {/* --------------------------------SCROLLVIEW---------------------------------- */}
+      <ScrollView
+        style={{
+          transform: [{ scaleY: -1 }],
+        }}
+        ref={(ref) => (chatView.current = ref)}
+        onScrollToTop={() => console.log("yowhat")}
+        onScroll={(event) => {
+          if (event.nativeEvent.contentOffset.y > 300 && onPresent) {
+            // console.log("true");
+            setOnPresent(false);
+          }
+          if (event.nativeEvent.contentOffset.y < 300 && !onPresent) {
+            // console.log("false");
+            setOnPresent(true);
+          }
+        }}
+        scrollEventThrottle
+      >
         <View style={{ paddingTop: "5%" }}></View>
         {chats &&
           chats.map((chat) => (
@@ -180,11 +219,15 @@ export default function FriendsList(props) {
                   chat.from
                     ? {
                         textAlign: "right",
-                        backgroundColor: "#49679F",
+                        backgroundColor: "#3ea3a3",
                         alignSelf: "flex-end",
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        padding: "2%",
+                        // scaleX: -1,
+                        // scaleY: -1,
+                        transform: [{ scaleY: -1 }],
                       }
                     : {
                         textAlign: "left",
@@ -193,6 +236,10 @@ export default function FriendsList(props) {
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        padding: "2%",
+                        // scaleX: -1,
+                        // scaleY: -1,
+                        transform: [{ scaleY: -1 }],
                       }
                 }
                 key={chat.id}
@@ -206,13 +253,15 @@ export default function FriendsList(props) {
                           paddingRight: "4%",
                           fontSize: 20,
                           color: "white",
+                          padding: "2%",
                         }
                       : {
                           textAlign: "left",
                           paddingLeft: "4%",
                           paddingRight: "4%",
                           fontSize: 20,
-                          color: "#20365F",
+                          color: "#3ea3a3",
+                          padding: "2%",
                         }
                   }
                   key={chat.id}
@@ -224,6 +273,24 @@ export default function FriendsList(props) {
             </View>
           ))}
       </ScrollView>
+      {!onPresent && (
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            bottom: "25%",
+            right: "0%",
+            borderWidth: 1,
+            width: "15%",
+            height: "10%",
+            justifyContent: "center",
+          }}
+          onPress={() => chatView.current.scrollTo()}
+        >
+          <Text style={{ color: "red", textAlign: "center" }}>
+            Back to Present
+          </Text>
+        </TouchableOpacity>
+      )}
       <View
         style={{
           flexDirection: "row",
@@ -233,7 +300,7 @@ export default function FriendsList(props) {
           // height: "8%",
           minHeight: "12%",
           maxHeight: "8%",
-          backgroundColor: "#20365F",
+          backgroundColor: "#185a9d",
           justifyContent: "space-evenly",
           flex: 1,
           flexWrap: "wrap",
@@ -250,11 +317,13 @@ export default function FriendsList(props) {
             paddingLeft: "4%",
             backgroundColor: "white",
             borderRadius: 30,
+            marginTop: "3.5%",
+            paddingTop: "3%",
           }}
           numberOfLines={10}
           multiline={true}
           placeholder="Type here"
-          placeholderTextColor="black"
+          placeholderTextColor="darkgrey"
           onChangeText={setText}
           value={text}
         />
