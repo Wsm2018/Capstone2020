@@ -27,13 +27,20 @@ import ActionButton from "react-native-action-button";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 import moment from "moment";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 export default function EmployeesRequest(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const [modal, setModal] = useState(false);
   const [phone, setPhone] = useState(null);
+  const [deviceType, setDeviceType] = useState(0);
 
   const [heightVal, setHeightVal] = useState("85%");
 
@@ -58,7 +65,13 @@ export default function EmployeesRequest(props) {
 
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // ---------------------------------DOWNLOAD---------------------------------
   const handleDownload = async () => {
     // ---------------------------------
@@ -263,7 +276,7 @@ export default function EmployeesRequest(props) {
               style={{
                 alignSelf: "center",
                 fontWeight: "bold",
-                fontSize: 16,
+                fontSize: responsiveFontSize(1.8),
               }}
             >
               {user.displayName}
@@ -279,7 +292,9 @@ export default function EmployeesRequest(props) {
                 // paddingBottom:20
               }}
             >
-              <Text style={{ fontSize: 15 }}>Change Role: </Text>
+              <Text style={{ fontSize: 15, fontSize: responsiveFontSize(1.6) }}>
+                Change Role:{" "}
+              </Text>
               {Platform.OS === "android" ? (
                 <View
                   style={{
@@ -335,12 +350,17 @@ export default function EmployeesRequest(props) {
                       justifyContent: "space-between",
                     }}
                   >
-                    <Text style={{ fontSize: 17, color: "#667085" }}>
+                    <Text
+                      style={{
+                        fontSize: responsiveFontSize(1.6),
+                        color: "#667085",
+                      }}
+                    >
                       {selectedRole == "" ? "Select a role" : selectedRole}
                     </Text>
                     <Ionicons
                       name="md-arrow-dropdown"
-                      size={23}
+                      size={responsiveScreenHeight(10)}
                       color="#333333"
                       style={{
                         marginRight: "5%",
@@ -363,7 +383,7 @@ export default function EmployeesRequest(props) {
             <Text
               style={{
                 alignSelf: "center",
-                fontSize: 15,
+                fontSize: responsiveFontSize(1.5),
                 marginBottom: "2%",
               }}
             >
@@ -390,14 +410,28 @@ export default function EmployeesRequest(props) {
         <Text style={styles.cardTitle}> Employees Details</Text>
 
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+          <Text
+            style={{
+              fontSize: responsiveFontSize(1.8),
+              color: "black",
+              marginTop: "1%",
+            }}
+          >
             Role
           </Text>
-          <Text style={{ fontSize: 16, marginTop: "1%" }}>{user.role}</Text>
+          <Text style={{ fontSize: responsiveFontSize(1.8), marginTop: "1%" }}>
+            {user.role}
+          </Text>
         </View>
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black" }}>Email</Text>
-          <Text style={{ fontSize: 16, marginBottom: "5%" }}>{user.email}</Text>
+          <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+            Email
+          </Text>
+          <Text
+            style={{ fontSize: responsiveFontSize(1.8), marginBottom: "5%" }}
+          >
+            {user.email}
+          </Text>
         </View>
       </View>
 
@@ -405,23 +439,36 @@ export default function EmployeesRequest(props) {
         <Text style={styles.cardTitle}> Personal Informatioon</Text>
 
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+          <Text
+            style={{
+              fontSize: responsiveFontSize(1.8),
+              color: "black",
+              marginTop: "1%",
+            }}
+          >
             Name
           </Text>
-          <Text style={{ fontSize: 16, marginTop: "1%" }}>
+          <Text style={{ fontSize: responsiveFontSize(1.8), marginTop: "1%" }}>
             {user.firstName} {user.lastName}
           </Text>
         </View>
 
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black" }}>Date of Birth</Text>
-          <Text style={{ fontSize: 16 }}>
+          <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+            Date of Birth
+          </Text>
+          <Text style={{ fontSize: responsiveFontSize(1.8) }}>
             {moment(user.dateOfBirth).format("LL")}
           </Text>
         </View>
         <View style={styles.text}>
-          <Text style={{ fontSize: 16, color: "black" }}>Nationality</Text>
-          <Text style={{ fontSize: 16 }}> {user.country}</Text>
+          <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+            Nationality
+          </Text>
+          <Text style={{ fontSize: responsiveFontSize(1.8) }}>
+            {" "}
+            {user.country}
+          </Text>
         </View>
       </View>
       <View
@@ -479,7 +526,7 @@ export default function EmployeesRequest(props) {
             >
               <Text
                 style={{
-                  fontSize: 19,
+                  fontSize: responsiveFontSize(1.8),
                   textAlign: "center",
                 }}
               >
@@ -488,7 +535,7 @@ export default function EmployeesRequest(props) {
               <Text></Text>
               <Text
                 style={{
-                  fontSize: 14,
+                  fontSize: responsiveFontSize(1.2),
                   textAlign: "center",
                 }}
               >
@@ -512,14 +559,29 @@ export default function EmployeesRequest(props) {
                   onPress={handleDownload}
                   style={styles.greenButton}
                 >
-                  <Text style={{ color: "white" }}> Confirm</Text>
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: responsiveFontSize(1.8),
+                    }}
+                  >
+                    {" "}
+                    Confirm
+                  </Text>
                 </TouchableOpacity>
                 {/* ---------------------------------CANCEL--------------------------------- */}
                 <TouchableOpacity
                   style={styles.redButton}
                   onPress={() => setModal(false)}
                 >
-                  <Text style={{ color: "white" }}>Cancel</Text>
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: responsiveFontSize(1.8),
+                    }}
+                  >
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -529,10 +591,14 @@ export default function EmployeesRequest(props) {
       {editMode ? (
         <View style={styles.buttons}>
           <TouchableOpacity style={styles.greenButton} onPress={handleSave}>
-            <Text style={{ color: "white" }}>Save</Text>
+            <Text style={{ color: "white", fontSize: responsiveFontSize(1.8) }}>
+              Save
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.redButton} onPress={handleCancel}>
-            <Text style={{ color: "white" }}>Cancel</Text>
+            <Text style={{ color: "white", fontSize: responsiveFontSize(1.8) }}>
+              Cancel
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -616,7 +682,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   text: {
-    fontSize: 80,
+    fontSize: responsiveFontSize(1.8),
     marginLeft: "4%",
     marginRight: "5%",
     marginBottom: "1%",
@@ -638,7 +704,7 @@ const styles = StyleSheet.create({
     //flexDirection: "row",
   },
   text2: {
-    fontSize: 80,
+    fontSize: responsiveFontSize(1.8),
     marginLeft: "4%",
     marginBottom: "1%",
     flexDirection: "row",
@@ -672,7 +738,7 @@ const styles = StyleSheet.create({
   },
   greenButton: {
     backgroundColor: "#3ea3a3",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",
@@ -686,7 +752,7 @@ const styles = StyleSheet.create({
   },
   redButton: {
     backgroundColor: "#901616",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",
@@ -756,7 +822,7 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(1.8),
     // backgroundColor: "red",
     width: "100%",
     height: 35,

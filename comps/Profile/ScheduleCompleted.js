@@ -26,6 +26,12 @@ import {
   CollapseHeader,
   CollapseBody,
 } from "accordion-collapse-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 export default function ScheduleCompleted(props) {
   const [user, setUser] = useState({});
   const [date, setDate] = useState();
@@ -38,6 +44,7 @@ export default function ScheduleCompleted(props) {
     moment().format("YYYY-MM-DDTHH:MM:SS")
   );
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
+  const [deviceType, setDeviceType] = useState(0);
 
   useEffect(() => {
     db.collection("users")
@@ -61,7 +68,13 @@ export default function ScheduleCompleted(props) {
         setUser(data);
       });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   useEffect(() => {
     if (schedule.length > 0) {
       manageTime();
@@ -119,7 +132,7 @@ export default function ScheduleCompleted(props) {
     <View View style={styles.container}>
       <Text
         style={{
-          fontSize: 20,
+          fontSize: responsiveFontSize(2),
           color: "#185a9d",
           justifyContent: "center",
           alignSelf: "center",
@@ -133,15 +146,16 @@ export default function ScheduleCompleted(props) {
         style={{
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: "#185a9d",
-          height: 50,
+          // borderColor: "#185a9d",
+          height: responsiveScreenHeight(5),
           width: "87%",
           alignSelf: "center",
           // opacity: 0.8,
           paddingLeft: "3%",
           marginTop: 20,
-          // flexDirection: "row-reverse",
-          // justifyContent: "space-between",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
           backgroundColor: "white",
         }}
       >
@@ -168,20 +182,26 @@ export default function ScheduleCompleted(props) {
             },
             dateInput: {
               borderWidth: 0,
-              color: "#698eb3",
+              //  color: "#698eb3",
               alignItems: "flex-start",
               fontSize: 12,
               // marginRight: "68%",
-              backgroundColor: "white",
+              //  backgroundColor: "white",
             },
             placeholderText: {
-              fontSize: 16,
-              color: "#698eb3",
-              backgroundColor: "white",
+              fontSize: responsiveFontSize(1.5),
+              // color: "#698eb3",
+              justifyContent: "flex-end",
+              alignContent: "center",
+              alignSelf: "center",
+              //   backgroundColor: "white",
+              width: "100%",
+              height: responsiveScreenHeight(4),
             },
             dateText: {
               fontSize: 15,
-              color: "#698eb3",
+              // color: "#698eb3",
+              fontSize: responsiveFontSize(1.5),
             },
           }}
           onDateChange={(t) => setDate(t) || setToday(false)}
@@ -233,13 +253,24 @@ export default function ScheduleCompleted(props) {
                             rightSubtitle={
                               s.serviceBooking.assetBooking.asset.name
                             }
-                            titleStyle={{ color: "black", fontWeight: "bold" }}
+                            titleStyle={{
+                              color: "black",
+                              fontWeight: "bold",
+                              fontSize: responsiveFontSize(2),
+                            }}
                             rightTitleStyle={{
                               color: "black",
                               fontWeight: "bold",
+                              fontSize: responsiveFontSize(2),
                             }}
-                            subtitleStyle={{ color: "gray" }}
-                            rightSubtitleStyle={{ color: "gray" }}
+                            subtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            rightSubtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
                             bottomDivider
                           />
                         ))}
@@ -259,7 +290,7 @@ export default function ScheduleCompleted(props) {
                       paddingRight: "5%",
                     }}
                   >
-                    <Text style={styles.cardTitle}>No Scheduled Booking</Text>
+                    <Text style={styles.cardTitle}>No Work Done Today</Text>
                   </View>
                 </CollapseHeader>
               </Collapse>
@@ -268,7 +299,7 @@ export default function ScheduleCompleted(props) {
         </View>
       ) : (
         <View>
-          <View style={styles.two}>
+          <View style={styles.two2}>
             <Collapse>
               <CollapseHeader>
                 <View
@@ -277,35 +308,59 @@ export default function ScheduleCompleted(props) {
                     paddingRight: "5%",
                   }}
                 >
-                  <Text style={styles.cardTitle}>
-                    Today's Completed Work{" "}
-                    {todaySchedule[0].dateTime.split("T")[0]}
-                  </Text>
+                  {show &&
+                  show.filter((s) => s.dateTime.split("T")[0] === date).length >
+                    0 ? (
+                    <Text style={styles.cardTitle}>
+                      Work Done on:{" "}
+                      {
+                        show
+                          .filter((s) => s.dateTime.split("T")[0] === date)[0]
+                          .dateTime.split("T")[0]
+                      }
+                    </Text>
+                  ) : (
+                    <Text style={styles.cardTitle}>No Work On This Date</Text>
+                  )}
                 </View>
                 <CollapseBody>
                   <View>
                     <View>
-                      {todaySchedule.map((s) => (
-                        <ListItem
-                          key={s.id}
-                          title={s.dateTime.split("T")[1]}
-                          rightTitle={s.serviceBooking.service.name}
-                          subtitle={
-                            s.serviceBooking.assetBooking.asset.description
-                          }
-                          rightSubtitle={
-                            s.serviceBooking.assetBooking.asset.name
-                          }
-                          titleStyle={{ color: "black", fontWeight: "bold" }}
-                          rightTitleStyle={{
-                            color: "black",
-                            fontWeight: "bold",
-                          }}
-                          subtitleStyle={{ color: "gray" }}
-                          rightSubtitleStyle={{ color: "gray" }}
-                          bottomDivider
-                        />
-                      ))}
+                      {show &&
+                        show.map((s) =>
+                          s.dateTime.split("T")[0] === date ? (
+                            <ListItem
+                              key={s.id}
+                              title={s.dateTime.split("T")[1]}
+                              rightTitle={s.serviceBooking.service.name}
+                              subtitle={
+                                s.serviceBooking.assetBooking.asset.description
+                              }
+                              rightSubtitle={
+                                s.serviceBooking.assetBooking.asset.name
+                              }
+                              titleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              rightTitleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              subtitleStyle={{
+                                color: "gray",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              rightSubtitleStyle={{
+                                color: "gray",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              bottomDivider
+                            />
+                          ) : null
+                        )}
                     </View>
                   </View>
                 </CollapseBody>
@@ -325,10 +380,10 @@ const styles = StyleSheet.create({
     // height: Math.round(Dimensions.get("window").height),
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(2),
     // backgroundColor: "red",
     width: "100%",
-    height: 25,
+    // height: 25,
     color: "#185a9d",
     fontWeight: "bold",
   },

@@ -27,7 +27,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
-export default ({ item }) => {
+export default ({ item, user }) => {
   const [editFlag, setEditFlag] = useState(true);
   const [viewNews, setViewNews] = useState(false);
   const [titleEdit, setTitleEdit] = useState(item.title);
@@ -134,13 +134,13 @@ export default ({ item }) => {
           {item.datePublished === item.endDate ? (
             <Text style={{ fontSize: 16.5, color: "#20365F" }}>Until</Text>
           ) : (
-              <Ionicons
-                name="ios-time"
-                size={20}
-                color="#20365F"
-                style={{ paddingTop: "0.3%" }}
-              />
-            )}
+            <Ionicons
+              name="ios-time"
+              size={20}
+              color="#20365F"
+              style={{ paddingTop: "0.3%" }}
+            />
+          )}
           {item.datePublished === item.endDate ? (
             <Text
               style={{ paddingLeft: "1%", fontSize: 16.5, color: "#20365F" }}
@@ -148,12 +148,12 @@ export default ({ item }) => {
               {moment(item.datePublished.toDate()).format("LL")}
             </Text>
           ) : (
-              <Text
-                style={{ paddingLeft: "3%", fontSize: 16.5, color: "#20365F" }}
-              >
-                {moment(item.datePublished.toDate()).format("LL")}
-              </Text>
-            )}
+            <Text
+              style={{ paddingLeft: "3%", fontSize: 16.5, color: "#20365F" }}
+            >
+              {moment(item.datePublished.toDate()).format("LL")}
+            </Text>
+          )}
           {viewNews === true ? (
             <Animatable.View animation="flipInX" style={{ width: "100%" }}>
               <TouchableOpacity
@@ -186,27 +186,27 @@ export default ({ item }) => {
               </TouchableOpacity>
             </Animatable.View>
           ) : (
-              <Animatable.View animation="flipInX" style={{ width: "100%" }}>
-                <TouchableOpacity
-                  onPress={() => setViewNews(!viewNews)}
-                  style={{
-                    borderRadius: 5,
-                    borderColor: "white",
-                    borderWidth: 1,
-                    marginLeft: "50%",
-                    width: "9%",
-                    backgroundColor: "#185a9d",
-                  }}
-                >
-                  <Ionicons
-                    name="md-more"
-                    size={24}
-                    color="white"
-                    style={{ paddingLeft: "43%" }}
-                  />
-                </TouchableOpacity>
-              </Animatable.View>
-            )}
+            <Animatable.View animation="flipInX" style={{ width: "100%" }}>
+              <TouchableOpacity
+                onPress={() => setViewNews(!viewNews)}
+                style={{
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 1,
+                  marginLeft: "50%",
+                  width: "9%",
+                  backgroundColor: "#185a9d",
+                }}
+              >
+                <Ionicons
+                  name="md-more"
+                  size={24}
+                  color="white"
+                  style={{ paddingLeft: "43%" }}
+                />
+              </TouchableOpacity>
+            </Animatable.View>
+          )}
 
           {/* <MaterialIcons name="unfold-more" size={30} color="black" style={{alignSelf:'flex-end', paddingLeft:'55%'}} /> */}
         </View>
@@ -225,7 +225,8 @@ export default ({ item }) => {
               {/* Description:  */}
               {item.description}
             </Text>
-            {item.endDate === item.datePublished ? null : (
+            {item.endDate === item.datePublished ? null : user.role ===
+                "admin" || user.role === "manager" ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -258,7 +259,7 @@ export default ({ item }) => {
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
+            ) : null}
           </Animatable.View>
         )}
       </Card>
@@ -278,19 +279,19 @@ export default ({ item }) => {
       <Button title="X" onPress={() => handleDelete(item)} /> */}
     </Animatable.View>
   ) : (
-      <Animatable.View
-        animation="flipInY"
-        style={{ paddingTop: "1%", flexDirection: "column", marginLeft: "12%" }}
-      >
-        <Card
-          title={
-            <View style={{ flexDirection: "row", height: "20%" }}>
-              <TouchableOpacity onPress={() => setEditFlag(!editFlag)}>
-                <Text>
-                  <MaterialIcons name="cancel" size={30} color="#BB1427" />
-                </Text>
-              </TouchableOpacity>
-              {/* <Text
+    <Animatable.View
+      animation="flipInY"
+      style={{ paddingTop: "1%", flexDirection: "column", marginLeft: "12%" }}
+    >
+      <Card
+        title={
+          <View style={{ flexDirection: "row", height: "20%" }}>
+            <TouchableOpacity onPress={() => setEditFlag(!editFlag)}>
+              <Text>
+                <MaterialIcons name="cancel" size={30} color="#BB1427" />
+              </Text>
+            </TouchableOpacity>
+            {/* <Text
               style={{
                 color: "#185a9d",
                 fontSize: 18,
@@ -301,7 +302,7 @@ export default ({ item }) => {
             >
               Title:{" "}
             </Text> */}
-              {/* <Input
+            {/* <Input
                       inputContainerStyle={{
                         borderBottomWidth: 0,
                         // color: "white",
@@ -322,229 +323,6 @@ export default ({ item }) => {
                       errorStyle={{ color: registerEmailError }}
                       renderErrorMessage
                     /> */}
-              <Input
-                inputContainerStyle={{
-                  borderBottomWidth: 0,
-                  // color: "white",
-                }}
-                containerStyle={{
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#185a9d",
-                  height: "50%",
-                  width: "50%",
-                  alignSelf: "center",
-                  marginLeft: "18%",
-                  opacity: 0.8,
-                  paddingLeft: "2%",
-                  marginTop: "2%",
-                  //paddingBottom: "1%",
-                }}
-                label="News Title"
-                labelStyle={{ fontSize: 18 }}
-                maxLength={28}
-                onChangeText={setTitleEdit}
-                placeholder={"" + item.title}
-                placeholderTextColor={"#185a9d"}
-                value={titleEdit}
-              />
-            </View>
-          }
-          image={item.image == null ? null : { uri: item.image }}
-          containerStyle={{
-            backgroundColor: "#fff",
-            borderColor: "#185a9d",
-            borderRadius: 10,
-            width: "80%",
-            shadowOpacity: 20,
-            shadowColor: "#185a9d",
-            borderWidth: 2,
-          }}
-          titleStyle={{
-            color: "#185a9d",
-            alignSelf: "center",
-            paddingLeft: "5%",
-          }}
-        >
-          <Animatable.View
-            animation="fadeIn"
-            style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
-          >
-            <TouchableOpacity
-              onPress={_pickImage}
-              style={
-                {
-                  //   marginLeft: "10%",
-                }
-              }
-            >
-              <Text>
-                <MaterialCommunityIcons
-                  name="camera-plus"
-                  size={30}
-                  color="#3ea3a3"
-                />
-              </Text>
-            </TouchableOpacity>
-          </Animatable.View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignContent: "flex-start",
-              paddingLeft: "2%",
-              // justifyContent: "flex-start",
-            }}
-          >
-            <Text
-              style={{
-                color: "#94A6AE",
-                fontSize: 18,
-                fontWeight: "bold",
-                paddingTop: "3%",
-              }}
-            >
-              Start Date {"    "}
-            </Text>
-            <DatePicker
-              style={{ width: "50%" }}
-              date={dateEdit}
-              mode="date"
-              placeholder="Published date "
-              format="MM/DD/YYYY"
-              confirmBtnText="Done"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  position: "absolute",
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0,
-                },
-                btnTextConfirm: {
-                  color: "#fff",
-                  fontSize: 18,
-                  fontWeight: "bold",
-                },
-                btnTextCancel: {
-                  color: "#fff",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                },
-
-                dateInput: {
-                  // marginLeft: 36,
-                  borderColor: "#185a9d",
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  width: "50%",
-                  height: "80%",
-                  color: "#185a9d",
-                  fontSize: 18,
-                },
-
-                // dateTouchBody:{
-                //   backgroundColor:'red'
-                // },
-                datePicker: {
-                  backgroundColor: "white",
-                },
-                datePickerCon: {
-                  backgroundColor: "#185a9d",
-                  borderWidth: 1,
-                  borderRadius: 25,
-                  // height:'0%'
-                },
-                // ... You can check the source to find the other keys.
-              }}
-              showIcon={true}
-              iconComponent={
-                <MaterialCommunityIcons
-                  name="calendar-today"
-                  size={30}
-                  color="#185a9d"
-                />
-              }
-              onDateChange={(dateEdit) => setDateEdit(dateEdit)}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignContent: "flex-start",
-              paddingLeft: "2%",
-              // justifyContent: "flex-start",
-            }}
-          >
-            <Text
-              style={{
-                color: "#94A6AE",
-                fontSize: 18,
-                fontWeight: "bold",
-                paddingTop: "3%",
-                paddingRight: "2%",
-              }}
-            >
-              End Date {"     "}
-            </Text>
-
-            <DatePicker
-              style={{ width: "50%" }}
-              date={endDateEdit}
-              mode="date"
-              placeholder="Published date "
-              format="MM/DD/YYYY"
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  // position: "absolute",
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0,
-                },
-                dateInput: {
-                  //  marginLeft: '3.3%',
-                  borderColor: "#185a9d",
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  width: "70%",
-                  height: "80%",
-                  color: "#185a9d",
-                  fontSize: 18,
-                },
-                // ... You can check the source to find the other keys.
-              }}
-              showIcon={true}
-              iconComponent={
-                <MaterialCommunityIcons
-                  name="calendar-outline"
-                  size={30}
-                  color="#185a9d"
-                />
-              }
-              onDateChange={(endDateEdit) => setEndDateEdit(endDateEdit)}
-            />
-          </View>
-
-          <View
-            style={{
-              marginTop: "2%",
-              marginBottom: "3%",
-              flexDirection: "row",
-              // justifyContent: "space-evenly",
-              // paddingLeft: "2%",
-            }}
-          >
-            {/* <Text
-            style={{
-              color: "#185a9d",
-              fontSize: 18,
-              fontWeight: "bold",
-              paddingTop: "2%",
-            }}
-          >
-            Description:{" "}
-          </Text> */}
             <Input
               inputContainerStyle={{
                 borderBottomWidth: 0,
@@ -554,48 +332,271 @@ export default ({ item }) => {
                 borderRadius: 8,
                 borderWidth: 1,
                 borderColor: "#185a9d",
-                height: "100%",
-                width: "100%",
+                height: "50%",
+                width: "50%",
                 alignSelf: "center",
-                // /  marginLeft:'18%',
+                marginLeft: "18%",
                 opacity: 0.8,
                 paddingLeft: "2%",
-                paddingBottom: "5%",
-                position: "relative",
-                //     marginTop: 20,
+                marginTop: "2%",
+                //paddingBottom: "1%",
               }}
-              multiline={true}
-              label="Update News"
+              label="News Title"
               labelStyle={{ fontSize: 18 }}
-              maxLength={400}
-              onChangeText={setDescriptionEdit}
-              placeholder={"" + item.description}
-              value={descriptionEdit}
+              maxLength={28}
+              onChangeText={setTitleEdit}
+              placeholder={"" + item.title}
+              placeholderTextColor={"#185a9d"}
+              value={titleEdit}
             />
           </View>
-
+        }
+        image={item.image == null ? null : { uri: item.image }}
+        containerStyle={{
+          backgroundColor: "#fff",
+          borderColor: "#185a9d",
+          borderRadius: 10,
+          width: "80%",
+          shadowOpacity: 20,
+          shadowColor: "#185a9d",
+          borderWidth: 2,
+        }}
+        titleStyle={{
+          color: "#185a9d",
+          alignSelf: "center",
+          paddingLeft: "5%",
+        }}
+      >
+        <Animatable.View
+          animation="fadeIn"
+          style={{ alignItems: "flex-end", justifyContent: "flex-end" }}
+        >
           <TouchableOpacity
-            style={{
-              backgroundColor: "#3ea3a3",
-              // height: '20%',
-              width: "26%",
-              alignSelf: "center",
-              justifyContent: "center",
-              alignItems: "center",
-              marginStart: "2%",
-              marginEnd: "3%",
-              borderRadius: 8,
-              // marginBottom: 0,
-              // marginTop: 20,
-            }}
-            onPress={() => handleEdit()}
+            onPress={_pickImage}
+            style={
+              {
+                //   marginLeft: "10%",
+              }
+            }
           >
-            <Text style={{ padding: "10%", fontSize: 18, color: "white" }}>
-              Edit
-          </Text>
+            <Text>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={30}
+                color="#3ea3a3"
+              />
+            </Text>
           </TouchableOpacity>
-        </Card>
-        {/* 
+        </Animatable.View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignContent: "flex-start",
+            paddingLeft: "2%",
+            // justifyContent: "flex-start",
+          }}
+        >
+          <Text
+            style={{
+              color: "#94A6AE",
+              fontSize: 18,
+              fontWeight: "bold",
+              paddingTop: "3%",
+            }}
+          >
+            Start Date {"    "}
+          </Text>
+          <DatePicker
+            style={{ width: "50%" }}
+            date={dateEdit}
+            mode="date"
+            placeholder="Published date "
+            format="MM/DD/YYYY"
+            confirmBtnText="Done"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: "absolute",
+                left: 0,
+                top: 4,
+                marginLeft: 0,
+              },
+              btnTextConfirm: {
+                color: "#fff",
+                fontSize: 18,
+                fontWeight: "bold",
+              },
+              btnTextCancel: {
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "bold",
+              },
+
+              dateInput: {
+                // marginLeft: 36,
+                borderColor: "#185a9d",
+                borderRadius: 10,
+                borderWidth: 1,
+                width: "50%",
+                height: "80%",
+                color: "#185a9d",
+                fontSize: 18,
+              },
+
+              // dateTouchBody:{
+              //   backgroundColor:'red'
+              // },
+              datePicker: {
+                backgroundColor: "white",
+              },
+              datePickerCon: {
+                backgroundColor: "#185a9d",
+                borderWidth: 1,
+                borderRadius: 25,
+                // height:'0%'
+              },
+              // ... You can check the source to find the other keys.
+            }}
+            showIcon={true}
+            iconComponent={
+              <MaterialCommunityIcons
+                name="calendar-today"
+                size={30}
+                color="#185a9d"
+              />
+            }
+            onDateChange={(dateEdit) => setDateEdit(dateEdit)}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignContent: "flex-start",
+            paddingLeft: "2%",
+            // justifyContent: "flex-start",
+          }}
+        >
+          <Text
+            style={{
+              color: "#94A6AE",
+              fontSize: 18,
+              fontWeight: "bold",
+              paddingTop: "3%",
+              paddingRight: "2%",
+            }}
+          >
+            End Date {"     "}
+          </Text>
+
+          <DatePicker
+            style={{ width: "50%" }}
+            date={endDateEdit}
+            mode="date"
+            placeholder="Published date "
+            format="MM/DD/YYYY"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                // position: "absolute",
+                left: 0,
+                top: 4,
+                marginLeft: 0,
+              },
+              dateInput: {
+                //  marginLeft: '3.3%',
+                borderColor: "#185a9d",
+                borderRadius: 10,
+                borderWidth: 1,
+                width: "70%",
+                height: "80%",
+                color: "#185a9d",
+                fontSize: 18,
+              },
+              // ... You can check the source to find the other keys.
+            }}
+            showIcon={true}
+            iconComponent={
+              <MaterialCommunityIcons
+                name="calendar-outline"
+                size={30}
+                color="#185a9d"
+              />
+            }
+            onDateChange={(endDateEdit) => setEndDateEdit(endDateEdit)}
+          />
+        </View>
+
+        <View
+          style={{
+            marginTop: "2%",
+            marginBottom: "3%",
+            flexDirection: "row",
+            // justifyContent: "space-evenly",
+            // paddingLeft: "2%",
+          }}
+        >
+          {/* <Text
+            style={{
+              color: "#185a9d",
+              fontSize: 18,
+              fontWeight: "bold",
+              paddingTop: "2%",
+            }}
+          >
+            Description:{" "}
+          </Text> */}
+          <Input
+            inputContainerStyle={{
+              borderBottomWidth: 0,
+              // color: "white",
+            }}
+            containerStyle={{
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: "#185a9d",
+              height: "100%",
+              width: "100%",
+              alignSelf: "center",
+              // /  marginLeft:'18%',
+              opacity: 0.8,
+              paddingLeft: "2%",
+              paddingBottom: "5%",
+              position: "relative",
+              //     marginTop: 20,
+            }}
+            multiline={true}
+            label="Update News"
+            labelStyle={{ fontSize: 18 }}
+            maxLength={400}
+            onChangeText={setDescriptionEdit}
+            placeholder={"" + item.description}
+            value={descriptionEdit}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#3ea3a3",
+            // height: '20%',
+            width: "26%",
+            alignSelf: "center",
+            justifyContent: "center",
+            alignItems: "center",
+            marginStart: "2%",
+            marginEnd: "3%",
+            borderRadius: 8,
+            // marginBottom: 0,
+            // marginTop: 20,
+          }}
+          onPress={() => handleEdit()}
+        >
+          <Text style={{ padding: "10%", fontSize: 18, color: "white" }}>
+            Edit
+          </Text>
+        </TouchableOpacity>
+      </Card>
+      {/* 
       {imageEdit != null ? (
         <Image
           source={{ uri: imageEdit }}
@@ -611,8 +612,8 @@ export default ({ item }) => {
       <TouchableOpacity onPress={() => handleEdit()}>
         <Text>Edit</Text>
       </TouchableOpacity> */}
-      </Animatable.View>
-    );
+    </Animatable.View>
+  );
 };
 
 const styles = StyleSheet.create({

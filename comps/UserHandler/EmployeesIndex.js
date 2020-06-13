@@ -103,6 +103,9 @@ export default function EmployeesRequest(props) {
     const type = await Device.getDeviceTypeAsync();
     setDeviceType(type);
   };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // ---------------------------------DOWNLOAD---------------------------------
   const handleDownload = async (user) => {
     // ---------------------------------
@@ -242,6 +245,7 @@ export default function EmployeesRequest(props) {
                   borderWidth: 1,
                   borderColor: "#fafafa",
                   backgroundColor: "#fafafa",
+                  // height: "70%",
                   fontSize: responsiveScreenFontSize(1.8),
                 }}
                 style={{
@@ -295,7 +299,7 @@ export default function EmployeesRequest(props) {
                         rightAvatar={
                           <Ionicons
                             name="ios-arrow-forward"
-                            size={24}
+                            size={responsiveScreenHeight(2)}
                             color="black"
                           />
                         }

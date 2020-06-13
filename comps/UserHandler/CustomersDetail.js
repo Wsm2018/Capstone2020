@@ -11,7 +11,13 @@ import { Ionicons } from "@expo/vector-icons";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 import { UserInterfaceIdiom } from "expo-constants";
@@ -20,6 +26,7 @@ export default function EmployeesRequest(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [friends, setFriends] = useState(null);
   const [marginVal, setMargin] = useState(0);
+  const [deviceType, setDeviceType] = useState(0);
 
   const user = props.navigation.getParam("user");
   // ------------------------------CURRENT USER------------------------------------
@@ -31,7 +38,13 @@ export default function EmployeesRequest(props) {
 
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // --------------------------------FRIENDS----------------------------------
   const handleFriends = async () => {
     db.collection("users")
@@ -125,18 +138,34 @@ export default function EmployeesRequest(props) {
           </Text>
 
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+            <Text
+              style={{
+                fontSize: responsiveFontSize(1.8),
+                color: "black",
+                marginTop: "1%",
+              }}
+            >
               Role
             </Text>
-            <Text style={{ fontSize: 16, marginTop: "1%" }}>{user.role}</Text>
+            <Text
+              style={{ fontSize: responsiveFontSize(1.8), marginTop: "1%" }}
+            >
+              {user.role}
+            </Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>ID</Text>
-            <Text style={{ fontSize: 16 }}>{user.id}</Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+              ID
+            </Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8) }}>{user.id}</Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>Email</Text>
-            <Text style={{ fontSize: 16, marginBottom: "5%" }}>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+              Email
+            </Text>
+            <Text
+              style={{ fontSize: responsiveFontSize(1.8), marginBottom: "5%" }}
+            >
               {user.email}
             </Text>
           </View>
@@ -151,30 +180,52 @@ export default function EmployeesRequest(props) {
           </Text>
 
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+            <Text
+              style={{
+                fontSize: responsiveFontSize(1.8),
+                color: "black",
+                marginTop: "1%",
+              }}
+            >
               Balance
             </Text>
-            <Text style={{ fontSize: 16, marginTop: "1%" }}>
+            <Text
+              style={{ fontSize: responsiveFontSize(1.8), marginTop: "1%" }}
+            >
               {user.balance}
             </Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
               Outstanding Balance
             </Text>
-            <Text style={{ fontSize: 16 }}>{user.outstandingBalance}</Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8) }}>
+              {user.outstandingBalance}
+            </Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>Referral Code</Text>
-            <Text style={{ fontSize: 16 }}>{user.referralCode}</Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+              Referral Code
+            </Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8) }}>
+              {user.referralCode}
+            </Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>Teputation</Text>
-            <Text style={{ fontSize: 16 }}>{user.reputation}</Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+              Teputation
+            </Text>
+            <Text style={{ fontSize: responsiveFontSize(1.8) }}>
+              {user.reputation}
+            </Text>
           </View>
           <View style={styles.text}>
-            <Text style={{ fontSize: 16, color: "black" }}>Tokens</Text>
-            <Text style={{ fontSize: 16, marginBottom: "5%" }}>
+            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
+              Tokens
+            </Text>
+            <Text
+              style={{ fontSize: responsiveFontSize(1.8), marginBottom: "5%" }}
+            >
               {user.tokens}
             </Text>
           </View>
@@ -200,11 +251,18 @@ export default function EmployeesRequest(props) {
                 >
                   QR Code
                 </Text>
-                <Ionicons name="md-arrow-dropdown" size={30} color="#5c5b5b" />
+                <Ionicons
+                  name="md-arrow-dropdown"
+                  size={responsiveScreenHeight(4)}
+                  color="#5c5b5b"
+                />
               </View>
             </CollapseHeader>
             <CollapseBody>
-              <Avatar source={{ uri: user.qrCode }} size="xlarge" />
+              <Avatar
+                source={{ uri: user.qrCode }}
+                size={responsiveScreenHeight(20)}
+              />
             </CollapseBody>
           </Collapse>
         </View>
@@ -228,7 +286,11 @@ export default function EmployeesRequest(props) {
                 >
                   Friends No: {friends && friends.length}
                 </Text>
-                <Ionicons name="md-arrow-dropdown" size={30} color="#5c5b5b" />
+                <Ionicons
+                  name="md-arrow-dropdown"
+                  size={responsiveScreenHeight(4)}
+                  color="#5c5b5b"
+                />
               </View>
             </CollapseHeader>
             <CollapseBody>
@@ -239,6 +301,7 @@ export default function EmployeesRequest(props) {
                       key={i}
                       leftAvatar={{ source: { uri: friend.photoURL } }}
                       title={friend.displayName}
+                      titleStyle={{ fontSize: responsiveFontSize(1) }}
                       subtitle={friend.email}
                       bottomDivider
                       containerStyle={{ width: "75%" }}
@@ -353,7 +416,7 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   ipadcardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(1.8),
     // backgroundColor: "red",
     width: "100%",
     height: 35,
@@ -363,7 +426,7 @@ const styles = StyleSheet.create({
     // marginLeft: "2%",
   },
   phonecardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(1.8),
     // backgroundColor: "red",
     width: "100%",
     height: 35,

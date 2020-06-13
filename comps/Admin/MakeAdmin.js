@@ -187,6 +187,6 @@ const styles = StyleSheet.create({
   },
 });
 MakeAdmin.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

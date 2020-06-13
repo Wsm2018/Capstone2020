@@ -24,7 +24,12 @@ import { AsyncStorage } from "react-native";
 import ExtendServices from "./ExtendServices";
 import { getIconType, Header, Card, Divider } from "react-native-elements";
 import { FlatList } from "react-native";
-import { FontAwesome5, Fontisto, Ionicons, AntDesign } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Fontisto,
+  Ionicons,
+  AntDesign,
+} from "@expo/vector-icons";
 
 export default function BookingHistory(props) {
   const [assetBookings, setAssetBookings] = useState([]);
@@ -52,6 +57,9 @@ export default function BookingHistory(props) {
   const [assetSections, setAssetSections] = useState([]);
   const [displayServices, setDisplayServices] = useState([]);
   const SB = useRef();
+
+  //Card styling
+  const [historyDetails, setHistoryDetails] = useState(false);
 
   useEffect(() => {
     getBookings();
@@ -442,7 +450,7 @@ export default function BookingHistory(props) {
   const getType = (s) => {
     var section = assetSections.filter((o) => o.id == s)[0];
     var type = assetTypes.filter((o) => o.id == section.assetType)[0];
-    console.log('Type Name: ', type.name)
+    console.log("Type Name: ", type.name);
     return type.name;
   };
 
@@ -548,72 +556,294 @@ export default function BookingHistory(props) {
             data={payments}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
-              <Card containerStyle={{ width: "90%", marginLeft: "5%",borderRadius:8 }}>
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+              <Card
+                containerStyle={{
+                  width: "90%",
+                  marginLeft: "5%",
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: "#185a9d",
+                }}
+                title={
+                  <View style={{ paddingTop: "3%", padding: "2%" }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      {/* <Text>
+            {getType(item.assetBooking.asset.assetSection) ===
+            "Parking" ? (
+              <FontAwesome5 name="car" size={24} color="black" />
+            ) : (
+              <Fontisto name="room" size={24} color="black" />
+            )}
+          </Text> */}
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "#185a9d",
+                        }}
+                      >
+                        {" "}
+                        Booked a{" "}
+                        {assetSections.length > 0
+                          ? getType(item.assetBooking.asset.assetSection)
+                          : "Loading ..."}
+                      </Text>
+                      {!item.status === true ? (
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "#901616",
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderColor: "#901616",
+                            // marginTop: "10%",
+                            marginLeft: assetSections.length > 0 &&
+                            getType(item.assetBooking.asset.assetSection) === "Parking" ? '35%' :'22%',
+                            //   textDecorationLine:'underline',
+                          }}
+                        >
+                          {!item.status ? "UNPAID" : "PAID"}
+                        </Text>
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "#3ea3a3",
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderColor: "#3ea3a3",
+                            // marginTop: "10%",
+                            marginLeft: assetSections.length > 0 &&
+                            getType(item.assetBooking.asset.assetSection) === "Parking" ? '35%' :'22%',
+                            //   textDecorationLine:'underline',
+                          }}
+                        >
+                          {!item.status ? "UNPAID" : "PAID"}
+                        </Text>
+                      )}
+                    </View>
+                    {/* <Text></Text>
+          <Divider/>
+          <Text></Text> */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      {/* <Text>
+            {getType(item.assetBooking.asset.assetSection) ===
+            "Parking" ? (
+              <FontAwesome5 name="car" size={24} color="black" />
+            ) : (
+              <Fontisto name="room" size={24} color="black" />
+            )}
+          </Text> */}
+                      <Ionicons
+                        name="ios-time"
+                        size={16}
+                        color="#B9B9B9"
+                        style={{ paddingTop: "2%" }}
+                      />
+                      <Text
+                        style={{
+                          paddingLeft: "1%",
+                          fontSize: 14,
+                          color: "#B9B9B9",
+                          paddingTop: "1.8%",
+                        }}
+                      >
+                        {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                        {converte(item.assetBooking.startDateTime)}
+                      </Text>
+                    </View>
+                    <Text></Text>
+                  </View>
+                }
+                image={
+                  //Parking
+                  assetSections.length > 0 &&
+                  getType(item.assetBooking.asset.assetSection) === "Parking"
+                    ? require("../../assets/Parking.jpg")
+                    : //ClassRoom
+                    assetSections.length > 0 &&
+                      getType(item.assetBooking.asset.assetSection) ===
+                        "Class Rooms"
+                    ? require("../../assets/ClassRoom.jpg")
+                    : //StudyRoom
+                    assetSections.length > 0 &&
+                      getType(item.assetBooking.asset.assetSection) ===
+                        "Study Rooms"
+                    ? require("../../assets/studyroomImage.jpg")
+                    : //Tutor (ChangeIamge)
+                      assetSections.length > 0 &&
+                      getType(item.assetBooking.asset.assetSection) ===
+                        "Tutor" &&
+                      require("../../assets/tutor.jpg")
+                }
+              >
+                <Text></Text>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+                    Section:{" "}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {assetSections.length > 0
+                      ? getSection(item.assetBooking.asset.assetSection)
+                      : "Loading ..."}
+                  </Text>
 
-                {/* <Text>
-                  {getType(item.assetBooking.asset.assetSection) ===
-                  "Parking" ? (
-                    <FontAwesome5 name="car" size={24} color="black" />
-                  ) : (
-                    <Fontisto name="room" size={24} color="black" />
-                  )}
-                </Text> */}
-                <Text style={{fontSize:18, fontWeight:'bold',color:'#185a9d'}}>
-                  {/* {' '}Type{" "} */}
-                  {assetSections.length > 0
-                    ? getType(item.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-               
+                  <Text></Text>
+
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+
+                    {  assetSections.length > 0 &&
+                      getType(item.assetBooking.asset.assetSection) ===
+                        "Class Rooms" ?'  Class:': '  Code:'}
+                    {/* {"  "}Code:{""} */}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.asset.code}
+                  </Text>
                 </View>
-                {/* <Text></Text>
-                <Divider/>
-                <Text></Text> */}
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-
-                {/* <Text>
-                  {getType(item.assetBooking.asset.assetSection) ===
-                  "Parking" ? (
-                    <FontAwesome5 name="car" size={24} color="black" />
-                  ) : (
-                    <Fontisto name="room" size={24} color="black" />
-                  )}
-                </Text> */}
-               <Ionicons
-            name="ios-time"
-            size={16}
-            color="#B9B9B9"
-            style={{ paddingTop: "2%" }}
-          />
-                <Text style={{ paddingLeft: "1%", fontSize: 14, color: "#B9B9B9",paddingTop: "1.8%" }}>
-             {item.assetBooking.startDateTime.split(" ")[0]}{" "}
-             {converte(item.assetBooking.startDateTime)} 
-          </Text>
-          <TouchableOpacity style={{backgroundColor:'#fff', width:'10%',marginLeft:'70%', borderRadius:8,paddingBottom:'5%'}}>
-                <AntDesign name="caretdown" size={30} color="#3ea3a3" style={{paddingLeft:'15%'}}/>
-
-                </TouchableOpacity>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+                    Booked Date:{""}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                    {converte(item.assetBooking.startDateTime)}
+                  </Text>
                 </View>
-                {/* <Text>
-                  Section{" "}
-                  {assetSections.length > 0
-                    ? getSection(item.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-                <Text>{item.assetBooking.asset.code}</Text>
-                <Text>
-                  {item.assetBooking.startDateTime.split(" ")[0]}{" "}
-                  {converte(item.assetBooking.startDateTime)}
-                </Text>
-                <Text>
-                  {item.assetBooking.endDateTime.split(" ")[0]}{" "}
-                  {converte(item.assetBooking.endDateTime)}
-                </Text>
-                <Text style={{ backgroundColor: "red" }}>
-                  {item.totalAmount} QR {!item.status ? "Not Payed" : "Payed"}
-                </Text>
-                <Text></Text> */}
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+                    End Date:{""}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.endDateTime.split(" ")[0]}{" "}
+                    {converte(item.assetBooking.endDateTime)}
+                  </Text>
+                </View>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+                    Total Amount:{" "}
+                  </Text>
+                  {!item.status === true ? (
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#901616",
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {item.totalAmount} QR{" "}
+                    </Text>
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#3ea3a3",
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {item.totalAmount} QR{" "}
+                    </Text>
+                  )}
+                </View>
+
+                {/* // <View>
+                  //   <Text>
+                  //   Section{" "}
+                  //   {assetSections.length > 0
+                  //     ? getSection(item.assetBooking.asset.assetSection)
+                  //     : "Loading ..."}
+                  // </Text>
+                  // <Text>{item.assetBooking.asset.code}</Text>
+                  // <Text>
+                  //   {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                  //   {converte(item.assetBooking.startDateTime)}
+                  // </Text>
+                  // <Text>
+                  //   {item.assetBooking.endDateTime.split(" ")[0]}{" "}
+                  //   {converte(item.assetBooking.endDateTime)}
+                  // </Text>
+                  // <Text style={{ backgroundColor: "red" }}>
+                  //   {item.totalAmount} QR {!item.status ? "Not Payed" : "Payed"}
+                  // </Text>
+                  // <Text></Text>
+
+                  // </View> */}
               </Card>
             )}
           />
