@@ -528,7 +528,7 @@ export default function BookingHistory(props) {
         flex: 1,
       }}
     >
-      <Header
+      {/* <Header
         containerStyle={{ backgroundColor: "#185a9d" }}
         //leftComponent={{ icon: 'menu', color: '#fff' }}
         centerComponent={{
@@ -536,7 +536,7 @@ export default function BookingHistory(props) {
           style: { color: "#fff", fontSize: 22 },
         }}
         // rightComponent={{ icon: 'home', color: '#fff' }}
-      />
+      /> */}
       <ScrollView
         style={{ backgroundColor: "#e3e3e3", width: "100%" }}
         // contentContainerStyle={{
@@ -603,8 +603,12 @@ export default function BookingHistory(props) {
                             borderRadius: 8,
                             borderColor: "#901616",
                             // marginTop: "10%",
-                            marginLeft: assetSections.length > 0 &&
-                            getType(item.assetBooking.asset.assetSection) === "Parking" ? '35%' :'22%',
+                            marginLeft:
+                              assetSections.length > 0 &&
+                              getType(item.assetBooking.asset.assetSection) ===
+                                "Parking"
+                                ? "35%"
+                                : "22%",
                             //   textDecorationLine:'underline',
                           }}
                         >
@@ -620,8 +624,12 @@ export default function BookingHistory(props) {
                             borderRadius: 8,
                             borderColor: "#3ea3a3",
                             // marginTop: "10%",
-                            marginLeft: assetSections.length > 0 &&
-                            getType(item.assetBooking.asset.assetSection) === "Parking" ? '35%' :'22%',
+                            marginLeft:
+                              assetSections.length > 0 &&
+                              getType(item.assetBooking.asset.assetSection) ===
+                                "Parking"
+                                ? "35%"
+                                : "22%",
                             //   textDecorationLine:'underline',
                           }}
                         >
@@ -723,10 +731,11 @@ export default function BookingHistory(props) {
                       color: "#185a9d",
                     }}
                   >
-
-                    {  assetSections.length > 0 &&
-                      getType(item.assetBooking.asset.assetSection) ===
-                        "Class Rooms" ?'  Class:': '  Code:'}
+                    {assetSections.length > 0 &&
+                    getType(item.assetBooking.asset.assetSection) ===
+                      "Class Rooms"
+                      ? "  Class:"
+                      : "  Code:"}
                     {/* {"  "}Code:{""} */}
                   </Text>
                   <Text
@@ -1064,7 +1073,9 @@ export default function BookingHistory(props) {
 }
 
 BookingHistory.navigationOptions = {
-  title: "History",
+  headerTitle: "Booking History",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
 };
 //
 const styles = StyleSheet.create({

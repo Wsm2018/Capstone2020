@@ -15,6 +15,7 @@ import Types from "../comps/Assets/Types";
 import Promotion from "../comps/Admin/Promotion/PromotionList";
 import AddPromotion from "../comps/Admin/Promotion/AddPromotion";
 // import NewsPage from "../comps/NewsPage";
+import AdvertisementsRequest from "../comps/Advertisements/AdvertisementsRequest";
 
 import NewsPage from "../comps/NewsPage";
 const AdminHomeStack = createStackNavigator({
@@ -32,6 +33,7 @@ const AdminHomeStack = createStackNavigator({
   Promotion: Promotion,
   AddPromotion: AddPromotion,
   News: NewsPage,
+  Ad: AdvertisementsRequest,
 });
 
 export default AdminHomeStack;
