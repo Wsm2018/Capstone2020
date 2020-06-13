@@ -183,6 +183,7 @@ export default function Payment(props) {
         setCards([...cards]);
         setChecked(cards[0] ? cards[0].id : 1);
         setOther(cards[0] ? false : true);
+        setCard(cards[0] ? cards[0] : {});
       });
 
     var years = [];
@@ -286,7 +287,7 @@ export default function Payment(props) {
         card: c,
         endDateTime: assetBooking.endDateTime,
         assetBooking: assetBooking,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount > 0 ? totalAmount : 0,
         status: true,
         serviceBooking: serviceBooking,
         user: u,
@@ -306,7 +307,7 @@ export default function Payment(props) {
         status: true,
         addCreditCard: addCreditCard && other,
         uid: firebase.auth().currentUser.uid,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount > 0 ? totalAmount : 0,
         // status: true,
         serviceBooking: serviceBooking,
       });
@@ -325,7 +326,9 @@ export default function Payment(props) {
         },
       };
       localNotification.title = "Payment complete";
-      localNotification.body = `Your payment of ${totalAmount} QAR for the ${tName} was completed successfully!`;
+      localNotification.body = `Your payment of ${
+        totalAmount > 0 ? totalAmount : 0
+      } QAR for the ${tName} was completed successfully!`;
       Notifications.presentLocalNotificationAsync(localNotification);
       props.navigation.navigate("Types");
     }
@@ -367,7 +370,7 @@ export default function Payment(props) {
   const _keyboardDidShow = () => {
     // console.log("keyyyyyyyyyyyyyyyShow");
 
-    setMargin(300);
+    setMargin(250);
   };
 
   const _keyboardDidHide = () => {
@@ -379,7 +382,12 @@ export default function Payment(props) {
   /////////////////////////////////////////////////////////////////////////////////////
   return (
     <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
-      <View style={{ flex: 8 }}>
+      <View
+        style={{
+          flex: 8,
+          marginBottom: Platform.OS === "ios" ? marginVal : 0,
+        }}
+      >
         <ScrollView>
           {/* <Text>
             Total Amount:{" "}
@@ -1259,7 +1267,7 @@ export default function Payment(props) {
                 >
                   {total}
                 </Text>{" "}
-                {totalAmount}
+                {totalAmount > 0 ? totalAmount : 0}
               </Text>
             ) : useToken ? (
               <Text style={{ fontWeight: "bold", fontSize: 22 }}>
@@ -1272,12 +1280,12 @@ export default function Payment(props) {
                 >
                   {total}
                 </Text>{" "}
-                {totalAmount}
+                {totalAmount > 0 ? totalAmount : 0}
               </Text>
             ) : (
               <Text style={{ fontWeight: "bold", fontSize: 22 }}>
                 {" "}
-                {totalAmount}{" "}
+                {totalAmount > 0 ? totalAmount : 0}
               </Text>
             )}{" "}
             QAR
