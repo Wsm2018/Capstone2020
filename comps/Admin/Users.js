@@ -12,6 +12,9 @@ import {
   Dimensions,
   Platform,
   ClippingRectangle,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -27,7 +30,7 @@ import DatePicker from "react-native-datepicker";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-import { Avatar, ListItem } from "react-native-elements";
+import { Avatar, ListItem, SearchBar } from "react-native-elements";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
@@ -58,6 +61,9 @@ export default function Users() {
   const [valueText, setValueText] = useState();
   const subscriptionLevel = ["gold", "silver", "bronze"];
   const [selectedSub, setSelectedSub] = useState("");
+  const [search, setSearch] = useState("");
+  const [marginVal, setMargin] = useState(0);
+  const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -283,6 +289,23 @@ export default function Users() {
       .collection("subscription")
       .doc(subscription.id)
       .update({ endDate: new Date() });
+  };
+
+  useEffect(() => {
+    handleSearch(search);
+  }, [search]);
+
+  const handleSearch = (query) => {
+    if (query.length > 0) {
+      let tempUsers = [...users];
+      let result = tempUsers.filter((user) =>
+        user.displayName.toLowerCase().match(search.toLowerCase())
+      );
+
+      setSearchResult(result);
+    } else {
+      setSearchResult([]);
+    }
   };
 
   return user ? (
@@ -1639,21 +1662,113 @@ export default function Users() {
       </ScrollView>
     </View>
   ) : users ? (
-    <ScrollView>
-      {users.map((user) => (
-        <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
-          <ListItem
-            leftAvatar={{ source: { uri: user.photoURL } }}
-            rightAvatar={
-              <Ionicons name="ios-arrow-forward" size={24} color="black" />
-            }
-            title={user.displayName}
-            subtitle={user.email}
-            bottomDivider
+    <KeyboardAvoidingView
+      behavior="position"
+      behavior="height"
+      behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      contentContainerStyle={{ flex: 1 }}
+      style={styles.container}
+      // keyboardVerticalOffset={-100}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[
+            styles.container,
+            { marginTop: Platform.isPad ? 0 : marginVal },
+          ]}
+        >
+          <SearchBar
+            placeholderTextColor="#185a9d"
+            placeholder="Search Here"
+            onChangeText={setSearch}
+            lightTheme
+            //showLoading={true}
+            searchIcon={true}
+            value={search}
+            containerStyle={{
+              backgroundColor: "#185a9d",
+              borderBottomColor: "#185a9d",
+              borderTopColor: "#185a9d",
+              width: "100%",
+              // height: "20%",
+            }}
+            inputContainerStyle={{
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: "#fafafa",
+              backgroundColor: "#fafafa",
+            }}
+            style={{
+              //backgroundColor: "white",
+              fontSize: 18,
+              paddingLeft: "2%",
+              // borderColor: "#185a9d",
+              // borderWidth: 2,
+              width: "85%",
+              height: 50,
+              marginLeft: 10,
+              marginRight: 10,
+              elevation: 20,
+            }}
           />
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+
+          <ScrollView>
+            {search !== "" ? (
+              searchResult.length > 0 ? (
+                searchResult.map((user) => (
+                  <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
+                    <ListItem
+                      leftAvatar={{ source: { uri: user.photoURL } }}
+                      rightAvatar={
+                        <Ionicons
+                          name="ios-arrow-forward"
+                          size={24}
+                          color="black"
+                        />
+                      }
+                      title={user.displayName}
+                      subtitle={user.email}
+                      bottomDivider
+                    />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Text style={{ color: "grey", fontSize: 20 }}>
+                    User not found
+                  </Text>
+                </View>
+              )
+            ) : (
+              users.map((user) => (
+                <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
+                  <ListItem
+                    leftAvatar={{ source: { uri: user.photoURL } }}
+                    rightAvatar={
+                      <Ionicons
+                        name="ios-arrow-forward"
+                        size={24}
+                        color="black"
+                      />
+                    }
+                    title={user.displayName}
+                    subtitle={user.email}
+                    bottomDivider
+                  />
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   ) : (
     <View
       style={{
