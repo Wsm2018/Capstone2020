@@ -13,6 +13,12 @@ import { Button, Text, Divider } from "react-native-elements";
 import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
+// import { Dimensions } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { Divider } from "react-native-elements";
 
 import db from "../../../db";
@@ -111,203 +117,163 @@ export default function AddCars(props) {
 
   return (
     <View style={styles.container}>
-      <View
-        // width={Dimensions.get("window").width / 1.1}
-        style={{
-          flex: 1,
-
-          alignItems: "center",
-          justifyContent: "center",
-          // marginTop: "-30%",
-          // backgroundColor: "blue",
-        }}
-      >
-        <View
-          style={{
-            flex: 0.5,
-
-            alignItems: "center",
-            justifyContent: "center",
-            // marginTop: "-30%",
-            // backgroundColor: "blue",
-          }}
-        >
-          <Text>Fill in your car information</Text>
-        </View>
-        {/* <LottieView
-          width={Dimensions.get("window").width}
-          source={require("../../../assets/cars.json")}
-          autoPlay
-        /> */}
-        {/* </View>
-      <View
-        style={{
-          // marginTop: "-40%",
-          // backgroundColor: "red",
-          flex: 0.5,
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}
-      > */}
-        {/* <Text style={{ fontSize: 22, marginTop: "-30%" }}>
-          Register your Car
-        </Text> */}
-        <View
-          style={{
-            backgroundColor: "white",
-            alignItems: "center",
-
-            flexDirection: "row",
-            paddingLeft: 6,
-            width: "80%",
-            borderColor: "black",
-            borderWidth: 1,
-            borderRadius: 10,
-            marginBottom: 10,
-          }}
-        >
-          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-          <TextInput
+      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
+          <View
             style={{
-              height: 50,
-              width: "80%",
-              paddingLeft: 6,
-              // backgroundColor: "red",
-            }}
-            placeholder="Enter Car Brand"
-            onChangeText={setBrand}
-            value={brand}
-          />
-        </View>
-        <View
-          style={{
-            backgroundColor: "white",
-            alignItems: "center",
+              flex: 1,
 
-            flexDirection: "row",
-            paddingLeft: 6,
-            width: "80%",
-            borderColor: "black",
-            borderWidth: 1,
-            borderRadius: 10,
-            marginBottom: 10,
-          }}
-        >
-          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-          <TextInput
-            style={{ height: 50, paddingLeft: 6, width: "80%" }}
-            placeholder="Enter Car Model"
-            // label="Car Model"
-            onChangeText={setModel}
-            value={model}
-          />
-        </View>
-        <View
-          style={{
-            backgroundColor: "white",
-            alignItems: "center",
-
-            flexDirection: "row",
-            paddingLeft: 6,
-            width: "80%",
-            borderColor: "black",
-            borderWidth: 1,
-            borderRadius: 10,
-            marginBottom: 10,
-          }}
-        >
-          {/* <MaterialCommunityIcons name="email" size={20} color="gray" /> */}
-          <TextInput
-            style={{ height: 50, paddingLeft: 6, width: "80%" }}
-            placeholder="Enter Plate Number"
-            onChangeText={setPlate}
-            // label="Plate Number"
-            value={plate}
-            maxLength={6}
-            keyboardType="number-pad"
-          />
-        </View>
-        {/* <TextInput
-          placeholder="Enter Car Brand"
-          // label="Car Brand"
-          onChangeText={setBrand}
-          value={brand}
-        /> */}
-        {/* <TextInput
-          placeholder="Enter Car Model"
-          // label="Car Model"
-          onChangeText={setModel}
-          value={model}
-        /> */}
-        {/* <TextInput
-          placeholder="Enter Plate Number"
-          onChangeText={setPlate}
-          // label="Plate Number"
-          value={plate}
-          keyboardType="number-pad"
-        /> */}
-      </View>
-
-      {/* <View
-        style={{
-          // backgroundColor: "blue",
-          flex: 0.5,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Button title="Submit" onPress={handleSubmit} />
-      </View> */}
-
-      <View
-        style={{
-          flex: 0.5,
-          justifyContent: "center",
-          alignItems: "center",
-          // backgroundColor: "red",
-          // justifyContent: "flex-start",
-
-          // marginVertical: 5,
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#20365F",
-            height: 40,
-            width: "40%",
-            // alignSelf: "center",
-            justifyContent: "center",
-            alignItems: "center",
-            //marginStart: "2%",
-            //marginEnd: "2%",
-            borderRadius: 30,
-            //marginBottom: 10,
-          }}
-          onPress={handleSubmit}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 16,
-              color: "white",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Submit
-          </Text>
-        </TouchableOpacity>
+            <View
+              style={{
+                flex: 1,
+
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: responsiveScreenFontSize(2.2),
+                  color: "#185a9d",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  textTransform: "capitalize",
+                }}
+              >
+                Fill in your car details
+              </Text>
+            </View>
+
+            <View
+              style={{
+                backgroundColor: "white",
+                alignItems: "center",
+
+                flexDirection: "column",
+
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 5,
+                marginBottom: "5%",
+              }}
+            >
+              <TextInput
+                width={Dimensions.get("window").width / 1.5}
+                style={{
+                  height: responsiveScreenHeight(5),
+                  paddingLeft: 6,
+                  fontSize: responsiveScreenFontSize(2),
+                }}
+                placeholder="Enter Car Brand"
+                onChangeText={setBrand}
+                value={brand}
+              />
+            </View>
+            <View
+              style={{
+                backgroundColor: "white",
+                alignItems: "center",
+
+                flexDirection: "column",
+
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 5,
+                marginBottom: "5%",
+              }}
+            >
+              <TextInput
+                width={Dimensions.get("window").width / 1.5}
+                style={{
+                  height: responsiveScreenHeight(5),
+                  paddingLeft: 6,
+                  fontSize: responsiveScreenFontSize(2),
+                }}
+                placeholder="Enter Car Model"
+                onChangeText={setModel}
+                value={model}
+              />
+            </View>
+            <View
+              style={{
+                backgroundColor: "white",
+                alignItems: "center",
+
+                flexDirection: "column",
+
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 5,
+                marginBottom: "5%",
+              }}
+            >
+              <TextInput
+                width={Dimensions.get("window").width / 1.5}
+                style={{
+                  height: responsiveScreenHeight(5),
+                  paddingLeft: 6,
+                  fontSize: responsiveScreenFontSize(2),
+                }}
+                placeholder="Enter Plate Number"
+                onChangeText={setPlate}
+                // label="Plate Number"
+                value={plate}
+                maxLength={6}
+                keyboardType="number-pad"
+              />
+            </View>
+          </View>
+
+          <View
+            style={{
+              flex: 0.5,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#2E9E9B",
+                height: responsiveScreenHeight(5),
+                width: responsiveScreenWidth(40),
+                alignSelf: "center",
+                justifyContent: "center",
+                alignItems: "center",
+
+                borderRadius: 10,
+                marginBottom: 10,
+              }}
+              onPress={handleSubmit}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: responsiveScreenFontSize(2),
+                  color: "white",
+                }}
+              >
+                Submit
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </View>
   );
 }
 
 AddCars.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: "lightgray",
+    backgroundColor: "#e3e3e3",
   },
 });

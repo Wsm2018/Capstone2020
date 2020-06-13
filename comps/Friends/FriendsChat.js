@@ -14,7 +14,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { Divider } from "react-native-elements";
+import { Divider, Avatar } from "react-native-elements";
 
 export default function FriendsList(props) {
   const friend = props.navigation.getParam("friend");
@@ -157,15 +157,29 @@ export default function FriendsList(props) {
           //  marginBottom: 20,
           height: "8%",
           maxHeight: "8%",
-          backgroundColor: "#20365F",
+          backgroundColor: "#185a9d",
           justifyContent: "flex-start",
           flex: 1,
           flexWrap: "wrap",
           paddingLeft: "4%",
         }}
       >
-        <Ionicons name="ios-arrow-back" size={35} color="white" />
-        <Text style={{ color: "white", fontSize: 24, paddingLeft: "3%" }}>
+        <Ionicons
+          name="ios-arrow-back"
+          size={35}
+          color="white"
+          onPress={() => props.navigation.goBack()}
+        />
+        <Avatar
+          rounded
+          source={{
+            uri: friend.photoURL,
+          }}
+          size="medium"
+          avatarStyle={{ paddingLeft: "3%" }}
+          containerStyle={{ marginLeft: "3%" }}
+        />
+        <Text style={{ color: "white", fontSize: 24, paddingLeft: "1%" }}>
           {" "}
           {friend.displayName}
         </Text>
@@ -205,11 +219,12 @@ export default function FriendsList(props) {
                   chat.from
                     ? {
                         textAlign: "right",
-                        backgroundColor: "#49679F",
+                        backgroundColor: "#3ea3a3",
                         alignSelf: "flex-end",
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        padding: "2%",
                         // scaleX: -1,
                         // scaleY: -1,
                         transform: [{ scaleY: -1 }],
@@ -221,6 +236,7 @@ export default function FriendsList(props) {
                         maxWidth: "85%",
                         minWidth: "20%",
                         borderRadius: 20,
+                        padding: "2%",
                         // scaleX: -1,
                         // scaleY: -1,
                         transform: [{ scaleY: -1 }],
@@ -237,13 +253,15 @@ export default function FriendsList(props) {
                           paddingRight: "4%",
                           fontSize: 20,
                           color: "white",
+                          padding: "2%",
                         }
                       : {
                           textAlign: "left",
                           paddingLeft: "4%",
                           paddingRight: "4%",
                           fontSize: 20,
-                          color: "#20365F",
+                          color: "#3ea3a3",
+                          padding: "2%",
                         }
                   }
                   key={chat.id}
@@ -282,7 +300,7 @@ export default function FriendsList(props) {
           // height: "8%",
           minHeight: "12%",
           maxHeight: "8%",
-          backgroundColor: "#20365F",
+          backgroundColor: "#185a9d",
           justifyContent: "space-evenly",
           flex: 1,
           flexWrap: "wrap",
@@ -299,11 +317,13 @@ export default function FriendsList(props) {
             paddingLeft: "4%",
             backgroundColor: "white",
             borderRadius: 30,
+            marginTop: "3.5%",
+            paddingTop: "3%",
           }}
           numberOfLines={10}
           multiline={true}
           placeholder="Type here"
-          placeholderTextColor="black"
+          placeholderTextColor="darkgrey"
           onChangeText={setText}
           value={text}
         />

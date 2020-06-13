@@ -10,7 +10,9 @@ import {
   Image,
   AsyncStorage,
   AppState,
+  Dimensions,
 } from "react-native";
+import LottieView from "lottie-react-native";
 import Authentication from "./mainpages/Authentication";
 console.disableYellowBox = true;
 import firebase from "firebase/app";
@@ -39,7 +41,7 @@ import ScheduleStack from "./navigation/ScheduleStack";
 import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
-
+import BookingHistory from "./comps/Profile/BookingHistory";
 import ManagersStack from "./comps/Managers/ManagersScreen";
 import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
@@ -77,11 +79,43 @@ export default function App(props) {
     }
   };
 
+  //////////////////////Themes////////////////////////////////////
+  const [theme, setTheme] = useState(null);
+
+  async function getTheme() {
+    let value = await AsyncStorage.getItem("theme");
+    if (value === null) {
+      await AsyncStorage.setItem("theme", "light");
+      value = await AsyncStorage.getItem("theme");
+      setTheme(value);
+      console.log(value, "111111111111111111111");
+    } else {
+      setTheme(value);
+      console.log(value, "222222222222222222222");
+    }
+    // AsyncStorage.clear();
+  }
+
+  // useEffect(() => {
+  //   getTheme();
+  // }, []);
+
+  ///////////////////////////////////////////////////////////////////
+
+  const Test = () => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Test</Text>
+      </View>
+    );
+  };
+
   const DashboardTabNavigator = createBottomTabNavigator(
     {
       Home: HomeStack,
 
       News: NewsStack,
+      BookingHistory: BookingHistory,
       Advertisments: AdvertismentsStack,
 
       Profile: ProfileStack,
@@ -98,7 +132,8 @@ export default function App(props) {
       tabBarOptions: {
         activeTintColor: "white",
         inactiveTintColor: "gray",
-        style: { backgroundColor: "#20365F" },
+        // style: { backgroundColor: theme === "light" ? "#185a9d" : "black" },
+        style: { backgroundColor: "#185a9d" },
       },
     }
   );
@@ -143,9 +178,9 @@ export default function App(props) {
             />
           ),
           headerStyle: {
-            backgroundColor: "#20365F",
+            backgroundColor: "#185a9d",
           },
-          headerTitle: "Friends List",
+          headerTitle: "FRIENDS",
           headerTintColor: "white",
         };
       },
@@ -252,13 +287,13 @@ export default function App(props) {
 
   async function getFirstLaunch() {
     const value = await AsyncStorage.getItem("alreadyLaunched");
-    console.log("valueeeeeeeeeeeee", value);
+    // console.log("valueeeeeeeeeeeee", value);
     if (value === null) {
       await AsyncStorage.setItem("alreadyLaunched", "true");
-      console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(true);
     } else {
-      console.log("falseeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("falseeeeeeeeeeeeeeeeeeeeeee");
       setFirstLaunch(false);
     }
   }
@@ -271,6 +306,7 @@ export default function App(props) {
 
   useEffect(() => {
     getFirstLaunch();
+    getTheme();
   }, []);
 
   const handleAppState = (nextAppState) => {
@@ -358,10 +394,21 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const adminTabNav = createBottomTabNavigator({
-    Home: AdminHomeStack,
-    Profile: ProfileStack,
-  });
+  const adminTabNav = createBottomTabNavigator(
+    {
+      Home: AdminHomeStack,
+      Profile: ProfileStack,
+      BookingHistory: BookingHistory,
+    },
+    {
+      tabBarOptions: {
+        activeTintColor: "white",
+        inactiveTintColor: "gray",
+        style: { backgroundColor: "#005c9d" },
+      },
+    }
+  );
+
   const AdminAppContainer = createAppContainer(adminTabNav);
 
   const serviceEmployeeTabNav = createBottomTabNavigator({
@@ -390,6 +437,7 @@ export default function App(props) {
       // if user info already retrieved
       if (user) {
         // if users first launch show guideView
+        // if (guideView) {
         if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
@@ -400,7 +448,7 @@ export default function App(props) {
         }
         // --------------------------------SERVICE EMPLOYEE----------------------------------
         // if user is customer or service employee go to <AppContainer/>
-        else if (user.role === "service employee") {
+        else if (user.role === "services employee") {
           return <ServiceEmployeeAppContainer />;
         }
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
@@ -414,12 +462,14 @@ export default function App(props) {
           // if big boi employee with null active roll THEN choose active role
           if (activeRole === null) {
             return <ChooseRole role={user.role} />;
+            // return <ManagersStack />;
           }
           // Which activeRole did you choose
           else {
             switch (activeRole) {
               case "admin":
                 return <AdminAppContainer />;
+              // return <FriendsStack />;
 
               case "manager":
                 return <ManagersStack />;
@@ -433,7 +483,7 @@ export default function App(props) {
               case "customer support":
                 return <AppContainer />;
 
-              case "service employee":
+              case "services employee":
                 return <ServiceEmployeeAppContainer />;
 
               case "customer":
@@ -449,7 +499,7 @@ export default function App(props) {
                       alignItems: "center",
                     }}
                   >
-                    <Text>WTF THERES A NEW ROLE?</Text>
+                    <Text>THERES A NEW ROLE?</Text>
                   </View>
                 );
             }
@@ -458,17 +508,45 @@ export default function App(props) {
       } else {
         return (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <Text>Loading...</Text>
+            <LottieView
+              width={Dimensions.get("window").width / 3}
+              source={require("./assets/loadingAnimations/890-loading-animation.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            />
           </View>
         );
       }
     }
   } else {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <LottieView
+          width={Dimensions.get("window").width / 3}
+          source={require("./assets/loadingAnimations/890-loading-animation.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "100%",
+          }}
+        />
       </View>
     );
   }
