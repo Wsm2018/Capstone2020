@@ -43,7 +43,7 @@ export default function SubscriptionsScreen(props) {
   const [deviceType, setDeviceType] = useState(0);
   const [valueText, setValueText] = useState("");
   const [userSubscription, setUserSubscription] = useState();
-  const subscriptionLevel = ["gold", "sliver", "bronze"];
+  const subscriptionLevel = ["gold", "silver", "bronze"];
   const [flag, setFlag] = useState(true);
   const [view, setView] = useState("first");
   const [modal, setModal] = useState(false);
@@ -80,20 +80,20 @@ export default function SubscriptionsScreen(props) {
 
   const process = (l) => {
     setChosenSub(l);
-    setModal(true);
     setValueText(l.level);
+    setModal(true);
   };
 
   const subscribe = async (type) => {
-    console.log("subs: ", userSubscription);
+    console.log("subs: ", valueText);
     const sub = {
       gold: {
         type: "gold",
         startDate: new Date(),
         endDate: new Date(moment().add(1, "month").calendar()),
       },
-      sliver: {
-        type: "sliver",
+      silver: {
+        type: "silver",
         startDate: new Date(),
         endDate: new Date(moment().add(1, "month").calendar()),
       },
@@ -112,7 +112,7 @@ export default function SubscriptionsScreen(props) {
         .update({
           endDate: new Date(),
         });
-      console.log(valueText);
+      console.log(type);
       if (valueText === "gold") {
         const decrement = firebase.firestore.FieldValue.increment(-50);
         db.collection("users")
@@ -122,7 +122,7 @@ export default function SubscriptionsScreen(props) {
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
           .add(sub.gold);
-      } else if (valueText === "sliver") {
+      } else if (valueText === "silver") {
         const decrement = firebase.firestore.FieldValue.increment(-20);
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
@@ -130,7 +130,7 @@ export default function SubscriptionsScreen(props) {
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
-          .add(sub.sliver);
+          .add(sub.silver);
       } else if (valueText === "bronze") {
         const decrement = firebase.firestore.FieldValue.increment(-10);
         db.collection("users")
@@ -142,7 +142,7 @@ export default function SubscriptionsScreen(props) {
           .add(sub.bronze);
       }
     }
-    console.log(valueText);
+    console.log(type);
     if (type === "new") {
       if (valueText === "gold") {
         const decrement = firebase.firestore.FieldValue.increment(-50);
@@ -153,7 +153,7 @@ export default function SubscriptionsScreen(props) {
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
           .add(sub.gold);
-      } else if (valueText === "sliver") {
+      } else if (valueText === "silver") {
         const decrement = firebase.firestore.FieldValue.increment(-20);
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
@@ -161,7 +161,7 @@ export default function SubscriptionsScreen(props) {
         db.collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("subscription")
-          .add(sub.sliver);
+          .add(sub.silver);
       } else if (valueText === "bronze") {
         const decrement = firebase.firestore.FieldValue.increment(-10);
         db.collection("users")
@@ -186,21 +186,19 @@ export default function SubscriptionsScreen(props) {
     getDeviceType();
   }, []);
 
+  // useEffect(() => {
+  //   setFlag(false)
+  // }, [userSubscription]);
+
+
+
   return (
     <View style={styles.container}>
       <Modal visible={modal} transparent={true}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={[styles.centeredView2]}>
             <View elevation={5} style={styles.modalView2}>
-              <TouchableOpacity
-                style={{
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                  marginEnd: 15,
-                  marginTop: 15,
-                }}
-                onPress={() => subscribe("new")}
-              ></TouchableOpacity>
+
 
               <TouchableOpacity
                 style={{
@@ -300,7 +298,7 @@ export default function SubscriptionsScreen(props) {
                             fontWeight: "bold",
                           }}
                         >
-                          Subscribe now
+                          Renew
                       </Text>
                       </TouchableOpacity>
                     )}
@@ -342,7 +340,7 @@ export default function SubscriptionsScreen(props) {
                     >
                       <View >
                         <Text
-                          style={{ fontSize: 18, color: "#2E9E9B", fontWeight: "bold" }}
+                          style={{ fontSize: responsiveScreenFontSize(3), color: "#2E9E9B", fontWeight: "bold" }}
                         >
                           VIP Subscriptions
                     </Text>
@@ -351,9 +349,10 @@ export default function SubscriptionsScreen(props) {
                       <View style={styles.card}>
                         <Text
                           style={{
-                            fontSize: 18,
+                            fontSize: responsiveScreenFontSize(1.4),
                             color: "#185a9d",
                             marginBottom: 15,
+                            fontWeight: "bold"
                             // textAlign: "center",
                           }}
                         >
@@ -382,7 +381,7 @@ export default function SubscriptionsScreen(props) {
                             />
                             <Text
                               style={{
-                                fontSize: 18,
+                                fontSize: responsiveScreenFontSize(2),
                                 color: "#185a9d",
                                 fontWeight: "bold",
                               }}
@@ -404,7 +403,7 @@ export default function SubscriptionsScreen(props) {
                             />
                             <Text
                               style={{
-                                fontSize: 18,
+                                fontSize: responsiveScreenFontSize(2),
                                 color: "#185a9d",
                                 fontWeight: "bold",
                               }}
@@ -427,7 +426,7 @@ export default function SubscriptionsScreen(props) {
                             />
                             <Text
                               style={{
-                                fontSize: 18,
+                                fontSize: responsiveScreenFontSize(2),
                                 color: "#185a9d",
                                 fontWeight: "bold",
                               }}
@@ -449,7 +448,7 @@ export default function SubscriptionsScreen(props) {
                             />
                             <Text
                               style={{
-                                fontSize: 18,
+                                fontSize: responsiveScreenFontSize(2),
                                 color: "#185a9d",
                                 fontWeight: "bold",
                               }}
@@ -471,7 +470,7 @@ export default function SubscriptionsScreen(props) {
                             />
                             <Text
                               style={{
-                                fontSize: 18,
+                                fontSize: responsiveScreenFontSize(2),
                                 color: "#185a9d",
                                 fontWeight: "bold",
                               }}
@@ -490,23 +489,28 @@ export default function SubscriptionsScreen(props) {
                     >
 
                       <View
-                        style={{
-                          flex: 1,
-                          justifyContent: "center",
-                          alignItems: "center",
-                          flexDirection: "row",
-                        }}
+                        width={Dimensions.get("window").width / 1}
+                        style={
+                          {
+                            // width: "100%",
+                            flex: 1,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "row"
+                          }}
                       >
                         {levels.map((l, i) => (
                           <View
+
                             style={{
                               flex: 1,
                               justifyContent: "center",
                               alignItems: "center",
+
                             }}
                           >
                             <Image
-                              width={Dimensions.get("window").width / 3.3}
+                              width={Dimensions.get("window").width / 3.5}
                               source={levelPics[i]}
                             />
 
@@ -539,14 +543,14 @@ export default function SubscriptionsScreen(props) {
                               >
                                 <Text
                                   style={
-                                    deviceType === 1
+                                    deviceType === 1 || deviceType === 0
                                       ? {
-                                        ...styles.levelPrice,
+                                        ...styles.levelDescription,
                                         fontSize: responsiveScreenFontSize(2.8),
                                       }
                                       : {
-                                        ...styles.levelPrice,
-                                        fontSize: responsiveScreenFontSize(3.5),
+                                        ...styles.levelDescription,
+                                        fontSize: responsiveScreenFontSize(1.8),
                                       }
                                   }
                                 >
@@ -556,19 +560,20 @@ export default function SubscriptionsScreen(props) {
                               <View style={{ alignItems: "flex-start", flex: 1 }}>
                                 <Text
                                   style={
-                                    deviceType === 1
+                                    deviceType === 1 || deviceType === 0
                                       ? {
                                         ...styles.levelDescription,
                                         fontSize: responsiveScreenFontSize(2),
                                       }
                                       : {
                                         ...styles.levelDescription,
-                                        fontSize: responsiveScreenFontSize(3.5),
+                                        fontSize: responsiveScreenFontSize(1.8),
                                       }
                                   }
                                 >
                                   Points: {l.points}
                                 </Text>
+
                               </View>
                               <View style={{ alignItems: "flex-start", flex: 0.6 }}>
                                 <TouchableOpacity
@@ -581,7 +586,7 @@ export default function SubscriptionsScreen(props) {
                                 >
                                   <Text
                                     style={
-                                      deviceType === 1
+                                      deviceType === 1 || deviceType === 0
                                         ? {
                                           ...styles.levelDescription,
                                           fontSize: responsiveScreenFontSize(2),
@@ -590,7 +595,7 @@ export default function SubscriptionsScreen(props) {
                                         }
                                         : {
                                           ...styles.levelDescription,
-                                          fontSize: responsiveScreenFontSize(3.5),
+                                          fontSize: responsiveScreenFontSize(1.8),
                                           fontWeight: "bold",
                                         }
                                     }
@@ -609,17 +614,19 @@ export default function SubscriptionsScreen(props) {
               ) : (
                   <>
                     <View
-                      style={{
-                        // width: "100%",
-                        flex: 1,
-                        alignItems: "center",
-                        justifyContent: "center",
+                      width={Dimensions.get("window").width / 1}
+                      style={
+                        {
+                          // width: "100%",
+                          flex: 1,
+                          alignItems: "center",
+                          justifyContent: "center",
 
-                      }}
+                        }}
                     >
                       <View >
                         <Text
-                          style={{ fontSize: 18, color: "#2E9E9B", fontWeight: "bold" }}
+                          style={{ fontSize: responsiveScreenFontSize(3), color: "#2E9E9B", fontWeight: "bold" }}
                         >
                           VIP Subscriptions
                 </Text>
@@ -628,9 +635,11 @@ export default function SubscriptionsScreen(props) {
                       <View style={styles.card}>
                         <Text
                           style={{
-                            fontSize: 18,
+
+                            fontSize: responsiveScreenFontSize(2),
                             color: "#185a9d",
-                            marginBottom: 15,
+                            marginBottom: 15, fontWeight: "bold"
+
                             // textAlign: "center",
                           }}
                         >
@@ -638,7 +647,7 @@ export default function SubscriptionsScreen(props) {
                         </Text>
                         <Text
                           style={{
-                            fontSize: 18,
+                            fontSize: responsiveScreenFontSize(2),
                             color: "#185a9d",
                             marginBottom: 15,
                             // textAlign: "center",
@@ -649,9 +658,9 @@ export default function SubscriptionsScreen(props) {
                         </Text>
                         <Text
                           style={{
-                            fontSize: 18,
+                            fontSize: responsiveScreenFontSize(1.5),
                             color: "#185a9d",
-                            marginBottom: 15,
+                            marginBottom: 15, fontWeight: "bold"
                             // textAlign: "center",
                           }}
                         >
@@ -784,10 +793,12 @@ export default function SubscriptionsScreen(props) {
                       flex: 1,
                       justifyContent: "center",
                       alignItems: "center",
+
                     }}>
 
                       <Image
-                        width={Dimensions.get("window").width / 2.5}
+                        // width={Dimensions.get("window").width / 1}
+                        height={responsiveScreenHeight(44)}
                         source={levelPics[levels.findIndex(l => l.level == userSubscription.type)]}
                       />
 
@@ -799,19 +810,26 @@ export default function SubscriptionsScreen(props) {
                           left: 0,
                           right: 0,
                           bottom: 0,
-                          justifyContent: "center",
+                          justifyContent: "space-around",
                           alignItems: "center",
+                          // backgroundColor: "pink"
                           // marginTop: "10%",
                         }}
                       >
                         <View
                           width={Dimensions.get("window").width / 4}
+                          // width={
+                          //   deviceType === 1 || deviceType === 0
+                          //     ? responsiveScreenFontSize(3.5)
+                          //     :
+                          //     responsiveScreenFontSize(3.5)
+                          // }
                           style={{
                             flex: 1,
                             alignItems: "center",
                             justifyContent: "center",
-                            paddingTop: "25%"
-                            // backgroundColor: "red",
+                            paddingTop: "10%",
+                            //backgroundColor: "red",
                             // justifyContent: "center",
                             // alignItems: "flex-end",
                             // marginTop: "-12%",
@@ -820,25 +838,25 @@ export default function SubscriptionsScreen(props) {
                         >
                           <Text
                             style={
-                              deviceType === 1
-                                ? { ...styles.levelPrice, fontSize: responsiveScreenFontSize(3.5) }
+                              deviceType === 1 || deviceType === 0
+                                ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2.5) }
                                 : {
-                                  ...styles.levelPrice,
-                                  fontSize: responsiveScreenFontSize(3.5),
+                                  ...styles.levelDescription,
+                                  fontSize: responsiveScreenFontSize(2.5),
                                 }
                             }
                           >
                             {levels[levels.findIndex(l => l.level == userSubscription.type)].price} QAR
                       </Text>
                         </View>
-                        <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "18%" }}>
+                        <View style={{ alignItems: "flex-start", flex: 1, paddingTop: "12%" }}>
                           <Text
                             style={
-                              deviceType === 1
+                              deviceType === 1 || deviceType === 0
                                 ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2.8) }
                                 : {
                                   ...styles.levelDescription,
-                                  fontSize: responsiveScreenFontSize(3.5),
+                                  fontSize: responsiveScreenFontSize(2.5),
                                 }
                             }
                           >
@@ -846,19 +864,19 @@ export default function SubscriptionsScreen(props) {
                           </Text>
 
                         </View>
-                        <View style={{ alignItems: "flex-start", flex: 3, paddingTop: "10%" }}>
-                          <TouchableOpacity onPress={() => { subscribe("update") }} style={{ width: "100%", height: "100%" }}>
+                        <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
+                          <TouchableOpacity onPress={() => { subscribe("update") }} style={{ width: "100%", height: "50%", }}>
                             <Text
                               style={
-                                deviceType === 1
+                                deviceType === 1 || deviceType === 0
                                   ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2) }
                                   : {
                                     ...styles.levelDescription,
-                                    fontSize: responsiveScreenFontSize(3.5),
+                                    fontSize: responsiveScreenFontSize(1.5),
                                   }
                               }
                             >
-                              renew/upgrade
+                              renew
                       </Text>
 
                           </TouchableOpacity>
@@ -918,9 +936,12 @@ const styles = StyleSheet.create({
     // marginTop: 22,
     // backgroundColor: "red",
   },
+  levelDescription: {
+    fontWeight: "bold"
+  },
   card: {
     backgroundColor: "#e3e3e3",
-    width: "100%",
+    width: width / 1.3,
     marginTop: "5%",
     // paddingBottom: "15%",
     // borderTopWidth: 1,
