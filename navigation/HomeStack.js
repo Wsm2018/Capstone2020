@@ -1,9 +1,10 @@
+import React from "react";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
 // import TabBarIcon from "../components/TabBarIcon";
 import { Avatar, Icon } from "react-native-elements";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import HomePage from "../comps/HomePage";
 import Payment from "../comps/Assets/Payment";
 import CheckOut from "../comps/Assets/CheckOut";
@@ -25,8 +26,19 @@ const HomeStack = createStackNavigator(
     CheckOut: CheckOut,
   },
   {
-    navigationOptions: ({ navigation }) => {
-      header: null;
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        headerLeft: () => (
+          <MaterialCommunityIcons
+            // style={{ marginLeft: 20 }}
+            onPress={() => navigation.openDrawer()}
+            name="menu"
+            color="white"
+            // type="MaterialCommunityIcons"
+            size={28}
+          />
+        ),
+      };
     },
   }
 );

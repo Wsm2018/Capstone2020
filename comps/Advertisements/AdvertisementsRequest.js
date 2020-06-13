@@ -7,11 +7,20 @@ import {
   TouchableOpacity,
   TextInput,
   //   Input,
+  ScrollView,
   Modal,
 } from "react-native";
-import { Input, Tooltip } from "react-native-elements";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
+import { Input, Tooltip, Divider } from "react-native-elements";
+import { Feather } from "react-native-vector-icons";
 import firebase, { firestore } from "firebase/app";
+import LottieView from "lottie-react-native";
 import "firebase/auth";
 import { Icon, Avatar, Button, Image } from "react-native-elements";
 import DatePicker from "react-native-datepicker";
@@ -22,7 +31,7 @@ import db from "../../db";
 // import SubscriptionsScreen from "../SubscriptionsScreen";
 import { set } from "react-native-reanimated";
 import * as Linking from "expo-linking";
-import { ScrollView } from "react-native-gesture-handler";
+
 import { MaterialIcons } from "@expo/vector-icons";
 export default function AdvertisementsRequest(props) {
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
@@ -216,7 +225,7 @@ export default function AdvertisementsRequest(props) {
         querySnapshot.forEach((doc) => {
           advertisements.push({ id: doc.id, ...doc.data() });
         });
-        console.log("advertisements.length", advertisements.length);
+        // console.log("advertisements.length", advertisements);
         setAdvertisements([...advertisements]);
       });
   }, []);
@@ -250,41 +259,281 @@ export default function AdvertisementsRequest(props) {
 
   return (
     <View style={styles.container}>
-      <View>
-        {/* <Button onPress={() => setFlag(flag + 1)} title={`switch ${flag}`}>
-          switch
-        </Button> */}
-      </View>
-      {
-        <View style={{ flex: 10 }}>
-          <ScrollView>
-            {advertisements &&
-              advertisements.map((item, index) => (
-                <View key={index}>
-                  <Text>{item.title}</Text>
-                  <Text>{item.description}</Text>
-                  <Text>{item.link}</Text>
-                  <Text>{moment(item.endDate.toDate()).format("L")}</Text>
-                  <Text>{moment(item.startDate.toDate()).format("L")}</Text>
-                  {item.image != null ? (
-                    <Image
-                      source={{ uri: item.image }}
-                      style={{ width: 100, height: 100 }}
-                    />
-                  ) : null}
-                  <TouchableOpacity
-                    onPress={() => approve(item.id, "approved")}
+      <View style={{ flex: 1, backgroundColor: "white" }}>
+        <View style={{ backgroundColor: "white", flex: 1, margin: 5 }}>
+          <View style={{ backgroundColor: "#e3e3e3", flex: 0.95, margin: 5 }}>
+            <ScrollView style={{ flex: 1 }}>
+              {advertisements.length !== 0 ? (
+                advertisements.map((item, index) => (
+                  <View
+                    style={{
+                      flex: 1,
+                      height: responsiveHeight(50),
+                      margin: 15,
+                      backgroundColor: "white",
+                      borderWidth: 3,
+                      borderColor: "#185a9d",
+                      padding: 5,
+                    }}
                   >
-                    <Text>approve</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => approve(item.id, "denied")}>
-                    <Text>denied</Text>
-                  </TouchableOpacity>
+                    <View
+                      style={{
+                        flex: 2,
+                        // backgroundColor: "pink",
+                        // borderRadius: 20,
+                        flexDirection: "row",
+                      }}
+                      key={index}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          // backgroundColor: "red",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {item.image != null ? (
+                          <Image
+                            source={{ uri: item.image }}
+                            style={{
+                              width: responsiveScreenWidth(30),
+                              height: responsiveScreenHeight(20),
+                              borderWidth: 1,
+                              borderColor: "transparent",
+                              resizeMode: "contain",
+                              // borderTopRightRadiusRadius: 10,
+                              // borderRadius: 5,
+                            }}
+                          />
+                        ) : (
+                          <Text>"null"</Text>
+                        )}
+                      </View>
+
+                      {/* -------------------------------- */}
+
+                      <View
+                        style={{
+                          flex: 1.5,
+
+                          alignItems: "center",
+                          justifyContent: "center",
+                          // backgroundColor: "lightblue",
+                        }}
+                      >
+                        <View
+                          // elevation={3}
+                          style={{
+                            flex: 0.3,
+                            width: "80%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // borderColor: "gray",
+                            // borderRadius: 5,
+                            // borderWidth: 1,
+                            // backgroundColor: "lightgray",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#185a9d",
+                              fontSize: responsiveFontSize(2),
+                              fontWeight: "bold",
+                              textTransform: "none",
+                            }}
+                          >
+                            {item.title}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 0.5,
+                            width: "90%",
+                            flexDirection: "row",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-start",
+                            // backgroundColor: "#185a9d",
+                            borderColor: "#185a9d",
+                            borderWidth: 1,
+                            padding: 5,
+                          }}
+                        >
+                          {/* <Ionicons
+                              name="md-paper"
+                              size={22}
+                              color="darkred"
+                            /> */}
+                          <Text style={{ fontSize: responsiveFontSize(2) }}>
+                            {item.description}
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flex: 0.2,
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            // backgroundColor: "pink",
+                          }}
+                        >
+                          <Feather name="link" size={20} color="gray" />
+                          <Text
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: responsiveFontSize(1.5),
+                            }}
+                          >
+                            {" "}
+                            {item.link}
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flex: 0.2,
+                            width: "95%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: "white",
+                            // borderBottomWidth: 1,
+                            // flexDirection: "row",
+                          }}
+                        >
+                          {/* <View>
+                              <MaterialCommunityIcons
+                                name="timer-sand"
+                                size={22}
+                                color="darkred"
+                              />
+                            </View> */}
+                          <View>
+                            <Text style={{ fontSize: responsiveFontSize(1.5) }}>
+                              {moment(item.startDate.toDate()).format("L")}{" "}
+                              <Text
+                                style={{
+                                  fontWeight: "bold",
+                                  color: "#185a9d",
+                                }}
+                              >
+                                {" "}
+                                To{" "}
+                              </Text>{" "}
+                              {moment(item.endDate.toDate()).format("L")}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <Divider
+                      style={{ height: "0.5%", backgroundColor: "#185a9d" }}
+                    />
+                    <View
+                      style={{
+                        flex: 0.5,
+                        // backgroundColor: "red",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 0.3,
+                          backgroundColor: "#2E9E9B",
+                          // borderWidth: 4,
+                          // width: responsiveScreenWidth(30),
+                          height: responsiveScreenHeight(5),
+                          // width: "30%",
+                          // alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          //marginStart: "2%",
+                          // marginEnd: "3%",
+                          borderRadius: 10,
+                          //marginBottom: 10,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => approve(item.id, "approved")}
+                        >
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: responsiveFontSize(1.5),
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Approve
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          flex: 0.3,
+                          backgroundColor: "#901919",
+                          // borderWidth: 4,
+                          height: responsiveScreenHeight(5),
+                          // width: "30%",
+                          // alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          //marginStart: "2%",
+                          marginStart: "3%",
+                          borderRadius: 10,
+                          //marginBottom: 10,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => approve(item.id, "denied")}
+                        >
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: responsiveFontSize(1.5),
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Reject
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <View style={styles.header}>
+                  <LottieView
+                    source={require("../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(2),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    No Ad Requests
+                  </Text>
                 </View>
-              ))}
-          </ScrollView>
+              )}
+            </ScrollView>
+          </View>
         </View>
-      }
+      </View>
     </View>
   );
 }
@@ -352,5 +601,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     //flexDirection: "row",
+  },
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    // flex: 0.7,
+    paddingTop: "15%",
   },
 });

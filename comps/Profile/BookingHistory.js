@@ -24,7 +24,12 @@ import { AsyncStorage } from "react-native";
 import ExtendServices from "./ExtendServices";
 import { getIconType, Header, Card, Divider } from "react-native-elements";
 import { FlatList } from "react-native";
-import { FontAwesome5, Fontisto, Ionicons, AntDesign } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Fontisto,
+  Ionicons,
+  AntDesign,
+} from "@expo/vector-icons";
 
 export default function BookingHistory(props) {
   const [assetBookings, setAssetBookings] = useState([]);
@@ -442,7 +447,7 @@ export default function BookingHistory(props) {
   const getType = (s) => {
     var section = assetSections.filter((o) => o.id == s)[0];
     var type = assetTypes.filter((o) => o.id == section.assetType)[0];
-    console.log('Type Name: ', type.name)
+    console.log("Type Name: ", type.name);
     return type.name;
   };
 
@@ -520,7 +525,7 @@ export default function BookingHistory(props) {
         flex: 1,
       }}
     >
-      <Header
+      {/* <Header
         containerStyle={{ backgroundColor: "#185a9d" }}
         //leftComponent={{ icon: 'menu', color: '#fff' }}
         centerComponent={{
@@ -528,7 +533,7 @@ export default function BookingHistory(props) {
           style: { color: "#fff", fontSize: 22 },
         }}
         // rightComponent={{ icon: 'home', color: '#fff' }}
-      />
+      /> */}
       <ScrollView
         style={{ backgroundColor: "#e3e3e3", width: "100%" }}
         // contentContainerStyle={{
@@ -548,10 +553,17 @@ export default function BookingHistory(props) {
             data={payments}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
-              <Card containerStyle={{ width: "90%", marginLeft: "5%",borderRadius:8 }}>
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-
-                {/* <Text>
+              <Card
+                containerStyle={{
+                  width: "90%",
+                  marginLeft: "5%",
+                  borderRadius: 8,
+                }}
+              >
+                <View
+                  style={{ flexDirection: "row", justifyContent: "flex-start" }}
+                >
+                  {/* <Text>
                   {getType(item.assetBooking.asset.assetSection) ===
                   "Parking" ? (
                     <FontAwesome5 name="car" size={24} color="black" />
@@ -559,20 +571,26 @@ export default function BookingHistory(props) {
                     <Fontisto name="room" size={24} color="black" />
                   )}
                 </Text> */}
-                <Text style={{fontSize:18, fontWeight:'bold',color:'#185a9d'}}>
-                  {/* {' '}Type{" "} */}
-                  {assetSections.length > 0
-                    ? getType(item.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-               
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                    }}
+                  >
+                    {/* {' '}Type{" "} */}
+                    {assetSections.length > 0
+                      ? getType(item.assetBooking.asset.assetSection)
+                      : "Loading ..."}
+                  </Text>
                 </View>
                 {/* <Text></Text>
                 <Divider/>
                 <Text></Text> */}
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-
-                {/* <Text>
+                <View
+                  style={{ flexDirection: "row", justifyContent: "flex-start" }}
+                >
+                  {/* <Text>
                   {getType(item.assetBooking.asset.assetSection) ===
                   "Parking" ? (
                     <FontAwesome5 name="car" size={24} color="black" />
@@ -580,20 +598,39 @@ export default function BookingHistory(props) {
                     <Fontisto name="room" size={24} color="black" />
                   )}
                 </Text> */}
-               <Ionicons
-            name="ios-time"
-            size={16}
-            color="#B9B9B9"
-            style={{ paddingTop: "2%" }}
-          />
-                <Text style={{ paddingLeft: "1%", fontSize: 14, color: "#B9B9B9",paddingTop: "1.8%" }}>
-             {item.assetBooking.startDateTime.split(" ")[0]}{" "}
-             {converte(item.assetBooking.startDateTime)} 
-          </Text>
-          <TouchableOpacity style={{backgroundColor:'#fff', width:'10%',marginLeft:'70%', borderRadius:8,paddingBottom:'5%'}}>
-                <AntDesign name="caretdown" size={30} color="#3ea3a3" style={{paddingLeft:'15%'}}/>
-
-                </TouchableOpacity>
+                  <Ionicons
+                    name="ios-time"
+                    size={16}
+                    color="#B9B9B9"
+                    style={{ paddingTop: "2%" }}
+                  />
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 14,
+                      color: "#B9B9B9",
+                      paddingTop: "1.8%",
+                    }}
+                  >
+                    {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                    {converte(item.assetBooking.startDateTime)}
+                  </Text>
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#fff",
+                      width: "10%",
+                      marginLeft: "70%",
+                      borderRadius: 8,
+                      paddingBottom: "5%",
+                    }}
+                  >
+                    <AntDesign
+                      name="caretdown"
+                      size={30}
+                      color="#3ea3a3"
+                      style={{ paddingLeft: "15%" }}
+                    />
+                  </TouchableOpacity>
                 </View>
                 {/* <Text>
                   Section{" "}
@@ -834,7 +871,9 @@ export default function BookingHistory(props) {
 }
 
 BookingHistory.navigationOptions = {
-  title: "History",
+  headerTitle: "Booking History",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
 };
 //
 const styles = StyleSheet.create({

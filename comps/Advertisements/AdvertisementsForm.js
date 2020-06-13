@@ -10,7 +10,7 @@ import {
   Modal,
 } from "react-native";
 import { Input, Tooltip } from "react-native-elements";
-
+import * as Device from "expo-device";
 import firebase, { firestore } from "firebase/app";
 import "firebase/auth";
 import { Icon, Avatar, Button, Image } from "react-native-elements";
@@ -148,16 +148,8 @@ export default function AdvertisementsForm(props) {
       console.log("link bad");
       setLink({ text: link.text, error: true });
     } else {
-      const urlRegEx = new RegExp(
-        "(https?://)?([w-])+.{1}([a-zA-Z]{2,63})([/w-]*)*/???([^#\n\r]*)?#?([^\n\r]*)"
-      );
-      if (urlRegEx.test(link)) {
-        console.log("link good");
-        count++;
-      } else {
-        alert("Invalid URL");
-        return;
-      }
+      console.log("link good");
+      count++;
     }
 
     if (description.text === "") {
@@ -214,6 +206,7 @@ export default function AdvertisementsForm(props) {
           status: "pending",
           clickers: 0,
           amount: amount,
+          paid: false,
           // dunno: "WHYYY",
         })
         .then((doc) => {
@@ -221,6 +214,7 @@ export default function AdvertisementsForm(props) {
           uploadImage(doc.id);
           setModal(true);
         });
+
       //   setTitle(null);
       //   setDate(null);
       //   setEndDate(null);
