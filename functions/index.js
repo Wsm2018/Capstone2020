@@ -294,28 +294,28 @@ exports.sendMail = functions.https.onRequest((request, response) => {
 });
 
 exports.assetManager = functions.https.onCall(async (data, context) => {
-
   if (data.type === "add") {
-    db.collection(data.collection).add(
-      data.obj
-    );
+    db.collection(data.collection).add(data.obj);
+  } else if (data.type === "update") {
+    db.collection(data.collection).doc(data.doc).set(data.obj);
+  } else {
+    db.collection(data.collection).doc(data.doc).delete();
   }
-  else if (data.type === "update") {
-    db.collection(data.collection).doc(data.doc).set(
-      data.obj
-    );
-  }
-  else {
-    db.collection(data.collection).doc(data.doc).delete()
-  }
-
 });
 
 exports.editBooking = functions.https.onCall(async (data, context) => {
-  var newAssetBooking = data.assetBooking
-  newAssetBooking.endDateTime = data.endDateTime
-  db.collection("payments").doc(data.paymentId).update({ totalAmount: data.totalAmount, assetBooking: newAssetBooking, status: data.status })
-  db.collection("assets").doc(data.assetBooking.asset.id).collection("assetBookings").doc(data.assetBooking.id).update({ endDateTime: data.endDateTime })
+  var newAssetBooking = data.assetBooking;
+  newAssetBooking.endDateTime = data.endDateTime;
+  db.collection("payments").doc(data.paymentId).update({
+    totalAmount: data.totalAmount,
+    assetBooking: newAssetBooking,
+    status: data.status,
+  });
+  db.collection("assets")
+    .doc(data.assetBooking.asset.id)
+    .collection("assetBookings")
+    .doc(data.assetBooking.id)
+    .update({ endDateTime: data.endDateTime });
 
   for (let i = 0; i < data.serviceBooking.length; i++) {
     var serviceBooking = {
@@ -323,68 +323,87 @@ exports.editBooking = functions.https.onCall(async (data, context) => {
       assetBooking: newAssetBooking,
       dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
       worker: data.serviceBooking[i].worker,
-      completed: false
-    }
+      completed: false,
+    };
 
-    var sId = ""
-    var getServiceBookingId = db.collection("services").doc(data.serviceBooking[i].service.id).collection("serviceBookings").add(serviceBooking).then(docRef =>
-      sId = docRef.id
-    )
-    serviceBooking.id = sId
+    var sId = "";
+    var getServiceBookingId = db
+      .collection("services")
+      .doc(data.serviceBooking[i].service.id)
+      .collection("serviceBookings")
+      .add(serviceBooking)
+      .then((docRef) => (sId = docRef.id));
+    serviceBooking.id = sId;
 
-    db.collection("users").doc(data.serviceBooking[i].worker).collection("schedules").add({
-      serviceBooking,
-      dateTime: data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
-      worker: data.serviceBooking[i].worker,
-      completed: false
-    })
+    db.collection("users")
+      .doc(data.serviceBooking[i].worker)
+      .collection("schedules")
+      .add({
+        serviceBooking,
+        dateTime:
+          data.serviceBooking[i].day + "T" + data.serviceBooking[i].time,
+        worker: data.serviceBooking[i].worker,
+        completed: false,
+      });
   }
-
-
 });
 
 exports.manageServices = functions.https.onCall(async (data, context) => {
-
   if (data.status === "add") {
-    var sId = ""
-    let add = await db.collection("services").add(data.obj).then((docRef) =>
-      (sId = docRef.id)
-    )
+    var sId = "";
+    let add = await db
+      .collection("services")
+      .add(data.obj)
+      .then((docRef) => (sId = docRef.id));
     for (let i = 0; i < data.weekDays.length; i++) {
       if (data.weekDays[i].hours.length > 0) {
-        db.collection("services").doc(sId).collection("workingDays").doc(data.weekDays.day).set({ hours: data.weekDays[i].hours })
+        db.collection("services")
+          .doc(sId)
+          .collection("workingDays")
+          .doc(data.weekDays.day)
+          .set({ hours: data.weekDays[i].hours });
       }
     }
-
   }
 
   if (data.status === "update") {
-    db.collection("services").doc(data.selectedService.service.id).update(data.obj)
+    db.collection("services")
+      .doc(data.selectedService.service.id)
+      .update(data.obj);
 
     for (let i = 0; i < data.serviceWorkHoursDays.length; i++) {
-      if (data.serviceWorkHoursDays[i].service === data.selectedService.service) {
-        for (let k = 0; k < data.serviceWorkHoursDays[i].workingDays.length; k++) {
+      if (
+        data.serviceWorkHoursDays[i].service === data.selectedService.service
+      ) {
+        for (
+          let k = 0;
+          k < data.serviceWorkHoursDays[i].workingDays.length;
+          k++
+        ) {
           if (data.serviceWorkHoursDays[i].workingDays[k].hours.length > 0) {
-            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).set(
-              { hours: data.serviceWorkHoursDays[i].workingDays[k].hours })
-          }
-          else {
-            db.collection("services").doc(data.selectedService.service.id).collection("workingDays").doc(data.serviceWorkHoursDays[i].workingDays[k].day).delete()
-
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .set({
+                hours: data.serviceWorkHoursDays[i].workingDays[k].hours,
+              });
+          } else {
+            db.collection("services")
+              .doc(data.selectedService.service.id)
+              .collection("workingDays")
+              .doc(data.serviceWorkHoursDays[i].workingDays[k].day)
+              .delete();
           }
         }
-
       }
     }
   }
-
-})
+});
 
 exports.manageServiceWorkers = functions.https.onCall(async (data, context) => {
-
-  db.collection("users").doc(data.user.id).update(data.user)
-
-})
+  db.collection("users").doc(data.user.id).update(data.user);
+});
 exports.addFriend = functions.https.onCall(async (data, context) => {
   console.log("data", data);
   db.collection("users")
@@ -515,7 +534,6 @@ exports.handleBooking = functions.https.onCall(async (data, context) => {
 
   if (data.addCreditCard) {
     db.collection("users").doc(data.uid).collection("cards").add(data.card);
-
   }
 });
 
@@ -734,7 +752,7 @@ exports.addFavorite = functions.https.onCall(async (data, context) => {
       .collection("users")
       .doc(data.uid)
       .collection("favorites")
-      .doc(data.asset.id)
+      .doc(data.asset)
       .set({ asset: data.asset });
     console.log("response ", response);
     return response;
@@ -904,18 +922,22 @@ exports.FAQ = functions.https.onCall(async (data, context) => {
   if (data.query === "update") {
     db.collection("faq").doc(data.id).update({
       answer: data.answer,
+      answeredBy: data.answeredBy,
       status: "approved",
     });
-  } else if (data.query === "create") {
+  }
+  if (data.query === "create") {
     db.collection("faq").add({
       date: new Date(),
       question: data.question,
-      userId: data.user.uid,
+      userId: data.user.id,
       userDisplayName: data.user.displayName,
       answer: "",
+      answeredBy: "",
       status: "pending",
     });
-  } else if (data.query === "delete") {
+  }
+  if (data.query === "delete") {
     db.collection("faq").doc(data.id).delete();
   }
 });
