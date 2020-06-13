@@ -155,12 +155,6 @@ export default function EmployeesRequest(props) {
           </View>
           <View style={styles.text}>
             <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
-              ID
-            </Text>
-            <Text style={{ fontSize: responsiveFontSize(1.8) }}>{user.id}</Text>
-          </View>
-          <View style={styles.text}>
-            <Text style={{ fontSize: responsiveFontSize(1.8), color: "black" }}>
               Email
             </Text>
             <Text
