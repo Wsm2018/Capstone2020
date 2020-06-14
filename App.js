@@ -571,21 +571,6 @@ export default function App(props) {
         .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ activeRole: user.role });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          setPhotoURL(userRef.data().photoURL);
-        });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          console.log("userRef", userRef.data().activeRole);
-          if (userRef.data().role.slice(-12) !== "(incomplete)") {
-            setActiveRole(userRef.data().activeRole);
-          }
-        });
     }
 
     console.log("userRole", user.role);
@@ -708,6 +693,32 @@ export default function App(props) {
       };
     }
   }, [loggedIn]);
+
+  useEffect(() => {
+    if (user) {
+      const unsubPhoto = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          setPhotoURL(userRef.data().photoURL);
+        });
+
+      const unsubActiveRole = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          console.log("userRef", userRef.data().activeRole);
+          if (userRef.data().role.slice(-12) !== "(incomplete)") {
+            setActiveRole(userRef.data().activeRole);
+          }
+        });
+
+      return () => {
+        unsubPhoto();
+        unsubActiveRole();
+      };
+    }
+  }, [user]);
 
   // useEffect(() => {}, [user]);
 
