@@ -661,10 +661,11 @@ exports.setEmployeeAuthentication = functions.https.onCall(
     });
 
     let role = data.user.role.slice(0, data.user.role.length - 13);
+
     await db
       .collection("users")
       .doc(data.user.id)
-      .update({ role, phone: `+974${data.phone}` });
+      .update({ role, phone: `+974${data.phone}`, activeRole: role });
     console.log("after set", result);
   }
 );

@@ -72,7 +72,8 @@ export default function App(props) {
       );
       firebase.auth().signOut();
     } else {
-      db.collection("users")
+      await db
+        .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ status: "offline" });
       firebase.auth().signOut();
@@ -255,30 +256,43 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((userRef) => {
-        console.log("userRef", userRef.data().activeRole);
-        setActiveRole(userRef.data().activeRole);
-      });
-
-    const userRef = await db
+    let userRef = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
-    const getAdmin = firebase.functions().httpsCallable("getAdmin");
-    const response = await getAdmin({
-      email: firebase.auth().currentUser.email,
-    });
 
-    const admin = response.data.result !== undefined ? true : false;
+    while (!userRef.exists) {
+      userRef = await db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get();
+    }
+    // const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    // const response = await getAdmin({
+    //   email: firebase.auth().currentUser.email,
+    // });
+
+    const admin = null; //response.data.result !== undefined ? true : false;
 
     const user = { ...userRef.data(), admin };
 
-    await db
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({ activeRole: user.role });
+    console.log("userRef.exists", userRef.exists);
+    if (userRef.exists) {
+      await db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ activeRole: user.role });
+    }
+
+    // db.collection("users")
+    //   .doc(firebase.auth().currentUser.uid)
+    //   .onSnapshot((userRef) => {
+    //     console.log("userRef", userRef.data().activeRole);
+    //     if (userRef.data().role.slice(-12) !== "(incomplete)") {
+    //       setActiveRole(userRef.data().activeRole);
+    //     }
+    //   });
+    setActiveRole("customer");
 
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);
@@ -454,7 +468,13 @@ export default function App(props) {
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
         else if (user.role.slice(-12) === "(incomplete)") {
-          return <EmployeeAuthentication user={user} setUser={setUser} />;
+          return (
+            <EmployeeAuthentication
+              user={user}
+              setUser={setUser}
+              setActiveRole={setActiveRole}
+            />
+          );
         }
         // If employee is any OTHER role
         else {
@@ -469,7 +489,6 @@ export default function App(props) {
             switch (activeRole) {
               case "admin":
                 return <AdminAppContainer />;
-              // return <FriendsStack />;
 
               case "manager":
                 return <ManagersStack />;

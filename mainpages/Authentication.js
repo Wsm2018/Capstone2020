@@ -324,7 +324,7 @@ export default function Authentication(props) {
               firebase.auth().currentUser.uid
             }&phoneNumber=${phone}&displayName=${displayName}&referralStatus=${referralStatus}&referral=${referral}`
           );
-          await AsyncStorage.setItem(firebase.auth().currentUser.uid, true);
+          await AsyncStorage.setItem(firebase.auth().currentUser.uid, "true");
           //sending the user a verification email
           await firebase
             .auth()
