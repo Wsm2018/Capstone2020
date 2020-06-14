@@ -15,6 +15,12 @@ import {
   Dimensions,
   AsyncStorage,
 } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -328,7 +334,10 @@ Types.navigationOptions = (props) => ({
   headerTintColor: "white",
   headerTitle: (
     <Image
-      style={{ width: 200, height: 200 }}
+      style={{
+        width: responsiveScreenWidth(28),
+        height: responsiveScreenHeight(8),
+      }}
       source={require("../../assets/loadingAnimations/headerlogo.png")}
     />
   ),
