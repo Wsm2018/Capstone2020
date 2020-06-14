@@ -342,29 +342,14 @@ export default function Sections(props) {
   //   });
   //   return ids.includes(id);
   // };
-
   const handleAddFavorite = async (item) => {
     console.log("fav preseddddddddddddddddddd ");
-    // if (!(await checkFavorites(item.id))) {
-    //   db.collection("users")
-    //     .doc(firebase.auth().currentUser.uid)
-    //     .collection("favorites")
-    //     .doc(item.id)
-    //     .set({ asset: item });
-    // } else {
-    //   alert("Already exists");
-    // }
-    // alert("item", item);
-
-    const addFavorite = firebase.functions().httpsCallable("addFavorite");
-    const response = await addFavorite({
-      uid: firebase.auth().currentUser.uid,
-      asset: item.id,
-    });
-    console.log(response);
-    if (response.data !== "Exists") {
-      // alert("Asset Added");
-      // getUserFavoriteAssets();
+    if (!favoriteIds.includes(item.id)) {
+      const addFavorite = firebase.functions().httpsCallable("addFavorite");
+      const response = await addFavorite({
+        uid: firebase.auth().currentUser.uid,
+        asset: item.id,
+      });
       showMessage({
         message: `Favourite Added!`,
         description: `Item added to your favourites successfully!`,
@@ -373,10 +358,44 @@ export default function Sections(props) {
         // duration: 2300,
       });
     } else {
-      console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       handleDeleteFavorite(item.id);
     }
   };
+  // const handleAddFavorite = async (item) => {
+  //   console.log("fav preseddddddddddddddddddd ");
+  //   // if (!(await checkFavorites(item.id))) {
+  //   //   db.collection("users")
+  //   //     .doc(firebase.auth().currentUser.uid)
+  //   //     .collection("favorites")
+  //   //     .doc(item.id)
+  //   //     .set({ asset: item });
+  //   // } else {
+  //   //   alert("Already exists");
+  //   // }
+  //   // alert("item", item);
+
+  //   const addFavorite = firebase.functions().httpsCallable("addFavorite");
+  //   const response = await addFavorite({
+  //     uid: firebase.auth().currentUser.uid,
+  //     asset: item.id,
+  //   });
+  //   console.log(response);
+  //   if (response.data !== "Exists") {
+  //     // alert("Asset Added");
+  //     // getUserFavoriteAssets();
+  //     showMessage({
+  //       message: `Favourite Added!`,
+  //       description: `Item added to your favourites successfully!`,
+  //       // type: "success",
+  //       backgroundColor: "#3ea3a3",
+  //       // duration: 2300,
+  //     });
+  //   } else {
+  //     console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+  //     handleDeleteFavorite(item.id);
+  //   }
+  // };
 
   const handleDeleteFavorite = async (id) => {
     console.log("deleteddddddddddd ", id);
@@ -391,7 +410,7 @@ export default function Sections(props) {
         message: `Favourite Deleted!`,
         description: `Item deleted from your favourites successfully!`,
         // type: "success",
-        backgroundColor: "#3ea3a3",
+        backgroundColor: "#901616",
         // duration: 2300,
       });
     }
