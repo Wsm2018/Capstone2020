@@ -5,7 +5,6 @@ import { createAppContainer } from "react-navigation";
 import AssetManagement from "./AssetManagement";
 import ServiceManagement from "./ServiceManagement";
 import { Icon } from "react-native-elements";
-import { color } from "react-native-reanimated";
 
 const AppContainer = createAppContainer(
   createStackNavigator(
@@ -31,9 +30,8 @@ const AppContainer = createAppContainer(
             ),
             headerStyle: {
               backgroundColor: "#185a9d",
-              
             },
-            headerTitleStyle={{color:"white"}}
+            // headerTitleStyle={{color:"white"}}
             // headerTitle: "FRIENDS",
             headerTintColor: "white",
           };
