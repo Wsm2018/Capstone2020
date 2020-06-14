@@ -61,6 +61,7 @@ import {
 } from "@expo/vector-icons";
 
 // import AsyncStorage from "@react-native-community/async-storage";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -567,6 +568,18 @@ export default function App(props) {
     }
   }
 
+  async function getGuide() {
+    const value = await AsyncStorage.getItem("guide");
+    // console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      // await AsyncStorage.setItem("alreadyLaunched", "true");
+      // console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", value);
+    } else {
+      // console.log("falseeeeeeeeeeeeeeeeeeeeeee", value);
+      setGuideView(false);
+    }
+  }
+
   const handleChangeRole = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -574,8 +587,9 @@ export default function App(props) {
   };
 
   useEffect(() => {
-    getFirstLaunch();
-    getTheme();
+    // getFirstLaunch();
+    // getTheme();
+    getGuide();
   }, []);
 
   const handleAppState = (nextAppState) => {
@@ -690,8 +704,9 @@ export default function App(props) {
   });
   const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
 
-  const guideSkip = () => {
+  const guideSkip = async () => {
     // console.log("Skipppped");
+    await AsyncStorage.setItem("guide", "false");
     setGuideView(false);
   };
 
@@ -706,14 +721,19 @@ export default function App(props) {
       // if user info already retrieved
       if (user) {
         // if users first launch show guideView
-        // if (guideView) {
-        if (firstLaunch && guideView) {
+        if (guideView) {
+          // if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
         // --------------------------------CUSTOMER----------------------------------
         // if user is customer or service employee go to <AppContainer/>
         else if (user.role === "customer") {
-          return <AppContainer />;
+          return (
+            <View style={{ flex: 1 }}>
+              <AppContainer />
+              <FlashMessage position="top" />
+            </View>
+          );
         }
         // --------------------------------SERVICE EMPLOYEE----------------------------------
         // if user is customer or service employee go to <AppContainer/>
@@ -739,6 +759,7 @@ export default function App(props) {
               case "admin":
                 return <AdminAppContainer />;
               // return <FriendsStack />;
+              // return <AppContainer />;
 
               case "manager":
                 return <ManagersStack />;
@@ -756,7 +777,12 @@ export default function App(props) {
                 return <ServiceEmployeeAppContainer />;
 
               case "customer":
-                return <AppContainer />;
+                return (
+                  <View style={{ flex: 1 }}>
+                    <AppContainer />
+                    <FlashMessage position="top" />
+                  </View>
+                );
 
               default:
                 // ---We dun goofed---

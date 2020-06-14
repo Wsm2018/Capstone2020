@@ -24,6 +24,7 @@ import "firebase/auth";
 import "firebase/functions";
 import { Divider, Card as Cards } from "react-native-elements";
 import { Octicons } from "@expo/vector-icons";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function Card(props) {
   const [deviceType, setDeviceType] = useState(0);
@@ -46,7 +47,14 @@ export default function Card(props) {
       cardId: cardInfo.id,
     });
     if (response.data !== null) {
-      alert("Card removed");
+      // alert("Card removed");
+      showMessage({
+        message: `Card Deleted!`,
+        description: `Your credit card information has been deleted successfully!`,
+        // type: "success",
+        backgroundColor: "#901616",
+        // duration: 2300,
+      });
     }
   };
   const getDeviceType = async () => {

@@ -29,37 +29,37 @@ export default function ChooseRole(props) {
   const allRoles = [
     {
       name: "admin",
-      photoURL: require("../assets/icons/iconAdmin.png"),
+      photoURL: require("../assets/icons/admin.png"),
       selected: false,
     },
     {
       name: "manager",
-      photoURL: require("../assets/icons/iconManager.png"),
+      photoURL: require("../assets/icons/manager.png"),
       selected: false,
     },
     {
       name: "user handler",
-      photoURL: require("../assets/icons/iconUserHandler.png"),
+      photoURL: require("../assets/icons/userHandler.png"),
       selected: false,
     },
     {
       name: "asset handler",
-      photoURL: require("../assets/icons/iconUserHandler.png"),
+      photoURL: require("../assets/icons/assetHandler.png"),
       selected: false,
     },
     {
       name: "customer support",
-      photoURL: require("../assets/icons/iconCustomerSupport.png"),
+      photoURL: require("../assets/icons/customerSupport.png"),
       selected: false,
     },
     {
       name: "services employee",
-      photoURL: require("../assets/icons/iconEmployee.png"),
+      photoURL: require("../assets/icons/servicesEmployee.png"),
       selected: false,
     },
     {
       name: "customer",
-      photoURL: require("../assets/icons/iconCustomer.png"),
+      photoURL: require("../assets/icons/customer2.png"),
       selected: false,
     },
   ];
@@ -160,22 +160,26 @@ export default function ChooseRole(props) {
             >
               <TouchableOpacity
                 key={index}
-                style={
-                  {
-                    // backgroundColor: "red"
-                  }
-                }
+                style={{
+                  // backgroundColor: "red",
+                  width: "100%",
+                }}
                 onPress={() => handleSelect(role, index)}
               >
                 <View
-                  style={{ justifyContent: "center", alignItems: "center" }}
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
                 >
-                  <View>
+                  <View style={{}}>
                     <Image
                       source={role.photoURL}
                       style={{
-                        width: "100%",
-                        aspectRatio: 1 / 1,
+                        width: 90,
+                        height: 90,
+                        // aspectRatio: 1 / 1,
                         // borderWidth: 10,
                       }}
                     />
@@ -184,6 +188,7 @@ export default function ChooseRole(props) {
                     style={{
                       // backgroundColor: "green",
                       height: 30,
+                      // width: "100%",
                       // justifyContent: "flex-end",
                     }}
                   >
@@ -229,6 +234,6 @@ const styles = StyleSheet.create({
     // margin: 20,
     justifyContent: "center",
     // height: "100%",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fafafa",
   },
 });
