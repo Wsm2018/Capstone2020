@@ -595,7 +595,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
         data.role === "manager" || data.role.slice(-7) === "handler"
           ? `${data.role} (request)`
           : `${data.role} (incomplete)`,
-      qrCode: "",
+      qrCode: `http://chart.apis.google.com/chart?cht=qr&chs=300x300&chl=${account.uid}`,
       displayName: data.displayName,
       phone: null,
       referralCode,
@@ -661,10 +661,11 @@ exports.setEmployeeAuthentication = functions.https.onCall(
     });
 
     let role = data.user.role.slice(0, data.user.role.length - 13);
+
     await db
       .collection("users")
       .doc(data.user.id)
-      .update({ role, phone: `+974${data.phone}` });
+      .update({ role, phone: `+974${data.phone}`, activeRole: role });
     console.log("after set", result);
   }
 );
@@ -692,7 +693,34 @@ exports.roleToIncomplete = functions.https.onCall(async (data, context) => {
 });
 
 exports.testJose = functions.https.onCall(async (data, context) => {
-  console.log("data.id", data.id);
+  console.log("testJose data", data);
+  console.log("testJose it started");
+  let passwordCode = Math.random().toString(36).slice(-8);
+  let doc = await db
+    .collection("users")
+    .doc(firebase.auth().currentUser.uid)
+    .get();
+
+  let resetPasswordArr;
+  if (
+    doc.data().resetPassword === undefined ||
+    doc.data().resetPassword === null
+  ) {
+    resetPasswordArr = [];
+  }
+
+  resetPasswordArr = doc.data().resetPassword;
+
+  db.collection("users")
+    .doc(data.id)
+    .update({ resetPassword: true, passwordCode });
+
+  setTimeout(() => {
+    db.collection("users")
+      .doc(data.id)
+      .update({ resetPassword: false, passwordCode: null });
+    console.log("testJose it's done");
+  }, 1000 * 10);
   // let userId = data.id;
   // let additionalClaims = {
   //   done: false,
@@ -708,21 +736,22 @@ exports.testJose = functions.https.onCall(async (data, context) => {
   // } catch (error) {
   //   console.log(error);
   // }
-  let userId = data.id;
-  let additionalClaims = {
-    premiumAccount: true,
-  };
+  // let userId = data.id;
+  // let additionalClaims = {
+  //   premiumAccount: true,
+  // };
 
-  admin
-    .auth()
-    .createCustomToken(userId, additionalClaims)
-    .then(function (customToken) {
-      return customToken;
-    })
-    .catch(function (error) {
-      console.log("Error creating custom token:", error);
-    });
+  // admin
+  //   .auth()
+  //   .createCustomToken(userId, additionalClaims)
+  //   .then(function (customToken) {
+  //     return customToken;
+  //   })
+  //   .catch(function (error) {
+  //     console.log("Error creating custom token:", error);
+  //   });
 });
+
 exports.deleteFavorite = functions.https.onCall(async (data, context) => {
   console.log("deleteFavorite   ", data);
   const res = await db
@@ -1094,4 +1123,59 @@ exports.deletePromotion = functions.https.onCall(async (data, context) => {
   console.log("delete promotion ", data);
   const response = await db.collection("promotionCodes").doc(data.id).delete();
   return response;
+});
+
+exports.sendResetPassCode = functions.https.onCall(async (data, context) => {
+  console.log("sendResetPassCode data", data);
+
+  let doc = await db
+    .collection("users")
+    .doc(data.id)
+    // .doc(firebase.auth().currentUser.uid)
+    .get();
+
+  let resetPasswordArr = doc.data().resetPassword;
+  console.log(resetPasswordArr);
+  // if never done it or null
+  if (resetPasswordArr === undefined || resetPasswordArr === null) {
+    resetPasswordArr = [];
+  }
+  // if more than one code submitted expire all
+  if (resetPasswordArr.length > 0) {
+    resetPasswordArr.map((item) => {
+      item.expired = true;
+      return item;
+    });
+  }
+  let passwordCode = Math.random().toString(36).slice(-8);
+  let passCode = { passwordCode, expired: false };
+  resetPasswordArr.push(passCode);
+  let body = `<p style="font-size: 16px;">Enter the code below to reset your password</p><p style="font-size: 32px;">${passwordCode}</p>`;
+  const response = await fetch(
+    `https://us-central1-capstone2020-b64fd.cloudfunctions.net/sendMail?dest=${
+      doc.data().email
+    }&sub=Reset Password&body=${body}`
+  );
+  // console.log(resetPasswordArr);
+  db.collection("users")
+    .doc(data.id)
+    // .doc(firebase.auth().currentUser.uid)
+    .update({ resetPassword: resetPasswordArr });
+  setTimeout(async () => {
+    let doc = await db
+      .collection("users")
+      .doc(data.id)
+      // .doc(firebase.auth().currentUser.uid)
+      .get();
+    let resetPasswordArr = doc.data().resetPassword;
+    resetPasswordArr.shift();
+    if (resetPasswordArr.length === 0) {
+      resetPasswordArr = null;
+    }
+    db.collection("users")
+      .doc(data.id)
+      // .doc(firebase.auth().currentUser.uid)
+      .update({ resetPassword: resetPasswordArr });
+    console.log("testJose it's done");
+  }, 1000 * 120);
 });
