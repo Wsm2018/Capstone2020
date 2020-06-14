@@ -36,6 +36,7 @@ const HomeStack = createStackNavigator(
             color="white"
             // type="MaterialCommunityIcons"
             size={28}
+            style={{ marginLeft: 15 }}
           />
         ),
       };

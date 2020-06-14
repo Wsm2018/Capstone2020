@@ -14,12 +14,15 @@ const NewsStack = createStackNavigator(
       return {
         headerLeft: () => (
           <Icon
-            style={{ paddingLeft: 10 }}
+            containerStyle={{
+              marginLeft: 20,
+            }}
             onPress={() => navigation.openDrawer()}
             name="md-menu"
             color="white"
             type="ionicon"
             size={30}
+            style={{ marginLeft: 15 }}
           />
         ),
       };

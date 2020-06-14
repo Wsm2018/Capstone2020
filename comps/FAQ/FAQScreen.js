@@ -5,25 +5,33 @@ import { createAppContainer } from "react-navigation";
 import { Icon } from "react-native-elements";
 import ViewScreen from "./FAQViewScreen";
 import CreateScreen from "./FAQCreate";
-import UpdateScreen from "./FAQScreen";
+import UpdateScreen from "./FAQUpdate";
 
-const FAQStack = createAppContainer(
-  createStackNavigator(
-    { View: ViewScreen, Create: CreateScreen, Update: UpdateScreen },
-    {
-      defaultNavigationOptions: {
+const FAQStack = createStackNavigator(
+  { View: ViewScreen, Create: CreateScreen, Update: UpdateScreen },
+  {
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        headerLeft: (
+          <Icon
+            onPress={() => navigation.openDrawer()}
+            name="md-menu"
+            type="ionicon"
+            color="white"
+            size={30}
+            containerStyle={{
+              marginLeft: 15,
+            }}
+          />
+        ),
         headerStyle: {
-          backgroundColor: "#006cab",
+          backgroundColor: "#185a9d",
         },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "normal",
-        },
-      },
-    }
-  )
+        headerTitle: "FAQ",
+        headerTintColor: "white",
+      };
+    },
+  }
 );
 
-export default function FAQScreen(props) {
-  return <FAQStack />;
-}
+export default FAQStack;

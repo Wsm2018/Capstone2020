@@ -130,7 +130,7 @@ export default function App(props) {
                 color="white"
                 // type="MaterialCommunityIcons"
                 size={28}
-                style={{ marginLeft: 20 }}
+                style={{ marginLeft: 15 }}
               />
             ),
           };
@@ -145,24 +145,25 @@ export default function App(props) {
         screen: HomeStack,
         navigationOptions: {
           tabBarIcon: ({ tintColor }) => {
-            return <Ionicons name="ios-home" size={20} color={tintColor} />;
+            return <Ionicons name="ios-home" size={22} color={tintColor} />;
           },
         },
       },
-      BookingHistory: {
-        screen: BookingHistory,
-        navigationOptions: {
-          tabBarIcon: ({ tintColor }) => {
-            return (
-              <MaterialCommunityIcons
-                name="history"
-                size={20}
-                color={tintColor}
-              />
-            );
-          },
-        },
-      },
+      // BookingHistory: {
+      //   screen: BookingHistory,
+      //   navigationOptions: {
+      //     tabBarIcon: ({ tintColor }) => {
+      //       return (
+      //         <MaterialCommunityIcons
+      //           name="history"
+      //           size={20}
+      //           color={tintColor}
+      //         />
+      //       );
+      //     },
+      //     tabBarLabel: "My Bookings",
+      //   },
+      // },
       Profile: {
         screen: ProfileStack,
         navigationOptions: {
@@ -172,7 +173,7 @@ export default function App(props) {
                 <Image
                   // hereboi
                   source={{ uri: photoURL }}
-                  style={{ height: 20, width: 20, borderRadius: 50 }}
+                  style={{ height: 25, width: 25, borderRadius: 50 }}
                 />
               )
             );
@@ -187,15 +188,17 @@ export default function App(props) {
             return (
               <MaterialCommunityIcons
                 name="history"
-                size={20}
+                size={22}
                 color={tintColor}
               />
             );
           },
+          tabBarLabel: "My Bookings",
         },
       },
     },
     {
+      shifting: true,
       //swipeEnabled - Whether to allow swiping between tabs.
       swipeEnabled: true,
       //animationEnabled - Whether to animate when changing tabs.
@@ -203,21 +206,21 @@ export default function App(props) {
       //activeColor - Custom color for icon and label in the active tab.
       activeColor: "white",
       //inactiveColor - Custom color for icon and label in the inactive tab.
-      inactiveColor: "gray",
+      inactiveColor: "lightgray",
       // barStyle - Style for the bottom navigation bar.
-      barStyle: { backgroundColor: "#276b9c" },
+      barStyle: { backgroundColor: "#185a9d" },
 
       // tabBarOptions - Configure the tab bar
       tabBarOptions: {
         //activeTintColor - Label and icon color of the active tab
         activeTintColor: "white",
         //inactiveTintColor - Label and icon color of the inactive tab.
-        inactiveTintColor: "gray",
+        inactiveTintColor: "lightgray",
         // to display the labels
 
         //style - Style object for the tab bar.
         style: {
-          backgroundColor: "#276b9c",
+          backgroundColor: "#185a9d",
           paddingTop: 4,
         },
         //labelStyle - Style object for the tab label.
@@ -267,23 +270,53 @@ export default function App(props) {
         return {
           headerLeft: (
             <Icon
-              style={{ paddingRight: 10 }}
               onPress={() => navigation.openDrawer()}
               name="md-menu"
               type="ionicon"
               color="white"
               size={30}
+              containerStyle={{
+                marginLeft: 15,
+              }}
             />
           ),
           headerStyle: {
             backgroundColor: "#185a9d",
           },
-          headerTitle: "FRIENDS",
+          // headerTitle: "FRIENDS",
           headerTintColor: "white",
         };
       },
     }
   );
+
+  // const TicketAppContainer = createAppContainer(
+  //   { Ticket: TicketScreen },
+  //   {}
+  // {
+  //   defaultNavigationOptions: ({ navigation }) => {
+  //     return {
+  //       headerLeft: (
+  //         <Icon
+  //           onPress={() => navigation.openDrawer()}
+  //           name="md-menu"
+  //           type="ionicon"
+  //           color="white"
+  //           size={30}
+  //           containerStyle={{
+  //             marginLeft: 20,
+  //           }}
+  //         />
+  //       ),
+  //       headerStyle: {
+  //         backgroundColor: "#185a9d",
+  //       },
+  //       // headerTitle: "FRIENDS",
+  //       headerTintColor: "white",
+  //     };
+  //   },
+  // }
+  // );
 
   const AppDrawerNavigator = createDrawerNavigator(
     {
@@ -311,16 +344,16 @@ export default function App(props) {
           drawerIcon: ({ tintColor }) => {
             return <Entypo name="news" size={20} color={tintColor} />;
           },
-          headerLeft: () => (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              color="white"
-              type="ionicon"
-              size={30}
-            />
-          ),
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       Ticket: {
@@ -335,16 +368,16 @@ export default function App(props) {
             );
           },
           drawerLabel: "Contact Us",
-          headerLeft: () => (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              color="white"
-              type="ionicon"
-              size={30}
-            />
-          ),
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       FAQ: {
@@ -358,31 +391,31 @@ export default function App(props) {
               />
             );
           },
-          headerLeft: () => (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              color="white"
-              type="ionicon"
-              size={30}
-            />
-          ),
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       Advertisment: {
         screen: AdvertismentsStack,
         navigationOptions: {
-          headerLeft: () => (
-            <Icon
-              style={{ paddingLeft: 10 }}
-              onPress={() => navigation.openDrawer()}
-              name="md-menu"
-              color="white"
-              type="ionicon"
-              size={30}
-            />
-          ),
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
           drawerLabel: "Advertise with us",
           drawerIcon: ({ tinColor }) => {
             return <FontAwesome5 name="adversal" size={20} color={tinColor} />;
@@ -719,14 +752,56 @@ export default function App(props) {
   const AdminAppContainer = createAppContainer(AdminHomeStack);
 
   // --------------------- CHANGE THE CONFIG ---------------------
-  const serviceEmployeeTabNav = createMaterialBottomTabNavigator({
-    Schedule: ScheduleStack,
-    Home: HomeStack,
+  const serviceEmployeeTabNav = createMaterialBottomTabNavigator(
+    {
+      Schedule: ScheduleStack,
+      Home: HomeStack,
 
-    News: NewsStack,
+      News: NewsStack,
 
-    Profile: ProfileStack,
-  });
+      Profile: ProfileStack,
+    },
+    {
+      //swipeEnabled - Whether to allow swiping between tabs.
+      swipeEnabled: true,
+      //animationEnabled - Whether to animate when changing tabs.
+      animationEnabled: true,
+      //activeColor - Custom color for icon and label in the active tab.
+      activeColor: "white",
+      //inactiveColor - Custom color for icon and label in the inactive tab.
+      inactiveColor: "lightgray",
+      // barStyle - Style for the bottom navigation bar.
+      barStyle: { backgroundColor: "#185a9d" },
+
+      // tabBarOptions - Configure the tab bar
+      tabBarOptions: {
+        //activeTintColor - Label and icon color of the active tab
+        activeTintColor: "white",
+        //inactiveTintColor - Label and icon color of the inactive tab.
+        inactiveTintColor: "lightgray",
+        // to display the labels
+
+        //style - Style object for the tab bar.
+        style: {
+          backgroundColor: "#185a9d",
+          paddingTop: 4,
+        },
+        //labelStyle - Style object for the tab label.
+        lableStyle: {
+          textAlign: "center",
+          fontSize: 19,
+          fontWeight: "bold",
+          color: "transparent",
+        },
+        //indicatorStyle - Style object for the tab indicator (line at the bottom of the tab).
+        indicatorStyle: {
+          borderBottomColor: "white",
+          borderBottomWidth: 70,
+        },
+      },
+    }
+  );
+
   const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
 
   const guideSkip = async () => {

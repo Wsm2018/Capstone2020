@@ -322,16 +322,28 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  // title: "QuickbookinQ",
+  title: "QuickbooQ",
   headerStyle: { backgroundColor: "#185a9d" },
   // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
   headerTintColor: "white",
-  headerTitle: (
-    <Image
-      style={{ width: 200, height: 200 }}
-      source={require("../../assets/loadingAnimations/headerlogo.png")}
-    />
-  ),
+  // headerTitle: (
+  //   <Image
+  //     style={{ width: 200, height: 200 }}
+  //     source={require("../../assets/loadingAnimations/headerlogo.png")}
+  //   />
+  // ),
+  // header: (
+  //   <View style={{ height: 100, justifyContent: "center", marginTop: 25 }}>
+  //     <Text
+  //       onPress={() => {
+  //         console.log("helllllllllllllo");
+  //         props.navigation.openDrawer();
+  //       }}
+  //     >
+  //       Helllo
+  //     </Text>
+  //   </View>
+  // ),
 });
 
 const styles = StyleSheet.create({
