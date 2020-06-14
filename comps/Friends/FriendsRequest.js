@@ -80,9 +80,9 @@ export default function FriendsList(props) {
 
   // -------------------------------DECLINE-----------------------------------
   const decline = async (user) => {
-    const dec = firebase.functions().httpsCallable("removeFriend");
-    const response = await dec({ user: currentUser, friend: user });
-    console.log("response", response);
+    // const dec = firebase.functions().httpsCallable("removeFriend");
+    // const response = await dec({ user: currentUser, friend: user });
+    // console.log("response", response);
 
     db.collection("users")
       .doc(currentUser.id)
@@ -109,7 +109,7 @@ export default function FriendsList(props) {
     </View>
   ) : (
     <View style={styles.container}>
-      <View
+      {/* <View
         style={{
           flexDirection: "row",
           alignContent: "center",
@@ -140,10 +140,16 @@ export default function FriendsList(props) {
         >
           Friends Request
         </Text>
-      </View>
+      </View> */}
 
       {friends.length > 0 ? (
-        <SafeAreaView style={{ paddingTop: "2%" }}>
+        <SafeAreaView
+          style={
+            {
+              // paddingTop: "2%"
+            }
+          }
+        >
           <ScrollView>
             <FlatList
               data={friends}
@@ -215,15 +221,16 @@ export default function FriendsList(props) {
           }}
         >
           <LottieView
-            source={require("../../assets/10000-empty-box.json")}
+            // source={require("../../assets/10000-empty-box.json")}
+            source={require("../../assets/17723-waitting.json")}
             autoPlay
             duration={2000}
             // loop
             style={{
               position: "relative",
               width: "100%",
-              paddingTop: "13%",
-              paddingLeft: "6%",
+              paddingTop: "5%",
+              // paddingLeft: "6%",
             }}
           />
           <Text
@@ -233,10 +240,10 @@ export default function FriendsList(props) {
               paddingLeft: "3%",
               paddingTop: "8%",
               color: "#3062AE",
-              textDecorationLine: "underline",
+              // textDecorationLine: "underline",
             }}
           >
-            You have no Requests
+            No Requests
           </Text>
         </View>
       )}
@@ -247,6 +254,6 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#e3e3e3'
+    backgroundColor: "#e3e3e3",
   },
 });

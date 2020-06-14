@@ -22,9 +22,10 @@ export default function FriendsMap(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [friends, setFriends] = useState(null);
+  // const [friends, setFriends] = useState(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const unsubFriends = useRef();
+  const friends = props.friends;
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -65,10 +66,10 @@ export default function FriendsMap(props) {
           // console.log(tempFriends);
           setFriends(tempFriends);
         });
-      unsubFriends.current = unsubscribe;
+      // unsubFriends.current = unsubscribe;
     } else {
       setFriends([]);
-      unsubFriends.current = null;
+      // unsubFriends.current = null;
     }
   };
 
@@ -82,14 +83,14 @@ export default function FriendsMap(props) {
     let location = await Location.getCurrentPositionAsync({});
     setLocation(location);
 
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .update({
-        location: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-      });
+    // db.collection("users")
+    //   .doc(firebase.auth().currentUser.uid)
+    //   .update({
+    //     location: {
+    //       latitude: location.coords.latitude,
+    //       longitude: location.coords.longitude,
+    //     },
+    //   });
   };
 
   // ------------------------------TOGGLE LOCATION------------------------------------
@@ -103,14 +104,15 @@ export default function FriendsMap(props) {
   // ------------------------------USE EFFECT------------------------------------
   useEffect(() => {
     handleCurrentuser();
-    handleFriends();
+    // handleFriends();
     getCurrentLocation();
 
-    return () => {
-      if (unsubFriends.current !== null) {
-        unsubFriends.current();
-      }
-    };
+    // return () => {
+    //   if (unsubFriends.current !== null) {
+    //     unsubFriends.current();
+    //   }
+    // };
+    console.log(friends.length);
   }, []);
 
   return (
@@ -127,28 +129,32 @@ export default function FriendsMap(props) {
           }}
           style={{ flex: 1 }}
         >
-          {friends.map((friend) => (
-            <Marker
-              key={friend.id}
-              coordinate={friend.location}
-              title={friend.displayName}
-              //  image={friend.photoURL}
-              //   description={marker.description}
-            >
-              <View>
-                <Image
-                  source={{ uri: friend.photoURL }}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    //   right: -20,
-                    borderRadius: 50,
-                  }}
-                />
-              </View>
-            </Marker>
-          ))}
-          <View
+          {friends.map(
+            (friend) =>
+              friend.location && (
+                <Marker
+                  key={friend.id}
+                  coordinate={friend.location && friend.location}
+                  //try pls <----------------------------------------------------------------------------------------
+                  title={friend.displayName}
+                  //  image={friend.photoURL}
+                  //   description={marker.description}
+                >
+                  <View>
+                    <Image
+                      source={{ uri: friend.photoURL }}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        //   right: -20,
+                        borderRadius: 50,
+                      }}
+                    />
+                  </View>
+                </Marker>
+              )
+          )}
+          {/* <View
             style={{
               flexDirection: "row-reverse",
               backgroundColor: null,
@@ -184,8 +190,26 @@ export default function FriendsMap(props) {
                 style={{ paddingLeft: "1%", paddingTop: "3%" }}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </MapView>
+        <View
+          style={{
+            position: "absolute",
+            top: "2%",
+            right: "2%",
+            alignItems: "center",
+            // backgroundColor: "red",
+          }}
+        >
+          <Switch
+            trackColor={{ false: "#767577", true: "#185a9d" }}
+            thumbColor={isEnabled ? "#fff" : "#f4f3f4"}
+            // ios_backgroundColor="transparent"
+            onValueChange={(value) => toggleLocation(value)}
+            value={isEnabled}
+          />
+          <Text style={{ fontSize: 8 }}>Location</Text>
+        </View>
       </View>
     )
   );
@@ -194,6 +218,6 @@ export default function FriendsMap(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderWidth: 1,
+    // borderWidth: 1,
   },
 });

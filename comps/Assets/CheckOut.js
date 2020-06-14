@@ -263,10 +263,19 @@ export default function CheckOut(props) {
         vibrate: true,
       },
     };
-    localNotification.title = "Booking Complete (Unpaid)";
+    if( !response.data ){
+      alert(
+        "Sorry, whatever !!" 
+      );
+
+    }
+    else{
+      localNotification.title = "Booking Complete (Unpaid)";
     localNotification.body = `Total of ${totalAmount} QAR is still pending and the ${tName} was booked successfully!`;
     Notifications.presentLocalNotificationAsync(localNotification);
 
+    }
+    
     props.navigation.navigate("Types");
   };
   return (

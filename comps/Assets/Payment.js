@@ -324,7 +324,7 @@ export default function Payment(props) {
   const _keyboardDidShow = () => {
     // console.log("keyyyyyyyyyyyyyyyShow");
 
-    setMargin(300);
+    setMargin(-250);
   };
 
   const _keyboardDidHide = () => {
@@ -336,7 +336,12 @@ export default function Payment(props) {
   /////////////////////////////////////////////////////////////////////////////////////
   return (
     <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
-      <View style={{ flex: 8 }}>
+      <View
+        style={{
+          flex: 8,
+          marginTop: Platform.OS === "ios" ? marginVal : 0,
+        }}
+      >
         <ScrollView>
           {/* <Text>
             Total Amount:{" "}

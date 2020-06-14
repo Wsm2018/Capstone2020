@@ -15,7 +15,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
 import { Button } from "react-native";
-import { Icon, ListItem } from "react-native-elements";
+import { Icon, ListItem, SearchBar } from "react-native-elements";
 import {
   MaterialCommunityIcons,
   Feather,
@@ -24,6 +24,7 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -114,25 +115,47 @@ export default function FriendsList(props) {
   // -------------------------------ADD-----------------------------------
   // Sends a friend request to a user
   const addFriend = async (user, index) => {
-    db.collection("users")
-      .doc(currentUser.id)
-      .collection("friends")
-      .doc(user.id)
-      .set({
-        displayName: user.displayName,
-        status: "pending",
-        photoURL: user.photoURL,
-      });
+    const result = friends.filter((item) => {
+      return item.id === user.id;
+    });
 
-    db.collection("users")
-      .doc(user.id)
-      .collection("friends")
-      .doc(currentUser.id)
-      .set({
-        displayName: currentUser.displayName,
-        status: "requested",
-        photoURL: currentUser.photoURL,
+    if (result.length === 0) {
+      db.collection("users")
+        .doc(currentUser.id)
+        .collection("friends")
+        .doc(user.id)
+        .set({
+          displayName: user.displayName,
+          status: "pending",
+          photoURL: user.photoURL,
+        });
+
+      db.collection("users")
+        .doc(user.id)
+        .collection("friends")
+        .doc(currentUser.id)
+        .set({
+          displayName: currentUser.displayName,
+          status: "requested",
+          photoURL: currentUser.photoURL,
+        });
+      showMessage({
+        message: `Success!`,
+        description: `Your friend request has been sent!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
       });
+    } else {
+      // alert("already added");
+      showMessage({
+        message: `Already a Friend!`,
+        description: `You already added/requested!`,
+        // type: "success",
+        backgroundColor: "#901616",
+        // duration: 2300,
+      });
+    }
   };
 
   // -------------------------------REMOVE-----------------------------------
@@ -149,6 +172,13 @@ export default function FriendsList(props) {
       .collection("friends")
       .doc(currentUser.id)
       .delete();
+    showMessage({
+      message: `Request Deleted!`,
+      description: `Your friend request has been deleted!`,
+      // type: "success",
+      backgroundColor: "#901616",
+      // duration: 2300,
+    });
   };
 
   // ---------------------------------SEARCH---------------------------------
@@ -233,20 +263,25 @@ export default function FriendsList(props) {
           flexDirection: "row",
           alignContent: "center",
           alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#185a9d",
-          borderTopColor: "#185a9d",
+          justifyContent: "space-evenly",
+          backgroundColor: "#f0f0f0",
+          // borderTopColor: "#185a9d",
+          borderBottomWidth: 1,
+          height: 65,
+          borderColor: "lightgray",
           //paddingTop:'2%',
         }}
       >
-        <MaterialCommunityIcons
-          name="account-search"
-          size={40}
-          color="white"
-          style={{ paddingTop: "2%", marginBottom: 10 }}
-        />
+        <TouchableOpacity onPress={() => props.navigation.goBack()}>
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={30}
+            color="#185a9d"
+            // style={{ paddingTop: "2%", marginBottom: 10 }}
+          />
+        </TouchableOpacity>
 
-        <TextInput
+        {/* <TextInput
           style={{
             backgroundColor: "white",
             fontSize: 18,
@@ -262,7 +297,45 @@ export default function FriendsList(props) {
           placeholder="Search Here"
           onChangeText={setSearch}
           value={search}
+        /> */}
+        <SearchBar
+          placeholderTextColor="#e3e3e3"
+          placeholder="Search Here"
+          onChangeText={setSearch}
+          lightTheme
+          //showLoading={true}
+          searchIcon={true}
+          value={search}
+          containerStyle={{
+            backgroundColor: "transparent",
+            // borderBottomColor: "#185a9d",
+            // borderTopColor: "#185a9d",
+            width: "80%",
+            height: "100%",
+            borderWidth: 0,
+            // marginTop: 0,
+          }}
+          inputContainerStyle={{
+            borderRadius: 20,
+            borderWidth: 0,
+            borderColor: "#185a9d",
+            backgroundColor: "#fafafa",
+            height: "100%",
+          }}
+          // style={{
+          //   //backgroundColor: "white",
+          //   fontSize: 18,
+          //   paddingLeft: "2%",
+          //   // borderColor: "#185a9d",
+          //   // borderWidth: 2,
+          //   width: "85%",
+          //   // height: 50,
+          //   marginLeft: 10,
+          //   marginRight: 10,
+          //   elevation: 20,
+          // }}
         />
+
         {/* <MaterialIcons
           name="cancel"
           size={25}
@@ -274,7 +347,7 @@ export default function FriendsList(props) {
             name="qrcode-scan"
             type="material-community"
             size={28}
-            color="#fff"
+            color="#185a9d"
           />
         </TouchableOpacity>
       </View>
@@ -454,16 +527,32 @@ export default function FriendsList(props) {
       style={{
         flex: 1,
         flexDirection: "column",
-        justifyContent: "flex-end",
+        justifyContent: "center",
         paddingBottom: "10%",
+        backgroundColor: "#e3e3e3",
       }}
     >
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+        // style={StyleSheet.absoluteFillObject}
+        style={{ width: "100%", height: "100%" }}
       />
 
-      <Button title="Cancel" onPress={() => setScan(false)} />
+      {/* <Button title="Cancel" onPress={() => setScan(false)} /> */}
+      <TouchableOpacity
+        onPress={() => setScan(false)}
+        style={{
+          backgroundColor: "#3ea3a3",
+          alignSelf: "center",
+          width: 100,
+          height: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 8,
+        }}
+      >
+        <Text style={{ color: "white" }}>Cancel</Text>
+      </TouchableOpacity>
     </View>
   );
 }
