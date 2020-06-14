@@ -32,14 +32,22 @@ export default function NewsPage() {
     const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
     setHasCameraRollPermission(status === "granted");
   };
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     askPermission();
+    getUser();
   }, []);
 
   useEffect(() => {
     callNews();
   }, []);
+
+  const getUser = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((doc) => setUser({ id: doc.id, ...doc.data() }));
+  };
 
   const callNews = () => {
     db.collection("news").onSnapshot((onSnapshot) => {
@@ -117,47 +125,49 @@ export default function NewsPage() {
           <News key={i} item={item} />
         ))}
       </ScrollView>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#3ea3a3",
-          height: 50,
-          width: "60%",
-          alignItems: "center",
-          alignContent: "center",
+      {user && (user.role === "admin" || user.role === "manager") ? (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#3ea3a3",
+            height: 50,
+            width: "60%",
+            alignItems: "center",
+            alignContent: "center",
 
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          // paddingLeft: 0,
-          marginTop: 10,
-          // marginLeft: "20%",
-          // marginEnd: "20%",
-          borderRadius: 8,
-          marginBottom: 10,
-        }}
-        onPress={() => {
-          setCreateFlag(!createFlag);
-        }}
-      >
-        <Text
-          style={{
-            color: "#fff",
-            fontSize: 22,
-            paddingLeft: "5%",
-            paddingBottom: "2%",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignSelf: "center",
+            // paddingLeft: 0,
+            marginTop: 10,
+            // marginLeft: "20%",
+            // marginEnd: "20%",
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+          onPress={() => {
+            setCreateFlag(!createFlag);
           }}
         >
-          Create News
-        </Text>
-        <Text
-          style={{
-            paddingBottom: "1%",
-          }}
-        >
-          {"  "}
-          <MaterialIcons name="create" size={25} color="white" />
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 22,
+              paddingLeft: "5%",
+              paddingBottom: "2%",
+            }}
+          >
+            Create News
+          </Text>
+          <Text
+            style={{
+              paddingBottom: "1%",
+            }}
+          >
+            {"  "}
+            <MaterialIcons name="create" size={25} color="white" />
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   ) : (
     <View style={styles.container2}>
