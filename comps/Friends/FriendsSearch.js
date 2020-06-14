@@ -575,7 +575,7 @@ export default function FriendsList(props) {
                 User not found
               </Text>
             ) : null}
-            {/* <LottieView
+            <LottieView
               source={require("../../assets/17723-waitting.json")}
               autoPlay
               loop
@@ -586,7 +586,7 @@ export default function FriendsList(props) {
                 // alignSelf: "center",
                 paddingTop: "5%",
               }}
-            /> */}
+            />
             {search.length > 0 ? null : (
               <Text style={{ color: "grey", fontSize: 20 }}>Add a Friend</Text>
             )}

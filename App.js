@@ -361,7 +361,7 @@ export default function App(props) {
       FAQ: {
         screen: FAQStack,
         navigationOptions: {
-          drawerIcon: ({ tinColor }) => {
+          drawerIcon: ({ tintColor }) => {
             return (
               <Image
                 source={require("./assets/images/faq.png")}

@@ -141,7 +141,7 @@ export default function Authentication(props) {
   // --------------------------------------------- END OF ALL STATES --------------------------------
 
   const getAllUsers = () => {
-    db.collection("users").onSnapshot((querySnapshot) => {
+    const unsub = db.collection("users").onSnapshot((querySnapshot) => {
       let users = [];
       let emails = [];
       querySnapshot.forEach((doc) => {
@@ -151,22 +151,29 @@ export default function Authentication(props) {
       setAllEmails([...emails]);
       setAllUsers([...users]);
     });
+
+    return unsub;
   };
 
   const getAllPhoneNumber = () => {
-    db.collection("users").onSnapshot((querySnapshot) => {
+    const unsub = db.collection("users").onSnapshot((querySnapshot) => {
       let phones = [];
       querySnapshot.forEach((doc) => {
         phones.push(doc.data().phone);
       });
-      console.log("phones            ", phones);
       setPhoneNumbers([...phones]);
     });
+
+    return unsub;
   };
 
   useEffect(() => {
-    getAllUsers();
-    getAllPhoneNumber();
+    const unsubUsers = getAllUsers();
+    const unsubPhones = getAllPhoneNumber();
+    return () => {
+      unsubUsers();
+      unsubPhones();
+    };
   }, []);
 
   const changePassword = async () => {
