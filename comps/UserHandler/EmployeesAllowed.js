@@ -26,12 +26,19 @@ import {
 } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 export default function EmployeesAllowed(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
+  const [deviceType, setDeviceType] = useState(0);
 
   const [marginVal, setMargin] = useState(0);
 
@@ -50,7 +57,13 @@ export default function EmployeesAllowed(props) {
 
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // --------------------------------USERS----------------------------------
   const handleUsers = () => {
     db.collection("users")
@@ -233,13 +246,19 @@ export default function EmployeesAllowed(props) {
                       rightAvatar={
                         <Ionicons
                           name="ios-arrow-forward"
-                          size={24}
+                          size={responsiveScreenHeight(2)}
                           color="black"
                         />
                       }
                       // leftAvatar={{ source: { uri: l.avatar_url } }}
-                      titleStyle={{ marginLeft: "4%" }}
-                      subtitleStyle={{ marginLeft: "4%" }}
+                      titleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.8),
+                      }}
+                      subtitleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.6),
+                      }}
                       // leftAvatar={user.photoURL}
                       title={user.displayName}
                       subtitle={user.email}
@@ -265,12 +284,18 @@ export default function EmployeesAllowed(props) {
                   style={{
                     position: "relative",
                     width: "100%",
-                    justifyContent: "center",
-                    alignSelf: "center",
-                    paddingTop: "30%",
+                    // justifyContent: "center",
+                    // alignSelf: "center",
+                    paddingTop: "5%",
                   }}
                 />
-                <Text style={{ color: "grey", fontSize: 20 }}>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 20,
+                    fontSize: responsiveScreenFontSize(1.8),
+                  }}
+                >
                   No Empolyees!
                 </Text>
               </View>
@@ -336,11 +361,11 @@ const styles = StyleSheet.create({
     marginTop: "-9%",
   },
   containerLogin2: {
-    flex: 0.7,
+    flex: 0.8,
     justifyContent: "flex-start",
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
-    marginTop: "-8%",
+    // marginTop: "-8%",
   },
   header: {
     padding: 15,

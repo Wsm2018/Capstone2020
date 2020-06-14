@@ -14,6 +14,7 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
 } from "react-native-responsive-dimensions";
 
 import db from "../../../db";
@@ -42,8 +43,8 @@ export default function PromotionList(props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 15 }}>
-        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
+      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 5 }}>
           <View
             style={{
               flex: 1,
@@ -117,7 +118,7 @@ export default function PromotionList(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 18,
+                    fontSize: responsiveFontSize(2),
                     color: "white",
                   }}
                 >

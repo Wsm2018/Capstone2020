@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Device from "expo-device";
 
 import db from "../db.js";
 import firebase from "firebase/app";
@@ -27,7 +28,10 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
-export default ({ item }) => {
+import { responsiveScreenFontSize } from "react-native-responsive-dimensions";
+export default ({ item, user }) => {
+  const [deviceType, setDeviceType] = useState(0);
+
   const [editFlag, setEditFlag] = useState(true);
   const [viewNews, setViewNews] = useState(false);
   const [titleEdit, setTitleEdit] = useState(item.title);
@@ -58,6 +62,13 @@ export default ({ item }) => {
       });
   };
 
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   const handleEdit = () => {
     console.log("the item Edit: ", item.id);
     db.collection("news")
@@ -131,15 +142,44 @@ export default ({ item }) => {
           }}
         >
           {/* <Badge status="primary" containerStyle={{ paddingTop: "1%" }} /> */}
-          <Ionicons
-            name="ios-time"
-            size={20}
-            color="#185a9d"
-            style={{ paddingTop: "0.3%" }}
-          />
-          <Text style={{ paddingLeft: "3%", fontSize: 18, color: "#185a9d" }}>
-            {moment(item.datePublished.toDate()).format("LL")}
-          </Text>
+          {item.datePublished === item.endDate ? (
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
+            >
+              Until
+            </Text>
+          ) : (
+            <Ionicons
+              name="ios-time"
+              size={deviceType === 1 ? 20 : 40}
+              color="#20365F"
+              style={{ paddingTop: "0.3%" }}
+            />
+          )}
+          {item.datePublished === item.endDate ? (
+            <Text
+              style={{
+                paddingLeft: "1%",
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
+            >
+              {moment(item.datePublished.toDate()).format("LL")}
+            </Text>
+          ) : (
+            <Text
+              style={{
+                paddingLeft: "3%",
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
+            >
+              {moment(item.datePublished.toDate()).format("LL")}
+            </Text>
+          )}
           {viewNews === true ? (
             <Animatable.View animation="flipInX" style={{ width: "100%" }}>
               <TouchableOpacity
@@ -155,7 +195,7 @@ export default ({ item }) => {
               >
                 <MaterialIcons
                   name="unfold-less"
-                  size={24}
+                  size={deviceType === 1 ? 20 : 40}
                   color="white"
                   style={{
                     paddingLeft: "10%",
@@ -186,7 +226,7 @@ export default ({ item }) => {
               >
                 <Ionicons
                   name="md-more"
-                  size={24}
+                  size={deviceType === 1 ? 20 : 40}
                   color="white"
                   style={{ paddingLeft: "43%" }}
                 />
@@ -207,42 +247,49 @@ export default ({ item }) => {
               paddingLeft: "7%",
             }}
           >
-            <Text style={{ fontSize: 18 }}>
+            <Text style={{ fontSize: responsiveScreenFontSize(2) }}>
               {/* Description:  */}
               {item.description}
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingTop: "3%",
-              }}
-            >
-              <TouchableOpacity
+            {item.endDate === item.datePublished ? null : user.activeRole ===
+              "admin" ? (
+              <View
                 style={{
-                  alignSelf: "flex-end",
-                  paddingRight: "2%",
-                  position: "relative",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingTop: "3%",
                 }}
-                onPress={() => setEditFlag(!editFlag)}
               >
-                <Text>
-                  <FontAwesome name="edit" size={28} color="#1488BB" />
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ alignSelf: "flex-end", position: "relative" }}
-                onPress={() => handleDelete(item)}
-              >
-                <Text>
-                  <MaterialCommunityIcons
-                    name="delete-circle-outline"
-                    size={28}
-                    color="#BB1427"
-                  />
-                </Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "flex-end",
+                    paddingRight: "2%",
+                    position: "relative",
+                  }}
+                  onPress={() => setEditFlag(!editFlag)}
+                >
+                  <Text>
+                    <FontAwesome
+                      name="edit"
+                      size={deviceType === 1 ? 30 : 40}
+                      color="#1488BB"
+                    />
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ alignSelf: "flex-end", position: "relative" }}
+                  onPress={() => handleDelete(item)}
+                >
+                  <Text>
+                    <MaterialCommunityIcons
+                      name="delete-circle-outline"
+                      size={deviceType === 1 ? 30 : 40}
+                      color="#BB1427"
+                    />
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </Animatable.View>
         )}
       </Card>

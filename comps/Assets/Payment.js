@@ -44,7 +44,7 @@ export default function Payment(props) {
   //const [serviceBooking, setServiceBooking] = useState({ asset: { id: "5uhqZwCDvQDH13OhKBJf", price: 100 }, startDateTime: "2020-05-15T01:00", endDateTime: "2020-05-16T08:00"})
   const [card, setCard] = useState({});
   const [cards, setCards] = useState([]);
-
+  const [checker, setChecker] = useState("");
   const [cardNumber, setCardNumber] = useState();
   const [year, setYear] = useState();
   const [month, setMonth] = useState();
@@ -217,7 +217,80 @@ export default function Payment(props) {
 
   const pay = async () => {
     setClicked(true);
-    console.log("154");
+    var bookingTemp = [];
+    var bookings = await db
+      .collection("assets")
+      .doc(assetBooking.asset.id)
+      .collection("assetBookings")
+      .get();
+    // console.log(" ehh", bookings)
+    if (bookings) {
+      bookings.forEach((b) => {
+        bookingTemp.push(b.data());
+      });
+    }
+    //const temp = [];
+    //setEmpty(true)
+    setChecker(bookingTemp);
+  };
+
+  useEffect(() => {
+    if (checker && checker.length >= 0) {
+      console.log(" got it !!! 3");
+      var conflict = false;
+      var result = checker.filter((AB) => {
+        if (
+          AB.startDateTime >= assetBooking.startDateTime &&
+          AB.startDateTime <= assetBooking.endDateTime
+        ) {
+          console.log(
+            " 1 ",
+            AB.startDateTime,
+            assetBooking.startDateTime,
+            AB.endDateTime,
+            assetBooking.startDateTime
+          );
+          conflict = true;
+          //break
+        } else if (
+          AB.endDateTime >= assetBooking.endDateTime &&
+          AB.endDateTime <= assetBooking.endDateTime
+        ) {
+          console.log(
+            " 2 ",
+            AB.startDateTime,
+            assetBooking.endDateTime,
+            AB.endDateTime,
+            assetBooking.endDateTime
+          );
+          conflict = true;
+          // break
+        } else if (
+          AB.startDateTime == assetBooking.startDateTime ||
+          AB.endDateTime == assetBooking.endDateTime
+        ) {
+          console.log(
+            " 3 ",
+            AB.startDateTime,
+            assetBooking.startDateTime,
+            AB.endDateTime,
+            assetBooking.endDateTime
+          );
+          conflict = true;
+          // break
+        }
+      });
+
+      if (!conflict) {
+        add();
+      } else {
+        alert("Sorry, Booking Can't be added!!");
+        props.navigation.navigate("BookingHistory");
+      }
+    }
+  }, [checker]);
+
+  const add = async () => {
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
     const editBooking = firebase.functions().httpsCallable("editBooking");
     const assetManager = firebase.functions().httpsCallable("assetManager");
@@ -330,7 +403,7 @@ export default function Payment(props) {
         totalAmount > 0 ? totalAmount : 0
       } QAR for the ${tName} was completed successfully!`;
       Notifications.presentLocalNotificationAsync(localNotification);
-      props.navigation.navigate("Types");
+      props.navigation.navigate("BookingHistory");
     }
     db.collection("users").doc(user.id).update(u);
     console.log("192");

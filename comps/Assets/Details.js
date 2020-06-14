@@ -33,6 +33,7 @@ export default function Details(props) {
   // const tName = props.navigation.getParam("tName", 'failed')
   // const sName = props.navigation.getParam("sName", 'failed')
   // const asset = props.navigation.getParam("asset", 'failed');
+  const userDaysRef = useRef()
   const tName = props.tName;
   const sName = props.sName;
   const asset = props.asset;
@@ -219,9 +220,12 @@ export default function Details(props) {
     if (diffDays > 0) {
       var startHour = start.current.split(" ")[2];
       var endHour = end.current.split(" ")[2];
+      console.log("startHour" ,startHour  )
+      console.log("startHour" ,endHour  )
       //remove hours before start hour
       for (let i = 0; i < timesList.length; i++) {
         if (timesList[i].time + "" === startHour) {
+         
           for (let k = i; k < timesList.length; k++) {
             firstDayHours.push(timesList[k]);
           }
@@ -277,7 +281,10 @@ export default function Details(props) {
         days[i].timesList = temp;
       }
     }
+   
     setUserDays(days);
+    userDaysRef.current = days
+   
   };
 
   const getAvailableTimings = () => {
@@ -867,17 +874,129 @@ export default function Details(props) {
                               marginBottom: 10,
                             }}
                           >
-                            {userDays.map((d, dayindex) => (
-                              <View
-                                style={
-                                  {
-                                    // marginBottom: d.timesList.length > 0 && 5,
-                                  }
-                                }
-                              >
-                                {/* {d.timesList.length > 0 && ( */}
+                            
+                            {Platform.OS == "ios" ?
+userDays.map((d, dayindex) => (
+  <View >
+
+    <Text>{getDay(d.day)}</Text>
+ 
+    {d.timesList.length > 0 ? (
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          marginBottom: 10,
+        }}
+      >
+        {d.timesList.length > 0
+          ? d.timesList.map((t, timeindex) =>
+              checkHour(timeindex, dayindex) ==
+              "green" ? (
+                <TouchableOpacity
+                  style={{
+                    // borderWidth: 2,
+                    borderColor: "#185a9d",
+                    backgroundColor: "#185a9d",
+                    borderRadius: 5,
+                    padding: 5,
+                    width: "23%",
+                    margin: 3,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={() =>
+                    book(dayindex, timeindex)
+                  }
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 13,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t.show}
+                  </Text>
+                </TouchableOpacity>
+              ) : checkHour(timeindex, dayindex) ==
+                "white" ? (
+                <TouchableOpacity
+                  style={{
+                    borderWidth: 2,
+                    borderColor: "#185a9d",
+                    backgroundColor: "white",
+                    borderRadius: 5,
+                    padding: 5,
+                    width: "23%",
+                    margin: 3,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={() =>
+                    book(dayindex, timeindex)
+                  }
+                >
+                  <Text
+                    style={{
+                      color: "#185a9d",
+                      fontSize: 13,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t.show}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{
+                    borderWidth: 2,
+                    borderColor: "gray",
+                    backgroundColor: "transparent",
+                    borderRadius: 5,
+                    padding: 5,
+                    width: "23%",
+                    margin: 3,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "gray",
+                      fontSize: 13,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t.show}
+                  </Text>
+                </View>
+              )
+            )
+          : // <Text>
+            //   No services available for this day
+            // </Text>
+
+            null}
+      </View>
+    ) : (
+      <Text
+        style={{
+          marginBottom: 10,
+          color: "#901616",
+        }}
+      >
+        No services available for this day
+      </Text>
+    )}
+  </View>
+))
+                            :
+                            userDays.map((d, dayindex) => (
+                              <View >
+                       
                                 <Text>{getDay(d.day)}</Text>
-                                {/* )} */}
+                             
                                 {d.timesList.length > 0 ? (
                                   <View
                                     style={{
@@ -991,7 +1110,7 @@ export default function Details(props) {
                           </View>
                         ) : null}
                       </View>
-                    ))
+                            ))
                   : // <Text>No Available Services</Text>
                     null}
               </View>

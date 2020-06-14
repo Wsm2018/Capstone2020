@@ -24,6 +24,15 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+  responsiveHeight,
+  useResponsiveHeight,
+} from "react-native-responsive-dimensions";
 import ReactNativePickerModule from "react-native-picker-module";
 
 import DatePicker from "react-native-datepicker";
@@ -32,7 +41,6 @@ import "firebase/auth";
 import db from "../../db";
 
 import { Avatar, ListItem, Icon } from "react-native-elements";
-
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
@@ -67,7 +75,6 @@ export default function Users() {
 
   const [marginVal, setMargin] = useState(0);
   const [searchResult, setSearchResult] = useState([]);
-
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -236,25 +243,25 @@ export default function Users() {
     }
   }, [users]);
 
-  const handleSearch = (query) => {
-    let tempUsers = JSON.parse(JSON.stringify(users));
-    if (query.length > 0) {
-      setSearch(query);
-      // let tempUsers = [...users];
-      let result = tempUsers.filter((user) =>
-        user.displayName.toLowerCase().match(query.toLowerCase())
-      );
+  // const handleSearch = (query) => {
+  //   let tempUsers = JSON.parse(JSON.stringify(users));
+  //   if (query.length > 0) {
+  //     setSearch(query);
+  //     // let tempUsers = [...users];
+  //     let result = tempUsers.filter((user) =>
+  //       user.displayName.toLowerCase().match(query.toLowerCase())
+  //     );
 
-      setUsers([...result]);
-    } else {
-      setUsers(tempUsers);
-      setSearch(query);
-    }
-  };
+  //     setUsers([...result]);
+  //   } else {
+  //     setUsers(tempUsers);
+  //     setSearch(query);
+  //   }
+  // };
 
-  useEffect(() => {
-    handleSearch(search);
-  }, [search]);
+  // useEffect(() => {
+  //   handleSearch(search);
+  // }, [search]);
 
   const subscribe = (type) => {
     if (type === "new") {
@@ -354,7 +361,7 @@ export default function Users() {
           <View
             elevation={5}
             style={{
-              height: height / 2.5,
+              height: responsiveHeight(52),
               width: width / 1.6,
               backgroundColor: "#fff",
               shadowOpacity: 1,
@@ -383,17 +390,24 @@ export default function Users() {
                 marginStart: 10,
               }}
             >
-              <View style={{ marginBottom: "10%", marginTop: 20 }}>
-                <Text
-                  style={{ fontSize: 16, color: "black", textAlign: "center" }}
-                >
-                  Are you sure you want to update {user.displayName}'s password?
-                </Text>
+              <View style={{ marginBottom: "10%", marginTop: 30 }}>
+                <View style={{ marginTop: "5%" }}>
+                  <Text
+                    style={{
+                      fontSize: responsiveFontSize(2),
+                      color: "black",
+                      textAlign: "center",
+                    }}
+                  >
+                    Are you sure you want to update {user.displayName}'s
+                    password?
+                  </Text>
+                </View>
               </View>
               <View>
                 <Text
                   style={{
-                    fontSize: 15,
+                    fontSize: responsiveFontSize(1.8),
                     color: "#901616",
                     fontWeight: "bold",
                     textAlign: "center",
@@ -441,7 +455,7 @@ export default function Users() {
                     flex: 0.4,
                     backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
-                    height: 40,
+                    height: responsiveScreenHeight(5),
                     // width: "30%",
                     // alignSelf: "center",
                     justifyContent: "center",
@@ -457,7 +471,7 @@ export default function Users() {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
@@ -471,7 +485,7 @@ export default function Users() {
                     flex: 0.4,
                     backgroundColor: "#2E9E9B",
                     // borderWidth: 4,
-                    height: 40,
+                    height: responsiveScreenHeight(5),
                     // width: "30%",
                     // alignSelf: "center",
                     justifyContent: "center",
@@ -486,7 +500,7 @@ export default function Users() {
                   <Text
                     style={{
                       textAlign: "center",
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(2),
                       color: "white",
                       // fontWeight: "bold",
                     }}
@@ -545,14 +559,22 @@ export default function Users() {
             >
               <View style={{ marginBottom: "10%", marginTop: 20 }}>
                 <Text
-                  style={{ fontSize: 16, color: "black", textAlign: "center" }}
+                  style={{
+                    fontSize: responsiveScreenFontSize(2),
+                    color: "black",
+                    textAlign: "center",
+                  }}
                 >
                   Are you sure you want to delete {user.displayName}'s account?
                 </Text>
               </View>
 
               <Text
-                style={{ fontSize: 16, color: "#901616", fontWeight: "bold" }}
+                style={{
+                  fontSize: responsiveScreenFontSize(2),
+                  color: "#901616",
+                  fontWeight: "bold",
+                }}
               >
                 This action can't be undone!
               </Text>
@@ -572,7 +594,7 @@ export default function Users() {
                   flex: 0.3,
                   backgroundColor: "#901616",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
@@ -587,7 +609,7 @@ export default function Users() {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -601,7 +623,7 @@ export default function Users() {
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
                   // borderWidth: 4,
-                  height: 40,
+                  height: responsiveScreenHeight(5),
                   // width: "30%",
                   // alignSelf: "center",
                   justifyContent: "center",
@@ -616,7 +638,7 @@ export default function Users() {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveScreenFontSize(2),
                     color: "white",
                     // fontWeight: "bold",
                   }}
@@ -656,7 +678,7 @@ export default function Users() {
                 {/* <Ionicons name="ios-arrow-back" size={22} color="#005c9d" /> */}
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: responsiveFontSize(2),
                     color: "#005c9d",
                     marginStart: 10,
                     // textAlign: "center",
@@ -669,13 +691,17 @@ export default function Users() {
               </TouchableOpacity>
             </View>
 
-            <Avatar rounded source={{ uri: user.photoURL }} size="xlarge" />
+            <Avatar
+              rounded
+              source={{ uri: user.photoURL }}
+              size={responsiveScreenWidth(25)}
+            />
             <View style={{ flex: 2 }}>
               <Text
                 style={{
                   alignSelf: "center",
                   fontWeight: "bold",
-                  fontSize: 16,
+                  fontSize: responsiveFontSize(2),
                 }}
               >
                 {user.displayName}
@@ -705,7 +731,7 @@ export default function Users() {
                 <TouchableOpacity onPress={() => setModal(true)}>
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(1.8),
                       color: "#2E9E9B",
 
                       fontWeight: "bold",
@@ -727,7 +753,7 @@ export default function Users() {
                 <TouchableOpacity onPress={() => setEditMode(true)}>
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(1.8),
                       color: "#005c9d",
 
                       fontWeight: "bold",
@@ -750,7 +776,7 @@ export default function Users() {
                 <TouchableOpacity onPress={() => setModal2(true)}>
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: responsiveFontSize(1.8),
                       color: "#901616",
 
                       fontWeight: "bold",
@@ -781,7 +807,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(20) }}>
                 <Text style={styles.text2}>Email:</Text>
               </View>
               <View
@@ -793,6 +819,7 @@ export default function Users() {
                     placeholder={"Email"}
                     value={email}
                     onChangeText={setEmail}
+                    style={{ fontSize: responsiveFontSize(1.5) }}
                     // style={styles.inputStyle}
                     // width={Dimensions.get("window").width / 2}
                   />
@@ -800,7 +827,7 @@ export default function Users() {
               </View>
             </View>
           ) : (
-            <View style={styles.text}>
+            <View style={{ width: responsiveScreenWidth(20) }}>
               <Text style={styles.text2}>Email: {user.email}</Text>
             </View>
           )}
@@ -812,7 +839,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(20) }}>
                 <Text style={styles.text2}>Name:</Text>
               </View>
               <View
@@ -824,12 +851,13 @@ export default function Users() {
                     placeholder={"Display Name"}
                     value={displayName}
                     onChangeText={setDisplayName}
+                    style={{ fontSize: responsiveFontSize(2) }}
                   />
                 </View>
               </View>
             </View>
           ) : (
-            <View style={styles.text}>
+            <View style={{ width: responsiveScreenWidth(20) }}>
               <Text style={styles.text2}>Name: {user.displayName}</Text>
             </View>
           )}
@@ -842,7 +870,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(20) }}>
                 <Text style={styles.text2}>Phone:</Text>
               </View>
               <View
@@ -850,20 +878,24 @@ export default function Users() {
                 style={styles.inputStyle}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={{ fontSize: 18, color: "gray" }}>🇶🇦 +974 </Text>
+                  <Text
+                    style={{ fontSize: responsiveFontSize(2), color: "gray" }}
+                  >
+                    🇶🇦 +974{" "}
+                  </Text>
                   <TextInput
                     // placeholder="1234 5678"
                     onChangeText={setPhone}
                     keyboardType="phone-pad"
                     maxLength={8}
-                    fontSize={18}
+                    fontSize={responsiveFontSize(2)}
                     value={phone}
                   />
                 </View>
               </View>
             </View>
           ) : (
-            <View style={styles.text}>
+            <View style={{ width: responsiveScreenWidth(20) }}>
               <Text style={styles.text2}>Phone: {user.phone}</Text>
             </View>
           )}
@@ -881,7 +913,7 @@ export default function Users() {
                   marginBottom: "5%",
                 }}
               >
-                <View style={{ width: 100 }}>
+                <View style={{ width: responsiveScreenWidth(22) }}>
                   <Text style={styles.text2}>Role: </Text>
                 </View>
 
@@ -891,7 +923,7 @@ export default function Users() {
                     borderRadius: 5,
                     borderWidth: 2,
                     borderColor: "gray",
-                    height: 40,
+                    height: responsiveScreenHeight(5),
                     //width: "80%",
                     alignSelf: "center",
                     paddingLeft: 12,
@@ -904,6 +936,7 @@ export default function Users() {
                     style={styles.picker}
                     // style={{ width: "50%" }}
                     // mode="dropdown"
+                    itemStyle={{ fontSize: responsiveScreenFontSize(2) }}
                     selectedValue={selectedRole}
                     onValueChange={(itemValue, itemIndex) =>
                       setSelectedRole(itemValue)
@@ -931,7 +964,7 @@ export default function Users() {
                     marginBottom: "5%",
                   }}
                 >
-                  <View style={{ width: 100 }}>
+                  <View style={{ width: responsiveScreenWidth(20) }}>
                     <Text style={styles.text2}>Role: </Text>
                   </View>
 
@@ -953,7 +986,7 @@ export default function Users() {
                       <View
                         style={{
                           width: "100%",
-                          height: 40,
+                          height: responsiveScreenHeight(5),
 
                           // flexDirection: "row",
                           // justifyContent: "space-evenly",
@@ -1017,7 +1050,7 @@ export default function Users() {
                 marginTop: 10,
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(22) }}>
                 <Text style={styles.text2}>Balance: </Text>
               </View>
               <View
@@ -1028,7 +1061,7 @@ export default function Users() {
                   placeholder={"Balance"}
                   value={balance}
                   onChangeText={setBalance}
-                  // style={styles.textinput}
+                  style={{ fontSize: responsiveFontSize(2) }}
                   width={Dimensions.get("window").width / 2}
                 />
               </View>
@@ -1046,7 +1079,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(22) }}>
                 <Text style={styles.text2}>Referral: </Text>
               </View>
               <View
@@ -1058,7 +1091,7 @@ export default function Users() {
                   // value={tokens}
                   // onChangeText={setTokens}
                   disabled={true}
-                  // style={styles.textinput}
+                  style={{ fontSize: responsiveFontSize(2) }}
                   width={Dimensions.get("window").width / 2}
                 />
               </View>
@@ -1076,7 +1109,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(22) }}>
                 <Text style={styles.text2}>Tokens: </Text>
               </View>
               <View
@@ -1087,7 +1120,7 @@ export default function Users() {
                   placeholder={"Tokens"}
                   value={tokens}
                   onChangeText={setTokens}
-                  // style={styles.textinput}
+                  style={{ fontSize: responsiveFontSize(2) }}
                   width={Dimensions.get("window").width / 2}
                 />
               </View>
@@ -1105,7 +1138,7 @@ export default function Users() {
                 marginBottom: "5%",
               }}
             >
-              <View style={{ width: 100 }}>
+              <View style={{ width: responsiveScreenWidth(22) }}>
                 <Text style={styles.text2}>Reputation: </Text>
               </View>
               <View
@@ -1116,7 +1149,7 @@ export default function Users() {
                   placeholder={"Reputation"}
                   value={reputation}
                   onChangeText={setReputation}
-                  // style={styles.textinput}
+                  style={{ fontSize: responsiveFontSize(2) }}
                   width={Dimensions.get("window").width / 2}
                 />
               </View>
@@ -1175,12 +1208,12 @@ export default function Users() {
                 >
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       color: "black",
                       textAlign: "center",
                     }}
                   >
-                    Are you sure you want to END {user.displayName}'s
+                    Are you sure you want to end {user.displayName}'s
                     Subscription?
                   </Text>
                 </View>
@@ -1200,7 +1233,7 @@ export default function Users() {
                       flex: 0.3,
                       backgroundColor: "#901616",
                       // borderWidth: 4,
-                      height: 40,
+                      height: responsiveScreenHeight(5),
                       // width: "30%",
                       // alignSelf: "center",
                       justifyContent: "center",
@@ -1215,7 +1248,7 @@ export default function Users() {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveFontSize(2),
                         color: "white",
                         // fontWeight: "bold",
                       }}
@@ -1229,7 +1262,7 @@ export default function Users() {
                       flex: 0.3,
                       backgroundColor: "#2E9E9B",
                       // borderWidth: 4,
-                      height: 40,
+                      height: responsiveScreenHeight(5),
                       // width: "30%",
                       // alignSelf: "center",
                       justifyContent: "center",
@@ -1244,7 +1277,7 @@ export default function Users() {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "white",
                         // fontWeight: "bold",
                       }}
@@ -1262,21 +1295,26 @@ export default function Users() {
               style={
                 subscription
                   ? {
-                      height: 300,
+                      height: responsiveScreenHeight(30),
                       alignItems: "center",
                       justifyContent: "center",
                     }
                   : {
-                      height: 150,
+                      height: responsiveScreenHeight(20),
                       alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "flex-start",
                     }
               }
             >
-              <View style={{ alignItems: "flex-start", width: "100%" }}>
+              <View
+                style={{
+                  alignItems: "flex-start",
+                  width: responsiveScreenWidth(100),
+                }}
+              >
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: responsiveFontSize(2),
                   }}
                 >
                   Subscription:{" "}
@@ -1328,20 +1366,25 @@ export default function Users() {
                         borderRadius: 5,
                         borderWidth: 2,
                         borderColor: "gray",
-                        height: 45,
-                        width: 250,
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(40),
                       }}
                     >
                       <Picker
                         selectedValue={valueText}
                         style={{
-                          height: 45,
-                          width: 250,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
                         }}
                         onValueChange={(item, itemIndex) => setValueText(item)}
                       >
                         {subscriptionLevel.map((item, index) => (
-                          <Picker.Item key={index} label={item} value={item} />
+                          <Picker.Item
+                            key={index}
+                            label={item}
+                            value={item}
+                            style={{ fontSize: responsiveFontSize(2) }}
+                          />
                         ))}
                       </Picker>
                     </View>
@@ -1355,7 +1398,7 @@ export default function Users() {
                   >
                     <DatePicker
                       style={{
-                        width: 250,
+                        width: responsiveScreenWidth(40),
                         margin: 5,
                         // height: 40,
                         // backgroundColor: "green",
@@ -1392,7 +1435,7 @@ export default function Users() {
                     />
                     <DatePicker
                       style={{
-                        width: 250,
+                        width: responsiveScreenWidth(40),
                         marginBottom: 5,
                         // height: 40,
                         // alignItems: "center",
@@ -1426,12 +1469,12 @@ export default function Users() {
                       onDateChange={(endDate) => setEndDate(endDate)}
                     />
                   </View>
-                  <View style={{ width: 150 }}>
+                  <View style={{ width: responsiveScreenWidth(50) }}>
                     <TouchableOpacity
                       style={{
                         backgroundColor: "#901616",
                         // borderWidth: 4,
-                        height: 40,
+                        height: responsiveScreenHeight(5),
                         // width: "30%",
                         // alignSelf: "center",
                         justifyContent: "center",
@@ -1448,7 +1491,7 @@ export default function Users() {
                       <Text
                         style={{
                           textAlign: "center",
-                          fontSize: 16,
+                          fontSize: responsiveFontSize(2),
                           color: "white",
                           // fontWeight: "bold",
                         }}
@@ -1459,12 +1502,20 @@ export default function Users() {
                   </View>
                 </>
               ) : (
-                <ScrollView>
+                <ScrollView
+                  style={{
+                    flex: 5,
+                    // backgroundColor: "yellow",
+                    // position: "absolute",
+                  }}
+                >
                   <View
                     style={{
                       flexDirection: "row",
                       justifyContent: "center",
                       alignItems: "center",
+                      // flex: 2,
+                      // height: responsiveScreenHeight(20),
                       // backgroundColor: "red",
                     }}
                   >
@@ -1476,7 +1527,7 @@ export default function Users() {
                         <TouchableOpacity
                           style={{
                             // paddingVertical: 10,
-                            width: 200,
+                            width: responsiveScreenWidth(50),
                           }}
                           onPress={() => {
                             pickerRef.show();
@@ -1513,15 +1564,16 @@ export default function Users() {
                           borderRadius: 5,
                           borderWidth: 2,
                           borderColor: "gray",
-                          height: 45,
-                          width: 250,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
                         }}
                       >
                         <Picker
                           selectedValue={valueText}
                           style={{
-                            height: 45,
-                            width: 250,
+                            // backgroundColor:"red",
+                            height: responsiveScreenHeight(5),
+                            width: responsiveScreenWidth(40),
                           }}
                           onValueChange={(item, itemIndex) =>
                             setValueText(item)
@@ -1546,14 +1598,16 @@ export default function Users() {
                       // backgroundColor: "red",
                       justifyContent: "center",
                       width: "100%",
+                      // height: responsiveScreenHeight(20),
                     }}
                   >
                     <TouchableOpacity
                       style={{
                         backgroundColor: "#005c9d",
                         // borderWidth: 4,
-                        height: 40,
-                        width: "75%",
+                        height: responsiveScreenHeight(5),
+
+                        width: responsiveScreenWidth(50),
                         // alignSelf: "center",
                         justifyContent: "center",
                         alignItems: "center",
@@ -1569,7 +1623,7 @@ export default function Users() {
                       <Text
                         style={{
                           textAlign: "center",
-                          fontSize: 16,
+                          fontSize: responsiveFontSize(2),
                           color: "white",
 
                           // fontWeight: "bold",
@@ -1585,17 +1639,21 @@ export default function Users() {
           ) : subscription ? (
             <View>
               <View style={{ marginLeft: "4%" }}>
-                <Text style={{ fontSize: 16 }}>Subscription: </Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
+                  Subscription:{" "}
+                </Text>
               </View>
               <View style={{ marginLeft: "8%" }}>
-                <Text>Type: {subscription.type}</Text>
-                <Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
+                  Type: {subscription.type}
+                </Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
                   Start Date:{" "}
                   {moment(subscription.startDate.toDate()).format(
                     "MMMM Do YYYY"
                   )}
                 </Text>
-                <Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
                   End Date:{" "}
                   {moment(subscription.endDate.toDate()).format("MMMM Do YYYY")}
                 </Text>
@@ -1604,8 +1662,12 @@ export default function Users() {
           ) : (
             <View style={{ flex: 1 }}>
               <View style={{ marginLeft: "4%", flexDirection: "row" }}>
-                <Text style={{ fontSize: 16 }}>Subscription: </Text>
-                <Text style={{ fontSize: 16 }}>No Subscription</Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
+                  Subscription:{" "}
+                </Text>
+                <Text style={{ fontSize: responsiveFontSize(2) }}>
+                  No Subscription
+                </Text>
               </View>
             </View>
           )}
@@ -1615,25 +1677,27 @@ export default function Users() {
               style={{
                 //   borderWidth: 1,
                 flex: 1,
-
+                height: responsiveScreenHeight(10),
+                // backgroundColor: "red",
                 // width: "100%",
                 // height: "100%",
                 justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "row",
-                paddingBottom: "10%",
-                paddingTop: "5%",
+                // paddingBottom: "10%",
+                // paddingTop: "5%",
               }}
             >
               <View
                 style={{
                   flex: 0.5,
                   backgroundColor: "#2E9E9B",
-                  height: 40,
+                  height: responsiveScreenHeight(5),
                   justifyContent: "center",
                   alignItems: "center",
                   marginEnd: "2%",
                   borderRadius: 10,
+                  width: responsiveScreenWidth(50),
                 }}
               >
                 <TouchableOpacity onPress={handleSave}>
@@ -1643,7 +1707,7 @@ export default function Users() {
                       // backgroundColor: "red",
                       // width: "60%",
                       textAlign: "center",
-                      fontSize: 18,
+                      fontSize: responsiveFontSize(2),
                       // fontWeight: "bold",
                       color: "white",
                     }}
@@ -1657,7 +1721,7 @@ export default function Users() {
                 style={{
                   flex: 0.5,
                   backgroundColor: "#2E9E9B",
-                  height: 40,
+                  height: responsiveHeight(5),
                   justifyContent: "center",
                   alignItems: "center",
                   marginStart: "2%",
@@ -1671,7 +1735,7 @@ export default function Users() {
                       // backgroundColor: "red",
                       // width: "60%",
                       textAlign: "center",
-                      fontSize: 18,
+                      fontSize: responsiveScreenFontSize(2),
                       // fontWeight: "bold",
                       color: "white",
                     }}
@@ -1686,94 +1750,43 @@ export default function Users() {
       </ScrollView>
     </View>
   ) : users ? (
-
-    <KeyboardAvoidingView
-      behavior="position"
-      behavior="height"
-      behavior="padding"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      contentContainerStyle={{ flex: 1 }}
-      style={styles.container}
-      // keyboardVerticalOffset={-100}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View
-          style={[
-            styles.container,
-            { marginTop: Platform.isPad ? 0 : marginVal },
-          ]}
-        >
-          <SearchBar
-            placeholderTextColor="#185a9d"
-            placeholder="Search Here"
-            onChangeText={setSearch}
-            lightTheme
-            //showLoading={true}
-            searchIcon={true}
-            value={search}
-            containerStyle={{
-              backgroundColor: "#185a9d",
-              borderBottomColor: "#185a9d",
-              borderTopColor: "#185a9d",
-              width: "100%",
-              // height: "20%",
-            }}
-            inputContainerStyle={{
-              borderRadius: 20,
-              borderWidth: 1,
-              borderColor: "#fafafa",
-              backgroundColor: "#fafafa",
-            }}
-            style={{
-              //backgroundColor: "white",
-              fontSize: 18,
-              paddingLeft: "2%",
-              // borderColor: "#185a9d",
-              // borderWidth: 2,
-              width: "85%",
-              height: 50,
-              marginLeft: 10,
-              marginRight: 10,
-              elevation: 20,
-            }}
-=======
     <ScrollView>
-//       <View
-//         style={{
-//           flexDirection: "row",
-//           alignContent: "center",
-//           alignItems: "center",
-//           justifyContent: "center",
-//           // backgroundColor: "#185a9d",
-//           borderTopColor: "#185a9d",
-//           //paddingTop:'2%',
-//         }}
-//       >
-//         <MaterialCommunityIcons
-//           name="account-search"
-//           size={40}
-//           color="black"
-//           style={{ paddingTop: "2%", marginBottom: 10 }}
-//         />
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          //paddingTop:'2%',
+        }}
+      >
+        <MaterialCommunityIcons
+          name="account-search"
+          size={40}
+          color="black"
+          style={{ paddingTop: "2%", marginBottom: 10 }}
+        />
 
-//         <TextInput
-//           style={{
-//             backgroundColor: "white",
-//             fontSize: 18,
-//             paddingLeft: "2%",
-//             borderColor: "#185a9d",
-//             borderWidth: 2,
-//             width: "80%",
-//             height: "80%",
-//             marginLeft: 10,
-//             marginRight: 10,
-//           }}
-//           placeholderTextColor="#20365F"
-//           placeholder="Search Here"
-//           onChangeText={setSearch}
-//           value={search}
-//         />
-//       </View>
+        <TextInput
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "#185a9d",
+            borderWidth: 2,
+            width: "80%",
+            height: "80%",
+            marginLeft: 10,
+            marginRight: 10,
+          }}
+          placeholderTextColor="#20365F"
+          placeholder="Search Here"
+          onChangeText={setSearch}
+          value={search}
+        />
+      </View>
       {users.map((user) => (
         <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
           <ListItem
@@ -1784,65 +1797,10 @@ export default function Users() {
             title={user.displayName}
             subtitle={user.email}
             bottomDivider
-
           />
-
-          <ScrollView>
-            {search !== "" ? (
-              searchResult.length > 0 ? (
-                searchResult.map((user) => (
-                  <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
-                    <ListItem
-                      leftAvatar={{ source: { uri: user.photoURL } }}
-                      rightAvatar={
-                        <Ionicons
-                          name="ios-arrow-forward"
-                          size={24}
-                          color="black"
-                        />
-                      }
-                      title={user.displayName}
-                      subtitle={user.email}
-                      bottomDivider
-                    />
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Text style={{ color: "grey", fontSize: 20 }}>
-                    User not found
-                  </Text>
-                </View>
-              )
-            ) : (
-              users.map((user) => (
-                <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
-                  <ListItem
-                    leftAvatar={{ source: { uri: user.photoURL } }}
-                    rightAvatar={
-                      <Ionicons
-                        name="ios-arrow-forward"
-                        size={24}
-                        color="black"
-                      />
-                    }
-                    title={user.displayName}
-                    subtitle={user.email}
-                    bottomDivider
-                  />
-                </TouchableOpacity>
-              ))
-            )}
-          </ScrollView>
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   ) : (
     <View
       style={{
@@ -1911,7 +1869,7 @@ const styles = StyleSheet.create({
     // height: "100%",
   },
   inputStyle: {
-    height: 40,
+    height: responsiveScreenHeight(5),
     // backgroundColor: "green",
     // alignItems: "center",
     justifyContent: "center",
@@ -1935,11 +1893,11 @@ const styles = StyleSheet.create({
     // borderColor: "lightgray",
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(2),
     // backgroundColor: "red",
     width: "100%",
 
-    height: 30,
+    height: responsiveScreenHeight(5),
     color: "#005c9d",
     fontWeight: "bold",
   },
@@ -1952,7 +1910,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   textinput: {
-    height: 40,
+    height: responsiveScreenHeight(5),
 
     paddingLeft: 6,
     borderColor: "black",
@@ -1960,18 +1918,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   text2: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(2),
+    width: responsiveScreenWidth(70),
     // fontWeight: "bold",
   },
   text3: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(1.8),
     fontWeight: "bold",
     color: "#005c9d",
   },
   picker: {
-    height: 40,
+    height: responsiveScreenHeight(5),
     width: "99%",
     borderColor: "black",
+    fontSize: responsiveFontSize(2),
     borderWidth: 1,
     color: "#667085",
     borderStyle: "solid",

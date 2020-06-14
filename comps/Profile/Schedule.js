@@ -34,6 +34,7 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
 } from "react-native-responsive-dimensions";
 export default function Schedule(props) {
   const [user, setUser] = useState({});
@@ -48,6 +49,7 @@ export default function Schedule(props) {
   const [currentDate, setCurrentDate] = useState(
     moment().format("YYYY-MM-DDTHH:MM:SS")
   );
+  const [deviceType, setDeviceType] = useState(0);
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
 
   useEffect(() => {
@@ -80,7 +82,13 @@ export default function Schedule(props) {
         setUser(data);
       });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   useEffect(() => {
     if (schedule.length > 0) {
       manageTime();
@@ -171,7 +179,7 @@ export default function Schedule(props) {
       <ScrollView>
         <Text
           style={{
-            fontSize: 20,
+            fontSize: responsiveFontSize(2),
             color: "#185a9d",
             justifyContent: "center",
             alignSelf: "center",
@@ -186,22 +194,24 @@ export default function Schedule(props) {
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#185a9d",
-            height: 50,
+            // borderColor: "#185a9d",
+            height: responsiveScreenHeight(5),
             width: "87%",
             alignSelf: "center",
             // opacity: 0.8,
             paddingLeft: "3%",
             marginTop: 20,
-            // flexDirection: "row-reverse",
-            // justifyContent: "space-between",
+            justifyContent: "center",
+            alignContent: "center",
+            alignSelf: "center",
             backgroundColor: "white",
           }}
         >
           <DatePicker
             style={{
               width: "100%",
-              color: "#667085",
+
+              // color: "#667085",
               justifyContent: "flex-start",
             }}
             //is24Hour
@@ -221,20 +231,26 @@ export default function Schedule(props) {
               },
               dateInput: {
                 borderWidth: 0,
-                color: "#698eb3",
+                //  color: "#698eb3",
                 alignItems: "flex-start",
                 fontSize: 12,
                 // marginRight: "68%",
-                backgroundColor: "white",
+                // backgroundColor: "white",
               },
               placeholderText: {
-                fontSize: 16,
-                color: "#698eb3",
+                fontSize: responsiveFontSize(1.5),
+                //color: "#698eb3",
+                justifyContent: "flex-end",
+                alignContent: "center",
+                alignSelf: "center",
                 backgroundColor: "white",
+                width: "100%",
+                height: responsiveScreenHeight(4),
               },
               dateText: {
                 fontSize: 15,
-                color: "#698eb3",
+                //  color: "#698eb3",
+                fontSize: responsiveFontSize(1.5),
               },
             }}
             onDateChange={(t) => setDate(t) || setToday(false)}
@@ -243,6 +259,7 @@ export default function Schedule(props) {
 
         <View style={styles.two}>
           <Text style={styles.cardTitle}>My services</Text>
+
           {user.services &&
             services.length > 0 &&
             user.services.map((service) => (
@@ -250,9 +267,9 @@ export default function Schedule(props) {
                 <TouchableOpacity
                   // onPress={}
                   style={{
-                    backgroundColor: "#185a9d",
-                    width: 100,
-                    height: 100,
+                    backgroundColor: "white",
+                    width: responsiveScreenWidth(22),
+                    height: responsiveScreenHeight(10),
                     margin: 5,
                     alignItems: "center",
                     flexDirection: "row",
@@ -275,14 +292,14 @@ export default function Schedule(props) {
                       name={
                         services.filter((s) => s.id === service)[0].serviceIcon
                       }
-                      size={33}
-                      color="white"
+                      size={responsiveScreenHeight(4)}
+                      color="#185a9d"
                     />
 
                     <Text
                       style={{
-                        fontSize: 20,
-                        color: "white",
+                        fontSize: responsiveFontSize(2),
+                        color: "#185a9d",
                         marginBottom: "2%",
                         // fontWeight: "bold",
                       }}
@@ -307,31 +324,60 @@ export default function Schedule(props) {
             <Text style={styles.cardTitle}>Next</Text>
 
             <View style={styles.text}>
-              <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+              <Text
+                style={
+                  deviceType === 1
+                    ? {
+                        color: "black",
+                        fontSize: responsiveScreenFontSize(2),
+                        fontWeight: "bold",
+                      }
+                    : {
+                        color: "black",
+                        fontSize: responsiveScreenFontSize(2),
+                        // fontWeight: "bold",
+                      }
+                }
+              >
                 Time
               </Text>
-              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+              <Text
+                style={{ fontSize: responsiveFontSize(2), marginTop: "1%" }}
+              >
                 {next.dateTime.split("T")[1]}
               </Text>
             </View>
             <View style={styles.text}>
-              <Text style={{ fontSize: 16, color: "black" }}>Service</Text>
-              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+              <Text style={{ fontSize: responsiveFontSize(2), color: "black" }}>
+                Service
+              </Text>
+              <Text
+                style={{ fontSize: responsiveFontSize(2), marginTop: "1%" }}
+              >
                 {next.serviceBooking.service.name}
               </Text>
             </View>
             <View style={styles.text}>
-              <Text style={{ fontSize: 16, color: "black" }}>Parking Name</Text>
-              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+              <Text style={{ fontSize: responsiveFontSize(2), color: "black" }}>
+                Parking Name
+              </Text>
+              <Text
+                style={{ fontSize: responsiveFontSize(2), marginTop: "1%" }}
+              >
                 {next.serviceBooking.assetBooking.asset.name}
               </Text>
             </View>
             <View style={styles.text}>
-              <Text style={{ fontSize: 16, color: "black" }}>Description</Text>
-              <Text style={{ fontSize: 16, marginTop: "1%" }}>
+              <Text style={{ fontSize: responsiveFontSize(2), color: "black" }}>
+                Description
+              </Text>
+              <Text
+                style={{ fontSize: responsiveFontSize(2), marginTop: "1%" }}
+              >
                 {next.serviceBooking.assetBooking.asset.description}
               </Text>
             </View>
+            <Text></Text>
             <View
               style={{
                 // width: "100%",
@@ -345,7 +391,7 @@ export default function Schedule(props) {
               <TouchableOpacity
                 style={{
                   backgroundColor: "#949494",
-                  height: 40,
+                  height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
                   justifyContent: "center",
@@ -370,12 +416,19 @@ export default function Schedule(props) {
                   })
                 }
               >
-                <Text style={{ color: "white" }}>View in Map</Text>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                >
+                  View in Map
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
                   backgroundColor: "#949494",
-                  height: 40,
+                  height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
                   justifyContent: "center",
@@ -387,7 +440,15 @@ export default function Schedule(props) {
                 }}
                 onPress={() => setModalVisible(true)}
               >
-                <Text style={{ color: "white" }}> Completed?</Text>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                >
+                  {" "}
+                  Completed?
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -396,7 +457,13 @@ export default function Schedule(props) {
             <Text style={styles.cardTitle}>Next</Text>
 
             <View style={styles.text}>
-              <Text style={{ fontSize: 16, color: "black", marginTop: "1%" }}>
+              <Text
+                style={{
+                  fontSize: responsiveFontSize(2),
+                  color: "black",
+                  marginTop: "1%",
+                }}
+              >
                 All Done
               </Text>
             </View>
@@ -469,7 +536,7 @@ export default function Schedule(props) {
                       </Text>
                       <Ionicons
                         name="md-arrow-dropdown"
-                        size={30}
+                        size={responsiveScreenHeight(3)}
                         color="#5c5b5b"
                       />
                     </View>
@@ -491,13 +558,24 @@ export default function Schedule(props) {
                             rightSubtitle={
                               s.serviceBooking.assetBooking.asset.name
                             }
-                            titleStyle={{ color: "black", fontWeight: "bold" }}
-                            rightTitleStyle={{
+                            titleStyle={{
                               color: "black",
                               fontWeight: "bold",
+                              fontSize: responsiveFontSize(2),
                             }}
-                            subtitleStyle={{ color: "gray" }}
-                            rightSubtitleStyle={{ color: "gray" }}
+                            rightTitleStyle={{
+                              color: "black",
+                              fontSize: responsiveFontSize(2),
+                              fontWeight: "bold",
+                            }}
+                            subtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            rightSubtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
                             bottomDivider
                           />
                         ))}
@@ -540,19 +618,28 @@ export default function Schedule(props) {
                     }}
                     // Platform.isPad ? styles.arrowIpad : styles.arrowPhone
                   >
-                    <Text style={styles.cardTitle}>
-                      {show &&
-                        show.filter((s) => s.dateTime.split("T")[0] === date)
-                          .length > 0 &&
-                        show
-                          .filter((s) => s.dateTime.split("T")[0] === date)[0]
-                          .dateTime.split("T")[0]}
-                    </Text>
-                    <Ionicons
-                      name="md-arrow-dropdown"
-                      size={30}
-                      color="#5c5b5b"
-                    />
+                    {show &&
+                    show.filter((s) => s.dateTime.split("T")[0] === date)
+                      .length > 0 ? (
+                      <Text style={styles.cardTitle}>
+                        {
+                          show
+                            .filter((s) => s.dateTime.split("T")[0] === date)[0]
+                            .dateTime.split("T")[0]
+                        }
+                      </Text>
+                    ) : (
+                      <Text style={styles.cardTitle}>No Work On This Date</Text>
+                    )}
+
+                    {show.filter((s) => s.dateTime.split("T")[0] === date)
+                      .length > 0 && (
+                      <Ionicons
+                        name="md-arrow-dropdown"
+                        size={30}
+                        color="#5c5b5b"
+                      />
+                    )}
                   </View>
                 </CollapseHeader>
                 <CollapseBody>
@@ -561,41 +648,63 @@ export default function Schedule(props) {
                            {todaySchedule[0].dateTime.split("T")[0]}
                          </Text> */}
                     <View>
-                      {show.filter((o) => o.dateTime.split("T")[0] === date)
-                        .length > 0 ? (
-                        show.map((s) =>
-                          s.dateTime.split("T")[0] === date ? (
-                            <ListItem
-                              key={s.id}
-                              title={s.dateTime.split("T")[1]}
-                              rightTitle={s.serviceBooking.service.name}
-                              subtitle={
-                                s.serviceBooking.assetBooking.asset.description
-                              }
-                              rightSubtitle={
-                                s.serviceBooking.assetBooking.asset.name
-                              }
-                              titleStyle={{
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                              rightTitleStyle={{
-                                color: "black",
-                                fontWeight: "bold",
-                              }}
-                              subtitleStyle={{ color: "gray" }}
-                              rightSubtitleStyle={{ color: "gray" }}
-                              bottomDivider
-                            />
-                          ) : (
-                            <Text>try2</Text>
+                      {
+                        show.filter((o) => o.dateTime.split("T")[0] === date)
+                          .length > 0 &&
+                          show.map((s) =>
+                            s.dateTime.split("T")[0] === date ? (
+                              <ListItem
+                                key={s.id}
+                                title={s.dateTime.split("T")[1]}
+                                rightTitle={s.serviceBooking.service.name}
+                                subtitle={
+                                  s.serviceBooking.assetBooking.asset
+                                    .description
+                                }
+                                rightSubtitle={
+                                  s.serviceBooking.assetBooking.asset.name
+                                }
+                                titleStyle={{
+                                  color: "black",
+                                  fontWeight: "bold",
+                                  fontSize: responsiveFontSize(2),
+                                }}
+                                rightTitleStyle={{
+                                  color: "black",
+                                  fontWeight: "bold",
+                                  fontSize: responsiveFontSize(2),
+                                }}
+                                subtitleStyle={{
+                                  color: "gray",
+                                  fontSize: responsiveFontSize(2),
+                                }}
+                                rightSubtitleStyle={{
+                                  color: "gray",
+                                  fontSize: responsiveFontSize(2),
+                                }}
+                                bottomDivider
+                              />
+                            ) : null
                           )
-                        )
-                      ) : (
-                        <Text style={styles.cardTitle}>
-                          No Booked Scheduled at this date!
-                        </Text>
-                      )}
+                        // : (
+                        //   <View style={styles.two}>
+                        //     <Collapse>
+                        //       <CollapseHeader>
+                        //         <View
+                        //           style={{
+                        //             flexDirection: "row",
+                        //             paddingRight: "5%",
+                        //           }}
+                        //         >
+                        //           <Text style={styles.cardTitle}>
+                        //             No Work Done Today
+                        //           </Text>
+                        //         </View>
+                        //       </CollapseHeader>
+                        //     </Collapse>
+                        //   </View>
+                        // )
+                      }
                     </View>
                   </View>
                 </CollapseBody>
@@ -636,7 +745,9 @@ export default function Schedule(props) {
           style={styles.blueButton}
           onPress={() => props.navigation.navigate("ScheduleCompleted")}
         >
-          <Text style={{ color: "white" }}>View Completed Work</Text>
+          <Text style={{ color: "white", fontSize: responsiveFontSize(2) }}>
+            View Completed Work
+          </Text>
         </TouchableOpacity>
 
         <Text></Text>
@@ -685,12 +796,16 @@ export default function Schedule(props) {
             >
               <Text
                 style={{
-                  fontSize: 18,
+                  fontSize: responsiveFontSize(2),
                   textAlign: "center",
                 }}
               >
                 Did you complete the service
               </Text>
+              <Text></Text>
+              <Text></Text>
+              <Text></Text>
+              <Text></Text>
               <Text></Text>
               <Text></Text>
               <View
@@ -708,14 +823,23 @@ export default function Schedule(props) {
                   onPress={() => handleComplete(next)}
                   style={styles.greenButton}
                 >
-                  <Text style={{ color: "white" }}> Yes</Text>
+                  <Text
+                    style={{ color: "white", fontSize: responsiveFontSize(2) }}
+                  >
+                    {" "}
+                    Yes
+                  </Text>
                 </TouchableOpacity>
                 {/* ---------------------------------CANCEL--------------------------------- */}
                 <TouchableOpacity
                   style={styles.redButton}
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text style={{ color: "white" }}>No</Text>
+                  <Text
+                    style={{ color: "white", fontSize: responsiveFontSize(2) }}
+                  >
+                    No
+                  </Text>
                 </TouchableOpacity>
               </View>
               {/* 
@@ -770,10 +894,10 @@ const styles = StyleSheet.create({
     // height: Math.round(Dimensions.get("window").height),
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(2.2),
     // backgroundColor: "red",
     width: "100%",
-    height: 25,
+    // height: 25,
     color: "#185a9d",
     fontWeight: "bold",
   },
@@ -835,7 +959,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   text: {
-    fontSize: 80,
+    // fontSize: 100,
     // marginLeft: "1%",
     // marginRight: "1%",
     marginBottom: "1%",
@@ -844,8 +968,8 @@ const styles = StyleSheet.create({
   },
   blueButton: {
     backgroundColor: "#185a9d",
-    height: 40,
-    width: "38%",
+    height: responsiveScreenHeight(4.5),
+    width: "75%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -856,7 +980,7 @@ const styles = StyleSheet.create({
   },
   greenButton: {
     backgroundColor: "#3ea3a3",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",
@@ -868,7 +992,7 @@ const styles = StyleSheet.create({
   },
   redButton: {
     backgroundColor: "#901616",
-    height: 40,
+    height: responsiveScreenHeight(4.5),
     width: "38%",
     alignSelf: "center",
     justifyContent: "center",

@@ -24,7 +24,13 @@ import {
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
 import LottieView from "lottie-react-native";
@@ -35,6 +41,7 @@ export default function EmployeesRequest(props) {
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
   const [marginVal, setMargin] = useState(0);
+  const [deviceType, setDeviceType] = useState(0);
 
   const roles = [
     "asset handler (request)",
@@ -70,7 +77,13 @@ export default function EmployeesRequest(props) {
         setAllUsers(tempUsers);
       });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // ---------------------------------DOWNLOAD---------------------------------
   const handleDownload = async (user) => {
     // ---------------------------------
@@ -231,8 +244,14 @@ export default function EmployeesRequest(props) {
                           color="black"
                         />
                       }
-                      titleStyle={{ marginLeft: "4%" }}
-                      subtitleStyle={{ marginLeft: "4%" }}
+                      titleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenHeight(1.8),
+                      }}
+                      subtitleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenHeight(1.6),
+                      }}
                       // leftAvatar={user.photoURL}
                       title={user.displayName}
                       subtitle={user.email}
@@ -248,9 +267,11 @@ export default function EmployeesRequest(props) {
             ) : (
               <View
                 style={{
+                  flex: 0.6,
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   flexDirection: "column",
+                  alignSelf: "center",
                 }}
               >
                 <LottieView
@@ -260,12 +281,18 @@ export default function EmployeesRequest(props) {
                   style={{
                     position: "relative",
                     width: "100%",
-                    justifyContent: "center",
-                    alignSelf: "center",
-                    paddingTop: "30%",
+                    // justifyContent: "center",
+                    // alignSelf: "center",
+                    paddingTop: "5%",
                   }}
                 />
-                <Text style={{ color: "grey", fontSize: 20 }}>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 20,
+                    fontSize: responsiveScreenHeight(1.8),
+                  }}
+                >
                   No Employees!
                 </Text>
               </View>
@@ -333,11 +360,11 @@ const styles = StyleSheet.create({
     marginTop: "-10%",
   },
   containerLogin2: {
-    flex: 0.7,
+    flex: 0.8,
     justifyContent: "flex-start",
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
-    marginTop: "-8%",
+    // marginTop: "-8%",
   },
   header: {
     padding: 15,

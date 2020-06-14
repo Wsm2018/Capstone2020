@@ -24,7 +24,17 @@ import { AsyncStorage } from "react-native";
 import ExtendServices from "./ExtendServices";
 import { getIconType, Header, Card, Divider } from "react-native-elements";
 import { FlatList } from "react-native";
-import { FontAwesome5, Fontisto, Ionicons, AntDesign } from "@expo/vector-icons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Review from "../Profile/Review.js";
+
+import {
+  FontAwesome5,
+  Fontisto,
+  Ionicons,
+  //AntDesign,
+} from "@expo/vector-icons";
 
 export default function BookingHistory(props) {
   const [assetBookings, setAssetBookings] = useState([]);
@@ -52,10 +62,97 @@ export default function BookingHistory(props) {
   const [assetSections, setAssetSections] = useState([]);
   const [displayServices, setDisplayServices] = useState([]);
   const SB = useRef();
+  const [users, setUsers] = useState([]);
+  const [workerSchedule, setWorkerSchedule] = useState([]);
+
+  //Card styling
+  const [historyDetails, setHistoryDetails] = useState(false);
 
   useEffect(() => {
     getBookings();
   }, []);
+
+  useEffect(() => {
+    getUserFavoriteAssets();
+  }, []);
+
+  ////////////////////review//////////////////////////////////////////////////
+  const [favoriteAssets, setFavoriteAssets] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const getUserFavoriteAssets = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("favorites")
+      .onSnapshot((querySnap) => {
+        let favorites = [];
+        let favoritesId = [];
+
+        querySnap.forEach((document) => {
+          favorites.push({ id: document.id, ...document.data() });
+          favoritesId.push(document.id);
+        });
+        setFavoriteAssets([...favorites]);
+        setFavoriteIds([...favoritesId]);
+      });
+  };
+
+  const handleAddFavorite = async (item) => {
+    console.log("fav preseddddddddddddddddddd ");
+    if (!favoriteIds.includes(item.id)) {
+      alert("Added to Favorite Successfully!");
+      const addFavorite = firebase.functions().httpsCallable("addFavorite");
+      const response = await addFavorite({
+        uid: firebase.auth().currentUser.uid,
+        asset: item.id,
+      });
+    } else {
+      alert("Favourite Deleted  from Your Favourites Successfully!");
+      handleDeleteFavorite(item.id);
+    }
+  };
+
+  // const handleAddFavorite = async (item) => {
+  //   console.log("fav preseddddddddddddddddddd ");
+  //   const addFavorite = firebase.functions().httpsCallable("addFavorite");
+  //   const response = await addFavorite({
+  //     uid: firebase.auth().currentUser.uid,
+  //     asset: item.id,
+  //   });
+  //   console.log(response);
+  //   if (response.data !== "Exists") {
+
+  //   } else {
+
+  //     // showMessage({
+  //     //   message: "Favourite Deleted!",
+  //     //   description: "Item deleted from your favourites successfully!",
+  //     //   // type: "success",
+  //     //   backgroundColor: "#3ea3a3",
+  //     //   // duration: 2300,
+  //     // });
+  //     handleDeleteFavorite(item.id);
+  //   }
+  // };
+
+  const handleDeleteFavorite = async (id) => {
+    console.log("deleteddddddddddd ", id);
+    const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
+    const response = await deleteFavorite({
+      uid: firebase.auth().currentUser.uid,
+      assetId: id,
+    });
+    // if (response.data !== null) {
+    //   // alert("Asset Deleteted");
+    //   showMessage({
+    //     message: "Favourite Deleted!",
+    //     description: "Item deleted from your favourites successfully!",
+    //     // type: "success",
+    //     backgroundColor: "#3ea3a3",
+    //     // duration: 2300,
+    //   });
+    // }
+  };
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const getBookings = () => {
     //payment has booking and user id
@@ -80,28 +177,16 @@ export default function BookingHistory(props) {
     });
 
     db.collection("users")
-      .where("role", "==", "service worker")
+      .where("role", "==", "services employee")
       .onSnapshot((snapshot) => {
-        var worker = "";
+        var worker = [];
         snapshot.forEach((doc) => {
-          worker = { ...doc.data(), id: doc.id };
-
-          var workerId = doc.id;
-          db.collection("users")
-            .doc(doc.id)
-            .collection("schedules")
-            .onSnapshot((snapshot) => {
-              const schedules = [];
-              snapshot.forEach((doc) => {
-                schedules.push({ ...doc.data(), worker: workerId, id: doc.id });
-              });
-              var temp = workers;
-              temp.push({ worker, schedules });
-              //console.log("worker",temp)
-              setWorkers(temp);
-            });
+          worker.push({ ...doc.data(), id: doc.id });
         });
+        // console.log("ahaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", temp.schedules)
+        setUsers(worker);
       });
+    // console.log("AAAAAAAAAAAAAHHHHHHHHHHHHHHHAAAAAAAAAA")
 
     db.collection("assetTypes").onSnapshot((querySnapshot) => {
       const p = [];
@@ -119,6 +204,36 @@ export default function BookingHistory(props) {
       setAssetSections([...p]);
     });
   };
+
+  useEffect(() => {
+    if (users) {
+      for (let i = 0; i < users.length; i++) {
+        //var workerId = doc.id
+
+        var temp = workers;
+        var schedules = [];
+        db.collection("users")
+          .doc(users[i].id)
+          .collection("schedules")
+          .onSnapshot((snapshot) => {
+            schedules = [];
+            snapshot.forEach((doc) => {
+              // console.log("{ ...doc.data(), worker: workerId, id: doc.id }")
+              //console.log("thhhhhhheeeeeee hel")
+              schedules.push({
+                ...doc.data(),
+                worker: users[i].id,
+                id: doc.id,
+              });
+            });
+
+            temp.push({ worker: users[i], schedules });
+          });
+        setWorkers(temp);
+      }
+      // console.log("OOOOOOOOOOOOOOOOOOOHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAA", workers[0])
+    }
+  }, [users]);
 
   useEffect(() => {
     if (services) {
@@ -165,9 +280,18 @@ export default function BookingHistory(props) {
   }, [viewDetails]);
 
   const cancelBooking = async () => {
+    Alert.alert("Cancel", "", [
+      { text: "Yes?", onPress: () => confirmCancel() },
+
+      { text: "No", onPress: () => console.log("No Pressed") },
+    ]);
+  };
+
+  const confirmCancel = async () => {
     //delete Payment
     db.collection("payments").doc(viewDetails.id).delete();
     //delete asset booking
+    // console.log("187", viewDetails.assetBooking.asset.id, viewDetails.assetBooking.id)
     db.collection("assets")
       .doc(viewDetails.assetBooking.asset.id)
       .collection("assetBookings")
@@ -175,14 +299,14 @@ export default function BookingHistory(props) {
       .delete();
 
     for (let i = 0; i < viewDetails.bookedServices.length; i++) {
-      //update worker schedule
+      //   //update worker schedule
       var worker = workers.filter(
         (w) => w.worker.id == viewDetails.bookedServices[i].worker
       )[0];
-      //console.log("worker schedule", worker)
       var sch = worker.schedules.filter(
         (s) => s.serviceBooking.assetBooking.id === viewDetails.assetBooking.id
       )[0];
+      //console.log("worker schedule", worker.schedules, "--", viewDetails.bookedServices[i].worker, "--,sch", sch, "--", viewDetails.bookedServices[i].service.id, "--", viewDetails.bookedServices[i].id)
 
       db.collection("users")
         .doc(viewDetails.bookedServices[i].worker)
@@ -305,12 +429,18 @@ export default function BookingHistory(props) {
       }
       setTotalAmount(totalAmount + serviceT);
       setServiceBookingTotal(serviceT);
+    } else {
+      setTotalAmount(totalAmount - serviceBookingTotal);
+      setServiceBookingTotal(0);
     }
   }, [newServiceBookings]);
 
   const getServiceBookings = (bookings, show, userdays, updateAvailable) => {
     if (bookings) {
       setNewServiceBookings(bookings);
+    } else {
+      setTotalAmount(totalAmount - serviceBookingTotal);
+      setServiceBookingTotal(0);
     }
 
     setNewShow(show);
@@ -390,7 +520,7 @@ export default function BookingHistory(props) {
         });
       } else {
         //if payed and pay now
-        console.log("337");
+        //console.log("337")
 
         props.navigation.navigate("Payment", {
           assetBooking: {
@@ -403,7 +533,6 @@ export default function BookingHistory(props) {
           totalAmount: totalAmount,
         });
       }
-      console.log("367");
     } else {
       if (paymentStat == "later") {
         //not payed and paylater
@@ -418,10 +547,7 @@ export default function BookingHistory(props) {
         //back()
       } else {
         //if not payed and pay now
-        console.log(
-          "---------------------------------------",
-          totalAmount + parseInt(viewDetails.totalAmount)
-        );
+        //  console.log("---------------------------------------",totalAmount + parseInt(viewDetails.totalAmount))
         props.navigation.navigate("Payment", {
           oldPayment: viewDetails,
           serviceBooking: newServiceBookings,
@@ -436,15 +562,32 @@ export default function BookingHistory(props) {
       }
     }
 
-    //back()
+    back();
   };
 
   const getType = (s) => {
     var section = assetSections.filter((o) => o.id == s)[0];
     var type = assetTypes.filter((o) => o.id == section.assetType)[0];
-    console.log('Type Name: ', type.name)
     return type.name;
   };
+
+  const getImage = (s) => {
+    var section = assetSections.filter((o) => o.id == s)[0];
+    var type = assetTypes.filter((o) => o.id == section.assetType)[0];
+    return type.image;
+  };
+
+  const getTypeIcon = (s) => {
+    var section = assetSections.filter((o) => o.id == s)[0];
+    var type = assetTypes.filter((o) => o.id == section.assetType)[0];
+    return type.assetIcon;
+  };
+
+  // const getTypeIcon = (s) => {
+  //   var section = assetSections.filter(o => o.id == s)[0]
+  //   var type = assetTypes.filter(o => o.id == section.assetType)[0]
+  //   return type.name
+  // }
 
   const getSection = (s) => {
     var section = assetSections.filter((o) => o.id == s)[0];
@@ -500,6 +643,18 @@ export default function BookingHistory(props) {
     SB.current = newOrder;
   };
 
+  const ext = (end) => {
+    if (
+      viewDetails.assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")
+        .length == 1
+    ) {
+      var t = end.split(" ")[0] + "T0" + end.split(" ")[2];
+      console.log("here", t);
+      return new Date().getTime() < new Date(t.split(" ").join("")).getTime();
+    } else {
+      return new Date().getTime() < new Date(end.split(" ").join("")).getTime();
+    }
+  };
   const converte = (hour) => {
     if (parseInt(hour.split("T")[1].split(":")[0]) == 0) {
       return "12:00 AM";
@@ -520,7 +675,7 @@ export default function BookingHistory(props) {
         flex: 1,
       }}
     >
-      <Header
+      {/* <Header
         containerStyle={{ backgroundColor: "#185a9d" }}
         //leftComponent={{ icon: 'menu', color: '#fff' }}
         centerComponent={{
@@ -528,242 +683,743 @@ export default function BookingHistory(props) {
           style: { color: "#fff", fontSize: 22 },
         }}
         // rightComponent={{ icon: 'home', color: '#fff' }}
-      />
-      <ScrollView
-        style={{ backgroundColor: "#e3e3e3", width: "100%" }}
-        // contentContainerStyle={{
-        //   alignItems: "center",
-        //   justifyContent: "center",
-        // }}
-      >
-        {accepted && viewDetails ? (
-          <View style={{ backgroundColor: "red" }}>
-            <Text>total : {totalAmount}</Text>
-            <Text>total Asset : {assetBookingTotal} </Text>
-          </View>
-        ) : null}
-
+      /> */}
+      <ScrollView style={{ backgroundColor: "#e3e3e3", width: "100%" }}>
         {payments && !viewDetails ? (
           <FlatList
             data={payments}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
-              <Card containerStyle={{ width: "90%", marginLeft: "5%",borderRadius:8 }}>
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
+              <Card
+                containerStyle={{
+                  width: "90%",
+                  marginLeft: "5%",
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: "#185a9d",
+                }}
+                title={
+                  <View style={{ paddingTop: "3%", padding: "2%" }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "bold",
+                          color: "#185a9d",
+                        }}
+                      >
+                        {" "}
+                        Booked a{" "}
+                        {assetSections.length > 0
+                          ? getType(item.assetBooking.asset.assetSection)
+                          : "Loading ..."}
+                      </Text>
+                      {!item.status === true ? (
+                        <TouchableOpacity
+                          onPress={() =>
+                            props.navigation.navigate("Payment", {
+                              partial: item,
+                            })
+                          }
+                        >
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontWeight: "bold",
+                              color: "#901616",
+                              // borderWidth: 2,
+                              borderRadius: 8,
+                              borderColor: "#901616",
+                              // marginTop: "10%",
+                              // width:"20%",
+                              marginLeft:
+                                assetSections.length > 0 &&
+                                getType(
+                                  item.assetBooking.asset.assetSection
+                                ) === "Parking"
+                                  ? "35%"
+                                  : "22%",
+                              //   textDecorationLine:'underline',
+                            }}
+                          >
+                            {!item.status ? "UNPAID" : "PAID"}
+                          </Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "#3ea3a3",
+                            // borderWidth: 2,
+                            borderRadius: 8,
+                            borderColor: "#3ea3a3",
+                            // marginTop: "10%",
+                            marginLeft:
+                              assetSections.length > 0 &&
+                              getType(item.assetBooking.asset.assetSection) ===
+                                "Parking"
+                                ? "35%"
+                                : "22%",
+                            //   textDecorationLine:'underline',
+                          }}
+                        >
+                          {!item.status ? "UNPAID" : "PAID"}
+                        </Text>
+                      )}
+                    </View>
 
-                {/* <Text>
-                  {getType(item.assetBooking.asset.assetSection) ===
-                  "Parking" ? (
-                    <FontAwesome5 name="car" size={24} color="black" />
-                  ) : (
-                    <Fontisto name="room" size={24} color="black" />
-                  )}
-                </Text> */}
-                <Text style={{fontSize:18, fontWeight:'bold',color:'#185a9d'}}>
-                  {/* {' '}Type{" "} */}
-                  {assetSections.length > 0
-                    ? getType(item.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-               
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      <Ionicons
+                        name="ios-time"
+                        size={16}
+                        color="#B9B9B9"
+                        style={{ paddingTop: "2%" }}
+                      />
+                      <Text
+                        style={{
+                          paddingLeft: "1%",
+                          fontSize: 14,
+                          color: "#B9B9B9",
+                          paddingTop: "1.8%",
+                        }}
+                      >
+                        {item.dateTime.split(" ")[0]} {converte(item.dateTime)}
+                      </Text>
+                    </View>
+                    <Text></Text>
+                    <Image
+                      style={{
+                        // width: Platform.isPad ? "70%" : "80%",
+                        // height: Platform.isPad ? "100%" : "80%",
+                        aspectRatio: 1 / 1,
+                        width: "80%",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                      }}
+                      source={{
+                        uri:
+                          assetSections.length > 0
+                            ? getImage(item.assetBooking.asset.assetSection)
+                            : null,
+                        // uri: t.image,
+                      }}
+                    />
+                  </View>
+                }
+
+                // image={
+                //   assetSections.length > 0
+                //     ? getImage(item.assetBooking.asset.assetSection)
+                //     : "Loading ..."
+                // }
+              >
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                      width: "40%",
+                    }}
+                  >
+                    Section{" "}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {assetSections.length > 0
+                      ? getSection(item.assetBooking.asset.assetSection)
+                      : "Loading ..."}
+                  </Text>
                 </View>
-                {/* <Text></Text>
-                <Divider/>
-                <Text></Text> */}
-                <View style={{flexDirection:'row',justifyContent:'flex-start'}}>
-
-                {/* <Text>
-                  {getType(item.assetBooking.asset.assetSection) ===
-                  "Parking" ? (
-                    <FontAwesome5 name="car" size={24} color="black" />
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                      width: "40%",
+                    }}
+                  >
+                    {assetSections.length > 0
+                      ? getType(item.assetBooking.asset.assetSection)
+                      : null}
+                    {/* {"  "}Code:{""} */}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.asset.code}
+                  </Text>
+                </View>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                      width: "40%",
+                    }}
+                  >
+                    Booked Date{""}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.startDateTime.split(" ")[0]}{" "}
+                    {converte(item.assetBooking.startDateTime)}
+                  </Text>
+                </View>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                      width: "40%",
+                    }}
+                  >
+                    End Date{""}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "1%",
+                      fontSize: 18,
+                      color: "#404143",
+                      paddingTop: "0.2%",
+                    }}
+                  >
+                    {item.assetBooking.endDateTime.split(" ")[0]}{" "}
+                    {converte(item.assetBooking.endDateTime)}
+                  </Text>
+                </View>
+                <Text></Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: "#185a9d",
+                      width: "40%",
+                    }}
+                  >
+                    Total Amount{" "}
+                  </Text>
+                  {!item.status === true ? (
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#901616",
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {item.totalAmount} QR{" "}
+                    </Text>
                   ) : (
-                    <Fontisto name="room" size={24} color="black" />
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: "#3ea3a3",
+                        textDecorationLine: "underline",
+                      }}
+                    >
+                      {item.totalAmount} QR{" "}
+                    </Text>
                   )}
-                </Text> */}
-               <Ionicons
-            name="ios-time"
-            size={16}
-            color="#B9B9B9"
-            style={{ paddingTop: "2%" }}
-          />
-                <Text style={{ paddingLeft: "1%", fontSize: 14, color: "#B9B9B9",paddingTop: "1.8%" }}>
-             {item.assetBooking.startDateTime.split(" ")[0]}{" "}
-             {converte(item.assetBooking.startDateTime)} 
-          </Text>
-          <TouchableOpacity style={{backgroundColor:'#fff', width:'10%',marginLeft:'70%', borderRadius:8,paddingBottom:'5%'}}>
-                <AntDesign name="caretdown" size={30} color="#3ea3a3" style={{paddingLeft:'15%'}}/>
-
+                </View>
+                <TouchableOpacity
+                  style={{
+                    marginTop: "2%",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    width: "30%",
+                    backgroundColor: "#2E9E9B",
+                    borderRaduis: 5,
+                    padding: 10,
+                  }}
+                  onPress={() => setViewDetails(item)}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 18,
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    }}
+                  >
+                    Details
+                  </Text>
                 </TouchableOpacity>
-                </View>
-                {/* <Text>
-                  Section{" "}
-                  {assetSections.length > 0
-                    ? getSection(item.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-                <Text>{item.assetBooking.asset.code}</Text>
-                <Text>
-                  {item.assetBooking.startDateTime.split(" ")[0]}{" "}
-                  {converte(item.assetBooking.startDateTime)}
-                </Text>
-                <Text>
-                  {item.assetBooking.endDateTime.split(" ")[0]}{" "}
-                  {converte(item.assetBooking.endDateTime)}
-                </Text>
-                <Text style={{ backgroundColor: "red" }}>
-                  {item.totalAmount} QR {!item.status ? "Not Payed" : "Payed"}
-                </Text>
-                <Text></Text> */}
               </Card>
             )}
           />
         ) : (
-          // payments.map((p) => (
-
-          //   <TouchableOpacity style={{backgroundColor:'green'}} onPress={() => setViewDetails(p)}>
-          //     <Text>
-          //       Type{" "}
-          //       {assetSections.length > 0
-          //         ? getType(p.assetBooking.asset.assetSection)
-          //         : "Loading ..."}
-          //     </Text>
-          //     <Text>
-          //       Section{" "}
-          //       {assetSections.length > 0
-          //         ? getSection(p.assetBooking.asset.assetSection)
-          //         : "Loading ..."}
-          //     </Text>
-          //     <Text>{p.assetBooking.asset.code}</Text>
-          //     <Text>
-          //       {p.assetBooking.startDateTime.split(" ")[0]}{" "}
-          //       {converte(p.assetBooking.startDateTime)}
-          //     </Text>
-          //     <Text>
-          //       {p.assetBooking.endDateTime.split(" ")[0]}{" "}
-          //       {converte(p.assetBooking.endDateTime)}
-          //     </Text>
-          //     <Text  style={{backgroundColor:'red'}} >
-          //       {p.totalAmount} QR {!p.status ? "Not Payed" : "Payed"}
-          //     </Text>
-          //     <Text></Text>
-          //   </TouchableOpacity>
-
-          // ))
           <View>
             {viewDetails ? (
               <View>
                 {/* <Text>{viewDetails.id}</Text> */}
-                <Text>
-                  Type{" "}
-                  {assetSections.length > 0
-                    ? getType(viewDetails.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-                <Text>
-                  Section{" "}
-                  {assetSections.length > 0
-                    ? getSection(viewDetails.assetBooking.asset.assetSection)
-                    : "Loading ..."}
-                </Text>
-                <Text>From: {viewDetails.assetBooking.startDateTime}</Text>
-                <Text>To: {viewDetails.assetBooking.endDateTime}</Text>
-                <Text>
-                  Total Amount: {viewDetails.totalAmount} QR{" "}
-                  {!viewDetails.status ? "Not Payed" : "Payed"}
-                </Text>
-                <Text>To: {viewDetails.id}</Text>
+                <View style={styles.box}>
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={25}
+                    color={"#901616"}
+                    style={{ position: "absolute", left: "90%" }}
+                    onPress={() => back()}
+                  />
 
-                {displayServices ? (
-                  <View>
-                    <Text>Booked Services</Text>
-                    {displayServices.map((s, index) => (
-                      <View>
-                        <Text>Service: {s.service}</Text>
-                        <Text>Timing/s: </Text>
-                        {s.timings.map((h) => (
-                          <View style={{ flexDirection: "row" }}>
-                            <Text>
-                              {h.split("T")[0]} {converte(h)}
-                            </Text>
-                            {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
-                          </View>
-                        ))}
+                  <View
+                    style={{
+                      width: "100%",
+                      marginRight: "auto",
+                      marginLeft: "auto",
+                      backgroundColor: "#f5f5f5",
+                      marginTop: "5%",
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={styles.names}>Booking Type</Text>
+                      <MaterialCommunityIcons
+                        name={getTypeIcon(
+                          viewDetails.assetBooking.asset.assetSection
+                        )}
+                        size={20}
+                        color={"#901616"}
+                        // style={{ position:"absolute" , left:"90%" }}
+                        onPress={() => back()}
+                      />
+                      <Text>
+                        {assetSections.length > 0
+                          ? getType(viewDetails.assetBooking.asset.assetSection)
+                          : "Loading ..."}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={styles.names}>From</Text>
+                      <Text>
+                        {" "}
+                        {
+                          viewDetails.assetBooking.startDateTime.split(" ")[0]
+                        } T {converte(viewDetails.assetBooking.startDateTime)}
+                      </Text>
+                    </View>
+
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={styles.names}>To</Text>
+                      <Text>
+                        {viewDetails.assetBooking.endDateTime.split(" ")[0]} T{" "}
+                        {converte(viewDetails.assetBooking.endDateTime)}
+                      </Text>
+                    </View>
+
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={styles.names}>Total Amount</Text>
+                      <Text>{viewDetails.totalAmount} QR </Text>
+                      <Text>
+                        {!viewDetails.status ? "   Not Payed" : "   Payed"}
+                      </Text>
+                    </View>
+
+                    {displayServices && displayServices.length > 0 ? (
+                      <View style={{ flexDirection: "row" }}>
+                        <Text style={styles.names}>Booked Services</Text>
+                        <View>
+                          {displayServices.map((s, index) => (
+                            <View style={{}}>
+                              <Text
+                                style={{ color: "#18414e", fontWeight: "bold" }}
+                              >
+                                {s.service}
+                              </Text>
+
+                              {s.timings.map((h) => (
+                                <View
+                                  style={{
+                                    flexDirection: "row",
+                                    marginLeft: "5%",
+                                  }}
+                                >
+                                  <Text
+                                    style={{ width: "100%", color: "#246175" }}
+                                  >
+                                    {h.split("T")[0]} {converte(h)}
+                                  </Text>
+                                  {/* <TouchableOpacity onPress={() => deleteBooking(index)}><Text>X</Text></TouchableOpacity>  */}
+                                </View>
+                              ))}
+                            </View>
+                          ))}
+                        </View>
                       </View>
-                    ))}
+                    ) : (
+                      <Text
+                        style={{
+                          width: "40%",
+                          color: "#901616",
+                          fontSize: 15,
+                        }}
+                      >
+                        No Booked Services
+                      </Text>
+                    )}
                   </View>
-                ) : (
-                  <Text>No Booked Services</Text>
-                )}
+                  <View style={{ flexDirection: "row" }}>
+                    {ext(viewDetails.assetBooking.endDateTime) ? (
+                      <TouchableOpacity
+                        style={styles.btn}
+                        onPress={() => showDateInput(true)}
+                      >
+                        <Text style={styles.btnTitle}>Extend</Text>
+                      </TouchableOpacity>
+                    ) : null}
 
-                {new Date().getTime() <
-                new Date(
-                  viewDetails.assetBooking.startDateTime.split(" ").join("")
-                ).getTime() ? (
-                  <Button title={"cancel"} onPress={() => cancelBooking()} />
-                ) : null}
+                    {ext(viewDetails.assetBooking.startDateTime) ? (
+                      <TouchableOpacity
+                        style={styles.Cancelbtn}
+                        onPress={() => cancelBooking()}
+                      >
+                        <Text style={styles.btnTitle}>Cancel</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                </View>
 
-                <Button title={"cancel"} onPress={() => cancelBooking()} />
-                <Button title={"Back"} onPress={() => back()} />
-                {new Date().getTime() <
-                new Date(
-                  viewDetails.assetBooking.endDateTime.split(" ").join("")
-                ).getTime() ? (
-                  <Button
-                    title={"extend"}
-                    onPress={() => showDateInput(true)}
-                  />
-                ) : null}
-                {!viewDetails.status ? (
-                  <Button
-                    title="Pay"
-                    onPress={() =>
-                      props.navigation.navigate("Payment", {
-                        partial: viewDetails,
-                      })
-                    }
-                  />
-                ) : null}
+                <Review
+                  // sName={selectedSection.name}
+                  // tName={tName}
+                  asset={viewDetails.assetBooking.asset}
+                  startDateTime={viewDetails.assetBooking.startDateTime}
+                  // endDateTime={endDate}
+                  // type={type}
+                  navigation={props.navigation}
+                  handleAddFavorite={handleAddFavorite}
+                  favoriteAssets={favoriteIds}
+                  assetIcon={getTypeIcon(
+                    viewDetails.assetBooking.asset.assetSection
+                  )}
+                  //sectionIcon={sectionIcon}
+                />
               </View>
             ) : null}
 
             {dateInput ? (
-              <DatePicker
-                style={{ width: 200 }}
-                //is24Hour
-                minuteInterval={15}
-                date={extension}
-                mode="datetime"
-                placeholder="select a Start date"
-                format="YYYY-MM-DD T hh:00 A"
-                minDate={viewDetails.assetBooking.endDateTime}
-                maxDate={moment().add(3, "month")}
-                minTime={moment(viewDetails.assetBooking.endDateTime).format()}
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateIcon: {
-                    position: "absolute",
-                    left: 0,
-                    top: 4,
-                    marginLeft: 0,
-                  },
-                  dateInput: {
-                    marginLeft: 36,
-                  },
-                  // ... You can check the source to find the other keys.
-                }}
-                onDateChange={setExtension}
-              />
-            ) : null}
+              <View style={styles.box2}>
+                <Text
+                  style={{
+                    //width: "40%",
+                    color: "#395e60",
+                    fontSize: 18,
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    fontWeight: "bold",
+                    marginBottom: "2%",
+                  }}
+                >
+                  Extend Booking
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <View
+                    style={{
+                      padding: 2,
+                      backgroundColor: "#d9d9d9",
+                      marginTop: "auto",
+                      marginBottom: "auto",
+                      borderWidth: 0.5,
+                      borderColor: "#dcdcdc",
+                      height: 40,
+                      width: 160,
+                    }}
+                  >
+                    <Text style={{ marginTop: "auto", marginBottom: "auto" }}>
+                      {viewDetails.assetBooking.endDateTime.split(" ")[0]} T{" "}
+                      {converte(viewDetails.assetBooking.endDateTime)}
+                    </Text>
+                  </View>
 
-            {accepted && extension ? (
-              <View>
-                <Text>Extension Valid</Text>
-                <Button title="Services" onPress={() => setAddServices(true)} />
-                <Button title="Confirm" onPress={() => confirm()} />
+                  <MaterialCommunityIcons
+                    name="arrow-right"
+                    size={25}
+                    color={"#3ea3a3"}
+                    style={{ marginTop: "auto", marginBottom: "auto" }}
+                  />
+                  <DatePicker
+                    style={{
+                      backgroundColor: "#d9d9d9",
+                      marginTop: "auto",
+                      marginBottom: "auto",
+                      borderWidth: 0.5,
+                      borderColor: "#dcdcdc",
+                      width: 160,
+                    }}
+                    //is24Hour
+                    minuteInterval={15}
+                    date={extension}
+                    mode="datetime"
+                    placeholder="Extend Till"
+                    format="YYYY-MM-DD T hh:00 A"
+                    minDate={viewDetails.assetBooking.endDateTime}
+                    maxDate={moment().add(3, "month")}
+                    minTime={moment(
+                      viewDetails.assetBooking.endDateTime
+                    ).format()}
+                    confirmBtnText="Confirm"
+                    cancelBtnText="Cancel"
+                    customStyles={{
+                      dateIcon: {
+                        width: 0,
+                        height: 0,
+                      },
+                      dateInput: {
+                        backgroundColor: "#d9d9d9",
+                        borderWidth: 0,
+                        borderColor: "#185a9d",
+                      },
+                      // ... You can check the source to find the other keys.
+                    }}
+                    onDateChange={setExtension}
+                  />
+                </View>
+
+                {accepted && extension ? (
+                  <View style={styles.box3}>
+                    <View style={styles.extension}>
+                      <Text
+                        style={{
+                          color: "#3ea3a3",
+                          marginTop: "auto",
+                          marginBottom: "auto",
+                          fontSize: 17,
+                          marginRight: "3%",
+                        }}
+                      >
+                        Extension Valid
+                      </Text>
+                      <AntDesign
+                        name="checkcircle"
+                        size={25}
+                        color={"#3ea3a3"}
+                        style={{
+                          marginTop: "auto",
+                          marginBottom: "auto",
+                          marginLeft: "3%",
+                        }}
+                      />
+                    </View>
+
+                    <View>
+                      {!viewDetails.status ? (
+                        <View>
+                          <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.amount}>Added Amount </Text>
+                            <Text style={{ color: "#246175" }}>
+                              {totalAmount} QR
+                            </Text>
+                          </View>
+
+                          <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.amount}>Services Total </Text>
+                            <Text style={{ color: "#246175" }}>
+                              {" "}
+                              {serviceBookingTotal} QR
+                            </Text>
+                          </View>
+
+                          {newServiceBookings.length > 0 ? (
+                            <View style={{ width: "100%" }}>
+                              {newShow && newShow.length > 0
+                                ? newShow.map((s) => (
+                                    <View style={{ marginLeft: "5%" }}>
+                                      <Text
+                                        style={{
+                                          color: "#18414e",
+                                          fontWeight: "bold",
+                                        }}
+                                      >
+                                        {s.service.name}
+                                      </Text>
+                                      {/* <Text>Total: {s.service.price * s.hours.length}</Text> */}
+
+                                      {s.hours.map((h) => (
+                                        <View style={{ flexDirection: "row" }}>
+                                          <Text
+                                            style={{
+                                              width: "50%",
+                                              color: "#246175",
+                                            }}
+                                          >
+                                            {h}
+                                          </Text>
+                                          <Text style={{ color: "#246175" }}>
+                                            {s.service.price} QR
+                                          </Text>
+                                        </View>
+                                      ))}
+                                    </View>
+                                  ))
+                                : null}
+                            </View>
+                          ) : null}
+                          <View>
+                            <View style={{ flexDirection: "row" }}>
+                              <Text style={styles.amount}>Total Amount </Text>
+                              <Text style={{ color: "#246175" }}>
+                                {" "}
+                                {totalAmount + viewDetails.totalAmount} QR
+                              </Text>
+                            </View>
+                          </View>
+                          <Text
+                            style={{
+                              color: "red",
+                              marginLeft: "auto",
+                              marginRight: "auto",
+                            }}
+                          >
+                            * Extension Amount will be added to this booking
+                            bill
+                          </Text>
+                        </View>
+                      ) : (
+                        <View>
+                          <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.amount}>Total Amount</Text>
+                            <Text style={{ color: "#246175" }}>
+                              {" "}
+                              {totalAmount} QR
+                            </Text>
+                          </View>
+
+                          <View style={{ flexDirection: "row" }}>
+                            <Text style={styles.amount}>Services Total </Text>
+                            <Text style={{ color: "#246175" }}>
+                              {" "}
+                              {serviceBookingTotal} QR
+                            </Text>
+                          </View>
+                          {newServiceBookings.length > 0 ? (
+                            <View style={{ width: "100%" }}>
+                              {newShow && newShow.length > 0
+                                ? newShow.map((s) => (
+                                    <View style={{ marginLeft: "5%" }}>
+                                      <Text
+                                        style={{
+                                          color: "#18414e",
+                                          fontWeight: "bold",
+                                        }}
+                                      >
+                                        {s.service.name}
+                                      </Text>
+                                      {/* <Text>Total: {s.service.price * s.hours.length}</Text> */}
+
+                                      {s.hours.map((h) => (
+                                        <View style={{ flexDirection: "row" }}>
+                                          <Text
+                                            style={{
+                                              width: "50%",
+                                              color: "#246175",
+                                            }}
+                                          >
+                                            {h}
+                                          </Text>
+                                          <Text style={{ color: "#246175" }}>
+                                            {s.service.price} QR
+                                          </Text>
+                                        </View>
+                                      ))}
+                                    </View>
+                                  ))
+                                : null}
+                            </View>
+                          ) : null}
+                          <Text
+                            style={{
+                              color: "red",
+                              marginLeft: "auto",
+                              marginRight: "auto",
+                            }}
+                          >
+                            * Extension Amount will be added to a new bill
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <View style={{ flexDirection: "row" }}>
+                      <TouchableOpacity
+                        style={styles.btn}
+                        onPress={() => setAddServices(true)}
+                      >
+                        <Text style={styles.btnTitle}>Services</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.btn}
+                        onPress={() => confirm()}
+                      >
+                        <Text style={styles.btnTitle}>Confirm</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : !accepted && extension ? (
+                  <View style={styles.extension}>
+                    <Text
+                      style={{
+                        color: "#901616",
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                        fontSize: 17,
+                        marginRight: "3%",
+                      }}
+                    >
+                      Extension Not Valid
+                    </Text>
+                    <AntDesign
+                      name="closecircle"
+                      size={25}
+                      color={"#901616"}
+                      style={{
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                        marginLeft: "3%",
+                      }}
+                    />
+                  </View>
+                ) : null}
               </View>
-            ) : !accepted && extension ? (
-              <Text>Extension Not Valid</Text>
             ) : null}
 
             {addServices ? (
@@ -807,25 +1463,6 @@ export default function BookingHistory(props) {
                 </View>
               </Modal>
             ) : null}
-
-            {newServiceBookings.length > 0 ? (
-              <View>
-                <Text>Booked Services</Text>
-                {newShow.map((s) => (
-                  <View>
-                    <Text>Service: {s.service.name}</Text>
-                    <Text>Price Per Hour {s.service.price}</Text>
-
-                    <Text>Total: {s.service.price * s.hours.length}</Text>
-                    <Text>Bookings</Text>
-                    {s.hours.map((h) => (
-                      <Text>{h}</Text>
-                    ))}
-                  </View>
-                ))}
-                <Text>Services Total Amount: {serviceBookingTotal}</Text>
-              </View>
-            ) : null}
           </View>
         )}
       </ScrollView>
@@ -834,7 +1471,10 @@ export default function BookingHistory(props) {
 }
 
 BookingHistory.navigationOptions = {
-  title: "History",
+  title: "My Bookings",
+  headerStyle: { backgroundColor: "#185a9d" },
+  // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
+  headerTintColor: "white",
 };
 //
 const styles = StyleSheet.create({
@@ -854,6 +1494,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
+    width: "90%",
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
@@ -873,5 +1514,100 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
+  },
+  box: {
+    width: "100%",
+    borderColor: "#cccccc",
+    //borderTopWidth: 2,
+    borderBottomWidth: 2,
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: "white",
+    // marginTop: "2%",
+    marginBottom: "2%",
+    paddingTop: "4%",
+    paddingBottom: "4%",
+    paddingLeft: "2%",
+    paddingRight: "2%",
+  },
+  box2: {
+    width: "100%",
+    borderColor: "#cccccc",
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: "#f2f2f2",
+    marginTop: "2%",
+    marginBottom: "2%",
+    paddingTop: "4%",
+    paddingBottom: "4%",
+    paddingLeft: "2%",
+    paddingRight: "2%",
+  },
+  box3: {
+    width: "85%",
+    //borderColor: "#cccccc",
+    //borderWidth: 2,
+    //borderBottomWidth: 2,
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: "#f2f2f2",
+    //marginTop: "2%",
+    marginBottom: "2%",
+    paddingTop: "4%",
+    //paddingBottom: "4%",
+    //paddingLeft: "2%",
+    //paddingRight: "2%"
+  },
+  names: {
+    width: "40%",
+    color: "#395e60",
+    fontSize: 18,
+  },
+  btn: {
+    width: "30%",
+    backgroundColor: "#2E9E9B",
+    borderRadius: 5,
+    margin: "3%",
+    padding: 10,
+    alignItems: "center",
+  },
+  Cancelbtn: {
+    width: "30%",
+    backgroundColor: "#901616",
+    borderRadius: 5,
+    margin: "3%",
+    padding: 10,
+    alignItems: "center",
+  },
+  btnTitle: {
+    color: "white",
+    fontSize: 15,
+    marginBottom: "1%",
+  },
+  extension: {
+    width: "50%",
+    flexDirection: "row",
+    // marginTop: "1%",
+    marginBottom: "3%",
+    marginLeft: "auto",
+    marginRight: "auto",
+    justifyContent: "center",
+    borderBottomWidth: 0.5,
+    width: "100%",
+    paddingBottom: "3%",
+  },
+  extensionTitle: {
+    marginTop: "auto",
+    marginBottom: "auto",
+    fontSize: 15,
+  },
+  amount: {
+    width: "50%",
+    marginBottom: "1%",
+    fontSize: 15,
+    color: "#18414e",
+    fontWeight: "bold",
   },
 }); //backgroundColor:"white" fontWieght:"bold" , paddingLeft: 5

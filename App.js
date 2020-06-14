@@ -61,6 +61,7 @@ import {
 } from "@expo/vector-icons";
 
 // import AsyncStorage from "@react-native-community/async-storage";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function App(props) {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -115,30 +116,54 @@ export default function App(props) {
 
   ///////////////////////////////////////////////////////////////////
 
+  const BookingStack = createAppContainer(
+    createStackNavigator(
+      { BookingHistory: BookingHistory },
+      {
+        defaultNavigationOptions: ({ navigation }) => {
+          return {
+            headerLeft: () => (
+              <MaterialCommunityIcons
+                // style={{ marginLeft: 20 }}
+                onPress={() => navigation.openDrawer()}
+                name="menu"
+                color="white"
+                // type="MaterialCommunityIcons"
+                size={28}
+                style={{ marginLeft: 15 }}
+              />
+            ),
+          };
+        },
+      }
+    )
+  );
+
   const DashboardTabNavigator = createMaterialBottomTabNavigator(
     {
       Home: {
         screen: HomeStack,
         navigationOptions: {
           tabBarIcon: ({ tintColor }) => {
-            return <Ionicons name="ios-home" size={20} color={tintColor} />;
+            return <Ionicons name="ios-home" size={22} color={tintColor} />;
           },
         },
       },
-      BookingHistory: {
-        screen: BookingHistory,
-        navigationOptions: {
-          tabBarIcon: ({ tintColor }) => {
-            return (
-              <MaterialCommunityIcons
-                name="history"
-                size={20}
-                color={tintColor}
-              />
-            );
-          },
-        },
-      },
+      // BookingHistory: {
+      //   screen: BookingHistory,
+      //   navigationOptions: {
+      //     tabBarIcon: ({ tintColor }) => {
+      //       return (
+      //         <MaterialCommunityIcons
+      //           name="history"
+      //           size={20}
+      //           color={tintColor}
+      //         />
+      //       );
+      //     },
+      //     tabBarLabel: "My Bookings",
+      //   },
+      // },
       Profile: {
         screen: ProfileStack,
         navigationOptions: {
@@ -148,15 +173,32 @@ export default function App(props) {
                 <Image
                   // hereboi
                   source={{ uri: photoURL }}
-                  style={{ height: 20, width: 20, borderRadius: 50 }}
+                  style={{ height: 25, width: 25, borderRadius: 50 }}
                 />
               )
             );
           },
         },
       },
+      BookingHistory: {
+        screen: BookingStack,
+
+        navigationOptions: {
+          tabBarIcon: ({ tintColor }) => {
+            return (
+              <MaterialCommunityIcons
+                name="history"
+                size={22}
+                color={tintColor}
+              />
+            );
+          },
+          tabBarLabel: "My Bookings",
+        },
+      },
     },
     {
+      shifting: true,
       //swipeEnabled - Whether to allow swiping between tabs.
       swipeEnabled: true,
       //animationEnabled - Whether to animate when changing tabs.
@@ -164,21 +206,21 @@ export default function App(props) {
       //activeColor - Custom color for icon and label in the active tab.
       activeColor: "white",
       //inactiveColor - Custom color for icon and label in the inactive tab.
-      inactiveColor: "gray",
+      inactiveColor: "lightgray",
       // barStyle - Style for the bottom navigation bar.
-      barStyle: { backgroundColor: "#276b9c" },
+      barStyle: { backgroundColor: "#185a9d" },
 
       // tabBarOptions - Configure the tab bar
       tabBarOptions: {
         //activeTintColor - Label and icon color of the active tab
         activeTintColor: "white",
         //inactiveTintColor - Label and icon color of the inactive tab.
-        inactiveTintColor: "gray",
+        inactiveTintColor: "lightgray",
         // to display the labels
 
         //style - Style object for the tab bar.
         style: {
-          backgroundColor: "#276b9c",
+          backgroundColor: "#185a9d",
           paddingTop: 4,
         },
         //labelStyle - Style object for the tab label.
@@ -228,23 +270,53 @@ export default function App(props) {
         return {
           headerLeft: (
             <Icon
-              style={{ paddingRight: 10 }}
-              onPress={() => navigation.FriendsList}
+              onPress={() => navigation.openDrawer()}
               name="md-menu"
               type="ionicon"
               color="white"
               size={30}
+              containerStyle={{
+                marginLeft: 15,
+              }}
             />
           ),
           headerStyle: {
             backgroundColor: "#185a9d",
           },
-          headerTitle: "FRIENDS",
+          // headerTitle: "FRIENDS",
           headerTintColor: "white",
         };
       },
     }
   );
+
+  // const TicketAppContainer = createAppContainer(
+  //   { Ticket: TicketScreen },
+  //   {}
+  // {
+  //   defaultNavigationOptions: ({ navigation }) => {
+  //     return {
+  //       headerLeft: (
+  //         <Icon
+  //           onPress={() => navigation.openDrawer()}
+  //           name="md-menu"
+  //           type="ionicon"
+  //           color="white"
+  //           size={30}
+  //           containerStyle={{
+  //             marginLeft: 20,
+  //           }}
+  //         />
+  //       ),
+  //       headerStyle: {
+  //         backgroundColor: "#185a9d",
+  //       },
+  //       // headerTitle: "FRIENDS",
+  //       headerTintColor: "white",
+  //     };
+  //   },
+  // }
+  // );
 
   const AppDrawerNavigator = createDrawerNavigator(
     {
@@ -272,6 +344,16 @@ export default function App(props) {
           drawerIcon: ({ tintColor }) => {
             return <Entypo name="news" size={20} color={tintColor} />;
           },
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       Ticket: {
@@ -286,6 +368,16 @@ export default function App(props) {
             );
           },
           drawerLabel: "Contact Us",
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       FAQ: {
@@ -299,11 +391,31 @@ export default function App(props) {
               />
             );
           },
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
         },
       },
       Advertisment: {
         screen: AdvertismentsStack,
         navigationOptions: {
+          // headerLeft: () => (
+          //   <Icon
+          //     style={{ paddingLeft: 10 }}
+          //     onPress={() => navigation.openDrawer()}
+          //     name="md-menu"
+          //     color="white"
+          //     type="ionicon"
+          //     size={30}
+          //   />
+          // ),
           drawerLabel: "Advertise with us",
           drawerIcon: ({ tinColor }) => {
             return <FontAwesome5 name="adversal" size={20} color={tinColor} />;
@@ -328,7 +440,7 @@ export default function App(props) {
             <View
               style={{
                 // height: 200,
-                // alignItems: "center",
+                alignItems: "center",
                 justifyContent: "center",
               }}
             >
@@ -385,6 +497,32 @@ export default function App(props) {
                 </View>
               </View>
             </View>
+            {user.role === "admin" ||
+            user.role === "manager" ||
+            user.role === "user handler" ||
+            user.role === "asset handler" ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                }}
+              >
+                <View>
+                  <Image
+                    source={require("./assets/images/roles.png")}
+                    style={{ height: 40, width: 40 }}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleChangeRole}
+                  style={{ justifyContent: "center", marginLeft: "2%" }}
+                >
+                  <View style={{ marginLeft: "2%" }}>
+                    <Text>Swap Your Role</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
           <Divider style={{ backgroundColor: "black", height: "0.1%" }} />
           <ScrollView
@@ -397,10 +535,14 @@ export default function App(props) {
           </ScrollView>
           {/* <Divider style={{ backgroundColor: "black", height: "0.1%" }} /> */}
 
-          <View style={{ justifyContent: "center" }}>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
             <TouchableOpacity
               onPress={handleLogout}
-              style={{ flexDirection: "row", justifyContent: "center" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               <MaterialCommunityIcons
                 name="logout"
@@ -409,20 +551,12 @@ export default function App(props) {
                 // style={styles.actionButtonIcon}
               />
               <View style={{ justifyContent: "center" }}>
-                <Text>Logout {user && user.displayName}</Text>
+                <Text style={{ fontWeight: "bold" }}>
+                  Logout {user && user.displayName}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
-          {user.role === "admin" ||
-          user.role === "manager" ||
-          user.role === "user handler" ||
-          user.role === "asset handler" ? (
-            <View>
-              <TouchableOpacity onPress={handleChangeRole}>
-                <Text>Change Role {user && user.displayName}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
         </SafeAreaView>
       ),
     }
@@ -492,6 +626,18 @@ export default function App(props) {
     }
   }
 
+  async function getGuide() {
+    const value = await AsyncStorage.getItem("guide");
+    // console.log("valueeeeeeeeeeeee", value);
+    if (value === null) {
+      // await AsyncStorage.setItem("alreadyLaunched", "true");
+      // console.log("trueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", value);
+    } else {
+      // console.log("falseeeeeeeeeeeeeeeeeeeeeee", value);
+      setGuideView(false);
+    }
+  }
+
   const handleChangeRole = () => {
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
@@ -499,8 +645,9 @@ export default function App(props) {
   };
 
   useEffect(() => {
-    getFirstLaunch();
-    getTheme();
+    // getFirstLaunch();
+    // getTheme();
+    getGuide();
   }, []);
 
   const handleAppState = (nextAppState) => {
@@ -588,35 +735,78 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const adminTabNav = createBottomTabNavigator(
+  // --------------------- CHANGE THE CONFIG ---------------------
+  // const adminTabNav = (
+  //   {
+  //     Home: AdminHomeStack,
+  //   },
+  //   {
+  //     tabBarOptions: {
+  //       activeTintColor: "white",
+  //       inactiveTintColor: "gray",
+  //       style: { backgroundColor: "#005c9d" },
+  //     },
+  //   }
+  // );
+
+  const AdminAppContainer = createAppContainer(AdminHomeStack);
+
+  // --------------------- CHANGE THE CONFIG ---------------------
+  const serviceEmployeeTabNav = createMaterialBottomTabNavigator(
     {
-      Home: AdminHomeStack,
+      Schedule: ScheduleStack,
+      Home: HomeStack,
+
+      News: NewsStack,
+
       Profile: ProfileStack,
-      BookingHistory: BookingHistory,
     },
     {
+      //swipeEnabled - Whether to allow swiping between tabs.
+      swipeEnabled: true,
+      //animationEnabled - Whether to animate when changing tabs.
+      animationEnabled: true,
+      //activeColor - Custom color for icon and label in the active tab.
+      activeColor: "white",
+      //inactiveColor - Custom color for icon and label in the inactive tab.
+      inactiveColor: "lightgray",
+      // barStyle - Style for the bottom navigation bar.
+      barStyle: { backgroundColor: "#185a9d" },
+
+      // tabBarOptions - Configure the tab bar
       tabBarOptions: {
+        //activeTintColor - Label and icon color of the active tab
         activeTintColor: "white",
-        inactiveTintColor: "gray",
-        style: { backgroundColor: "#005c9d" },
+        //inactiveTintColor - Label and icon color of the inactive tab.
+        inactiveTintColor: "lightgray",
+        // to display the labels
+
+        //style - Style object for the tab bar.
+        style: {
+          backgroundColor: "#185a9d",
+          paddingTop: 4,
+        },
+        //labelStyle - Style object for the tab label.
+        lableStyle: {
+          textAlign: "center",
+          fontSize: 19,
+          fontWeight: "bold",
+          color: "transparent",
+        },
+        //indicatorStyle - Style object for the tab indicator (line at the bottom of the tab).
+        indicatorStyle: {
+          borderBottomColor: "white",
+          borderBottomWidth: 70,
+        },
       },
     }
   );
 
-  const AdminAppContainer = createAppContainer(adminTabNav);
-
-  const serviceEmployeeTabNav = createBottomTabNavigator({
-    Schedule: ScheduleStack,
-    Home: HomeStack,
-
-    News: NewsStack,
-
-    Profile: ProfileStack,
-  });
   const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
 
-  const guideSkip = () => {
+  const guideSkip = async () => {
     // console.log("Skipppped");
+    await AsyncStorage.setItem("guide", "false");
     setGuideView(false);
   };
 
@@ -631,14 +821,19 @@ export default function App(props) {
       // if user info already retrieved
       if (user) {
         // if users first launch show guideView
-        // if (guideView) {
-        if (firstLaunch && guideView) {
+        if (guideView) {
+          // if (firstLaunch && guideView) {
           return <Guide guideSkip={guideSkip} />;
         }
         // --------------------------------CUSTOMER----------------------------------
         // if user is customer or service employee go to <AppContainer/>
         else if (user.role === "customer") {
-          return <AppContainer />;
+          return (
+            <View style={{ flex: 1 }}>
+              <AppContainer />
+              <FlashMessage position="top" />
+            </View>
+          );
         }
         // --------------------------------SERVICE EMPLOYEE----------------------------------
         // if user is customer or service employee go to <AppContainer/>
@@ -686,7 +881,12 @@ export default function App(props) {
                 return <ServiceEmployeeAppContainer />;
 
               case "customer":
-                return <AppContainer />;
+                return (
+                  <View style={{ flex: 1 }}>
+                    <AppContainer />
+                    <FlashMessage position="top" />
+                  </View>
+                );
 
               default:
                 // ---We dun goofed---
@@ -713,6 +913,17 @@ export default function App(props) {
               justifyContent: "center",
             }}
           >
+            <Image
+              width={Dimensions.get("window").width / 6}
+              source={require("./assets/images/mylogo.png")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "50%",
+                height: "30%",
+              }}
+            />
             <LottieView
               width={Dimensions.get("window").width / 3}
               source={require("./assets/loadingAnimations/890-loading-animation.json")}
@@ -736,6 +947,17 @@ export default function App(props) {
           justifyContent: "center",
         }}
       >
+        <Image
+          width={Dimensions.get("window").width / 6}
+          source={require("./assets/images/mylogo.png")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "50%",
+            height: "30%",
+          }}
+        />
         <LottieView
           width={Dimensions.get("window").width / 3}
           source={require("./assets/loadingAnimations/890-loading-animation.json")}

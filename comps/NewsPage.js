@@ -8,6 +8,12 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon, Avatar, Button, Image, Input } from "react-native-elements";
@@ -28,6 +34,7 @@ export default function NewsPage() {
   const [endDate, setEndDate] = useState();
   const [description, setDescription] = useState();
   const [news, setNews] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const askPermission = async () => {
     const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
     setHasCameraRollPermission(status === "granted");
@@ -41,6 +48,24 @@ export default function NewsPage() {
 
   useEffect(() => {
     callNews();
+  }, [promotions]);
+
+  useEffect(() => {
+    db.collection("promotionCodes").onSnapshot((query) => {
+      let codes = [];
+      query.forEach((doc) => {
+        codes.push({
+          datePublished: doc.data().expiryDate,
+          endDate: doc.data().expiryDate,
+          title: `Promotion Code ${doc.data().code}`,
+          description: `${doc.data().percentage}% OFF!`,
+          image:
+            "https://firebasestorage.googleapis.com/v0/b/capstone2020-b64fd.appspot.com/o/advertisements%2Fpromotion.jpg?alt=media&token=c8dbaa7b-311f-4030-a374-1aa772bdfdaf",
+          isPromo: true,
+        });
+      });
+      setPromotions(codes);
+    });
   }, []);
 
   const getUser = () => {
@@ -53,8 +78,15 @@ export default function NewsPage() {
     db.collection("news").onSnapshot((onSnapshot) => {
       let data = [];
       onSnapshot.forEach((doc) => {
-        data.push(doc.data());
+        data.push({ id: doc.id, ...doc.data(), isPromo: false });
       });
+      promotions.forEach((p) => {
+        console.log("promo", p);
+
+        data.push(p);
+      });
+
+      // console.log("promotions", promotions);
       setNews(data);
     });
   };
@@ -121,16 +153,22 @@ export default function NewsPage() {
       {/* <Text>Header</Text> */}
 
       <ScrollView style={{ flex: 1, width: "125%" }} horizontal={false}>
-        {news.map((item, i) => (
-          <News key={i} item={item} />
-        ))}
+        {news.map((item, i) =>
+          user.activeRole === "admin" ? (
+            !item.isPromo ? (
+              <News key={i} item={item} user={user} />
+            ) : null
+          ) : (
+            <News key={i} item={item} user={user} />
+          )
+        )}
       </ScrollView>
-      {user && (user.role === "admin" || user.role === "manager") ? (
+      {user && user.activeRole === "admin" ? (
         <TouchableOpacity
           style={{
             backgroundColor: "#3ea3a3",
-            height: 50,
-            width: "60%",
+            height: responsiveScreenHeight(5),
+            width: "50%",
             alignItems: "center",
             alignContent: "center",
 
@@ -151,7 +189,7 @@ export default function NewsPage() {
           <Text
             style={{
               color: "#fff",
-              fontSize: 22,
+              fontSize: responsiveFontSize(2),
               paddingLeft: "5%",
               paddingBottom: "2%",
             }}
@@ -184,7 +222,7 @@ export default function NewsPage() {
           flexDirection: "column",
         }}
       >
-        <View
+        {/* <View
           style={{
             // paddingTop: "15%",
             borderBottomWidth: 1,
@@ -211,10 +249,16 @@ export default function NewsPage() {
               <MaterialIcons name="cancel" size={30} color="#fff" />
             </Text>
           </TouchableOpacity>
-          <Text style={{ fontSize: 28, color: "#fff", paddingBottom: "5%" }}>
+          <Text
+            style={{
+              fontSize: responsiveFontSize(3),
+              color: "#fff",
+              paddingBottom: "5%",
+            }}
+          >
             Create News
           </Text>
-        </View>
+        </View> */}
         <View
           style={{
             borderWidth: 2,

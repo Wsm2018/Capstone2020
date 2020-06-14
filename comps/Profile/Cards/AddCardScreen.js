@@ -28,6 +28,8 @@ import {
 import { CreditCardInput } from "react-native-credit-card-input";
 // import { TouchableOpacity } from "react-native-gesture-handler";
 // import { ScrollView } from "react-native-gesture-handler";
+import FlashMessage, { showMessage } from "react-native-flash-message";
+
 export default function AddCard(props) {
   const user = props.navigation.getParam("user");
   const [cardNumber, setCardNumber] = useState("");
@@ -116,7 +118,15 @@ export default function AddCard(props) {
         cardInfo: { cardNumber, holderName, cardType, expiryDate, cvc },
       });
       if (response.data !== null) {
-        alert("Card Added");
+        // alert("Card Added");
+        showMessage({
+          message: `Card Added!`,
+          description: `Your credit card information has been added successfully!`,
+          // type: "success",
+          backgroundColor: "#3ea3a3",
+          // duration: 2300,
+        });
+
         props.navigation.goBack();
       }
     }
@@ -193,13 +203,13 @@ export default function AddCard(props) {
                 // width: "30%",
                 // backgroundColor: "red",
 
-                justifyContent: "center",
+                justifyContent: "flex-end",
                 alignItems: "center",
               }}
             >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#3d9478",
+                  backgroundColor: "#3ea3a3",
                   // height: 40,
                   // width: "30%",
                   height: responsiveScreenHeight(5),

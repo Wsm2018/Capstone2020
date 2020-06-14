@@ -11,6 +11,11 @@ import LottieView from "lottie-react-native";
 import { BarChart, Grid, YAxis, XAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
 import Swiper from "react-native-swiper";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 export default function Statistics(props) {
   // --------------------------------------- STATE VARIABLES -------------------------
 
@@ -95,7 +100,7 @@ export default function Statistics(props) {
               booking: query.docs.length,
               color: doc.data().color,
               legendFontColor: "#7F7F7F",
-              legendFontSize: 15,
+              legendFontSize: responsiveScreenFontSize(1.5),
             });
 
             if (count === querySnap.docs.length) {
@@ -151,7 +156,7 @@ export default function Statistics(props) {
             booking: bookingCount,
             color: assetSection.color,
             legendFontColor: "#7F7F7F",
-            legendFontSize: 15,
+            legendFontSize: responsiveScreenFontSize(1.5),
           });
         }
       });
@@ -231,21 +236,21 @@ export default function Statistics(props) {
         // color: "#03396c",
         color: "#011f4b",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "Customers",
         users: customers.length,
         color: "#005b96",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "User Handlers",
         users: userHandlers.length,
         color: "#c7a43e",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "Managers",
@@ -253,28 +258,28 @@ export default function Statistics(props) {
         color: "#29a8ab",
         // color: "#b3cde0",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "Aseet Handlers",
         users: assetHandler.length,
         color: "#b4cfd1",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "Support Agent",
         users: customerSupport.length,
         color: "#901616",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
       {
         name: "Service Worker",
         users: serviceEmployee.length,
         color: "#be9b7b",
         legendFontColor: "#7F7F7F",
-        legendFontSize: 15,
+        legendFontSize: responsiveScreenFontSize(1.5),
       },
     ];
 
@@ -327,7 +332,7 @@ export default function Statistics(props) {
             >
               <Text
                 style={{
-                  fontSize: 25,
+                  fontSize: responsiveScreenFontSize(4),
                   color: "#005c9d",
                   textAlign: "center",
                   fontWeight: "bold",
@@ -340,8 +345,8 @@ export default function Statistics(props) {
             <View style={{ marginRight: 30 }}>
               <PieChart
                 data={userChart}
-                width={screenWidth}
-                height={220}
+                width={responsiveScreenWidth(90)}
+                height={responsiveScreenHeight(25)}
                 chartConfig={chartConfig}
                 accessor="users"
                 backgroundColor="transparent"
@@ -396,7 +401,7 @@ export default function Statistics(props) {
             >
               <Text
                 style={{
-                  fontSize: 25,
+                  fontSize: responsiveScreenFontSize(4),
                   color: "#005c9d",
                   textAlign: "center",
                   fontWeight: "bold",
@@ -409,8 +414,8 @@ export default function Statistics(props) {
             <View>
               <PieChart
                 data={assetChartData}
-                width={screenWidth}
-                height={220}
+                width={responsiveScreenWidth(90)}
+                height={responsiveScreenHeight(25)}
                 chartConfig={chartConfig}
                 accessor="booking"
                 backgroundColor="transparent"
@@ -464,7 +469,7 @@ export default function Statistics(props) {
             >
               <Text
                 style={{
-                  fontSize: 25,
+                  fontSize: responsiveScreenFontSize(4),
                   color: "#005c9d",
                   textAlign: "center",
                   fontWeight: "bold",
@@ -477,8 +482,8 @@ export default function Statistics(props) {
             <View>
               <PieChart
                 data={serviceChartData}
-                width={screenWidth}
-                height={220}
+                width={responsiveScreenWidth(90)}
+                height={responsiveScreenHeight(25)}
                 chartConfig={chartConfig}
                 accessor="booking"
                 backgroundColor="transparent"

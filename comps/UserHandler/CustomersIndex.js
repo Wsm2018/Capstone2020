@@ -12,7 +12,13 @@ import {
   Keyboard,
   Platform,
 } from "react-native";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import LottieView from "lottie-react-native";
 import { ListItem, SearchBar } from "react-native-elements";
 import firebase from "firebase/app";
@@ -34,6 +40,7 @@ export default function EmployeesRequest(props) {
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
   const [marginVal, setMargin] = useState(0);
+  const [deviceType, setDeviceType] = useState(0);
 
   const roles = [
     "asset handler",
@@ -152,12 +159,14 @@ export default function EmployeesRequest(props) {
                   borderTopColor: "#185a9d",
                   width: "100%",
                   height: "20%",
+                  fontSize: responsiveScreenFontSize(1.8),
                 }}
                 inputContainerStyle={{
                   borderRadius: 20,
                   borderWidth: 1,
                   borderColor: "#fafafa",
                   backgroundColor: "#fafafa",
+                  fontSize: responsiveScreenFontSize(1.8),
                 }}
                 style={{
                   //backgroundColor: "white",
@@ -170,6 +179,7 @@ export default function EmployeesRequest(props) {
                   marginLeft: 10,
                   marginRight: 10,
                   elevation: 20,
+                  fontSize: responsiveScreenFontSize(1.8),
                 }}
               />
             </View>
@@ -192,12 +202,18 @@ export default function EmployeesRequest(props) {
                       rightAvatar={
                         <Ionicons
                           name="ios-arrow-forward"
-                          size={24}
+                          size={responsiveScreenHeight(2)}
                           color="black"
                         />
                       }
-                      titleStyle={{ marginLeft: "4%" }}
-                      subtitleStyle={{ marginLeft: "4%" }}
+                      titleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.8),
+                      }}
+                      subtitleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.6),
+                      }}
                       title={user.displayName}
                       subtitle={user.email}
                       bottomDivider
@@ -212,9 +228,11 @@ export default function EmployeesRequest(props) {
             ) : (
               <View
                 style={{
+                  flex: 0.6,
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   flexDirection: "column",
+                  alignSelf: "center",
                 }}
               >
                 <LottieView
@@ -224,12 +242,18 @@ export default function EmployeesRequest(props) {
                   style={{
                     position: "relative",
                     width: "100%",
-                    justifyContent: "center",
-                    alignSelf: "center",
-                    paddingTop: "30%",
+                    // justifyContent: "center",
+                    // alignSelf: "center",
+                    paddingTop: "5%",
                   }}
                 />
-                <Text style={{ color: "grey", fontSize: 20 }}>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 20,
+                    fontSize: responsiveScreenFontSize(1.8),
+                  }}
+                >
                   User not found
                 </Text>
               </View>
@@ -295,12 +319,11 @@ const styles = StyleSheet.create({
     // elevation: 20,
   },
   containerLogin2: {
-    flex: 0.7,
+    flex: 0.8,
     justifyContent: "flex-start",
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
-    marginTop: "-8%",
-    // elevation: 20,
+    // marginTop: "-8%",
   },
   header: {
     padding: 15,

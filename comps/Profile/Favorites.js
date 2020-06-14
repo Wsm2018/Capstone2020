@@ -17,6 +17,7 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveHeight,
 } from "react-native-responsive-dimensions";
 import { AntDesign, FontAwesome } from "react-native-vector-icons";
 
@@ -634,7 +635,7 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 1.6,
+    height: responsiveHeight(90),
     width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
