@@ -76,6 +76,12 @@ export default function NewsPage() {
     });
   }, []);
 
+  const getUser = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((doc) => setUser({ id: doc.id, ...doc.data() }));
+  };
+
   const callNews = () => {
     db.collection("news").onSnapshot((onSnapshot) => {
       let data = [];

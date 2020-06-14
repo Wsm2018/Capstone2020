@@ -532,20 +532,7 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((userRef) => {
-        console.log("userRef", userRef.data().activeRole);
-        setActiveRole(userRef.data().activeRole);
-      });
-
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((userRef) => {
-        setPhotoURL(userRef.data().photoURL);
-      });
-
-    const userRef = await db
+    let userRef = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
