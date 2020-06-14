@@ -22,23 +22,23 @@ const FriendsStack = createAppContainer(
     },
     {
       headerMode: null,
-      headerStyle: { backgroundColor: "#185a9d" },
-      headerTintColor: "white",
+      // // headerStyle: { backgroundColor: "#185a9d" },
+      // // headerTintColor: "white",
       // defaultNavigationOptions: ({ navigation }) => {
-      //   if (navigation.state.routeName === "FriendsList") {
-      //     return {
-      //       headerLeft: () => (
-      //         <Icon
-      //           style={{ paddingLeft: 10 }}
-      //           onPress={() => navigation.openDrawer()}
-      //           name="md-menu"
-      //           color="black"
-      //           type="ionicon"
-      //           size={30}
-      //         />
-      //       ),
-      //     };
-      //   }
+      //   // if (navigation.state.routeName === "FriendsList") {
+      //   return {
+      //     headerLeft: () => (
+      //       <Icon
+      //         style={{ marginLeft: 20 }}
+      //         onPress={() => navigation.openDrawer()}
+      //         name="md-menu"
+      //         color="black"
+      //         type="ionicon"
+      //         size={30}
+      //       />
+      //     ),
+      //   };
+      //   // }
       // },
     }
   )

@@ -675,7 +675,7 @@ export default function BookingHistory(props) {
         flex: 1,
       }}
     >
-      <Header
+      {/* <Header
         containerStyle={{ backgroundColor: "#185a9d" }}
         //leftComponent={{ icon: 'menu', color: '#fff' }}
         centerComponent={{
@@ -683,7 +683,7 @@ export default function BookingHistory(props) {
           style: { color: "#fff", fontSize: 22 },
         }}
         // rightComponent={{ icon: 'home', color: '#fff' }}
-      />
+      /> */}
       <ScrollView style={{ backgroundColor: "#e3e3e3", width: "100%" }}>
         {payments && !viewDetails ? (
           <FlatList
@@ -1471,7 +1471,10 @@ export default function BookingHistory(props) {
 }
 
 BookingHistory.navigationOptions = {
-  title: "History",
+  title: "My Bookings",
+  headerStyle: { backgroundColor: "#185a9d" },
+  // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
+  headerTintColor: "white",
 };
 //
 const styles = StyleSheet.create({

@@ -1123,9 +1123,9 @@ const styles = StyleSheet.create({
 
 FriendsList.navigationOptions = {
   //header: null,
-  headerStyle: { backgroundColor: "#185a9d", paddingLeft: 15 },
-  headerTintColor: "white",
-  tabBarIcon: () => {
-    <Icon name="news" type="font-awesome" size={24} color={"black"} />;
-  },
+  // headerStyle: { backgroundColor: "#185a9d", paddingLeft: 15 },
+  // headerTintColor: "white",
+  // tabBarIcon: () => {
+  //   <Icon name="news" type="font-awesome" size={24} color={"black"} />;
+  // },
 };
