@@ -606,16 +606,47 @@ export default function EmployeesRequest(props) {
           </TouchableOpacity>
         </View>
       ) : (
-        <ActionButton buttonColor={"#3ea3a3"} size={80}>
+        // <ActionButton
+        //   buttonColor={"#3ea3a3"}
+        //   size={responsiveScreenFontSize(8)}
+        //   buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+        // >
+        //   <ActionButton.Item
+        //     buttonColor="#185a9d"
+        //     title="Reset Password"
+        //     onPress={() => setModal(true)}
+        //   >
+        //     <EvilIcons name="lock" size={20} style={styles.actionButtonIcon2} />
+        //   </ActionButton.Item>
+        //   <ActionButton.Item
+        //     buttonColor="#901616"
+        //     title="Edit"
+        //     onPress={() => {
+        //       setEditMode(true);
+        //       setHeightVal("75%");
+        //     }}
+        //   >
+        //     <Feather name="edit" size={20} style={styles.actionButtonIcon} />
+        //   </ActionButton.Item>
+        // </ActionButton>
+        <ActionButton
+          buttonColor={"#3ea3a3"}
+          size={responsiveScreenFontSize(8)}
+          //  style={styles.actionButtonIcon2}
+          // icon={responsiveScreenFontSize(10)}
+          buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+          // position="left"
+          //verticalOrientation="down"
+        >
           <ActionButton.Item
-            buttonColor="#9b59b6"
+            buttonColor="#185a9d"
             title="Reset Password"
             onPress={() => setModal(true)}
           >
             <EvilIcons name="lock" size={20} style={styles.actionButtonIcon2} />
           </ActionButton.Item>
           <ActionButton.Item
-            buttonColor="#3498db"
+            buttonColor="#901616"
             title="Edit"
             onPress={() => {
               setEditMode(true);
@@ -651,13 +682,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#e3e3e3",
   },
   actionButtonIcon: {
-    fontSize: 20,
-    height: 22,
+    fontSize: responsiveFontSize(2),
+    // height: 40,
     color: "white",
   },
   actionButtonIcon2: {
-    fontSize: 30,
-    height: 22,
+    fontSize: responsiveFontSize(4),
+    // height: 40,
     color: "white",
   },
   footer: {
@@ -671,11 +702,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginStart: "2%",
-    // marginEnd: "2%",
     borderRadius: 10,
     marginBottom: 10,
-
     flexDirection: "row",
   },
   text: {
