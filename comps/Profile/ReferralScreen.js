@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,14 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import * as Device from "expo-device";
+
 import LottieView from "lottie-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 import { Tooltip } from "react-native-elements";
 
@@ -26,10 +33,23 @@ export default function ReferralScreen(props) {
   const user = props.user;
   const [phoneModal, setPhoneModal] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
+  const [showPhoneErr, setShowPhoneErr] = useState(false);
+  const [deviceType, setDeviceType] = useState(0);
+
+  useEffect(() => {
+    getDeviceType();
+  }, []);
 
   const handleSendSMS = async () => {
     if (phone === "") {
-      alert("Enter Phone Number");
+      setPhoneErr("* Enter the phone number");
+      setShowPhoneErr(true);
+      return;
+    }
+    if (phone.length < 8) {
+      setPhoneErr("* Invalid phone number");
+      setShowPhoneErr(true);
       return;
     }
     const isAvailable = await SMS.isAvailableAsync();
@@ -59,15 +79,21 @@ export default function ReferralScreen(props) {
     }
   };
 
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <Card
-            elevation={2}
+          <View
+            // elevation={2}
             style={{
+              backgroundColor: "white",
               width: "100%",
               flex: 1,
               borderWidth: 1,
@@ -96,54 +122,30 @@ export default function ReferralScreen(props) {
                   justifyContent: "center",
                 }}
               >
-                <Tooltip
-                  height={100}
-                  width={355}
-                  backgroundColor={"#229277"}
-                  popover={
-                    <Text style={{ color: "white", fontSize: 18 }}>
-                      You can receive tokens by referring the App to new users!
-                      Just click on the ({" "}
-                      <Fontisto name="share" size={16} color="white" /> ) icon
-                      to share your referral code using an SMS.
-                    </Text>
-                  }
-                  containerStyle={{
-                    justifyContent: "center",
-                    alignSelf: "center",
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: responsiveScreenFontSize(2),
+                    fontWeight: "bold",
+                    color: "black",
+
+                    // color: "#20365F",
                   }}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      // borderBottomWidth: 1,
-                      // borderBottomColor: "gray",
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, color: "black" }}>
-                      What is this{" "}
-                    </Text>
-                    <AntDesign
-                      name="questioncircle"
-                      size={20}
-                      color="darkred"
-                    />
-                  </View>
-                </Tooltip>
+                  Tokens: {user.tokens}
+                </Text>
               </View>
               <Card
                 // elevation={2}
                 style={{
-                  width: "50%",
+                  width: "45%",
                   // flex: 1,
                   // backgroundColor: "#6b9c74",
                   // backgroundColor: "rgb(26,148,149)",
                   backgroundColor: "#e3e1e1",
 
                   // height: "50%",
-                  flex: 0.5,
+                  flex: 0.51,
                   borderWidth: 1,
                   // borderTopWidth: 0,
                   borderColor: "darkgray",
@@ -151,57 +153,140 @@ export default function ReferralScreen(props) {
               >
                 <View
                   style={{
-                    // backgroundColor: "red",
-                    flex: 1,
+                    width: "100%",
+                    // backgroundColor: "green",
                     flexDirection: "row",
-                    justifyContent: "center",
+                    height: "100%",
+                    // justifyContent: "flex-end",
                   }}
                 >
                   <View
                     style={{
-                      // backgroundColor: "red",
-                      flex: 1,
-                      // flexDirection: "row",
-                      justifyContent: "center",
+                      width: "75%",
+                      // backgroundColor: "blue",
+                      // height: "100%",
                     }}
                   >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        // textAlign: "right",
-                        // marginStart: 10,
-                        // flex: 4,
-                        fontSize: 32,
-                        fontWeight: "bold",
-                        color: "black",
-                      }}
-                    >
-                      {user.referralCode}
-                    </Text>
                     <View
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-evenly",
+                        // backgroundColor: "red",
+                        // flex: 0.7,
+                        // flexDirection: "row",
+                        justifyContent: "center",
+                        marginLeft: "10%",
                       }}
                     >
-                      <Text
+                      <View
                         style={{
-                          // marginStart: 10,
-                          textAlign: "center",
-                          fontSize: 18,
-                          // fontWeight: "bold",
-                          // borderBottomWidth: 1,
-                          color: "black",
+                          // backgroundColor: "red",
+                          // flex: 1,
+                          // flexDirection: "row",
+                          justifyContent: "space-evenly",
+                          marginTop: "7%",
+                          marginLeft: "20%",
                         }}
                       >
-                        My Referral Code
-                      </Text>
-                      <View style={{ justifyContent: "center" }}>
-                        <TouchableOpacity onPress={() => setPhoneModal(true)}>
-                          <Fontisto name="share" size={23} color="black" />
-                        </TouchableOpacity>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            // textAlign: "right",
+                            // marginStart: 10,
+                            // flex: 4,
+                            fontSize: responsiveScreenFontSize(1.68),
+                            // fontWeight: "bold",
+                            color: "black",
+                          }}
+                        >
+                          Referral Code
+                        </Text>
+                        <Text
+                          style={{
+                            textAlign: "center",
+                            // textAlign: "right",
+                            // marginStart: 10,
+                            // flex: 4,
+                            fontSize: responsiveScreenFontSize(3),
+                            fontWeight: "bold",
+                            color: "black",
+                          }}
+                        >
+                          {user.referralCode}
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-evenly",
+                          }}
+                        >
+                          <View style={{ justifyContent: "center" }}>
+                            <TouchableOpacity
+                              onPress={() => setPhoneModal(true)}
+                            >
+                              {deviceType === 1 ? (
+                                <Fontisto
+                                  name="share"
+                                  size={23}
+                                  color="#216380"
+                                />
+                              ) : (
+                                <Fontisto
+                                  name="share"
+                                  size={32}
+                                  color="#216380"
+                                />
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        </View>
                       </View>
                     </View>
+                  </View>
+                  <View style={{ width: "25%" }}>
+                    <Tooltip
+                      height={responsiveScreenHeight(20)}
+                      width={responsiveScreenWidth(70)}
+                      backgroundColor={"#2E9E9B"}
+                      popover={
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: responsiveScreenFontSize(2),
+                          }}
+                        >
+                          You can receive tokens by referring the App to new
+                          users! Just click on the ({" "}
+                          <Fontisto name="share" size={16} color="white" /> )
+                          icon to share your referral code using an SMS.
+                        </Text>
+                      }
+                      containerStyle={{
+                        justifyContent: "center",
+                        alignSelf: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                          margin: 10,
+                        }}
+                      >
+                        {deviceType === 1 ? (
+                          <AntDesign
+                            name="questioncircle"
+                            size={20}
+                            color="#901616"
+                          />
+                        ) : (
+                          <AntDesign
+                            name="questioncircle"
+                            size={23}
+                            color="#901616"
+                          />
+                        )}
+                      </View>
+                    </Tooltip>
                   </View>
                 </View>
               </Card>
@@ -219,42 +304,10 @@ export default function ReferralScreen(props) {
                     // backgroundColor: "red",
                     flex: 0.5,
                   }}
-                >
-                  <Text
-                    style={{
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: "bold",
-                      color: "black",
-
-                      // color: "#20365F",
-                    }}
-                  >
-                    Tokens: {user.tokens}
-                  </Text>
-                </View>
-
-                {/* <View
-                style={{
-                  justifyContent: "flex-start",
-                  // backgroundColor: "red",
-                  flex: 0.5,
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    color: "black",
-                  }}
-                >
-                  Discount: 0
-                </Text>
-              </View> */}
+                ></View>
               </View>
             </View>
-          </Card>
+          </View>
         </View>
         <Modal visible={phoneModal} transparent={true}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -297,12 +350,11 @@ export default function ReferralScreen(props) {
                       // width: "100%",
                     }}
                   />
-
                   <Text
                     style={{
                       // paddingTop: "10%",
                       paddingBottom: "5%",
-                      fontSize: 16,
+                      fontSize: responsiveScreenFontSize(2),
                       // color: "darkred",
                       fontWeight: "bold",
                     }}
@@ -312,7 +364,8 @@ export default function ReferralScreen(props) {
                   <View
                     width={Dimensions.get("window").width / 1.8}
                     style={{
-                      height: 50,
+                      height: responsiveScreenHeight(5),
+                      width: responsiveScreenWidth(50),
                       // backgroundColor: "green",
                       // alignItems: "center",
                       justifyContent: "center",
@@ -328,18 +381,38 @@ export default function ReferralScreen(props) {
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      <Text style={{ fontSize: 20, color: "gray" }}>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "gray",
+                        }}
+                      >
                         🇶🇦 +974{" "}
                       </Text>
                       <TextInput
                         placeholder="1234 5678"
-                        onChangeText={setPhone}
+                        onChangeText={(phn) => {
+                          setPhone(phn);
+                          setPhoneErr("");
+                          setShowPhoneErr(false);
+                        }}
                         keyboardType="phone-pad"
                         maxLength={8}
-                        fontSize={20}
+                        fontSize={responsiveScreenFontSize(2)}
                       />
                     </View>
                   </View>
+                  {showPhoneErr ? (
+                    <Text
+                      style={
+                        showPhoneErr
+                          ? { color: "red" }
+                          : { color: "transparent" }
+                      }
+                    >
+                      {phoneErr}
+                    </Text>
+                  ) : null}
                 </View>
 
                 <View
@@ -354,14 +427,15 @@ export default function ReferralScreen(props) {
                   <TouchableOpacity
                     style={{
                       flex: 0.4,
-                      backgroundColor: "#20365F",
-                      // borderWidth: 4,
-                      // height: 20,
+
+                      backgroundColor: "#2E9E9B",
+                      height: 40,
                       width: "40%",
+                      // borderWidth: 4,
                       // alignSelf: "center",
                       justifyContent: "center",
                       alignItems: "center",
-                      //marginStart: "2%",
+                      // marginStart: "3%",
                       //marginEnd: "2%",
                       borderRadius: 10,
                       //marginBottom: 10,
@@ -371,7 +445,7 @@ export default function ReferralScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "white",
                         fontWeight: "bold",
                       }}

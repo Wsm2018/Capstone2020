@@ -12,6 +12,12 @@ import firebase from "firebase";
 import "firebase/auth";
 import "firebase/functions";
 import Card from "./Card";
+import LottieView from "lottie-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 
 export default function CardsScreen(props) {
   const user = props.navigation.getParam("user", "No param");
@@ -37,78 +43,97 @@ export default function CardsScreen(props) {
   // 5190767138616175
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f5f0f0" }}>
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          // backgroundColor: "red",
-          flex: 0.1,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 22,
-            fontWeight: "bold",
-          }}
-        >
-          My Cards
-        </Text>
+    <View style={{ flex: 1, backgroundColor: "#white" }}>
+      <View style={{ backgroundColor: "#185a9d", flex: 1, margin: 10 }}>
+        <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 10 }}>
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              flex: 0.2,
+            }}
+          ></View>
+          <View style={{ flex: 5 }}>
+            <ScrollView>
+              {cards && cards.length === 0 ? (
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <LottieView
+                    source={require("../../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: 20,
+                      color: "gray",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    No Cards
+                  </Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={cards}
+                  renderItem={({ item }) => <Card card={item} />}
+                  keyExtractor={(item) => item.id}
+                />
+              )}
+            </ScrollView>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              // backgroundColor: "red",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                // flex: 0.2,
+                backgroundColor: "#2E9E9B",
+                height: responsiveScreenHeight(5),
+                width: responsiveScreenWidth(40),
+                alignSelf: "center",
+                justifyContent: "center",
+                alignItems: "center",
+
+                borderRadius: 10,
+                marginBottom: 10,
+              }}
+              onPress={() =>
+                props.navigation.navigate("AddCard", { user: user })
+              }
+            >
+              <Text
+                style={{
+                  // height: 60,
+                  // backgroundColor: "red",
+                  // width: "60%",
+                  textAlign: "center",
+                  fontSize: responsiveScreenFontSize(1.8),
+                  // fontWeight: "bold",
+                  color: "white",
+                }}
+              >
+                + Add a New Card
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-      <ScrollView style={{ flex: 5 }}>
-        {cards && cards.length === 0 ? (
-          <Text>No Cards</Text>
-        ) : (
-          <FlatList
-            data={cards}
-            renderItem={({ item }) => <Card card={item} />}
-            keyExtractor={(item) => item.id}
-          />
-        )}
-      </ScrollView>
-      {/* <View
-        style={{
-          flex: 0.2,
-          // backgroundColor: "red",
-          // height: 50,
-          justifyContent: "flex-end",
-          alignItems: "center",
-        }}
-      > */}
-      <TouchableOpacity
-        style={{
-          flex: 0.2,
-          // backgroundColor: "red",
-          // height: 50,
-          justifyContent: "flex-end",
-          alignItems: "center",
-        }}
-        // style={{ alignItems: "center", justifyContent: "center" }}
-        onPress={() => props.navigation.navigate("AddCard", { user: user })}
-      >
-        {/* <Image
-            source={require("../../../assets/images/addcard.png")}
-            style={{ height: 60, width: 60 }}
-          /> */}
-        <Text
-          style={{
-            height: 60,
-            // backgroundColor: "red",
-            width: "60%",
-            textAlign: "center",
-            fontSize: 18,
-            fontWeight: "bold",
-            color: "gray",
-          }}
-        >
-          + Add a New Card
-        </Text>
-      </TouchableOpacity>
     </View>
-    // </View>
   );
 }
 CardsScreen.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

@@ -6,14 +6,23 @@ import {
   TouchableOpacity,
   Button,
   ScrollView,
+  Image,
+  Platform,
 } from "react-native";
 
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/functions";
 import db from "../db";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 import { TextInput } from "react-native-paper";
 import { Picker } from "react-native";
+// import { Image, Avatar } from "react-native-elements";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
@@ -24,13 +33,41 @@ export default function ChooseRole(props) {
   const [roles, setRoles] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const allRoles = [
-    { name: "admin", photoURL: "", selected: false },
-    { name: "manager", photoURL: "", selected: false },
-    { name: "user handler", photoURL: "", selected: false },
-    { name: "asset handler", photoURL: "", selected: false },
-    { name: "customer support", photoURL: "", selected: false },
-    { name: "services employee", photoURL: "", selected: false },
-    { name: "customer", photoURL: "", selected: false },
+    {
+      name: "admin",
+      photoURL: require("../assets/icons/admin.png"),
+      selected: false,
+    },
+    {
+      name: "manager",
+      photoURL: require("../assets/icons/manager.png"),
+      selected: false,
+    },
+    {
+      name: "user handler",
+      photoURL: require("../assets/icons/userHandler.png"),
+      selected: false,
+    },
+    {
+      name: "asset handler",
+      photoURL: require("../assets/icons/assetHandler.png"),
+      selected: false,
+    },
+    {
+      name: "customer support",
+      photoURL: require("../assets/icons/customerSupport.png"),
+      selected: false,
+    },
+    {
+      name: "services employee",
+      photoURL: require("../assets/icons/servicesEmployee.png"),
+      selected: false,
+    },
+    {
+      name: "customer",
+      photoURL: require("../assets/icons/customer2.png"),
+      selected: false,
+    },
   ];
 
   // ------------------------------CURRENT USER------------------------------------
@@ -44,12 +81,17 @@ export default function ChooseRole(props) {
   };
 
   // ------------------------------------------------------------------
-  const handleSelect = (parking, index) => {
-    if (selectedIndex > -1) {
-      roles[selectedIndex].selected = false;
-    }
-    setSelectedIndex(index);
-    roles[index].selected = true;
+  const handleSelect = (role, index) => {
+    // if (selectedIndex > -1) {
+    //   roles[selectedIndex].selected = false;
+    // }
+    // setSelectedIndex(index);
+    // roles[index].selected = true;
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: roles[index].name });
+
+    // handleNext();
   };
 
   // ------------------------------------------------------------------
@@ -88,74 +130,107 @@ export default function ChooseRole(props) {
 
   return (
     <View style={styles.container}>
-      <Text>Choose Role</Text>
-      <Text></Text>
       <View
         style={{
-          // flex: 1,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          justifyContent: "space-around",
-          // borderWidth: 1,
-          height: "20%",
-        }}
-      >
-        {roles.map((role, index) => (
-          <TouchableOpacity
-            key={index}
-            style={
-              role.selected
-                ? {
-                    width: `${90 / 3}%`,
-                    height: `${
-                      roles.length > 6
-                        ? 100 / 3
-                        : roles.length > 3
-                        ? 100 / 2
-                        : 100
-                    }%`,
-                    // borderWidth: 1,
-                    borderRadius: 50,
-                    backgroundColor: "green",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }
-                : {
-                    width: `${90 / 3}%`,
-                    height: `${
-                      roles.length > 6
-                        ? 100 / 3
-                        : roles.length > 3
-                        ? 100 / 2
-                        : 100
-                    }%`,
-                    borderWidth: 1,
-                    borderRadius: 50,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    // marginBottom: "2%",
-                  }
-            }
-            onPress={() => handleSelect(role, index)}
-          >
-            <Text style={{ textAlign: "center" }}>{role.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <Text></Text>
-      <TouchableOpacity
-        style={{
-          borderWidth: 1,
-          width: "100%",
-          height: "5%",
-          justifyContent: "center",
+          flex: 1,
+          justifyContent: "flex-end",
           alignItems: "center",
+          // backgroundColor: "red",
         }}
-        onPress={handleNext}
-        // disabled={selectedIndex === -1}
       >
-        <Text>Next</Text>
-      </TouchableOpacity>
+        <Text style={{ fontSize: responsiveFontSize(3) }}>Login As:</Text>
+      </View>
+      <View
+        style={{
+          flex: 6,
+          // justifyContent: "center",
+          alignItems: "center",
+          // backgroundColor: "blue",
+        }}
+      >
+        <View style={{ flexDirection: "row", flexWrap: "wrap", padding: "5%" }}>
+          {roles.map((role, index) => (
+            // index < 7 &&
+            <View
+              key={index}
+              style={{
+                width: "29%",
+                // height: "29%",
+                // backgroundColor: "yellow",
+
+                // borderWidth: 1,
+                marginTop: "5%",
+                margin: "2%",
+                padding: "5%",
+                aspectRatio: 1 / 1,
+              }}
+            >
+              <TouchableOpacity
+                key={index}
+                style={{
+                  // backgroundColor: "red",
+                  width: "100%",
+                }}
+                onPress={() => handleSelect(role, index)}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <View style={{}}>
+                    <Image
+                      source={role.photoURL}
+                      style={{
+                        width: responsiveScreenWidth(20),
+                        height: responsiveScreenWidth(20),
+                        // aspectRatio: 1 / 1,
+                        // borderWidth: 10,
+                      }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      // backgroundColor: "green",
+                      height: 30,
+                      // width: "100%",
+                      // justifyContent: "flex-end",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: responsiveFontSize(1.5),
+                        textTransform: "capitalize",
+                        // color: "#20365F",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {role.name}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        {/* <TouchableOpacity
+          style={{
+            borderWidth: 1,
+            width: "100%",
+            height: "5%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={handleNext}
+          // disabled={selectedIndex === -1}
+        >
+          <Text>Next</Text>
+        </TouchableOpacity> */}
+      </View>
     </View>
   );
 }
@@ -164,8 +239,9 @@ const styles = StyleSheet.create({
   container: {
     // borderWidth: 1,
     flex: 1,
-    margin: 20,
+    // margin: 20,
     justifyContent: "center",
     // height: "100%",
+    backgroundColor: "#fafafa",
   },
 });

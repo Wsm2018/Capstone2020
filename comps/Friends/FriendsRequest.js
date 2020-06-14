@@ -65,16 +65,36 @@ export default function FriendsList(props) {
 
   // -------------------------------ACCEPT-----------------------------------
   const accept = async (user) => {
-    const add = firebase.functions().httpsCallable("acceptFriend");
-    const response = await add({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .update({ status: "accepted" });
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .update({ status: "accepted" });
   };
 
   // -------------------------------DECLINE-----------------------------------
   const decline = async (user) => {
-    const dec = firebase.functions().httpsCallable("removeFriend");
-    const response = await dec({ user: currentUser, friend: user });
-    console.log("response", response);
+    // const dec = firebase.functions().httpsCallable("removeFriend");
+    // const response = await dec({ user: currentUser, friend: user });
+    // console.log("response", response);
+
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
   };
 
   // ------------------------------------------------------------------
@@ -84,19 +104,34 @@ export default function FriendsList(props) {
   }, []);
 
   return !friends ? (
-    <View>
-      <Text>LOADING...</Text>
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
     </View>
   ) : (
     <View style={styles.container}>
-      <View
+      {/* <View
         style={{
           flexDirection: "row",
           alignContent: "center",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#20365F",
-          borderTopColor: "#20365F",
+          backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
           //paddingTop:'2%',
         }}
       >
@@ -120,10 +155,16 @@ export default function FriendsList(props) {
         >
           Friends Request
         </Text>
-      </View>
+      </View> */}
 
       {friends.length > 0 ? (
-        <SafeAreaView style={{ paddingTop: "2%" }}>
+        <SafeAreaView
+          style={
+            {
+              // paddingTop: "2%"
+            }
+          }
+        >
           <ScrollView>
             <FlatList
               data={friends}
@@ -133,14 +174,14 @@ export default function FriendsList(props) {
                   key={item.id}
                   //leftAvatar={{ source: { uri: item.photoURL } }}
                   leftAvatar={
-                    <AntDesign name="adduser" size={35} color="#20365F" />
+                    <AntDesign name="adduser" size={35} color="#185a9d" />
                   }
                   rightIcon={
                     <TouchableOpacity
                       style={{
                         borderWidth: 1,
-                        borderColor: "#20365F",
-                        backgroundColor: "#344C7A",
+                        borderColor: "#3ea3a3",
+                        backgroundColor: "#3ea3a3",
                         padding: "2%",
                         borderRadius: 8,
                         alignItems: "center",
@@ -158,8 +199,8 @@ export default function FriendsList(props) {
                     <TouchableOpacity
                       style={{
                         borderWidth: 1,
-                        borderColor: "#344C7A",
-                        backgroundColor: "#9AA5B6",
+                        borderColor: "#901616",
+                        backgroundColor: "#901616",
                         padding: "2%",
                         borderRadius: 8,
                         alignItems: "center",
@@ -174,7 +215,7 @@ export default function FriendsList(props) {
                     </TouchableOpacity>
                   }
                   title={item.displayName}
-                  titleStyle={{ fontSize: 18 }}
+                  titleStyle={{ fontSize: 22 }}
                   subtitle={item.status}
                   //subtitle={item.status + " to add you"}
                   subtitleStyle={{ fontSize: 12, color: "grey" }}
@@ -188,22 +229,23 @@ export default function FriendsList(props) {
         <View
           style={{
             flex: 1,
-          //  paddingTop: "10%",
+            //  paddingTop: "10%",
             alignContent: "center",
             alignItems: "center",
             flexDirection: "column",
           }}
         >
           <LottieView
-            source={require("../../assets/10000-empty-box.json")}
+            // source={require("../../assets/10000-empty-box.json")}
+            source={require("../../assets/17723-waitting.json")}
             autoPlay
             duration={2000}
             // loop
             style={{
               position: "relative",
               width: "100%",
-              paddingTop: "13%",
-              paddingLeft: "6%",
+              paddingTop: "5%",
+              // paddingLeft: "6%",
             }}
           />
           <Text
@@ -211,12 +253,12 @@ export default function FriendsList(props) {
               fontWeight: "500",
               fontSize: 26,
               paddingLeft: "3%",
-              paddingTop:'8%',
+              paddingTop: "8%",
               color: "#3062AE",
-              textDecorationLine:'underline'
+              // textDecorationLine: "underline",
             }}
           >
-            You have no Requests
+            No Requests
           </Text>
         </View>
       )}
@@ -227,5 +269,6 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#e3e3e3",
   },
 });

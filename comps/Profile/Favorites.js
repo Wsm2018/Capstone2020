@@ -7,13 +7,18 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
-  SafeAreaView,
   Button,
   Dimensions,
 } from "react-native";
 import Image from "react-native-scalable-image";
 import { Card } from "react-native-shadow-cards";
-
+import * as Device from "expo-device";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
 import { AntDesign, FontAwesome } from "react-native-vector-icons";
 
 import db from "../../db";
@@ -31,13 +36,19 @@ export default function Favorites({
   user,
 }) {
   // ------------------------------------- USE STATES ---------------------------------------------
-
+  // ------------------------------------- USE STATES ---------------------------------------------
+  const [deviceType, setDeviceType] = useState(0);
   const [favoriteAssets, setFavoriteAssets] = useState([]);
   const [assetModal, setAssetModal] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [allBookings, setAllBookings] = useState([]);
+
+  const [assetTypes, setAssetTypes] = useState([]);
+  const [assetTypeIds, setAssetTypeIds] = useState([]);
+  const [assetSections, setAssetSections] = useState([]);
+  const [assetSectionIds, setAssetSectionIds] = useState([]);
 
   // ------------------------------------- FUNCTIONS ----------------------------------------------
 
@@ -46,12 +57,48 @@ export default function Favorites({
       .doc(firebase.auth().currentUser.uid)
       .collection("favorites")
       .onSnapshot((querySnap) => {
-        let favorites = [];
-        querySnap.forEach((document) => {
-          favorites.push({ id: document.id, ...document.data() });
+        let assetArr = [];
+        querySnap.forEach(async (doc) => {
+          let assetBookings = [];
+          const asset = await db.collection("assets").doc(doc.id).get();
+          console.log(asset.data());
+          const assets = await db
+            .collection("assets")
+            .doc(doc.id)
+            .collection("assetBookings")
+            .get();
+          assets.forEach((assetBooking) => {
+            assetBookings.push({ id: assetBooking.id, ...assetBooking.data() });
+          });
+          assetArr.push({
+            id: asset.id,
+            assetName: asset.data().name,
+            assetSection: asset.data().assetSection,
+            assetBookings: assetBookings,
+          });
+          if (assetArr.length === querySnap.size) {
+            setFavoriteAssets([...assetArr]);
+          }
         });
-        setFavoriteAssets([...favorites]);
       });
+  };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
+
+  const formatDate = (date) => {
+    const splitDateTime = date.split("T");
+    const splitTimes = splitDateTime[1].split(":");
+    let hour = splitTimes[0];
+    if (parseInt(hour) < 12) {
+      hour = `0${hour}`;
+    }
+    const dateTime = `${splitDateTime[0]}T${hour}:${splitTimes[1]}:${splitTimes[2]}`;
+    return new Date(dateTime);
   };
 
   const handleDeleteAlert = (id) => {
@@ -69,33 +116,64 @@ export default function Favorites({
       { cancelable: false }
     );
   };
-
   const handleDeleteFavorite = async (id) => {
-    // console.log(id);
+    console.log("deleteddddddddddd ", id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
       assetId: id,
     });
     if (response.data !== null) {
-      alert("Asset Deleteted");
+      // alert("Asset Deleteted");
+      showMessage({
+        message: `Favourite Deleted!`,
+        description: `Item deleted from your favourites successfully!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
+      });
     }
   };
 
-  // const getAssetBookings = () => {
-  //   db.collection("asset")
-  //     .doc(selectedAsset.id)
-  //     .collection("assetBookings")
-  //     .onSnapshot((querySnap) => {
-  //       let bookings = [];
-  //       querySnap.forEach((doc) => {
-  //         bookings.push({ id: doc.id, ...doc.data() });
-  //       });
-  //       setAllBookings([...bookings]);
-  //     });
-  // };
+  const getAssetSections = async () => {
+    db.collection("assetSections").onSnapshot((query) => {
+      let assetSection = [];
+      let ids = [];
+      query.forEach((doc) => {
+        ids.push(doc.id);
+        assetSection.push({ id: doc.id, ...doc.data() });
+      });
+      setAssetSectionIds([...ids]);
+      setAssetSections([...assetSection]);
+    });
+  };
 
-  const handleBooking = () => {
+  const getAssetTypes = async () => {
+    db.collection("assetTypes").onSnapshot((query) => {
+      let assetType = [];
+      let ids = [];
+      query.forEach((doc) => {
+        ids.push(doc.id);
+        assetType.push({ id: doc.id, ...doc.data() });
+      });
+      setAssetTypeIds([...ids]);
+      setAssetTypes([...assetType]);
+    });
+  };
+
+  const handleBooking = async () => {
+    const sectionIndex = assetSectionIds.includes(selectedAsset.assetSection)
+      ? assetSectionIds.indexOf(selectedAsset.assetSection)
+      : -1;
+    const selectedSection =
+      sectionIndex !== -1 ? assetSections[sectionIndex] : null;
+
+    const typeId = assetTypeIds.includes(selectedSection.assetType)
+      ? assetTypeIds.indexOf(selectedSection.assetType)
+      : -1;
+
+    const assetType = typeId !== -1 ? assetTypes[typeId] : null;
+
     if (selectedAsset.assetBookings.length === 0) {
       setAssetModal(false);
       setFavoritesModal(false);
@@ -109,9 +187,42 @@ export default function Favorites({
             startDate: startDate,
             endDate: endDate,
             asset: selectedAsset,
+            selectedSection: selectedSection,
+            assetType: assetType,
           },
         })
       );
+    } else {
+      const filteredArray = selectedAsset.assetBookings.filter(
+        (item) =>
+          formatDate(item.endDateTime.replace(/\s+/g, "")) -
+            formatDate(startDate.replace(/\s+/g, "")) >
+            0 &&
+          formatDate(item.startDateTime.replace(/\s+/g, "")) -
+            formatDate(endDate.replace(/\s+/g, "")) <
+            0
+      );
+      if (filteredArray.length > 0) {
+        alert("Asset booked within these times");
+      } else {
+        setAssetModal(false);
+        setFavoritesModal(false);
+        navigation.navigate(
+          "Home",
+          {},
+          NavigationActions.navigate({
+            routeName: "Sections",
+            params: {
+              flag: true,
+              startDate: startDate,
+              endDate: endDate,
+              asset: selectedAsset,
+              selectedSection: selectedSection,
+              assetType: assetType,
+            },
+          })
+        );
+      }
     }
   };
 
@@ -119,30 +230,16 @@ export default function Favorites({
 
   useEffect(() => {
     getUserFavoriteAssets();
+    getAssetSections();
+    getAssetTypes();
   }, []);
-
-  // useEffect(() => {
-  //   if (selectedAsset) {
-  //     getAssetBookings();
-  //   }
-  // }, [selectedAsset]);
 
   // ----------------------------------------- RETURN ---------------------------------------------
 
   return (
     <Modal visible={favoritesModal} transparent={true}>
-      {/* <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <TouchableOpacity onPress={() => setFavoritesModal(false)}>
-            <Text>X</Text>
-          </TouchableOpacity> */}
-
       <View style={styles.centeredView2}>
         <View elevation={5} style={styles.modalView2}>
-          {/* <TouchableOpacity onPress={() => setAssetModal(false)}>
-                <Text>X</Text>
-              </TouchableOpacity> */}
-
           <TouchableOpacity
             style={{
               justifyContent: "center",
@@ -152,37 +249,33 @@ export default function Favorites({
             }}
             onPress={() => setFavoritesModal(false)}
           >
-            <AntDesign name="close" size={25} style={{ color: "#224229" }} />
+            <AntDesign
+              name="close"
+              size={deviceType === 1 ? 25 : 40}
+              style={{ color: "#224229" }}
+            />
           </TouchableOpacity>
 
           <View style={{ flex: 10, alignItems: "center" }}>
-            <Text
-              style={{
-                // paddingTop: "15%",
-
-                fontSize: 20,
-                color: "darkred",
-                fontWeight: "bold",
-              }}
-            >
-              My Favorites
-            </Text>
             {favoriteAssets.length === 0 ? (
               <View style={styles.header}>
                 <LottieView
-                  source={require("../../assets/872-empty-list.json")}
+                  source={require("../../assets/17723-waitting.json")}
                   autoPlay
                   loop
                   style={{
                     position: "relative",
-                    width: "100%",
+                    width: "80%",
+                    justifyContent: "center",
+                    alignSelf: "center",
+                    // paddingTop: "30%",
                   }}
                 />
                 <Text
                   style={{
-                    paddingTop: "15%",
-                    fontSize: 20,
-                    color: "darkred",
+                    // paddingTop: "15%",
+                    fontSize: responsiveScreenFontSize(2),
+                    color: "darkgray",
                     fontWeight: "bold",
                   }}
                 >
@@ -192,24 +285,19 @@ export default function Favorites({
                   style={{
                     flex: 4,
                     // backgroundColor: "red",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
+                    // justifyContent: "flex-end",
+                    alignItems: "flex-end",
                     flexDirection: "row-reverse",
                   }}
                 >
                   <TouchableOpacity
                     style={{
-                      backgroundColor: "#20365F",
-                      // borderWidth: 4,
-                      height: 40,
-                      width: "40%",
-                      // alignSelf: "center",
+                      backgroundColor: "#2E9E9B",
+                      height: responsiveScreenHeight(5),
+                      width: responsiveScreenWidth(40),
                       justifyContent: "center",
                       alignItems: "center",
-                      //marginStart: "2%",
-                      //marginEnd: "2%",
-                      borderRadius: 15,
-                      //marginBottom: 10,
+                      borderRadius: 10,
                     }}
                     onPress={() => {
                       setFavoritesModal(false);
@@ -223,151 +311,168 @@ export default function Favorites({
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: 16,
+                        fontSize: responsiveScreenFontSize(2),
                         color: "white",
                         // fontWeight: "bold",
                       }}
                     >
-                      Add Favorite
+                      Add Favorites
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             ) : (
-              favoriteAssets.map((item, index) => (
+              <View
+                style={{
+                  // flex: 0.5,
+                  flex: 0.5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <View
-                  width={Dimensions.get("window").width / 1.2}
                   style={{
-                    flex: 0.1,
-                    marginTop: "5%",
-                    // backgroundColor: "red",
+                    // flex: 0.5,
+                    flex: 0.2,
                     justifyContent: "center",
                     alignItems: "center",
-                    flexDirection: "row",
                   }}
-                  key={index}
                 >
-                  {/* <TouchableOpacity
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      color: "#185a9d",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    My Favorites
+                  </Text>
+                </View>
+                {favoriteAssets.map((item, index) => (
+                  <View
+                    width={Dimensions.get("window").width / 1.2}
+                    style={{
+                      flex: 1,
+                      marginTop: "10%",
+                      // backgroundColor: "red",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row",
+                    }}
+                    key={index}
+                  >
+                    {/* <TouchableOpacity
                     onPress={() => handleDeleteAlert(item.asset.id)}
                   >
                     <Text>X</Text>
                   </TouchableOpacity> */}
 
-                  {/* ================== */}
+                    {/* ================== */}
 
-                  <Card
-                    elevation={2}
-                    style={{
-                      // flex: 2,
-                      height: 50,
-                      // marginTop: "-1.5%",
-                      width: "95%",
-                      borderWidth: 0.5,
-                      justifyContent: "center",
-                      borderColor: "lightgray",
-                      // flex: 0.95,
-                    }}
-                  >
-                    {/* ============================================== */}
-                    <View
+                    <Card
+                      elevation={2}
                       style={{
-                        // flex: 1,
-                        justifyContent: "space-between",
-                        alignItems: "stretch",
-                        flexDirection: "row-reverse",
-                        // // marginEnd: 15,
-                        // backgroundColor: "yellow",
-
-                        // marginTop: 15,
+                        // flex: 2,
+                        height: 50,
+                        // marginTop: "-1.5%",
+                        width: "95%",
+                        borderWidth: 0.5,
+                        justifyContent: "center",
+                        borderColor: "lightgray",
+                        // flex: 0.95,
                       }}
                     >
+                      {/* ============================================== */}
                       <View
                         style={{
-                          flex: 1,
+                          // flex: 1,
+                          justifyContent: "space-between",
+                          alignItems: "stretch",
                           flexDirection: "row-reverse",
+                          // // marginEnd: 15,
+                          // backgroundColor: "yellow",
+
+                          // marginTop: 15,
                         }}
                       >
-                        <TouchableOpacity
+                        <View
                           style={{
-                            flex: 0.2,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            // marginEnd: 15,
-                            // backgroundColor: "yellow",
-
-                            // marginTop: 15,
+                            flex: 1,
+                            flexDirection: "row-reverse",
                           }}
-                          onPress={() => handleDeleteAlert(item.asset.id)}
                         >
-                          <FontAwesome
-                            name="remove"
-                            size={24}
-                            color="darkgray"
-                          />
-                        </TouchableOpacity>
-                        {/* <Button
+                          <TouchableOpacity
+                            style={{
+                              flex: 0.2,
+                              justifyContent: "center",
+                              alignItems: "center",
+                              marginEnd: 15,
+                              // backgroundColor: "yellow",
+
+                              // marginTop: 15,
+                            }}
+                            onPress={() => handleDeleteAlert(item.id)}
+                          >
+                            <FontAwesome
+                              name="remove"
+                              size={28}
+                              color="#901616"
+                            />
+                          </TouchableOpacity>
+                          {/* <Button
                     title="Book This"
                     onPress={() => {
                       setAssetModal(true);
                       setSelectedAsset(item.asset);
                     }}
                   /> */}
-                        {/* -------------- */}
-                        <TouchableOpacity
-                          onPress={() => {
-                            setAssetModal(true);
-                            setSelectedAsset(item.asset);
-                          }}
+                          {/* -------------- */}
+                          <TouchableOpacity
+                            onPress={() => {
+                              setAssetModal(true);
+                              setSelectedAsset(item);
+                            }}
+                            style={{
+                              backgroundColor: "#2E9E9B",
+                              height: responsiveScreenHeight(4),
+                              width: responsiveScreenWidth(25),
+                              alignSelf: "center",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              marginEnd: 15,
+                              borderRadius: 10,
+                              // marginBottom: 10,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                fontSize: responsiveScreenFontSize(2),
+                                color: "white",
+                              }}
+                            >
+                              Book Now
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <Text
                           style={{
-                            flex: 0.4,
-
-                            // position: "relative",
-                            // width: "100%",
-                            // flex: 1,
-                            // height: "100%",
+                            fontSize: 20,
+                            paddingStart: 10,
+                            fontWeight: "bold",
+                            color: "#185a9d",
+                            // fontVariant: 4,
+                            // backgroundColor: "green",
                             // backgroundColor: "blue",
-                            justifyContent: "center",
-                            alignItems: "center",
                           }}
                         >
-                          <Image
-                            width={Dimensions.get("window").width / 5}
-                            source={require("../../assets/images/bookit2.png")}
-                            autoPlay
-                            // onPress={() => setCarsModal(true)}
-                            // loop
-                            style={
-                              {
-                                // position: "relative",
-                                // width: "70%",
-                                // height: "75%",
-                                // flex: 1,
-                                // backgroundColor: "blue",
-                                // justifyContent: "center",
-                                // alignItems: "center",
-                                // paddingTop: "5%",
-                              }
-                            }
-                          />
-                        </TouchableOpacity>
+                          {item.assetName}
+                        </Text>
                       </View>
-                      <Text
-                        style={{
-                          fontSize: 20,
-                          paddingStart: 10,
-                          fontWeight: "bold",
-                          color: "#20365F",
-                          // fontVariant: 4,
-                          // backgroundColor: "green",
-                          // backgroundColor: "blue",
-                        }}
-                      >
-                        {item.asset.name}
-                      </Text>
-                    </View>
-                  </Card>
-                </View>
-              ))
+                    </Card>
+                  </View>
+                ))}
+              </View>
             )}
           </View>
         </View>
@@ -461,18 +566,15 @@ export default function Favorites({
               >
                 <TouchableOpacity
                   style={{
-                    flex: 0.5,
-                    backgroundColor: "#20365F",
-                    // borderWidth: 4,
-                    // height: 20,
-                    width: "40%",
-                    // alignSelf: "center",
+                    backgroundColor: "#2E9E9B",
+                    height: responsiveScreenHeight(4),
+                    width: responsiveScreenWidth(25),
+                    alignSelf: "center",
                     justifyContent: "center",
                     alignItems: "center",
-                    //marginStart: "2%",
-                    //marginEnd: "2%",
+                    marginEnd: 15,
                     borderRadius: 10,
-                    //marginBottom: 10,
+                    // marginBottom: 10,
                   }}
                   // style={{ flex: 0.5, backgroundColor: "yellow" }}
                   onPress={() => handleBooking()}
@@ -482,7 +584,7 @@ export default function Favorites({
                       textAlign: "center",
                       fontSize: 16,
                       color: "white",
-                      fontWeight: "bold",
+                      // fontWeight: "bold",
                     }}
                   >
                     Book
@@ -533,7 +635,7 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 1.3,
+    height: responsiveHeight(90),
     width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,
@@ -542,7 +644,7 @@ const styles = StyleSheet.create({
       height: 1,
       width: 1,
     },
-    borderRadius: 20,
+    borderRadius: 10,
     // padding: 35,
     // justifyContent: "center",
     // alignItems: "center",

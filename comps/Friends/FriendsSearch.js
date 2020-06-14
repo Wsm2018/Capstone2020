@@ -8,21 +8,25 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
-  Alert
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
 import { Button } from "react-native";
-import { Icon, ListItem } from "react-native-elements";
+import { Icon, ListItem, SearchBar } from "react-native-elements";
 import {
   MaterialCommunityIcons,
   Feather,
   Ionicons,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function FriendsList(props) {
   const [users, setUsers] = useState(null);
@@ -35,6 +39,30 @@ export default function FriendsList(props) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [friendId, setFriendId] = useState("");
+
+  const [marginVal, setMargin] = useState(0);
+
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+    Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+    };
+  }, []);
+
+  const _keyboardDidShow = () => {
+    // console.log("keyyyyyyyyyyyyyyyShow");
+
+    setMargin(-200);
+  };
+
+  const _keyboardDidHide = () => {
+    // console.log("keyyyyyyyyyyyyyyyHide");
+    setMargin(0);
+  };
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -53,7 +81,10 @@ export default function FriendsList(props) {
       let tempUsers = [];
 
       queryBySnapshot.forEach((doc) => {
-        if (doc.id !== firebase.auth().currentUser.uid) {
+        if (
+          doc.id !== firebase.auth().currentUser.uid &&
+          doc.data().email !== "DELETED"
+        ) {
           tempUsers.push({
             id: doc.id,
             ...doc.data(),
@@ -110,19 +141,85 @@ export default function FriendsList(props) {
   // -------------------------------ADD-----------------------------------
   // Sends a friend request to a user
   const addFriend = async (user, index) => {
-    allUsers[index].loading = true;
-    const add = firebase.functions().httpsCallable("addFriend");
-    const response = await add({ user: currentUser, friend: user });
-    console.log("response", response);
-    allUsers[index].loading = false;
+    const result = friends.filter((item) => {
+      return item.id === user.id;
+    });
+
+    if (result.length === 0) {
+      db.collection("users")
+        .doc(currentUser.id)
+        .collection("friends")
+        .doc(user.id)
+        .set({
+          displayName: user.displayName,
+          status: "pending",
+          photoURL: user.photoURL,
+        });
+
+      db.collection("users")
+        .doc(user.id)
+        .collection("friends")
+        .doc(currentUser.id)
+        .set({
+          displayName: currentUser.displayName,
+          status: "requested",
+          photoURL: currentUser.photoURL,
+        });
+      showMessage({
+        message: `Success!`,
+        description: `Your friend request has been sent!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
+      });
+    } else {
+      // alert("already added");
+      showMessage({
+        message: `Already a Friend!`,
+        description: `You already added/requested!`,
+        // type: "success",
+        backgroundColor: "#901616",
+        // duration: 2300,
+      });
+    }
   };
 
   // -------------------------------REMOVE-----------------------------------
   // Removes your pending request
   const remove = async (user) => {
-    const rem = firebase.functions().httpsCallable("removeFriend");
-    const response = await rem({ user: currentUser, friend: user });
-    console.log("response", response);
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .delete();
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .delete();
+    showMessage({
+      message: `Request Deleted!`,
+      description: `Your friend request has been deleted!`,
+      // type: "success",
+      backgroundColor: "#901616",
+      // duration: 2300,
+    });
+  };
+
+  // -------------------------------ACCEPT-----------------------------------
+  const accept = async (user) => {
+    db.collection("users")
+      .doc(currentUser.id)
+      .collection("friends")
+      .doc(user.id)
+      .update({ status: "accepted" });
+
+    db.collection("users")
+      .doc(user.id)
+      .collection("friends")
+      .doc(currentUser.id)
+      .update({ status: "accepted" });
   };
 
   // ---------------------------------SEARCH---------------------------------
@@ -200,32 +297,37 @@ export default function FriendsList(props) {
   }
 
   return !scan ? (
-    <View style={styles.container}>
+    <View style={styles.container} onPress={() => Keyboard.dismiss}>
       {/* <Text>Friends Search</Text> */}
       <View
         style={{
           flexDirection: "row",
           alignContent: "center",
           alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#20365F",
-          borderTopColor: "#20365F",
+          justifyContent: "space-evenly",
+          backgroundColor: "#f0f0f0",
+          // borderTopColor: "#185a9d",
+          borderBottomWidth: 1,
+          height: 65,
+          borderColor: "lightgray",
           //paddingTop:'2%',
         }}
       >
-        <MaterialCommunityIcons
-          name="account-search"
-          size={40}
-          color="white"
-          style={{ paddingTop: "2%", marginBottom: 10 }}
-        />
+        <TouchableOpacity onPress={() => props.navigation.goBack()}>
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={30}
+            color="#185a9d"
+            // style={{ paddingTop: "2%", marginBottom: 10 }}
+          />
+        </TouchableOpacity>
 
-        <TextInput
+        {/* <TextInput
           style={{
             backgroundColor: "white",
             fontSize: 18,
             paddingLeft: "2%",
-            borderColor: "#20365F",
+            borderColor: "#185a9d",
             borderWidth: 2,
             width: "70%",
             height: "80%",
@@ -236,16 +338,59 @@ export default function FriendsList(props) {
           placeholder="Search Here"
           onChangeText={setSearch}
           value={search}
+        /> */}
+        <SearchBar
+          placeholderTextColor="#e3e3e3"
+          placeholder="Search Here"
+          onChangeText={setSearch}
+          lightTheme
+          //showLoading={true}
+          searchIcon={true}
+          value={search}
+          containerStyle={{
+            backgroundColor: "transparent",
+            // borderBottomColor: "#185a9d",
+            // borderTopColor: "#185a9d",
+            width: "80%",
+            height: "100%",
+            borderWidth: 0,
+            // marginTop: 0,
+          }}
+          inputContainerStyle={{
+            borderRadius: 20,
+            borderWidth: 0,
+            borderColor: "#185a9d",
+            backgroundColor: "#fafafa",
+            height: "100%",
+          }}
+          // style={{
+          //   //backgroundColor: "white",
+          //   fontSize: 18,
+          //   paddingLeft: "2%",
+          //   // borderColor: "#185a9d",
+          //   // borderWidth: 2,
+          //   width: "85%",
+          //   // height: 50,
+          //   marginLeft: 10,
+          //   marginRight: 10,
+          //   elevation: 20,
+          // }}
         />
-        <MaterialIcons
+
+        {/* <MaterialIcons
           name="cancel"
           size={25}
           color="#fff"
           onPress={() => props.navigation.goBack()}
-        />
-         <TouchableOpacity onPress={() => setScan(true)}>
-        <Icon name="qrcode-scan" type="material-community" size={28} />
-      </TouchableOpacity>
+        /> */}
+        <TouchableOpacity onPress={() => setScan(true)}>
+          <Icon
+            name="qrcode-scan"
+            type="material-community"
+            size={28}
+            color="#185a9d"
+          />
+        </TouchableOpacity>
       </View>
       {/* <View
         style={{
@@ -273,111 +418,179 @@ export default function FriendsList(props) {
       </View> */}
       {/* <Button title="test search" onPress={() => handleSearch()} /> */}
       {
-        users && friends && (
-          <SafeAreaView>
-            <ScrollView>
-              <FlatList
-                data={users}
-                keyExtractor={(item) => String(item.id)}
-                renderItem={({ item, index }) => (
-                  <ListItem
-                    key={item.id}
-                    leftAvatar={{ source: { uri: item.photoURL } }}
-                    rightElement={
-                      item.friendStatus === "pending" ? (
-                        <TouchableOpacity
-                          style={{
-                            borderWidth: 2,
-                            borderColor: "#344C7A",
-                            backgroundColor: "#9AA5B6",
-                            padding: "2%",
-                            borderRadius: 12,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            minWidth: "27%",
-                            maxWidth: "27%",
-                          }}
-                          disabled={true}
-                        >
-                          <Feather name="loader" size={18} color="white" />
-                          <Text
+        users && users.length > 0 ? (
+          friends && (
+            <SafeAreaView>
+              <ScrollView>
+                <FlatList
+                  data={users}
+                  keyExtractor={(item) => String(item.id)}
+                  renderItem={({ item, index }) => (
+                    <ListItem
+                      key={item.id}
+                      leftAvatar={{ source: { uri: item.photoURL } }}
+                      rightIcon={
+                        item.friendStatus === "requested" && (
+                          <TouchableOpacity
                             style={{
-                              color: "white",
-                              fontWeight: "600",
-                              paddingLeft: "1%",
+                              borderWidth: 1,
+                              borderColor: "#3ea3a3",
+                              backgroundColor: "#3ea3a3",
+                              padding: "2%",
+                              borderRadius: 8,
+                              alignItems: "center",
+                              minWidth: "20%",
+                              maxWidth: "20%",
+                            }}
+                            onPress={() => accept(item)}
+                          >
+                            <Text style={{ color: "white", fontWeight: "600" }}>
+                              Accept
+                            </Text>
+                          </TouchableOpacity>
+                        )
+                      }
+                      rightElement={
+                        item.friendStatus === "pending" ? (
+                          <TouchableOpacity
+                            style={{
+                              borderWidth: 2,
+                              borderColor: "#547BA3",
+                              backgroundColor: "#547BA3",
+                              padding: "2%",
+                              borderRadius: 12,
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "27%",
+                              maxWidth: "27%",
+                            }}
+                            onPress={() => remove(item)}
+                          >
+                            <Feather name="loader" size={18} color="white" />
+                            <Text
+                              style={{
+                                color: "white",
+                                fontWeight: "600",
+                                paddingLeft: "1%",
+                              }}
+                            >
+                              {" "}
+                              Pending
+                            </Text>
+                          </TouchableOpacity>
+                        ) : item.friendStatus === "accepted" ? (
+                          <TouchableOpacity
+                            style={{
+                              borderWidth: 2,
+                              borderColor: "#3ea3a3",
+                              backgroundColor: "#3ea3a3",
+                              padding: "2%",
+                              borderRadius: 12,
+                              minWidth: "27%",
+                              maxWidth: "27%",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
                             }}
                           >
-                            {" "}
-                            Pending
-                          </Text>
-                        </TouchableOpacity>
-                      ) : item.friendStatus === "accepted" ? (
-                        <TouchableOpacity
-                          style={{
-                            borderWidth: 2,
-                            borderColor: "#20365F",
-                            backgroundColor: "#344C7A",
-                            padding: "2%",
-                            borderRadius: 12,
-                            minWidth: "27%",
-                            maxWidth: "27%",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text style={{ color: "white", fontWeight: "600" }}>
-                            Added
-                          </Text>
-                        </TouchableOpacity>
-                      ) : item.loading === true ? (
-                        <TouchableOpacity
-                          style={{
-                            borderWidth: 2,
-                            borderColor: "#20365F",
-                            padding: "2%",
-                            borderRadius: 12,
-                            minWidth: "27%",
-                            maxWidth: "27%",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text style={{ color: "#20365F", fontWeight: "600" }}>
-                            Loading
-                          </Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          style={{
-                            borderWidth: 2,
-                            borderColor: "#20365F",
-                            padding: "2%",
-                            borderRadius: 12,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            minWidth: "27%",
-                            maxWidth: "27%",
-                          }}
-                          onPress={() => addFriend(item, index)}
-                        >
-                          <Ionicons name="md-add" size={18} color="black" />
-                          <Text style={{ color: "#20365F", fontWeight: "600" }}>
-                            {" "}
-                            Add Friend
-                          </Text>
-                        </TouchableOpacity>
-                      )
-                    }
-                    title={item.displayName}
-                    titleStyle={{ fontSize: 18 }}
-                    subtitle={item.email}
-                    subtitleStyle={{ fontSize: 12, color: "grey" }}
-                    bottomDivider
-                  />
-                )}
-              />
-            </ScrollView>
-          </SafeAreaView>
+                            <AntDesign name="check" size={18} color="white" />
+                            <Text
+                              style={{
+                                color: "white",
+                                fontWeight: "600",
+                                paddingRight: "10%",
+                              }}
+                            >
+                              Added
+                            </Text>
+                          </TouchableOpacity>
+                        ) : item.friendStatus === "requested" ? (
+                          <TouchableOpacity
+                            style={{
+                              borderWidth: 1,
+                              borderColor: "#901616",
+                              backgroundColor: "#901616",
+                              padding: "2%",
+                              borderRadius: 8,
+                              alignItems: "center",
+                              minWidth: "20%",
+                              maxWidth: "20%",
+                            }}
+                            onPress={() => remove(item)}
+                          >
+                            <Text style={{ color: "white", fontWeight: "600" }}>
+                              Decline
+                            </Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            style={{
+                              borderWidth: 2,
+                              borderColor: "#3ea3a3",
+                              padding: "2%",
+                              borderRadius: 12,
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              minWidth: "27%",
+                              maxWidth: "27%",
+                            }}
+                            onPress={() => addFriend(item, index)}
+                          >
+                            <Ionicons name="md-add" size={18} color="#3ea3a3" />
+                            <Text
+                              style={{ color: "#3ea3a3", fontWeight: "600" }}
+                            >
+                              {" "}
+                              Add Friend
+                            </Text>
+                          </TouchableOpacity>
+                        )
+                      }
+                      title={item.displayName}
+                      titleStyle={{ fontSize: 18 }}
+                      subtitle={item.email}
+                      subtitleStyle={{ fontSize: 12, color: "grey" }}
+                      bottomDivider
+                    />
+                  )}
+                />
+              </ScrollView>
+            </SafeAreaView>
+          )
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              //  paddingTop: "10%",
+              alignContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              // marginTop: marginVal === 0 ? 0 : -70,
+            }}
+          >
+            {search.length > 0 ? (
+              <Text style={{ color: "grey", fontSize: 20, paddingTop: 20 }}>
+                User not found
+              </Text>
+            ) : null}
+            <LottieView
+              source={require("../../assets/17723-waitting.json")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "100%",
+                // justifyContent: "center",
+                // alignSelf: "center",
+                paddingTop: "5%",
+              }}
+            />
+            {search.length > 0 ? null : (
+              <Text style={{ color: "grey", fontSize: 20 }}>Add a Friend</Text>
+            )}
+          </View>
         )
         // users.map((user, index) => (
         //   <View
@@ -414,15 +627,32 @@ export default function FriendsList(props) {
       style={{
         flex: 1,
         flexDirection: "column",
-        justifyContent: "flex-end",
+        justifyContent: "center",
+        paddingBottom: "10%",
+        backgroundColor: "#e3e3e3",
       }}
     >
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+        // style={StyleSheet.absoluteFillObject}
+        style={{ width: "100%", height: "100%" }}
       />
 
-      <Button title="Cancel" bonPress={() => setScan(false)} />
+      {/* <Button title="Cancel" onPress={() => setScan(false)} /> */}
+      <TouchableOpacity
+        onPress={() => setScan(false)}
+        style={{
+          backgroundColor: "#3ea3a3",
+          alignSelf: "center",
+          width: 100,
+          height: 50,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 8,
+        }}
+      >
+        <Text style={{ color: "white" }}>Cancel</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -430,7 +660,7 @@ export default function FriendsList(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#e3e3e3",
   },
   searchSection: {
     flex: 1,

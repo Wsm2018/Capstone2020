@@ -1,8 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { TextInput, Button, View, Text } from "react-native";
+import {
+  TextInput,
+  Button,
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
 import firebase from "firebase";
 import "firebase/functions";
 import db from "../../db";
+import LottieView from "lottie-react-native";
+import {
+  responsiveFontSize,
+  responsiveHeight,
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+} from "react-native-responsive-dimensions";
 
 export default function MakeAdmin(props) {
   // -------------------------------------- STATE -----------------------------------
@@ -62,26 +79,122 @@ export default function MakeAdmin(props) {
     }
   };
 
-  // -------------------------------------- RETURN -----------------------------------
-
   return (
-    <View>
-      <TextInput
-        placeholder="Email"
-        onChangeText={(email) => {
-          setEmail(email);
-          setErr("");
-          setShowErr(false);
+    <KeyboardAvoidingView
+      behavior={Platform.OS == "ios" ? "height" : "height"}
+      style={styles.container}
+    >
+      <View
+        style={{
+          flex: 2,
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "yellow",
         }}
-        value={email}
-      />
-      {showErr ? (
-        <Text style={showErr ? { color: "red" } : { color: "transparent" }}>
-          {err}
-        </Text>
-      ) : null}
+      >
+        <LottieView
+          width={Dimensions.get("window").width / 1.3}
+          source={require("../../assets/admin.json")}
+          autoPlay
+          loop
+          style={{
+            alignItems: "center",
+            position: "relative",
+          }}
+        />
+      </View>
 
-      <Button title="submit" onPress={handleSubmit} />
-    </View>
+      <View
+        style={{
+          alignItems: "center",
+          flex: 1.5,
+          // backgroundColor: "red",
+          justifyContent: "flex-start",
+          // marginTop: 10,
+        }}
+      >
+        <View style={{ marginTop: 15, marginBottom: 5 }}>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: responsiveFontSize(1.8),
+              color: "#808080",
+              // fontWeight: "bold",
+            }}
+          >
+            Enter an email to give admin privileges.
+          </Text>
+        </View>
+        <TextInput
+          // width={Dimensions.get("window").width / 1.2}
+          style={{
+            backgroundColor: "white",
+            height: responsiveScreenHeight(5),
+            width: responsiveScreenWidth(90),
+            // color: "red",
+            // position: "absolute",
+            fontSize: responsiveFontSize(1.8),
+            borderColor: "gray",
+            borderWidth: 1,
+            borderRadius: 10,
+            paddingStart: 10,
+          }}
+          placeholder="Example@email.com"
+          onChangeText={(email) => {
+            setEmail(email);
+            setErr("");
+            setShowErr(false);
+          }}
+        />
+        {showErr ? (
+          <Text style={showErr ? { color: "red" } : { color: "transparent" }}>
+            {err}
+          </Text>
+        ) : null}
+        <View
+          style={{
+            marginTop: 5,
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row-reverse",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#2E9E9B",
+              height: responsiveScreenHeight(5),
+              width: "30%",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 5,
+            }}
+            onPress={handleSubmit}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: responsiveFontSize(2),
+                color: "white",
+                // fontWeight: "bold",
+              }}
+            >
+              Submit
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // position: "absolute",
+    backgroundColor: "#ebe8e8",
+  },
+});
+MakeAdmin.navigationOptions = {
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+};

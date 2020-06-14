@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   AsyncStorage,
+  ImageBackground,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -88,6 +89,7 @@ export default function Authentication(props) {
         }
       : undefined
   );
+  const [phoneNumbers, setPhoneNumbers] = useState([]);
 
   // Validation useStates for Form
   //Login
@@ -114,19 +116,106 @@ export default function Authentication(props) {
   const [phoneErr2, setPhoneErr2] = useState("transparent");
   const [phoneAccess, setPhoneAccess] = useState("");
 
+  // ----------------------------------- FORGET PASSWORD ---------------------------------------
+
+  const [forgotView, setForgotView] = useState(0);
+
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [showEmailErr, setShowEmailErr] = useState(false);
+
+  const [resetCode, setResetCode] = useState("");
+  const [showResetCodeErr, setShowResetCodeErr] = useState(false);
+  const [resetErrMsg, setResetErrMsg] = useState("");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPassErr, setShowNewPassErr] = useState(false);
+  const [newPasswordErrMsg, setNewPasswordErrMsg] = useState("");
+
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showCofirmNewPassErr, setShowCofirmNewPassErr] = useState(false);
+  const [cofirmNewPassErrMsg, setCofirmNewPassErrMsg] = useState("");
+
+  const [allEmails, setAllEmails] = useState([]);
+  const [emailErrMsg, setEmailErrMsg] = useState("");
+
+  // --------------------------------------------- END OF ALL STATES --------------------------------
+
   const getAllUsers = () => {
-    db.collection("users").onSnapshot((querySnapshot) => {
+    const unsub = db.collection("users").onSnapshot((querySnapshot) => {
       let users = [];
+      let emails = [];
       querySnapshot.forEach((doc) => {
+        emails.push(doc.data().email);
         users.push({ id: doc.id, ...doc.data() });
       });
+      setAllEmails([...emails]);
       setAllUsers([...users]);
     });
+
+    return unsub;
+  };
+
+  const getAllPhoneNumber = () => {
+    const unsub = db.collection("users").onSnapshot((querySnapshot) => {
+      let phones = [];
+      querySnapshot.forEach((doc) => {
+        phones.push(doc.data().phone);
+      });
+      setPhoneNumbers([...phones]);
+    });
+
+    return unsub;
   };
 
   useEffect(() => {
-    getAllUsers();
+    const unsubUsers = getAllUsers();
+    const unsubPhones = getAllPhoneNumber();
+    return () => {
+      unsubUsers();
+      unsubPhones();
+    };
   }, []);
+
+  const changePassword = async () => {
+    if (newPassword === "" || confirmNewPassword === "") {
+      setShowNewPassErr(true);
+      setNewPasswordErrMsg("* Enter Password");
+      setShowCofirmNewPassErr(true);
+      setCofirmNewPassErrMsg("* Enter Confirm Password");
+    } else {
+      if (newPassword !== confirmNewPassword) {
+        setShowCofirmNewPassErr(true);
+        setShowNewPassErr(true);
+        setCofirmNewPassErrMsg("* Passwords do not match");
+        setNewPasswordErrMsg("* Passwords do not match");
+      } else {
+        // add change password code
+        if (passwordStrength(newPassword)) {
+          let forgotUser = allUsers.filter(
+            (user) => user.email === forgotEmail
+          );
+          forgotUser = forgotUser[0];
+          const update = firebase.functions().httpsCallable("updatePassword");
+          const response = await update({
+            user: forgotUser,
+            password: newPassword,
+          });
+
+          setForgotView(0);
+          setForgotEmail("");
+          setResetCode("");
+          setNewPassword("");
+          setModalViewLogin(false);
+          setConfirmNewPassword("");
+        } else {
+          setShowCofirmNewPassErr(true);
+          setShowNewPassErr(true);
+          setCofirmNewPassErrMsg("* Enter a strong password");
+          setNewPasswordErrMsg("* Enter a strong password");
+        }
+      }
+    }
+  };
 
   // used for sending verfication code to the phone.
   const handleSendVerificationCode = async () => {
@@ -160,18 +249,23 @@ export default function Authentication(props) {
       }
     }
 
-    try {
-      const phoneProvider = new firebase.auth.PhoneAuthProvider();
-      const verificationId = await phoneProvider.verifyPhoneNumber(
-        `+974${phone}`,
-        recaptchaVerifier.current
-      );
-      setVerificationId(verificationId);
-      alert("Verification code has been sent to your phone.");
-      setRegistered(true);
-    } catch (err) {
-      alert(`Error: ${err.message}`);
+    if (!phoneNumbers.includes(`+974${phone}`)) {
+      try {
+        const phoneProvider = new firebase.auth.PhoneAuthProvider();
+        const verificationId = await phoneProvider.verifyPhoneNumber(
+          `+974${phone}`,
+          recaptchaVerifier.current
+        );
+        setVerificationId(verificationId);
+        alert("Verification code has been sent to your phone.");
+        setRegistered(true);
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      }
+    } else {
+      alert("Phone Number Already Exists");
     }
+
     // trying creating user and if there is any error it will alert it for example:
     // email is not corrent or password is not strong
   };
@@ -237,7 +331,7 @@ export default function Authentication(props) {
               firebase.auth().currentUser.uid
             }&phoneNumber=${phone}&displayName=${displayName}&referralStatus=${referralStatus}&referral=${referral}`
           );
-          await AsyncStorage.setItem(firebase.auth().currentUser.uid, true);
+          await AsyncStorage.setItem(firebase.auth().currentUser.uid, "true");
           //sending the user a verification email
           await firebase
             .auth()
@@ -256,7 +350,7 @@ export default function Authentication(props) {
       alert(`Error: ${err.message}`);
     }
   };
-
+  // 12.1
   const handleLogin = async () => {
     firebase
       .auth()
@@ -272,37 +366,54 @@ export default function Authentication(props) {
   };
 
   const handleSubmit = async () => {
-    firebase
-      .auth()
-      .sendPasswordResetEmail(loginEmail)
-      .then(() => {
-        alert("Email Sent");
-        setLoginEmailError("transparent");
-        setModalViewLogin(false);
-      })
-      .catch((err) => {
-        setLoginEmailError("red");
-      });
+    if (forgotEmail.length !== 0) {
+      if (emailValidity(forgotEmail)) {
+        if (allEmails.includes(forgotEmail)) {
+          //call a server side function
+          //to send the code.
+          //need to get email then id of the acc
+          // where the send email code at?
+          let forgotUser = allUsers.filter(
+            (user) => user.email === forgotEmail
+          );
+          forgotUser = forgotUser[0];
+          console.log("submitting");
+          const test = firebase.functions().httpsCallable("sendResetPassCode");
+          const response = await test({ id: forgotUser.id });
+
+          setForgotView(1);
+
+          console.log(response);
+        } else {
+          setShowEmailErr(true);
+          setEmailErrMsg("* Email does not exists");
+        }
+      } else {
+        setShowEmailErr(true);
+        setEmailErrMsg("* Invalid Email");
+      }
+    } else {
+      setShowEmailErr(true);
+      setEmailErrMsg("* Enter Email");
+    }
   };
 
-  const emailValidity = () => {
-    if (validator.validate(registerEmail)) {
-      const emailParts = registerEmail.split("@");
+  const emailValidity = (email) => {
+    if (validator.validate(email)) {
+      const emailParts = email.split("@");
       const providers = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"];
       const providerParts = emailParts[1].split(".");
       const provider = providerParts[0];
       return providers.includes(provider);
-    } else {
-      // alert("Not a valid email");
     }
   };
 
-  const passwordStrength = () => {
+  const passwordStrength = (password) => {
     const strongRegex = new RegExp(
       "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
     );
-    console.log("pass", strongRegex.test(registerPassword));
-    return strongRegex.test(registerPassword);
+    console.log("pass", strongRegex.test(password));
+    return strongRegex.test(password);
   };
 
   const registerNext = async () => {
@@ -314,7 +425,7 @@ export default function Authentication(props) {
       }
     });
 
-    if (emailValidity()) {
+    if (emailValidity(registerEmail)) {
       let count = 0;
 
       if (!registerEmail.includes("@")) {
@@ -324,7 +435,7 @@ export default function Authentication(props) {
         count = count + 1;
       }
 
-      if (!passwordStrength()) {
+      if (!passwordStrength(registerPassword)) {
         setRegisterPasswordError("red");
       } else {
         setRegisterPasswordError("transparent");
@@ -409,6 +520,35 @@ export default function Authentication(props) {
     setRegistered(false);
   };
 
+  const validateResetCode = async () => {
+    if (resetCode.length === 0) {
+      setShowResetCodeErr(true);
+      setResetErrMsg("* Enter Reset Code");
+    } else {
+      if (resetCode.length === 8) {
+        // Add server call here
+        let forgotUser = allUsers.filter(
+          (users) => users.email === forgotEmail
+        );
+        forgotUser = forgotUser[0];
+        let code = forgotUser.resetPassword.filter(
+          (code) => code.expired === false
+        );
+        code = code[0];
+        console.log("code line 502", code);
+        if (resetCode === code.passwordCode) {
+          setForgotView(2);
+        } else {
+          setShowResetCodeErr(true);
+          setResetErrMsg("* Invalid Reset Code");
+        }
+      } else {
+        setShowResetCodeErr(true);
+        setResetErrMsg("* Invalid Reset Code");
+      }
+    }
+  };
+
   ///////////////////////////////Font-End////////////////////////////////
 
   useEffect(() => {
@@ -437,227 +577,248 @@ export default function Authentication(props) {
   /////////////////////////////////////////////////////////////////////////////////////
 
   return (
-    <KeyboardAvoidingView
-      // behavior="position"
-      // behavior="height"
-      // behavior="padding"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      // contentContainerStyle={{ flex: 1 }}
-      style={{
-        width: "100%",
-        flex: 1,
-        backgroundColor: "#20365F",
-        height: "100%",
-      }}
-      // keyboardVerticalOffset={-100}
-    >
-      <View
-        style={[
-          styles.container,
-          { marginTop: Platform.isPad ? 0 : marginVal },
-        ]}
+    <View style={{ backgroundColor: "#185a9d", flex: 1, width: "100%" }}>
+      <ImageBackground
+        source={require("../assets/bg/bg5.png")}
+        style={{ width: "100%", height: "100%", position: "absolute" }}
       >
-        {/* {marginVal === 0 && ( */}
-        <View style={styles.header}>
-          <LottieView
-            source={require("../assets/login1.json")}
-            autoPlay
-            loop
-            style={{
-              position: "relative",
-              // width: "60%",
-              flex: 1,
-              alignSelf: "center",
-              // backgroundColor: "red",
-            }}
-          />
-        </View>
-        {/* )} */}
-        <View style={styles.buttonGroup}>
-          <ButtonGroup
-            onPress={() => (view === 1 ? setView(0) : setView(1))}
-            selectedIndex={view}
-            selectedTextStyle={{ color: "#20365F" }}
-            textStyle={{ color: "white", fontSize: 21 }}
-            buttons={buttons}
-            containerStyle={{
-              backgroundColor: "#20365F",
-              borderTopRightRadius: 30,
-              borderTopLeftRadius: 30,
-              borderWidth: 0,
-              borderColor: "white",
-              marginTop: 50,
-              width: "87%",
-            }}
-            selectMultiple={false}
-            selectedButtonStyle={{
-              backgroundColor: "white",
-            }}
-            innerBorderStyle={{
-              color: "transparent",
-            }}
-          />
-        </View>
-
-        {view === 1 ? (
-          <View style={styles.containerRegister}>
-            <View style={styles.form}>
-              <FirebaseRecaptchaVerifierModal
-                ref={recaptchaVerifier}
-                firebaseConfig={config}
-              />
-              <View
+        <KeyboardAvoidingView
+          // behavior="position"
+          // behavior="height"
+          // behavior="padding"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          // contentContainerStyle={{ flex: 1 }}
+          style={{
+            width: "100%",
+            flex: 1,
+            // backgroundColor: "#185a9d",
+            height: "100%",
+          }}
+          // keyboardVerticalOffset={-100}
+        >
+          <View
+            style={[
+              styles.container,
+              { marginTop: Platform.isPad ? 0 : marginVal },
+            ]}
+          >
+            {/* {marginVal === 0 && ( */}
+            <View style={styles.header}>
+              <LottieView
+                source={require("../assets/login1.json")}
+                autoPlay
+                loop
                 style={{
-                  flex: 6,
-                  width: "100%",
-                  justifyContent: "center",
+                  position: "relative",
+                  // width: "60%",
+                  flex: 1,
+                  alignSelf: "center",
                   // backgroundColor: "red",
-                  // minHeight: "70%",
                 }}
-              >
-                {!registered ? (
-                  registerView === 0 ? (
-                    <View>
-                      <Input
-                        inputContainerStyle={{
-                          borderBottomWidth: 0,
-                          // color: "white",
-                        }}
-                        leftIcon={
-                          <Icon
-                            name="email-outline"
-                            size={20}
-                            color="#20365F"
-                          />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setRegisterEmail}
-                        placeholder="E-mail"
-                        value={registerEmail}
-                        placeholderTextColor="#20365F"
-                        inputStyle={{
-                          color: "#20365F",
-                          fontSize: 16,
-                        }}
-                        errorMessage="* Invalid E-mail"
-                        errorStyle={{ color: registerEmailError }}
-                        renderErrorMessage
-                      />
+              />
+            </View>
+            {/* )} */}
+            <View style={styles.buttonGroup}>
+              <ButtonGroup
+                onPress={() => (view === 1 ? setView(0) : setView(1))}
+                selectedIndex={view}
+                selectedTextStyle={{ color: "#185a9d" }}
+                textStyle={{ color: "white", fontSize: 21 }}
+                buttons={buttons}
+                containerStyle={{
+                  backgroundColor: "transparent",
+                  borderTopRightRadius: 30,
+                  borderTopLeftRadius: 30,
+                  borderWidth: 0,
+                  borderColor: "white",
+                  marginTop: 50,
+                  width: "87%",
+                }}
+                selectMultiple={false}
+                selectedButtonStyle={{
+                  backgroundColor: "white",
+                }}
+                innerBorderStyle={{
+                  color: "transparent",
+                }}
+              />
+            </View>
 
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                          // width: "85%",
-
-                          // paddingLeft: "10%",
-                        }}
-                      >
-                        <Input
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          leftIcon={
-                            <Icon name="key" size={20} color="#20365F" />
-                          }
-                          rightIcon={
-                            <Tooltip
-                              height={180}
-                              width={370}
-                              backgroundColor={"#20365F"}
-                              popover={
-                                <View>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Your password must be between 8 and 30
-                                    characters.
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - Password must contain at least one
-                                    uppercase, or capital, letter (ex: A, B,
-                                    etc.)
-                                  </Text>
-                                  <Text
-                                    style={{ color: "white", fontSize: 18 }}
-                                  >
-                                    - One number digit and at least one special
-                                    character.
-                                  </Text>
-                                </View>
-                              }
-                              containerStyle={{
-                                justifyContent: "center",
-                                alignSelf: "center",
-                              }}
-                            >
-                              <AntDesign
-                                name="exclamationcircleo"
-                                size={22}
-                                color="#20365F"
+            {view === 1 ? (
+              <View style={styles.containerRegister}>
+                <View style={styles.form}>
+                  <FirebaseRecaptchaVerifierModal
+                    ref={recaptchaVerifier}
+                    firebaseConfig={config}
+                  />
+                  <View
+                    style={{
+                      flex: 6,
+                      width: "100%",
+                      justifyContent: "center",
+                      // backgroundColor: "red",
+                      // minHeight: "70%",
+                    }}
+                  >
+                    {!registered ? (
+                      registerView === 0 ? (
+                        <View>
+                          <Input
+                            inputContainerStyle={{
+                              borderBottomWidth: 0,
+                              // color: "white",
+                            }}
+                            leftIcon={
+                              <Icon
+                                name="email-outline"
+                                size={20}
+                                color="#185a9d"
                               />
-                            </Tooltip>
-                          }
-                          containerStyle={styles.Inputs}
-                          onChangeText={setRegisterPassword}
-                          placeholder="Password"
-                          secureTextEntry={true}
-                          value={registerPassword}
-                          errorMessage="* Enter a strong password"
-                          errorStyle={{ color: registerPasswordError }}
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
-                          placeholderTextColor="#20365F"
-                          renderErrorMessage
-                        />
-                      </View>
-                      <Input
-                        inputStyle={{
-                          color: "#20365F",
-                          fontSize: 16,
-                        }}
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon name="lock-outline" size={20} color="#20365F" />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setConfirmRegisterPassword}
-                        placeholder="Confirm Password"
-                        secureTextEntry={true}
-                        value={confirmRegisterPassword}
-                        placeholderTextColor="#20365F"
-                        errorMessage="* Password doesn't match"
-                        errorStyle={{ color: confirmRegisterPasswordError }}
-                        renderErrorMessage
-                      />
-                    </View>
-                  ) : (
-                    <View>
-                      <Input
-                        inputStyle={{
-                          color: "#20365F",
-                          fontSize: 16,
-                        }}
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon
-                            name="account-card-details"
-                            size={20}
-                            color="#20365F"
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={setRegisterEmail}
+                            placeholder="E-mail *"
+                            value={registerEmail}
+                            placeholderTextColor="#185a9d"
+                            inputStyle={{
+                              color: "#185a9d",
+                              fontSize: 16,
+                            }}
+                            errorMessage="* Invalid E-mail"
+                            errorStyle={{ color: registerEmailError }}
+                            renderErrorMessage
                           />
-                        }
-                        containerStyle={styles.Inputs}
-                        placeholderTextColor="#20365F"
-                        onChangeText={setDisplayName}
-                        placeholder="Display Name"
-                        value={displayName}
-                        errorMessage="* Invalid name"
-                        errorStyle={{ color: displayNameError }}
-                        renderErrorMessage
-                      />
-                      <View
+
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "center",
+                              // width: "85%",
+
+                              // paddingLeft: "10%",
+                            }}
+                          >
+                            <Input
+                              inputContainerStyle={{ borderBottomWidth: 0 }}
+                              leftIcon={
+                                <Icon name="key" size={20} color="#185a9d" />
+                              }
+                              rightIcon={
+                                marginVal === 0 && (
+                                  <Tooltip
+                                    // disabled
+                                    height={180}
+                                    width={370}
+                                    backgroundColor={"#185a9d"}
+                                    popover={
+                                      <View>
+                                        <Text
+                                          style={{
+                                            color: "white",
+                                            fontSize: 18,
+                                          }}
+                                        >
+                                          - Your password must be between 8 and
+                                          30 characters.
+                                        </Text>
+                                        <Text
+                                          style={{
+                                            color: "white",
+                                            fontSize: 18,
+                                          }}
+                                        >
+                                          - Password must contain at least one
+                                          uppercase, or capital, letter (ex: A,
+                                          B, etc.)
+                                        </Text>
+                                        <Text
+                                          style={{
+                                            color: "white",
+                                            fontSize: 18,
+                                          }}
+                                        >
+                                          - One number digit and at least one
+                                          special character.
+                                        </Text>
+                                      </View>
+                                    }
+                                    containerStyle={{
+                                      justifyContent: "center",
+                                      alignSelf: "center",
+                                    }}
+                                  >
+                                    <AntDesign
+                                      name="exclamationcircleo"
+                                      size={22}
+                                      color="#185a9d"
+                                    />
+                                  </Tooltip>
+                                )
+                              }
+                              containerStyle={styles.Inputs}
+                              onChangeText={setRegisterPassword}
+                              placeholder="Password *"
+                              secureTextEntry={true}
+                              value={registerPassword}
+                              errorMessage="* Enter a strong password"
+                              errorStyle={{ color: registerPasswordError }}
+                              inputStyle={{
+                                color: "#185a9d",
+                                fontSize: 16,
+                              }}
+                              placeholderTextColor="#185a9d"
+                              renderErrorMessage
+                            />
+                          </View>
+                          <Input
+                            inputStyle={{
+                              color: "#185a9d",
+                              fontSize: 16,
+                            }}
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="lock-outline"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={setConfirmRegisterPassword}
+                            placeholder="Confirm Password *"
+                            secureTextEntry={true}
+                            value={confirmRegisterPassword}
+                            placeholderTextColor="#185a9d"
+                            errorMessage="* Password doesn't match"
+                            errorStyle={{ color: confirmRegisterPasswordError }}
+                            renderErrorMessage
+                          />
+                        </View>
+                      ) : (
+                        <View>
+                          <Input
+                            inputStyle={{
+                              color: "#185a9d",
+                              fontSize: 16,
+                            }}
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="account-card-details"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            placeholderTextColor="#185a9d"
+                            onChangeText={setDisplayName}
+                            placeholder="Display Name *"
+                            value={displayName}
+                            errorMessage="* Invalid name"
+                            errorStyle={{ color: displayNameError }}
+                            renderErrorMessage
+                          />
+                          {/* <View
                         style={{
                           flexDirection: "row",
                           justifyContent: "space-evenly",
@@ -666,7 +827,7 @@ export default function Authentication(props) {
                       >
                         <Input
                           inputStyle={{
-                            color: "#20365F",
+                            color: "#185a9d",
                             fontSize: 16,
                           }}
                           inputContainerStyle={{ borderBottomWidth: 0 }}
@@ -679,7 +840,7 @@ export default function Authentication(props) {
                           containerStyle={{
                             borderRadius: 8,
                             borderWidth: 1,
-                            borderColor: "#20365F",
+                            borderColor: "#185a9d",
                             height: 50,
                             width: "25%",
                             alignSelf: "center",
@@ -689,7 +850,7 @@ export default function Authentication(props) {
                             marginLeft: 20,
                             paddingTop: 5,
                           }}
-                          placeholderTextColor="#20365F"
+                          placeholderTextColor="#185a9d"
                           keyboardType="number-pad"
                           placeholder="+974"
                           // errorMessage="* Invalid Phone No."
@@ -699,7 +860,7 @@ export default function Authentication(props) {
                         />
                         <Input
                           inputStyle={{
-                            color: "#20365F",
+                            color: "#185a9d",
                             fontSize: 16,
                           }}
                           inputContainerStyle={{ borderBottomWidth: 0 }}
@@ -707,13 +868,13 @@ export default function Authentication(props) {
                           //   <Icon
                           //     name="cellphone-android"
                           //     size={20}
-                          //     color="#20365F"
+                          //     color="#185a9d"
                           //   />
                           // }
                           containerStyle={{
                             borderRadius: 8,
                             borderWidth: 1,
-                            borderColor: "#20365F",
+                            borderColor: "#185a9d",
                             height: 50,
                             width: "50%",
                             alignSelf: "center",
@@ -723,7 +884,7 @@ export default function Authentication(props) {
                             marginRight: 25,
                             paddingTop: "1%",
                           }}
-                          placeholderTextColor="#20365F"
+                          placeholderTextColor="#185a9d"
                           onChangeText={setPhone}
                           keyboardType="number-pad"
                           placeholder="Phone No."
@@ -732,307 +893,349 @@ export default function Authentication(props) {
                           errorStyle={{ color: phoneError }}
                           renderErrorMessage
                         />
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                        }}
-                      >
+                      </View> */}
+                          <View
+                            style={{
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                // justifyContent: "center",
+                                alignItems: "center",
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: "#185a9d",
+                                height: 50,
+                                marginTop: 25,
+                                width: "80%",
+                              }}
+                            >
+                              {/* // leftIcon={
+                          //   <Image
+                          //     source={require("../assets/qatarFlag.png")}
+                          //     style={{ width: 20, height: 25 }}
+                          //   /> */}
+
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  color: "#185a9d",
+                                  // width: "25%",
+                                  paddingLeft: 10,
+                                  // backgroundColor: "red",
+                                }}
+                              >
+                                🇶🇦 +974{" "}
+                              </Text>
+                              <Input
+                                inputStyle={{
+                                  color: "#185a9d",
+                                  fontSize: 16,
+                                  // justifyContent: "center",
+                                }}
+                                inputContainerStyle={{
+                                  borderBottomWidth: 0,
+                                  // justifyContent: "center",
+                                  // fontSize: 18,
+                                }}
+                                // lcon={
+                                //   <Icon
+                                //     name="cellphone-android"
+                                //     size={20}
+                                //     color="#185a9d"
+                                //   />
+                                // }
+                                containerStyle={{
+                                  // borderRadius: 8,
+                                  // borderWidth: 1,
+                                  // borderColor: "#185a9d",
+                                  height: 50,
+                                  // backgroundColor: "blue",
+                                  width: "80%",
+                                  // width: "55%",
+                                  // alignSelf: "center",
+                                  // opacity: 0.8,
+                                  // paddingLeft: 0,
+                                  // marginTop: 20,
+                                  // marginRight: 25,
+                                  paddingTop: 5,
+                                  // fontSize: 18,
+                                }}
+                                placeholderTextColor="#185a9d"
+                                onChangeText={setPhone}
+                                keyboardType="number-pad"
+                                placeholder="Phone Number *"
+                                value={phone}
+                                errorMessage="* Invalid Phone No."
+                                errorStyle={{
+                                  color: phoneError,
+                                  marginLeft: -75,
+                                }}
+                                renderErrorMessage
+                              />
+                            </View>
+                          </View>
+                          <View
+                            style={{
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                width: "80%",
+                                // alignSelf: "center",
+                                // marginLeft: "1%",
+                              }}
+                            >
+                              <Input
+                                inputStyle={{
+                                  fontSize: 16,
+                                  paddingLeft: 10,
+                                  color: "#185a9d",
+                                  // width: "50%",
+                                }}
+                                inputContainerStyle={{ borderBottomWidth: 0 }}
+                                leftIcon={
+                                  <Icon
+                                    name="alpha-r-box"
+                                    size={20}
+                                    color="#185a9d"
+                                  />
+                                }
+                                containerStyle={styles.useCodeInputs}
+                                placeholderTextColor="#185a9d"
+                                onChangeText={setReferral}
+                                placeholder="Referral Code"
+                                value={referral}
+                                errorMessage="* Invalid Code"
+                                errorStyle={{ color: refErr }}
+                                renderErrorMessage
+                              />
+
+                              <TouchableOpacity
+                                onPress={checkReferral}
+                                style={styles.useCodeButton}
+                              >
+                                <Text
+                                  style={{ color: "white", fontWeight: "bold" }}
+                                >
+                                  Use Code
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        </View>
+                      )
+                    ) : (
+                      <View>
                         <Input
                           inputStyle={{
+                            color: "#185a9d",
                             fontSize: 16,
-                            // width:'50%'
                           }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
+                          editable={!!verificationId}
+                          // inputContainerStyle={{ borderBottomWidth: 10 }}
                           leftIcon={
-                            <Icon
-                              name="account-card-details"
+                            <Octicons
+                              name="verified"
                               size={20}
-                              color="lightgray"
+                              color="#185a9d"
                             />
                           }
-                          containerStyle={styles.useCodeInputs}
-                          placeholderTextColor="white"
-                          onChangeText={setReferral}
-                          placeholder="Referral Code"
-                          value={referral}
-                          errorMessage="* Invalid Code"
-                          errorStyle={{ color: refErr }}
-                          renderErrorMessage
+                          containerStyle={styles.Inputs}
+                          placeholderTextColor="#185a9d"
+                          onChangeText={setVerificationCode}
+                          placeholder="Verification Code"
                         />
-
-                        <TouchableOpacity
-                          onPress={checkReferral}
-                          style={styles.useCodeButton}
-                        >
-                          <Text style={{ color: "white", fontWeight: "bold" }}>
-                            Use Code
-                          </Text>
-                        </TouchableOpacity>
                       </View>
-                    </View>
-                  )
-                ) : (
-                  <View>
-                    <Input
-                      inputStyle={{
-                        //color: "white",
-                        fontSize: 16,
-                      }}
-                      editable={!!verificationId}
-                      // inputContainerStyle={{ borderBottomWidth: 10 }}
-                      leftIcon={
-                        <Octicons name="verified" size={20} color="lightgray" />
-                      }
-                      containerStyle={styles.Inputs}
-                      placeholderTextColor="gray"
-                      onChangeText={setVerificationCode}
-                      placeholder="Verification Code"
-                    />
+                    )}
                   </View>
-                )}
-              </View>
 
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-                }}
-              >
-                {registerView === 0 ? (
-                  <TouchableOpacity
-                    onPress={() => registerNext()}
-                    style={styles.loginButton}
-                  >
-                    <Text style={{ color: "white" }}>Next</Text>
-                  </TouchableOpacity>
-                ) : (
                   <View
-                    style={{ flexDirection: "row", justifyContent: "center" }}
+                    style={{
+                      flex: 1,
+                      width: "100%",
+                    }}
                   >
-                    <TouchableOpacity
-                      onPress={() => handleSetRegisterView()}
-                      style={styles.backButton}
-                    >
-                      <Ionicons
-                        name="ios-arrow-back"
-                        size={30}
-                        color="#20365F"
-                      />
-                    </TouchableOpacity>
-                    {!registered ? (
+                    {registerView === 0 ? (
                       <TouchableOpacity
-                        onPress={() => handleSendVerificationCode()}
-                        style={styles.registerButton}
+                        onPress={() => registerNext()}
+                        style={styles.loginButton}
                       >
                         <Text style={{ color: "white", fontWeight: "bold" }}>
-                          Sign Up!
+                          Next
                         </Text>
                       </TouchableOpacity>
                     ) : (
-                      <TouchableOpacity
-                        onPress={handleRegister}
-                        disabled={!verificationId}
-                        style={{ ...styles.registerButton }}
-                      >
-                        <Text style={{ color: "white", fontWeight: "bold" }}>
-                          Confirm Verification Code
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
-        ) : view === 0 ? (
-          <View style={styles.containerLogin}>
-            {modalViewLogin === false && accessFlag == false ? (
-              <View style={styles.form}>
-                <View
-                  style={{
-                    flex: 2,
-                    width: "100%",
-                    // backgroundColor: "red",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginEmail}
-                    placeholder="E-mail"
-                    value={loginEmail}
-                    errorMessage="* E-mail not valid"
-                    placeholderTextColor="#20365F"
-                    errorStyle={{
-                      color: loginEmailError,
-                    }}
-                    renderErrorMessage
-                  />
-                  <Input
-                    inputStyle={{
-                      color: "#20365F",
-                      fontSize: 16,
-                    }}
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={<Icon name="key" size={20} color="#20365F" />}
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginPassword}
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    value={loginPassword}
-                    placeholderTextColor="#20365F"
-                    errorMessage="* Please check your email and password"
-                    errorStyle={{
-                      color: loginPasswordError,
-                      fontSize: 13,
-                    }}
-                    renderErrorMessage
-                  />
-                </View>
-
-                <View
-                  style={{
-                    flex: 1,
-                    width: "100%",
-                    justifyContent: "center",
-                    // backgroundColor: "yellow",
-                    // marginTop: "15%",
-                  }}
-                >
-                  <View style={{}}>
-                    <TouchableOpacity
-                      style={[styles.loginButton]}
-                      onPress={() => handleLogin()}
-                    >
-                      <Text style={{ color: "white" }}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.loginButton}
-                      onPress={() => setAccessFlag(true)}
-                    >
-                      <Text style={{ color: "white" }}>Access Code</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <Text
-                      onPress={() => setModalViewLogin(true)}
-                      style={{ textAlign: "center", color: "#20365F" }}
-                    >
-                      Forgot Password?
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ) : modalViewLogin === true && accessFlag == false ? (
-              <View style={styles.form}>
-                <View
-                  style={{
-                    flex: 6,
-                    width: "100%",
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <Input
-                    inputContainerStyle={{ borderBottomWidth: 0 }}
-                    leftIcon={
-                      <Icon name="email-outline" size={20} color="#20365F" />
-                    }
-                    containerStyle={styles.Inputs}
-                    onChangeText={setLoginEmail}
-                    placeholder="E-mail"
-                    value={loginEmail}
-                    inputStyle={{
-                      fontSize: 16,
-                    }}
-                    placeholderTextColor="#20365F"
-                    errorMessage="* Email not valid"
-                    errorStyle={{ color: loginEmailError }}
-                    renderErrorMessage
-                  />
-                  <View>
-                    <TouchableOpacity
-                      style={styles.loginButton}
-                      onPress={() => handleSubmit()}
-                    >
-                      <Text style={{ color: "white" }}>Submit</Text>
-                    </TouchableOpacity>
-                    <Text
-                      onPress={() => setModalViewLogin(false)}
-                      style={{ textAlign: "center", color: "#20365F" }}
-                    >
-                      Back to Login
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ) : (
-              modalViewLogin === false &&
-              accessFlag === true && (
-                <View style={styles.form}>
-                  {accessValid == false ? (
-                    <View
-                      style={{
-                        flex: 6,
-                        width: "100%",
-                        justifyContent: "space-evenly",
-                      }}
-                    >
-                      <Input
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon name="account-key" size={20} color="#20365F" />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setAccessCode}
-                        placeholder="Access Code"
-                        value={AccessCode}
-                        errorMessage="* Code Invalid"
-                        inputStyle={{
-                          color: "#20365F",
-                          fontSize: 16,
-                        }}
-                        placeholderTextColor="#20365F"
-                        errorStyle={{ color: accessCodeError }}
-                        renderErrorMessage
-                      />
-                      <View>
-                        <TouchableOpacity
-                          style={styles.loginButton}
-                          onPress={() => handleAccessCode()}
-                        >
-                          <Text style={{ color: "white" }}>Use Code</Text>
-                        </TouchableOpacity>
-                        <Text
-                          onPress={() => setAccessFlag(false)}
-                          style={{ textAlign: "center", color: "#20365F" }}
-                        >
-                          Back to Login
-                        </Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <View
-                      style={{
-                        flex: 6,
-                        width: "100%",
-                        justifyContent: "space-evenly",
-                      }}
-                    >
                       <View
                         style={{
                           flexDirection: "row",
-                          alignItems: "center",
                           justifyContent: "center",
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => handleSetRegisterView()}
+                          style={styles.backButton}
+                        >
+                          <Ionicons
+                            name="ios-arrow-back"
+                            size={30}
+                            color="#185a9d"
+                          />
+                        </TouchableOpacity>
+                        {!registered ? (
+                          <TouchableOpacity
+                            onPress={() => handleSendVerificationCode()}
+                            style={styles.registerButton}
+                          >
+                            <Text
+                              style={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Sign Up!
+                            </Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={handleRegister}
+                            disabled={!verificationId}
+                            style={{ ...styles.registerButton }}
+                          >
+                            <Text
+                              style={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Confirm Verification Code
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </View>
+            ) : view === 0 ? (
+              <View style={styles.containerLogin}>
+                {modalViewLogin === false && accessFlag == false ? (
+                  <View style={styles.form}>
+                    <View
+                      style={{
+                        flex: 2,
+                        width: "100%",
+                        // backgroundColor: "red",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Input
+                        inputStyle={{
+                          color: "#185a9d",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={
+                          <Icon
+                            name="email-outline"
+                            size={20}
+                            color="#185a9d"
+                          />
+                        }
+                        containerStyle={styles.Inputs}
+                        onChangeText={setLoginEmail}
+                        placeholder="E-mail *"
+                        value={loginEmail}
+                        errorMessage="* E-mail not valid"
+                        placeholderTextColor="#185a9d"
+                        errorStyle={{
+                          color: loginEmailError,
+                        }}
+                        renderErrorMessage
+                      />
+                      <Input
+                        inputStyle={{
+                          color: "#185a9d",
+                          fontSize: 16,
+                        }}
+                        inputContainerStyle={{ borderBottomWidth: 0 }}
+                        leftIcon={<Icon name="key" size={20} color="#185a9d" />}
+                        containerStyle={styles.Inputs}
+                        onChangeText={setLoginPassword}
+                        placeholder="Password *"
+                        secureTextEntry={true}
+                        value={loginPassword}
+                        placeholderTextColor="#185a9d"
+                        errorMessage="* Please check your email and password"
+                        errorStyle={{
+                          color: loginPasswordError,
+                          fontSize: 13,
+                          marginLeft: -10,
+                        }}
+                        renderErrorMessage
+                      />
+                    </View>
+
+                    <View
+                      style={{
+                        flex: 1,
+                        width: "100%",
+                        justifyContent: "center",
+                        // backgroundColor: "yellow",
+                        // marginTop: "15%",
+                      }}
+                    >
+                      <View style={{}}>
+                        <TouchableOpacity
+                          style={[styles.loginButton]}
+                          onPress={() => handleLogin()}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 17,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Login
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.loginButton}
+                          onPress={() => setAccessFlag(true)}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access Code
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View>
+                        {marginVal === 0 && (
+                          <Text
+                            onPress={() => setModalViewLogin(true)}
+                            style={{ textAlign: "center", color: "#185a9d" }}
+                          >
+                            Forgot Password?
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                ) : modalViewLogin === true && accessFlag == false ? (
+                  forgotView === 0 ? (
+                    <View style={styles.form}>
+                      <View
+                        style={{
+                          flex: 6,
+                          width: "100%",
+                          justifyContent: "space-evenly",
                         }}
                       >
                         <Input
@@ -1041,165 +1244,428 @@ export default function Authentication(props) {
                             <Icon
                               name="email-outline"
                               size={20}
-                              color="#20365F"
+                              color="#185a9d"
                             />
                           }
-                          containerStyle={styles.AccessInputs}
-                          value={AccessEmail}
+                          containerStyle={styles.Inputs}
+                          onChangeText={(email) => {
+                            setForgotEmail(email);
+                            setEmailErrMsg("");
+                            setShowEmailErr(false);
+                          }}
+                          placeholder="E-mail"
+                          value={forgotEmail}
                           inputStyle={{
-                            color: "#20365F",
                             fontSize: 16,
-                            textAlign: "center",
+                            color: "#185a9d",
                           }}
-                          placeholderTextColor="#20365F"
-                          disabled={true}
+                          placeholderTextColor="#185a9d"
+                          errorMessage={emailErrMsg}
+                          errorStyle={
+                            showEmailErr
+                              ? { color: "red", fontWeight: "bold" }
+                              : { color: "transparent", fontWeight: "bold" }
+                          }
+                          renderErrorMessage={showEmailErr}
                         />
-
-                        <Input
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Icon
-                          //     name="email-outline"
-                          //     size={20}
-                          //     color="#20365F"
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "20%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 12,
-                            marginTop: 20,
-                            paddingTop: "1%",
-                          }}
-                          inputStyle={{
-                            color: "#20365F",
-                            textAlign: "center",
-                          }}
-                          placeholderTextColor="#20365F"
-                          value={AccessAmount}
-                          disabled={true}
-                        />
+                        <View>
+                          <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={() => handleSubmit()}
+                          >
+                            <Text style={{ color: "white" }}>Submit</Text>
+                          </TouchableOpacity>
+                          <Text
+                            onPress={() => setModalViewLogin(false)}
+                            style={{ textAlign: "center", color: "#185a9d" }}
+                          >
+                            Back to Login
+                          </Text>
+                        </View>
                       </View>
-                      <Input
-                        inputContainerStyle={{ borderBottomWidth: 0 }}
-                        leftIcon={
-                          <Icon
-                            name="account-card-details"
-                            size={20}
-                            color="#20365F"
-                          />
-                        }
-                        containerStyle={styles.Inputs}
-                        onChangeText={setAccessDisplayName}
-                        placeholder="Display Name"
-                        value={accessDisplayName}
-                        inputStyle={{
-                          fontSize: 16,
-                        }}
-                        placeholderTextColor="#20365F"
-                        errorMessage="* Invalid Display Name"
-                        errorStyle={{ color: displayErr2 }}
-                        renderErrorMessage
-                      />
+                    </View>
+                  ) : forgotView === 1 ? (
+                    <View style={styles.form}>
                       <View
                         style={{
-                          flexDirection: "row",
+                          flex: 6,
+                          width: "100%",
                           justifyContent: "space-evenly",
-                          alignContent: "center",
                         }}
                       >
                         <Input
-                          inputStyle={{
-                            color: "#20365F",
-                            fontSize: 16,
-                          }}
                           inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Image
-                          //     source={require("../assets/qatarFlag.png")}
-                          //     style={{ width: 20, height: 25 }}
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "25%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 10,
-                            marginTop: 20,
-                            marginLeft: 20,
+                          leftIcon={
+                            <Icon
+                              name="email-outline"
+                              size={20}
+                              color="#185a9d"
+                            />
+                          }
+                          containerStyle={styles.Inputs}
+                          onChangeText={(code) => {
+                            setResetCode(code);
+                            setResetErrMsg("");
+                            setShowResetCodeErr(false);
                           }}
-                          placeholderTextColor="#20365F"
-                          keyboardType="number-pad"
-                          placeholder="+974"
-                          // errorMessage="* Invalid Phone No."
-                          // errorStyle={{ color: phoneErr2 }}
-                          // renderErrorMessage
-                          disabled={true}
-                        />
-                        <Input
+                          placeholder="Reset Code"
+                          value={resetCode}
                           inputStyle={{
-                            color: "#20365F",
                             fontSize: 16,
+                            color: "#185a9d",
                           }}
-                          inputContainerStyle={{ borderBottomWidth: 0 }}
-                          // leftIcon={
-                          //   <Icon
-                          //     name="cellphone-android"
-                          //     size={20}
-                          //     color="#20365F"
-                          //   />
-                          // }
-                          containerStyle={{
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: "#20365F",
-                            height: 50,
-                            width: "50%",
-                            alignSelf: "center",
-                            opacity: 0.8,
-                            paddingLeft: 12,
-                            marginTop: 20,
-                            marginRight: 25,
-                            paddingTop: "1%",
-                          }}
-                          placeholderTextColor="#20365F"
-                          onChangeText={setPhoneAccess}
-                          keyboardType="number-pad"
-                          placeholder="Phone No."
-                          value={phoneAccess}
-                          errorMessage="* Invalid Phone No."
-                          errorStyle={{ color: phoneErr2 }}
-                          renderErrorMessage
+                          placeholderTextColor="#185a9d"
+                          errorMessage={resetErrMsg}
+                          errorStyle={
+                            showResetCodeErr
+                              ? { color: "red", fontWeight: "bold" }
+                              : { color: "transparent" }
+                          }
+                          renderErrorMessage={showResetCodeErr}
                         />
-                      </View>
-
-                      <View style={{ marginTop: "7%" }}>
-                        <TouchableOpacity
-                          style={styles.loginButton}
-                          onPress={handleAccessCodeData}
-                        >
-                          <Text style={{ color: "white" }}>Next</Text>
-                        </TouchableOpacity>
+                        <View>
+                          <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={() => validateResetCode()}
+                          >
+                            <Text style={{ color: "white" }}>Submit</Text>
+                          </TouchableOpacity>
+                          <Text
+                            onPress={() => setForgotView(0)}
+                            style={{ textAlign: "center", color: "#185a9d" }}
+                          >
+                            Back to Email
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  )}
-                </View>
-              )
-            )}
-          </View>
-        ) : (
-          <View>
-            {/* <Text>Forgot Password</Text> */}
-            {/* <TextInput
+                  ) : (
+                    <View style={styles.form}>
+                      <View
+                        style={{
+                          flex: 6,
+                          width: "100%",
+                          justifyContent: "space-evenly",
+                        }}
+                      >
+                        <View>
+                          <Input
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="email-outline"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={(newPass) => {
+                              setNewPassword(newPass);
+                              setNewPasswordErrMsg("");
+                              setShowNewPassErr(false);
+                              setCofirmNewPassErrMsg("");
+                              setShowCofirmNewPassErr(false);
+                            }}
+                            placeholder="New Password"
+                            value={newPassword}
+                            inputStyle={{
+                              fontSize: 16,
+                              color: "#185a9d",
+                            }}
+                            secureTextEntry
+                            placeholderTextColor="#185a9d"
+                            errorMessage={newPasswordErrMsg}
+                            errorStyle={
+                              showNewPassErr
+                                ? { color: "red", fontWeight: "bold" }
+                                : { color: "transparent" }
+                            }
+                            renderErrorMessage={showNewPassErr}
+                          />
+
+                          <Input
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="email-outline"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={(confirm) => {
+                              setConfirmNewPassword(confirm);
+                              setNewPasswordErrMsg("");
+                              setShowNewPassErr(false);
+                              setCofirmNewPassErrMsg("");
+                              setShowCofirmNewPassErr(false);
+                            }}
+                            secureTextEntry
+                            placeholder="Confirm New Password"
+                            value={confirmNewPassword}
+                            inputStyle={{
+                              fontSize: 16,
+                              color: "#185a9d",
+                            }}
+                            placeholderTextColor="#185a9d"
+                            errorMessage={cofirmNewPassErrMsg}
+                            errorStyle={
+                              showCofirmNewPassErr
+                                ? { color: "red", fontWeight: "bold" }
+                                : { color: "transparent" }
+                            }
+                            renderErrorMessage={showCofirmNewPassErr}
+                          />
+                        </View>
+
+                        <View>
+                          <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={() => changePassword()}
+                          >
+                            <Text style={{ color: "white" }}>Submit</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  )
+                ) : (
+                  modalViewLogin === false &&
+                  accessFlag === true && (
+                    <View style={styles.form}>
+                      {accessValid == false ? (
+                        <View
+                          style={{
+                            flex: 6,
+                            width: "100%",
+                            justifyContent: "space-evenly",
+                          }}
+                        >
+                          <Input
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="account-key"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={setAccessCode}
+                            placeholder="Access Code *"
+                            value={AccessCode}
+                            errorMessage="* Code Invalid"
+                            inputStyle={{
+                              color: "#185a9d",
+                              fontSize: 16,
+                            }}
+                            placeholderTextColor="#185a9d"
+                            errorStyle={{ color: accessCodeError }}
+                            renderErrorMessage
+                          />
+                          <View>
+                            <TouchableOpacity
+                              style={styles.loginButton}
+                              onPress={() => handleAccessCode()}
+                            >
+                              <Text
+                                style={{ color: "white", fontWeight: "bold" }}
+                              >
+                                Use Code
+                              </Text>
+                            </TouchableOpacity>
+                            <Text
+                              onPress={() => setAccessFlag(false)}
+                              style={{ textAlign: "center", color: "#185a9d" }}
+                            >
+                              Back to Login
+                            </Text>
+                          </View>
+                        </View>
+                      ) : (
+                        <View
+                          style={{
+                            flex: 6,
+                            width: "100%",
+                            justifyContent: "space-evenly",
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Input
+                              inputContainerStyle={{ borderBottomWidth: 0 }}
+                              leftIcon={
+                                <Icon
+                                  name="email-outline"
+                                  size={20}
+                                  color="#185a9d"
+                                />
+                              }
+                              containerStyle={styles.AccessInputs}
+                              value={AccessEmail}
+                              inputStyle={{
+                                color: "#185a9d",
+                                fontSize: 16,
+                                textAlign: "center",
+                              }}
+                              placeholderTextColor="#185a9d"
+                              disabled={true}
+                            />
+
+                            <Input
+                              inputContainerStyle={{ borderBottomWidth: 0 }}
+                              // leftIcon={
+                              //   <Icon
+                              //     name="email-outline"
+                              //     size={20}
+                              //     color="#185a9d"
+                              //   />
+                              // }
+                              containerStyle={{
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: "#185a9d",
+                                height: 50,
+                                width: "20%",
+                                alignSelf: "center",
+                                opacity: 0.8,
+                                paddingLeft: 12,
+                                marginTop: 20,
+                                paddingTop: "1%",
+                              }}
+                              inputStyle={{
+                                color: "#185a9d",
+                                textAlign: "center",
+                              }}
+                              placeholderTextColor="#185a9d"
+                              value={AccessAmount}
+                              disabled={true}
+                            />
+                          </View>
+                          <Input
+                            inputContainerStyle={{ borderBottomWidth: 0 }}
+                            leftIcon={
+                              <Icon
+                                name="account-card-details"
+                                size={20}
+                                color="#185a9d"
+                              />
+                            }
+                            containerStyle={styles.Inputs}
+                            onChangeText={setAccessDisplayName}
+                            placeholder="Display Name *"
+                            value={accessDisplayName}
+                            inputStyle={{
+                              fontSize: 16,
+                            }}
+                            placeholderTextColor="#185a9d"
+                            errorMessage="* Invalid Display Name"
+                            errorStyle={{ color: displayErr2 }}
+                            renderErrorMessage
+                          />
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-evenly",
+                              alignContent: "center",
+                            }}
+                          >
+                            <Input
+                              inputStyle={{
+                                color: "#185a9d",
+                                fontSize: 16,
+                              }}
+                              inputContainerStyle={{ borderBottomWidth: 0 }}
+                              // leftIcon={
+                              //   <Image
+                              //     source={require("../assets/qatarFlag.png")}
+                              //     style={{ width: 20, height: 25 }}
+                              //   />
+                              // }
+                              containerStyle={{
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: "#185a9d",
+                                height: 50,
+                                width: "25%",
+                                alignSelf: "center",
+                                opacity: 0.8,
+                                paddingLeft: 10,
+                                marginTop: 20,
+                                marginLeft: 20,
+                              }}
+                              placeholderTextColor="#185a9d"
+                              keyboardType="number-pad"
+                              placeholder="+974"
+                              // errorMessage="* Invalid Phone No."
+                              // errorStyle={{ color: phoneErr2 }}
+                              // renderErrorMessage
+                              disabled={true}
+                            />
+                            <Input
+                              inputStyle={{
+                                color: "#185a9d",
+                                fontSize: 16,
+                              }}
+                              inputContainerStyle={{ borderBottomWidth: 0 }}
+                              // leftIcon={
+                              //   <Icon
+                              //     name="cellphone-android"
+                              //     size={20}
+                              //     color="#185a9d"
+                              //   />
+                              // }
+                              containerStyle={{
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: "#185a9d",
+                                height: 50,
+                                width: "50%",
+                                alignSelf: "center",
+                                opacity: 0.8,
+                                paddingLeft: 12,
+                                marginTop: 20,
+                                marginRight: 25,
+                                paddingTop: "1%",
+                              }}
+                              placeholderTextColor="#185a9d"
+                              onChangeText={setPhoneAccess}
+                              keyboardType="number-pad"
+                              placeholder="Phone Number *"
+                              value={phoneAccess}
+                              errorMessage="* Invalid Phone No."
+                              errorStyle={{ color: phoneErr2 }}
+                              renderErrorMessage
+                            />
+                          </View>
+
+                          <View style={{ marginTop: "7%" }}>
+                            <TouchableOpacity
+                              style={styles.loginButton}
+                              onPress={handleAccessCodeData}
+                            >
+                              <Text
+                                style={{ color: "white", fontWeight: "bold" }}
+                              >
+                                Next
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+                  )
+                )}
+              </View>
+            ) : (
+              <View>
+                {/* <Text>Forgot Password</Text> */}
+                {/* <TextInput
           placeholder="Email"
           value={forgotPassEmail}
           onChangeText={setForgotPassEmail}
@@ -1211,17 +1677,19 @@ export default function Authentication(props) {
         <TouchableOpacity onPress={() => setView("Login")}>
           <Text>Back to Login</Text>
         </TouchableOpacity> */}
+              </View>
+            )}
           </View>
-        )}
-      </View>
-    </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#20365F",
+    // backgroundColor: "",
     alignItems: "center",
     // width: Math.round(Dimensions.get("window").width),
     // width: "100%",
@@ -1261,7 +1729,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // justifyContent: "center",
     textAlign: "center",
-    color: "#20365F",
+    color: "#185a9d",
     fontSize: 34,
     fontWeight: "bold",
   },
@@ -1269,7 +1737,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#415598",
+    // backgroundColor: "#415598",
     flex: 1,
     flexDirection: "row",
   },
@@ -1284,7 +1752,7 @@ const styles = StyleSheet.create({
   Inputs: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#20365F",
+    borderColor: "#185a9d",
     height: 50,
     width: "80%",
     alignSelf: "center",
@@ -1295,7 +1763,7 @@ const styles = StyleSheet.create({
   AccessInputs: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#20365F",
+    borderColor: "#185a9d",
     height: 50,
     width: "56%",
     alignSelf: "center",
@@ -1307,7 +1775,7 @@ const styles = StyleSheet.create({
   Buttons: {
     borderRadius: 8,
     borderWidth: 1,
-    backgroundColor: "#20365F",
+    backgroundColor: "#185a9d",
     height: 35,
     width: "30%",
     alignSelf: "center",
@@ -1329,9 +1797,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButton: {
-    backgroundColor: "#20365F",
-    height: 50,
-    width: "80%",
+    backgroundColor: "#60c4c4",
+    height: 45,
+    width: "60%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -1340,9 +1808,11 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginBottom: 5,
     marginTop: 5,
+    // borderWidth: 3,
+    // borderColor: "#185a9d",
   },
   registerButton: {
-    backgroundColor: "#20365F",
+    backgroundColor: "#60c4c4",
     height: 50,
     width: "55%",
     alignSelf: "center",
@@ -1354,9 +1824,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   useCodeButton: {
-    backgroundColor: "#20365F",
+    backgroundColor: "#60c4c4",
     height: 50,
-    width: "26%",
+    width: "30%",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -1369,14 +1839,14 @@ const styles = StyleSheet.create({
   useCodeInputs: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#20365F",
+    borderColor: "#185a9d",
     height: 50,
-    width: "52%",
+    width: "69%",
     alignSelf: "center",
     opacity: 0.8,
     paddingLeft: 10,
     marginTop: 20,
-    marginLeft: 8,
+    marginLeft: 15,
   },
   header: {
     justifyContent: "center",

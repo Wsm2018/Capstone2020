@@ -12,6 +12,8 @@ import {
   View,
   Picker,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import firebase from "firebase";
 import "firebase/functions";
 import "firebase/auth";
@@ -19,7 +21,17 @@ import db from "../../db";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import { ListItem } from "react-native-elements";
-
+import {
+  Collapse,
+  CollapseHeader,
+  CollapseBody,
+} from "accordion-collapse-react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 export default function ScheduleCompleted(props) {
   const [user, setUser] = useState({});
   const [date, setDate] = useState();
@@ -32,6 +44,7 @@ export default function ScheduleCompleted(props) {
     moment().format("YYYY-MM-DDTHH:MM:SS")
   );
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
+  const [deviceType, setDeviceType] = useState(0);
 
   useEffect(() => {
     db.collection("users")
@@ -55,7 +68,13 @@ export default function ScheduleCompleted(props) {
         setUser(data);
       });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   useEffect(() => {
     if (schedule.length > 0) {
       manageTime();
@@ -110,102 +129,339 @@ export default function ScheduleCompleted(props) {
   };
 
   return (
-    <View>
-      <Text>Schedule</Text>
-
-      <DatePicker
-        style={{ width: 200 }}
-        //is24Hour
-        date={date}
-        mode="date"
-        placeholder="View my schedule in.."
-        format="YYYY-MM-DD"
-        //minDate={moment()}
-        // maxDate={moment().add(3,"month")}
-        confirmBtnText="Confirm"
-        cancelBtnText="Cancel"
-        customStyles={{
-          dateIcon: {
-            position: "absolute",
-            left: 0,
-            top: 4,
-            marginLeft: 0,
-          },
-          dateInput: {
-            marginLeft: 36,
-          },
-          // ... You can check the source to find the other keys.
+    <View View style={styles.container}>
+      <Text
+        style={{
+          fontSize: responsiveFontSize(2),
+          color: "#185a9d",
+          justifyContent: "center",
+          alignSelf: "center",
+          marginTop: "5%",
+          fontWeight: "bold",
         }}
-        onDateChange={(t) => setDate(t) || setToday(false)}
-      />
-      <TouchableOpacity
+      >
+        Completed Work
+      </Text>
+      <View
+        style={{
+          borderRadius: 8,
+          borderWidth: 1,
+          // borderColor: "#185a9d",
+          height: responsiveScreenHeight(5),
+          width: "87%",
+          alignSelf: "center",
+          // opacity: 0.8,
+          paddingLeft: "3%",
+          marginTop: 20,
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+          backgroundColor: "white",
+        }}
+      >
+        <DatePicker
+          style={{
+            width: "100%",
+            color: "#667085",
+            justifyContent: "flex-start",
+          }}
+          //is24Hour
+          date={date}
+          mode="date"
+          placeholder="View my schedule in.."
+          format="YYYY-MM-DD"
+          //minDate={moment()}
+          // maxDate={moment().add(3,"month")}
+          confirmBtnText="Confirm"
+          cancelBtnText="Cancel"
+          customStyles={{
+            dateIcon: {
+              // // width: 1,
+              // // height: 1,
+              // left: true,
+            },
+            dateInput: {
+              borderWidth: 0,
+              //  color: "#698eb3",
+              alignItems: "flex-start",
+              fontSize: 12,
+              // marginRight: "68%",
+              //  backgroundColor: "white",
+            },
+            placeholderText: {
+              fontSize: responsiveFontSize(1.5),
+              // color: "#698eb3",
+              justifyContent: "flex-end",
+              alignContent: "center",
+              alignSelf: "center",
+              //   backgroundColor: "white",
+              width: "100%",
+              height: responsiveScreenHeight(4),
+            },
+            dateText: {
+              fontSize: 15,
+              // color: "#698eb3",
+              fontSize: responsiveFontSize(1.5),
+            },
+          }}
+          onDateChange={(t) => setDate(t) || setToday(false)}
+        />
+      </View>
+      {/* <TouchableOpacity
         style={{ borderWidth: 2, padding: 3, width: 100 }}
         onPress={() => props.navigation.navigate("Schedule")}
       >
         <Text>Back</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableOpacity> */}
+      {/* <TouchableOpacity
         style={{ borderWidth: 2, padding: 3, width: 100 }}
         onPress={() => setToday(true)}
       >
         <Text>Today</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {today ? (
         <View>
           {todaySchedule.length > 0 ? (
-            <View>
-              <Text style={{ fontSize: 26 }}>
-                {todaySchedule[0].dateTime.split("T")[0]}
-              </Text>
-              {todaySchedule.map((s) => (
-                <ListItem
-                  key={s.id}
-                  title={s.dateTime.split("T")[1]}
-                  rightTitle={s.serviceBooking.service.name}
-                  subtitle={s.serviceBooking.assetBooking.asset.description}
-                  rightSubtitle={s.serviceBooking.assetBooking.asset.name}
-                  titleStyle={{ color: "black", fontWeight: "bold" }}
-                  rightTitleStyle={{ color: "black", fontWeight: "bold" }}
-                  subtitleStyle={{ color: "gray" }}
-                  rightSubtitleStyle={{ color: "gray" }}
-                  bottomDivider
-                />
-              ))}
+            <View style={styles.two}>
+              <Collapse>
+                <CollapseHeader>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      //justifyContent: "space-between",
+                      // paddingLeft: 20,
+                      paddingRight: "5%",
+                    }}
+                  >
+                    <Text style={styles.cardTitle}>
+                      Today's Completed Work:{" "}
+                      {todaySchedule[0].dateTime.split("T")[0]}
+                    </Text>
+                  </View>
+                  <CollapseBody>
+                    <View>
+                      <View>
+                        {todaySchedule.map((s) => (
+                          <ListItem
+                            key={s.id}
+                            title={s.dateTime.split("T")[1]}
+                            rightTitle={s.serviceBooking.service.name}
+                            subtitle={
+                              s.serviceBooking.assetBooking.asset.description
+                            }
+                            rightSubtitle={
+                              s.serviceBooking.assetBooking.asset.name
+                            }
+                            titleStyle={{
+                              color: "black",
+                              fontWeight: "bold",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            rightTitleStyle={{
+                              color: "black",
+                              fontWeight: "bold",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            subtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            rightSubtitleStyle={{
+                              color: "gray",
+                              fontSize: responsiveFontSize(2),
+                            }}
+                            bottomDivider
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </CollapseBody>
+                </CollapseHeader>
+              </Collapse>
             </View>
           ) : (
-            <Text>No Scheduled Bookings</Text>
+            <View style={styles.two}>
+              <Collapse>
+                <CollapseHeader>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      paddingRight: "5%",
+                    }}
+                  >
+                    <Text style={styles.cardTitle}>No Work Done Today</Text>
+                  </View>
+                </CollapseHeader>
+              </Collapse>
+            </View>
           )}
         </View>
       ) : (
         <View>
-          <Text style={{ fontSize: 26 }}>
-            {show &&
-              show.filter((s) => s.dateTime.split("T")[0] === date).length >
-                0 &&
-              show
-                .filter((s) => s.dateTime.split("T")[0] === date)[0]
-                .dateTime.split("T")[0]}
-          </Text>
-          {show &&
-            show.map((s) =>
-              s.dateTime.split("T")[0] === date ? (
-                <ListItem
-                  key={s.id}
-                  title={s.dateTime.split("T")[1]}
-                  rightTitle={s.serviceBooking.service.name}
-                  subtitle={s.serviceBooking.assetBooking.asset.description}
-                  rightSubtitle={s.serviceBooking.assetBooking.asset.name}
-                  titleStyle={{ color: "black", fontWeight: "bold" }}
-                  rightTitleStyle={{ color: "black", fontWeight: "bold" }}
-                  subtitleStyle={{ color: "gray" }}
-                  rightSubtitleStyle={{ color: "gray" }}
-                  bottomDivider
-                />
-              ) : null
-            )}
+          <View style={styles.two2}>
+            <Collapse>
+              <CollapseHeader>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    paddingRight: "5%",
+                  }}
+                >
+                  {show &&
+                  show.filter((s) => s.dateTime.split("T")[0] === date).length >
+                    0 ? (
+                    <Text style={styles.cardTitle}>
+                      Work Done on:{" "}
+                      {
+                        show
+                          .filter((s) => s.dateTime.split("T")[0] === date)[0]
+                          .dateTime.split("T")[0]
+                      }
+                    </Text>
+                  ) : (
+                    <Text style={styles.cardTitle}>No Work On This Date</Text>
+                  )}
+                </View>
+                <CollapseBody>
+                  <View>
+                    <View>
+                      {show &&
+                        show.map((s) =>
+                          s.dateTime.split("T")[0] === date ? (
+                            <ListItem
+                              key={s.id}
+                              title={s.dateTime.split("T")[1]}
+                              rightTitle={s.serviceBooking.service.name}
+                              subtitle={
+                                s.serviceBooking.assetBooking.asset.description
+                              }
+                              rightSubtitle={
+                                s.serviceBooking.assetBooking.asset.name
+                              }
+                              titleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              rightTitleStyle={{
+                                color: "black",
+                                fontWeight: "bold",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              subtitleStyle={{
+                                color: "gray",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              rightSubtitleStyle={{
+                                color: "gray",
+                                fontSize: responsiveFontSize(2),
+                              }}
+                              bottomDivider
+                            />
+                          ) : null
+                        )}
+                    </View>
+                  </View>
+                </CollapseBody>
+              </CollapseHeader>
+            </Collapse>
+          </View>
         </View>
       )}
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#e3e3e3",
+    //width: Dimensions.get("window").width,
+    // height: Math.round(Dimensions.get("window").height),
+  },
+  cardTitle: {
+    fontSize: responsiveFontSize(2),
+    // backgroundColor: "red",
+    width: "100%",
+    // height: 25,
+    color: "#185a9d",
+    fontWeight: "bold",
+  },
+  cardTitleInactive: {
+    fontSize: 18,
+    // backgroundColor: "red",
+    width: "100%",
+    height: 50,
+    color: "#6b6b6b",
+    // fontWeight: "bold",
+  },
+  two: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "5%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    // justifyContent: "space-between",
+  },
+  two2: {
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: "3%",
+    padding: "3%",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "lightgray",
+    // flexDirection: "row",
+    //flexWrap: "wrap",
+    borderBottomColor: "white",
+    // justifyContent: "space-between",
+  },
+  surface: {
+    flex: 0.3,
+    marginTop: "2%",
+    //  backgroundColor: "blue",
+    // width: "50%",
+    // height: "100%",
+    // alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    // alignItems: "center",
+    justifyContent: "space-evenly",
+
+    // justifyContent: "space-between",
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    // height: 40,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    //height: 22,
+    // width: 22,
+    fontSize: 20,
+  },
+  text: {
+    fontSize: 80,
+    // marginLeft: "1%",
+    // marginRight: "1%",
+    marginBottom: "1%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  redButton: {
+    backgroundColor: "#3ea3a3",
+    height: 40,
+    width: "38%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+});

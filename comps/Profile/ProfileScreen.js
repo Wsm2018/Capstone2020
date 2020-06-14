@@ -11,8 +11,18 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  PixelRatio,
   Platform,
+  AsyncStorage,
 } from "react-native";
+import * as Device from "expo-device";
+
+// import ResponsiveImageView from "react-native-responsive-image-view";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from "react-native-responsive-dimensions";
 // import { Dimensions } from "react-native";
 import Image from "react-native-scalable-image";
 const LottieView = require("lottie-react-native");
@@ -50,32 +60,41 @@ import Favorites from "./Favorites";
 const { width, height } = Dimensions.get("screen");
 
 export default function ProfileScreen(props) {
+  // ------------------------------------- STATES ----------------------------------------
   const [user, setUser] = useState(null);
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
   const [photoURL, setPhotoURL] = useState("");
   const [edit, setEdit] = useState(false);
   const [profileBackground, setProfileBackground] = useState("");
   const [displayName, setDisplayName] = useState();
-  const buttons = ["Balance", "Send Gift", "Referral Code"];
+  const buttons = ["Balance", "Send Gift", "Referral"];
   const [view, setView] = useState(0);
   const [carsModal, setCarsModal] = useState(false);
   const [favoritesModal, setFavoritesModal] = useState(false);
   const [flag, setFlag] = useState(false);
   const [editPic, setEditPic] = useState("");
   const [editDisplayName, setEditDisplayName] = useState("");
+  const [displayNameErr, setDisplayNameErr] = useState("");
+  const [showDisplayErr, setShowDisplayErr] = useState(false);
+  const [backgroundEdit, setBackgroundEdit] = useState(false);
+  const [deviceType, setDeviceType] = useState(0);
+  const size = PixelRatio.getPixelSizeForLayoutSize(140);
 
+  console.log("------------------------------------------", Device.DeviceType);
+  // ------------------------------------------- FUNCTIONS --------------------------------------
   const getUser = async () => {
-    db.collection("users")
+    const userRef = await db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((doc) => {
-        const user = doc.data();
-        setPhotoURL(user.photoURL);
-        setDisplayName(user.displayName);
-        setProfileBackground(user.profileBackground);
-        setEditDisplayName(user.displayName);
-        setEditPic(user.photoURL);
-        setUser(user);
-      });
+      .get();
+
+    const user = userRef.data();
+    setPhotoURL(user.photoURL);
+    setDisplayName(user.displayName);
+    setProfileBackground(user.profileBackground);
+    setEditDisplayName(user.displayName);
+    setEditPic(user.photoURL);
+    setUser(user);
   };
 
   const askPermission = async () => {
@@ -83,15 +102,11 @@ export default function ProfileScreen(props) {
     setHasCameraRollPermission(status === "granted");
   };
 
-  useEffect(() => {
-    getUser();
-    askPermission();
-  }, []);
-
-  const handleSave = async (uri, type, displayName) => {
+  const handleSave = async (uri, type) => {
     const response = await fetch(uri);
     const blob = await response.blob();
     if (type === "profile") {
+      console.log("hey ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
       const putResult = await firebase
         .storage()
         .ref()
@@ -103,10 +118,12 @@ export default function ProfileScreen(props) {
         .child(`users/${firebase.auth().currentUser.uid}`)
         .getDownloadURL();
       console.log("url ", url);
-      handleSaveEdit(url, displayName);
+      await handleSaveEdit(url, editDisplayName);
       setPhotoURL(url);
-      setFlag(false);
+      getUser();
+      // setFlag(false);
     } else {
+      setBackgroundEdit(false);
       const putResult = await firebase
         .storage()
         .ref()
@@ -123,6 +140,7 @@ export default function ProfileScreen(props) {
         profileBackground: url,
       });
       getUser();
+
       // setPhotoURL(url);
     }
   };
@@ -131,7 +149,7 @@ export default function ProfileScreen(props) {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
     if (!result.cancelled) {
@@ -173,17 +191,46 @@ export default function ProfileScreen(props) {
   };
 
   const saveImage = async () => {
-    // setPhotoURL(editPic);
-
-    handleSave(editPic, "profile", editDisplayName);
-    // if (flag) {
-    //   handleSaveEdit();
-    // }
+    console.log(editDisplayName);
+    console.log(displayName);
+    if (editDisplayName) {
+      handleSave(editPic, "profile");
+    } else {
+      setDisplayNameErr("Enter Display Name");
+      setShowDisplayErr(true);
+    }
   };
 
+  const removeBackground = () => {
+    setBackgroundEdit(false);
+    db.collection("users").doc(firebase.auth().currentUser.uid).update({
+      profileBackground:
+        "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
+    });
+  };
+
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+
+  // ------------------------------------------------------ USE EFFECTS -------------------------------------------------
   useEffect(() => {
-    console.log("flag", flag);
-  }, [flag]);
+    getDeviceType();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log("flag", flag);
+  // }, [flag]);
+
+  useEffect(() => {
+    getUser();
+    askPermission();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log("user got changed ");
+  // }, [user]);
 
   ///////////////////////////////Font-End////////////////////////////////
 
@@ -209,43 +256,110 @@ export default function ProfileScreen(props) {
     setMargin(0);
   };
 
+  const removeProfile = () => {
+    handleSave(
+      "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
+      "profile"
+    );
+  };
+
   const [marginVal, setMargin] = useState(0);
   /////////////////////////////////////////////////////////////////////////////////////
+  const [theme, setTheme] = useState();
+  const getTheme = async () => {
+    const theme = await AsyncStorage.getItem("theme");
+    setTheme(theme);
+  };
+
+  useEffect(() => {
+    getTheme();
+  }, []);
+
+  // ----------------------------------------------- RETURN --------------------------------------
 
   return (
     user && (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss;
+          setBackgroundEdit(false);
+        }}
+      >
         <View
           style={[
-            styles.container,
+            theme === "light" ? styles.container : styles.container2,
             { marginTop: !Platform.isPad && marginVal },
           ]}
         >
           <View style={styles.headerContainer}>
-            <View style={styles.coverContainer}>
-              <ImageBackground
-                source={{
-                  uri: profileBackground,
-                }}
-                style={styles.coverImage}
-              >
-                <View style={styles.coverTitleContainer}>
-                  <Ionicons
-                    name="md-images"
-                    size={40}
-                    color="white"
-                    onPress={handlePickBackgroundImage}
-                  />
-                </View>
-              </ImageBackground>
-            </View>
+            {deviceType === 1 || deviceType === 0 ? (
+              <View style={styles.coverContainer}>
+                <ImageBackground
+                  source={{
+                    uri: profileBackground,
+                  }}
+                  style={styles.coverImage}
+                >
+                  <View style={styles.coverTitleContainer}>
+                    <MaterialCommunityIcons
+                      name="dots-horizontal"
+                      size={40}
+                      color="white"
+                      onPress={() => setBackgroundEdit(true)}
+                    />
+                  </View>
+                </ImageBackground>
+              </View>
+            ) : (
+              <View style={styles.coverContainerTab}>
+                <ImageBackground
+                  source={{
+                    uri: profileBackground,
+                  }}
+                  style={styles.coverImage}
+                >
+                  <View style={styles.coverTitleContainer}>
+                    <MaterialCommunityIcons
+                      name="dots-horizontal"
+                      size={40}
+                      color="white"
+                      onPress={() => setBackgroundEdit(true)}
+                    />
+                  </View>
+                </ImageBackground>
+              </View>
+            )}
+
             <View style={styles.profileImageContainer}>
               <Avatar
                 rounded
                 source={{ uri: photoURL }}
                 size="xlarge"
-                style={styles.profileImage}
+                style={
+                  deviceType === 1
+                    ? {
+                        ...styles.profileImage,
+                        width: 140,
+                        height: 140,
+                      }
+                    : deviceType === 2
+                    ? {
+                        ...styles.profileImageTab,
+                        width: 120 * 2,
+                        height: 120 * 2,
+                        overflow: "hidden",
+                      }
+                    : {
+                        ...styles.profileImage,
+                        width: 140,
+                        height: 140,
+                      }
+                }
               />
+
+              {/* <View {...getViewProps()}>
+                <Image {...getImageProps()} />
+              </View> */}
             </View>
           </View>
           {/* <View style={{ flexDirection: "row", flexWrap: "wrap" }}> */}
@@ -270,11 +384,37 @@ export default function ProfileScreen(props) {
                 }}
               >
                 <Text
-                  style={{ color: "black", fontSize: 15, fontWeight: "bold" }}
+                  style={
+                    deviceType === 1 || deviceType === 0
+                      ? {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(2),
+                          fontWeight: "bold",
+                        }
+                      : {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(1.5),
+                          fontWeight: "bold",
+                        }
+                  }
                 >
                   Reputation
                 </Text>
-                <Text style={styles.tabLabelNumber}>{user.reputation}</Text>
+                <Text
+                  style={
+                    deviceType === 1 || deviceType === 0
+                      ? {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(2),
+                        }
+                      : {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(1.2),
+                        }
+                  }
+                >
+                  {user.reputation}
+                </Text>
               </View>
               <View style={{ width: "30%" }}></View>
               <View
@@ -285,11 +425,37 @@ export default function ProfileScreen(props) {
                 }}
               >
                 <Text
-                  style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+                  style={
+                    deviceType === 1 || deviceType === 0
+                      ? {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(2),
+                          fontWeight: "bold",
+                        }
+                      : {
+                          color: "black",
+                          fontSize: responsiveScreenFontSize(1.5),
+                          fontWeight: "bold",
+                        }
+                  }
                 >
                   Points
                 </Text>
-                <Text style={styles.tabLabelNumber}>{user.points}</Text>
+                <Text
+                  style={
+                    deviceType === 1 || deviceType === 0
+                      ? {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(2),
+                        }
+                      : {
+                          ...styles.tabLabelNumber,
+                          fontSize: responsiveScreenFontSize(1.2),
+                        }
+                  }
+                >
+                  {user.points}
+                </Text>
               </View>
             </View>
             {/* ================================================= */}
@@ -303,15 +469,143 @@ export default function ProfileScreen(props) {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 18, paddingRight: 5 }}>{displayName}</Text>
+            <Text
+              style={
+                deviceType === 1 || deviceType === 0
+                  ? { fontSize: responsiveScreenFontSize(2.5), paddingRight: 5 }
+                  : {
+                      fontSize: responsiveScreenFontSize(1.8),
+                      paddingRight: 5,
+                    }
+              }
+            >
+              {displayName}
+            </Text>
             <TouchableOpacity onPress={() => setEdit(true)}>
-              <FontAwesome5
-                name="edit"
-                size={20}
-                style={{ color: "#224229" }}
-              />
+              {deviceType === 1 || deviceType === 0 ? (
+                <FontAwesome5
+                  name="edit"
+                  size={20}
+                  style={{ color: "#185a9d" }}
+                  //#60c4c4
+                />
+              ) : (
+                <FontAwesome5
+                  name="edit"
+                  size={28}
+                  style={{ color: "#185a9d" }}
+                  //#60c4c4
+                />
+              )}
             </TouchableOpacity>
           </View>
+
+          <Modal
+            visible={backgroundEdit}
+            animationType="fade"
+            transparent={true}
+            onRequestClose={() => setBackgroundEdit(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                alignItems: "flex-end",
+                // justifyContent: "",
+              }}
+            >
+              <View elevation={2} style={styles.modalView2}>
+                <TouchableOpacity
+                  style={{
+                    flex: 0.2,
+                    marginEnd: "2%",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-end",
+                    // height: "30%",
+                    // marginEnd: 15,
+                    // marginTop: 15,
+                  }}
+                  onPress={() => setBackgroundEdit(false)}
+                >
+                  <AntDesign
+                    name="close"
+                    size={deviceType === 1 ? 25 : 40}
+                    style={{ color: "#224229" }}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={{
+                    flex: 1,
+                    // justifyContent: "space-evenly",
+                    width: "100%",
+                    // backgroundColor: "red",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* <TouchableOpacity
+                    style={{ alignItems: "center" }}
+                    onPress={() => handlePickBackgroundImage()}
+                  >
+                    <Text></Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.6,
+                      // backgroundColor: "#B4C5CF",
+                      // height: 40,
+                      justifyContent: "center",
+                      width: "100%",
+                      borderBottomWidth: 1,
+                      borderBottomColor: "darkgray",
+                      // alignItems: "center",
+                      // borderRadius: 10,
+                    }}
+                    onPress={() => handlePickBackgroundImage()}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: responsiveScreenFontSize(1.5),
+                        color: "#28456B",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Change Background
+                    </Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity
+                    style={{ alignItems: "center" }}
+                    onPress={() => removeBackground()}
+                  >
+                    <Text>Remove Background</Text>
+                  </TouchableOpacity> */}
+
+                  <TouchableOpacity
+                    style={{
+                      flex: 0.6,
+                      // backgroundColor: "#B4C5CF",
+                      // height: 40,
+                      justifyContent: "center",
+                      width: "100%",
+                      // alignItems: "center",
+                      borderRadius: 5,
+                    }}
+                    onPress={() => removeBackground()}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: responsiveScreenFontSize(1.5),
+                        color: "#28456B",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Remove Background
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           <Modal visible={edit} animationType="fade" transparent={true}>
             <View style={styles.centeredView}>
@@ -325,100 +619,210 @@ export default function ProfileScreen(props) {
                       justifyContent: "space-around",
                       flex: 1,
                       alignItems: "center",
+                      // backgroundColor: "red",
                     }}
                   >
-                    {!flag ? (
-                      <Avatar
-                        rounded
-                        source={{ uri: editPic }}
-                        showAccessory
-                        onAccessoryPress={handlePickImage}
-                        size="xlarge"
-                      />
-                    ) : (
-                      <Text>Loading...</Text>
-                    )}
+                    <Avatar
+                      accessory={
+                        deviceType === 1
+                          ? {
+                              size: 45,
+                            }
+                          : deviceType === 2
+                          ? {
+                              size: 70,
+                            }
+                          : {
+                              size: 70,
+                            }
+                      }
+                      rounded
+                      source={{ uri: editPic }}
+                      showAccessory
+                      onAccessoryPress={handlePickImage}
+                      size="xlarge"
+                      style={
+                        deviceType === 1
+                          ? {
+                              ...styles.profileImageEdit,
+                              width: 140,
+                              height: 140,
+                            }
+                          : deviceType === 2
+                          ? {
+                              ...styles.profileImageTab,
+                              width: 250,
+                              height: 250,
+                              // overflow: "hidden",
+                            }
+                          : {
+                              ...styles.profileImageEdit,
+                              width: 140,
+                              height: 140,
+                            }
+                      }
+                    />
+
                     <Input
                       inputContainerStyle={{
-                        width: "100%",
+                        // width: "100%",
                         borderColor: "black",
+                        // height: 40,
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(60),
+                        // backgroundColor: "green",
+                        // alignItems: "center",
+                        justifyContent: "center",
+                        // flexDirection: "row",
+                        paddingLeft: 6,
+                        // width: "60%",
+
+                        borderColor: "gray",
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        // marginBottom: 10,
                       }}
                       label="Display Name"
+                      // labelStyle={(fontSize = responsiveScreenFontSize(2))}
                       value={editDisplayName}
-                      onChangeText={setEditDisplayName}
+                      onChangeText={(name) => {
+                        setEditDisplayName(name);
+                        setDisplayNameErr("");
+                        setShowDisplayErr(false);
+                      }}
                       // onSubmitEditing={saveImage}
                     />
+                    {showDisplayErr ? (
+                      <Text
+                        style={
+                          showDisplayErr
+                            ? { color: "red" }
+                            : { color: "transparent" }
+                        }
+                      >
+                        {displayNameErr}
+                      </Text>
+                    ) : null}
                   </View>
 
                   <View
                     style={{
-                      flexDirection: "row",
                       justifyContent: "space-evenly",
-                      // backgroundColor: "red",
-                      marginTop: 20,
-                      width: "100%",
-                      // marginEnd: 50,
-                      // flex: 1,
+                      flex: 0.5,
+                      // backgroundColor: "green",
                     }}
                   >
                     <View
                       style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        //marginStart: "2%",
-                        //marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
+                        flexDirection: "row",
+                        justifyContent: "space-evenly",
+                        // backgroundColor: "red",
+                        // marginTop: 20,
+                        width: "100%",
+                        // marginEnd: 50,
+                        // flex: 1,
                       }}
                     >
-                      <TouchableOpacity onPress={saveImage}>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
-                          }}
-                        >
-                          Save
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "#20365F",
-                        height: 40,
-                        width: "40%",
-                        // alignSelf: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        // marginStart: "2%",
-                        // marginEnd: "2%",
-                        borderRadius: 30,
-                        //marginBottom: 10,
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {
-                          setPhotoURL(firebase.auth().currentUser.photoURL);
-                          setEditPic(photoURL);
-                          setEdit(false);
-                          setEditDisplayName(displayName);
+                      <View
+                        style={{
+                          flex: 0.4,
+                          backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
+                          // width: "30%",
+                          // alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          //marginStart: "2%",
+                          marginEnd: "3%",
+
+                          //marginBottom: 10,
                         }}
                       >
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: 16,
-                            color: "white",
+                        <TouchableOpacity onPress={saveImage}>
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "white",
+                            }}
+                          >
+                            Save
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View
+                        style={{
+                          flex: 0.4,
+                          backgroundColor: "#901616",
+                          // borderWidth: 4,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(40),
+                          // alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginStart: "3%",
+                          // marginEnd: "3%",
+                          borderRadius: 10,
+                          //marginBottom: 10,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
+                            setPhotoURL(photoURL);
+                            setEditPic(photoURL);
+                            setEdit(false);
+                            setEditDisplayName(displayName);
                           }}
                         >
-                          Cancel
-                        </Text>
-                      </TouchableOpacity>
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "white",
+                            }}
+                          >
+                            Cancel
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View
+                      style={{ justifyContent: "center", alignItems: "center" }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: "lightgray",
+
+                          // backgroundColor: "#2E9E9B",
+                          borderRadius: 10,
+                          // borderWidth: 4,
+                          height: responsiveScreenHeight(5),
+                          width: responsiveScreenWidth(60),
+                          // alignSelf: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          //marginStart: "2%",
+                          //marginEnd: "2%",
+                          // borderRadius: 20,
+                          //marginBottom: 10,
+                        }}
+                      >
+                        <TouchableOpacity onPress={() => removeProfile()}>
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "darkgray",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Remove Current Picture
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 </KeyboardAvoidingView>
@@ -426,37 +830,74 @@ export default function ProfileScreen(props) {
             </View>
           </Modal>
           <View style={{ flex: 1 }}>
-            <View style={{ width: "100%", alignSelf: "center" }}>
+            <View
+              style={{
+                // backgroundColor: "green",
+                //paddingLeft: -5,
+                width: "104.6%",
+                marginStart: -20,
+                marginEnd: 50,
+              }}
+            >
               <ButtonGroup
                 onPress={(index) => setView(index)}
                 selectedIndex={view}
                 buttons={buttons}
+                //width={"100%"}
                 // containerStyle={{ height: 100 }}
+                //style={{ width: "100%" }}
                 containerStyle={{
                   backgroundColor: "#D2D4DA",
                   borderWidth: 1,
+                  //backgroundColor: "red",
                   // borderBottomColor: "red",
                   // borderBottomWidth: 0,
                   // borderTopLeftRadius: 6,
                   // borderTopRightRadius: 6,
                   // borderBottomLeftRadius: 40,
-
+                  width: "100%",
+                  height: responsiveScreenHeight(5),
                   borderColor: "darkgrey",
                   // borderRightColor: "black",
                 }}
                 selectedButtonStyle={{
                   backgroundColor: "white",
                   borderBottomWidth: 0,
-                  // borderBottomColor: "red",
+                  //backgroundColor: "blue",
+                  width: "100%",
                 }}
-                selectedTextStyle={{
-                  color: "black",
-                  fontWeight: "bold",
-                }}
-                textStyle={{ color: "#535150", fontWeight: "bold" }}
+                selectedTextStyle={
+                  deviceType === 1 || deviceType === 0
+                    ? {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(2),
+                      }
+                    : {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(1.5),
+                      }
+                }
+                textStyle={
+                  deviceType === 1 || deviceType === 0
+                    ? {
+                        color: "#535150",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(2),
+                      }
+                    : {
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: responsiveScreenFontSize(1.5),
+                      }
+                }
               />
             </View>
-            <View style={[styles.containerLogin]}>
+            <View
+              //width={Dimensions.get("window").width}
+              style={[styles.containerLogin]}
+            >
               {view === 0 ? (
                 <DetailsScreen user={user} navigation={props.navigation} />
               ) : view === 1 ? (
@@ -468,24 +909,35 @@ export default function ProfileScreen(props) {
             <View
               style={{
                 // marginTop: "5%",
-                // width: "100%",
-                // borderWidth: 1,
-                // borderColor: "darkgray",
+                width: "100%",
+                borderTopWidth: 1,
+                borderColor: "darkgray",
                 alignItems: "center",
                 alignSelf: "center",
                 flex: 0.8,
-                // backgroundColor: "red",
+                backgroundColor: "white",
               }}
             >
-              <Card
+              <View
+                // elevation={2}
+                // style={{
+                //   marginTop: "-1.5%",
+                //   // width: "95%",
+                //   borderWidth: 1,
+                //   borderColor: "darkgray",
+                //   flex: 0.95,
+
+                //   // backgroundColor: "red",
+                // }}
                 elevation={2}
                 style={{
-                  marginTop: "-1.5%",
-                  // width: "95%",
+                  width: "100%",
+                  flex: 1,
                   borderWidth: 1,
+                  borderTopWidth: 0,
                   borderColor: "darkgray",
-                  flex: 0.95,
-                  // backgroundColor: "red",
+                  // borderRadius: 0,
+                  backgroundColor: "white",
                 }}
               >
                 <View
@@ -519,8 +971,8 @@ export default function ProfileScreen(props) {
                     onPress={() => setFavoritesModal(true)}
                   >
                     <Image
-                      width={Dimensions.get("window").width / 5.6}
-                      source={require("../../assets/images/editheart.gif")}
+                      width={Dimensions.get("window").width / 8}
+                      source={require("../../assets/images/flist.png")}
                       autoPlay
                       loop
                       style={
@@ -544,10 +996,11 @@ export default function ProfileScreen(props) {
                       justifyContent: "center",
                       alignItems: "center",
                     }}
+                    onPress={() => props.navigation.navigate("Subscription")}
                   >
                     <Image
-                      width={Dimensions.get("window").width / 4}
-                      source={require("../../assets/images/subs.gif")}
+                      width={Dimensions.get("window").width / 3.5}
+                      source={require("../../assets/images/subscribe1.png")}
                       autoPlay
                       loop
                       style={
@@ -569,7 +1022,7 @@ export default function ProfileScreen(props) {
                     style={{
                       // position: "relative",
                       // width: "100%",
-                      flex: 0.9,
+                      flex: 0.8,
                       // height: "100%",
                       // backgroundColor: "blue",
                       justifyContent: "center",
@@ -577,8 +1030,8 @@ export default function ProfileScreen(props) {
                     }}
                   >
                     <Image
-                      width={Dimensions.get("window").width / 6}
-                      source={require("../../assets/car5.gif")}
+                      width={Dimensions.get("window").width / 5}
+                      source={require("../../assets/images/mycar.png")}
                       autoPlay
                       onPress={() => setCarsModal(true)}
                       loop
@@ -625,7 +1078,7 @@ export default function ProfileScreen(props) {
                   />
                 </View> */}
                 </View>
-              </Card>
+              </View>
             </View>
 
             <CarsScreen
@@ -654,6 +1107,14 @@ const styles = StyleSheet.create({
     // width: Math.round(Dimensions.get("window").width),
     // height: Math.round(Dimensions.get("window").height),
   },
+  container2: {
+    flex: 1,
+    //"#f5f0f0"
+    backgroundColor: "#f5f0f0",
+    // alignItems: "center",
+    // width: Math.round(Dimensions.get("window").width),
+    // height: Math.round(Dimensions.get("window").height),
+  },
   coverBio: {
     color: "#FFF",
     fontSize: 15,
@@ -663,7 +1124,15 @@ const styles = StyleSheet.create({
     marginBottom: 55,
     position: "relative",
   },
+  coverContainerTab: {
+    marginBottom: 60,
+    position: "relative",
+  },
   coverImage: {
+    height: Dimensions.get("window").width * (3 / 7),
+    width: Dimensions.get("window").width,
+  },
+  coverImageTab: {
     height: Dimensions.get("window").width * (3 / 7),
     width: Dimensions.get("window").width,
   },
@@ -688,6 +1157,8 @@ const styles = StyleSheet.create({
   coverTitleContainer: {
     flex: 1,
     alignItems: "flex-end",
+    marginRight: "2%",
+    marginTop: "1%",
   },
   headerContainer: {
     alignItems: "center",
@@ -707,16 +1178,24 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     borderRadius: 70,
     borderWidth: 4,
-    height: 140,
-    width: 140,
+    // height: 140,
+    // width: 140,
+  },
+  profileImageTab: {
+    borderColor: "#FFF",
+    borderRadius: 280 / 2,
+    borderWidth: 4,
+    // height: 140,
+    // width: 140,
   },
   profileImageContainer: {
+    // top: "10%",
     bottom: 0,
     position: "absolute",
   },
   modalView: {
     margin: 20,
-    height: height / 1.8,
+    height: height / 1.5,
     width: width / 1.4,
     backgroundColor: "#fff",
     shadowOpacity: 1,
@@ -729,6 +1208,28 @@ const styles = StyleSheet.create({
     padding: 35,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  modalView2: {
+    marginTop: 90,
+    marginRight: 10,
+    height: height / 6,
+    width: width / 2.2,
+    backgroundColor: "#fff",
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1,
+    },
+    borderRadius: 5,
+    // padding: 35,
+    // justifyContent: "center",
+    // alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -764,10 +1265,10 @@ const styles = StyleSheet.create({
     // position: "relative",
     // flexDirection: "row",
     // backgroundColor: "blue",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    // alignItems: "flex-start",
-    flex: 0.07,
+    // flexWrap: "wrap",
+    // justifyContent: "flex-start",
+    // // alignItems: "flex-start",
+    // flex: 0.07,
   },
   tabRowRight: {
     // backgroundColor: "red",
@@ -777,7 +1278,6 @@ const styles = StyleSheet.create({
   tabLabelNumber: {
     fontWeight: "bold",
     color: "#229277",
-    fontSize: 16,
     textAlign: "center",
     marginBottom: 2,
   },
@@ -791,14 +1291,17 @@ const styles = StyleSheet.create({
     // marginLeft: 10.5,
     // backgroundColor: "#E8ECF4",
     // backgroundColor: "red",
-    width: "95%",
+    // width: "100%",
     marginTop: -5,
     marginBottom: "4%",
-    alignSelf: "center",
+    //borderColor: "red",
+    //borderWidth: 3,
+    //backgroundColor: "yellow",
+    // alignSelf: "center",
   },
 });
 
 ProfileScreen.navigationOptions = {
-  headerStyle: { backgroundColor: "#20365F" },
+  headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 };

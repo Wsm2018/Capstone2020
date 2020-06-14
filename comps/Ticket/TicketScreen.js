@@ -17,31 +17,47 @@ import SupportChat from "./TicketSupportChat";
 import TicketDetailScreen from "./TicketDetailScreen";
 import TicketAgentScreen from "./TicketAgentScreen";
 import TicketCustomerScreen from "./TicketCustomerScreen";
+import { Icon, Divider } from "react-native-elements";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  FontAwesome5,
+  FontAwesome,
+  Entypo,
+  Fontisto,
+} from "@expo/vector-icons";
+const TicketStack = createStackNavigator(
+  {
+    Customer: TicketCustomerScreen,
+    Agent: TicketAgentScreen,
+    Chat: SupportChat,
+    Details: TicketDetailScreen,
+  },
+  {
+    // initialRouteName: "Customer Support",
 
-const TicketStack = createAppContainer(
-  createStackNavigator(
-    {
-      Agent: TicketAgentScreen,
-      Customer: TicketCustomerScreen,
-      Chat: SupportChat,
-      Details: TicketDetailScreen,
-    },
-    {
-      // initialRouteName: "Customer Support",
-
-      defaultNavigationOptions: {
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        headerLeft: (
+          <Icon
+            onPress={() => navigation.openDrawer()}
+            name="md-menu"
+            type="ionicon"
+            color="white"
+            size={30}
+            containerStyle={{
+              marginLeft: 15,
+            }}
+          />
+        ),
         headerStyle: {
-          backgroundColor: "#006cab",
+          backgroundColor: "#185a9d",
         },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "normal",
-        },
-      },
-    }
-  )
+        // headerTitle: "FRIENDS",
+        headerTintColor: "white",
+      };
+    },
+  }
 );
 
-export default function TicketScreen(props) {
-  return <TicketStack />;
-}
+export default TicketStack;

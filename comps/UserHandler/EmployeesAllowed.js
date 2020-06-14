@@ -7,22 +7,41 @@ import {
   Button,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
 } from "react-native";
-
-import { ListItem } from "react-native-elements";
-
+import LottieView from "lottie-react-native";
+import { ListItem, SearchBar } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-
+import {
+  MaterialCommunityIcons,
+  Feather,
+  Ionicons,
+  FontAwesome,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 export default function EmployeesAllowed(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
+  const [deviceType, setDeviceType] = useState(0);
+
+  const [marginVal, setMargin] = useState(0);
+
   const roles = [
     "asset handler (allowed)",
     "manager (allowed)",
@@ -38,7 +57,13 @@ export default function EmployeesAllowed(props) {
 
     setCurrentUser({ id: doc.id, ...doc.data() });
   };
-
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // --------------------------------USERS----------------------------------
   const handleUsers = () => {
     db.collection("users")
@@ -136,53 +161,224 @@ export default function EmployeesAllowed(props) {
   };
 
   return users ? (
-    <View style={styles.container}>
-      <Text>Employees Index</Text>
-      <TextInput
-        placeholder="Search Here"
-        onChangeText={setSearch}
-        value={search}
-        style={{ borderWidth: 1, padding: 1 }}
-      />
-      <Text></Text>
-      <ScrollView>
-        {users.map((user, i) => (
-          <ListItem
-            key={i}
-            // leftAvatar={{ source: { uri: l.avatar_url } }}
-            title={user.displayName}
-            subtitle={user.email}
-            bottomDivider
-            // chevron
-            rightElement={
-              <TouchableOpacity
-                style={{
-                  borderWidth: 1,
-                  width: "25%",
-                  height: "80%",
-                  justifyContent: "center",
-                  alignItems: "center",
+    <KeyboardAvoidingView
+      behavior="position"
+      behavior="height"
+      behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      contentContainerStyle={{ flex: 1 }}
+      style={styles.container}
+      // keyboardVerticalOffset={-100}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[
+            styles.container,
+            { marginTop: Platform.isPad ? 0 : marginVal },
+          ]}
+        >
+          <View style={styles.header}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <SearchBar
+                placeholderTextColor="#20365F"
+                placeholder="Search Here"
+                onChangeText={setSearch}
+                lightTheme
+                //showLoading={true}
+                searchIcon={true}
+                value={search}
+                containerStyle={{
+                  backgroundColor: "#185a9d",
+                  borderBottomColor: "#185a9d",
+                  borderTopColor: "#185a9d",
+                  width: "100%",
+                  height: "20%",
                 }}
-                onPress={() => handleCreate(user)}
-              >
-                <Text>Create</Text>
-              </TouchableOpacity>
+                inputContainerStyle={{
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: "#fafafa",
+                  backgroundColor: "#fafafa",
+                }}
+                style={{
+                  //backgroundColor: "white",
+                  fontSize: 18,
+                  paddingLeft: "2%",
+                  // borderColor: "#20365F",
+                  // borderWidth: 2,
+                  width: "85%",
+                  height: 50,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  elevation: 20,
+                }}
+              />
+            </View>
+          </View>
+          <View
+            style={
+              Platform.isPad ? styles.containerLogin : styles.containerLogin2
             }
-          />
-        ))}
-      </ScrollView>
-      <Button title="test" onPress={test} />
-    </View>
+          >
+            {users.length > 0 ? (
+              <ScrollView
+                style={{
+                  flex: 0.9,
+                }}
+              >
+                <ScrollView
+                  style={{
+                    flex: 0.9,
+                    // borderRadius: 50,
+                    // borderWidth: 1,
+                    // borderColor: "#e3e3e3",
+                  }}
+                >
+                  {users.map((user, i) => (
+                    <ListItem
+                      key={i}
+                      rightAvatar={
+                        <Ionicons
+                          name="ios-arrow-forward"
+                          size={responsiveScreenHeight(2)}
+                          color="black"
+                        />
+                      }
+                      // leftAvatar={{ source: { uri: l.avatar_url } }}
+                      titleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.8),
+                      }}
+                      subtitleStyle={{
+                        marginLeft: "4%",
+                        fontSize: responsiveScreenFontSize(1.6),
+                      }}
+                      // leftAvatar={user.photoURL}
+                      title={user.displayName}
+                      subtitle={user.email}
+                      bottomDivider
+                      // chevron
+                      onPress={() => handleCreate(user)}
+                    />
+                  ))}
+                </ScrollView>
+              </ScrollView>
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexDirection: "column",
+                }}
+              >
+                <LottieView
+                  source={require("../../assets/17723-waitting.json")}
+                  autoPlay
+                  loop
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    // justifyContent: "center",
+                    // alignSelf: "center",
+                    paddingTop: "5%",
+                  }}
+                />
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 20,
+                    fontSize: responsiveScreenFontSize(1.8),
+                  }}
+                >
+                  No Empolyees!
+                </Text>
+              </View>
+            )}
+          </View>
+          {/* ---------------------------------DELETE--------------------------------- */}
+
+          {/* <TouchableOpacity onPress={handleDelete} style={styles.payButton}>
+        <Text style={{ color: "white" }}>Delete All Employees</Text>
+      </TouchableOpacity> */}
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   ) : (
-    <View>
-      <Text>LOADING...</Text>
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
     </View>
   );
 }
-
+EmployeesAllowed.navigationOptions = (props) => ({
+  title: "Employees Allowed ",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+});
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    backgroundColor: "#e3e3e3",
+    marginTop: "-9%",
+  },
+  payButton: {
+    backgroundColor: "#bd2f2f",
+    height: 40,
+    width: "90%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginStart: "2%",
+    marginEnd: "2%",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  containerLogin: {
+    flex: 0.7,
+    justifyContent: "flex-start",
+    width: "90%",
+    alignSelf: "center",
+    marginTop: "-9%",
+  },
+  containerLogin2: {
+    flex: 0.8,
+    justifyContent: "flex-start",
+    width: "100%",
+    alignSelf: "center",
+    // marginTop: "-8%",
+  },
+  header: {
+    padding: 15,
+    flex: 0.2,
+    justifyContent: "space-around",
+    flexDirection: "row",
+    alignItems: "center",
+    // justifyContent: "center",
+    backgroundColor: "#e3e3e3",
+    // flex: 0.2,
+    backgroundColor: "#185a9d",
+  },
+  buttongroup: {
+    justifyContent: "flex-start",
   },
 });
