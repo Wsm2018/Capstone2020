@@ -146,7 +146,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
     result = await admin.auth().updateUser(request.query.uid, {
       displayName: request.query.displayName,
       photoURL:
-        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+        "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       phoneNumber: `+974${request.query.phoneNumber}`,
     });
     console.log("after set", result);
