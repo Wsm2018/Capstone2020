@@ -292,7 +292,7 @@ export default function ReferralScreen(props) {
                         ) : (
                           <AntDesign
                             name="questioncircle"
-                            size={32}
+                            size={23}
                             color="#901616"
                           />
                         )}
