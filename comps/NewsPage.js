@@ -46,14 +46,6 @@ export default function NewsPage() {
     getUser();
   }, []);
 
-  const getUser = () => {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((querySnap) => {
-        setUser(querySnap.data());
-      });
-  };
-
   useEffect(() => {
     callNews();
   }, [promotions]);
