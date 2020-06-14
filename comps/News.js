@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Device from "expo-device";
 
 import db from "../db.js";
 import firebase from "firebase/app";
@@ -27,7 +28,10 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
+import { responsiveScreenFontSize } from "react-native-responsive-dimensions";
 export default ({ item, user }) => {
+  const [deviceType, setDeviceType] = useState(0);
+
   const [editFlag, setEditFlag] = useState(true);
   const [viewNews, setViewNews] = useState(false);
   const [titleEdit, setTitleEdit] = useState(item.title);
@@ -58,6 +62,13 @@ export default ({ item, user }) => {
       });
   };
 
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   const handleEdit = () => {
     console.log("the item Edit: ", item.id);
     db.collection("news")
@@ -132,24 +143,39 @@ export default ({ item, user }) => {
         >
           {/* <Badge status="primary" containerStyle={{ paddingTop: "1%" }} /> */}
           {item.datePublished === item.endDate ? (
-            <Text style={{ fontSize: 16.5, color: "#20365F" }}>Until</Text>
+            <Text
+              style={{
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
+            >
+              Until
+            </Text>
           ) : (
             <Ionicons
               name="ios-time"
-              size={20}
+              size={deviceType === 1 ? 20 : 40}
               color="#20365F"
               style={{ paddingTop: "0.3%" }}
             />
           )}
           {item.datePublished === item.endDate ? (
             <Text
-              style={{ paddingLeft: "1%", fontSize: 16.5, color: "#20365F" }}
+              style={{
+                paddingLeft: "1%",
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
             >
               {moment(item.datePublished.toDate()).format("LL")}
             </Text>
           ) : (
             <Text
-              style={{ paddingLeft: "3%", fontSize: 16.5, color: "#20365F" }}
+              style={{
+                paddingLeft: "3%",
+                fontSize: responsiveScreenFontSize(2),
+                color: "#20365F",
+              }}
             >
               {moment(item.datePublished.toDate()).format("LL")}
             </Text>
@@ -169,7 +195,7 @@ export default ({ item, user }) => {
               >
                 <MaterialIcons
                   name="unfold-less"
-                  size={24}
+                  size={deviceType === 1 ? 20 : 40}
                   color="white"
                   style={{
                     paddingLeft: "10%",
@@ -200,7 +226,7 @@ export default ({ item, user }) => {
               >
                 <Ionicons
                   name="md-more"
-                  size={24}
+                  size={deviceType === 1 ? 20 : 40}
                   color="white"
                   style={{ paddingLeft: "43%" }}
                 />
@@ -221,12 +247,12 @@ export default ({ item, user }) => {
               paddingLeft: "7%",
             }}
           >
-            <Text style={{ fontSize: 18 }}>
+            <Text style={{ fontSize: responsiveScreenFontSize(2) }}>
               {/* Description:  */}
               {item.description}
             </Text>
-            {item.endDate === item.datePublished ? null : user.role ===
-                "admin" || user.role === "manager" ? (
+            {item.endDate === item.datePublished ? null : user.activeRole ===
+              "admin" ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -243,7 +269,11 @@ export default ({ item, user }) => {
                   onPress={() => setEditFlag(!editFlag)}
                 >
                   <Text>
-                    <FontAwesome name="edit" size={28} color="#1488BB" />
+                    <FontAwesome
+                      name="edit"
+                      size={deviceType === 1 ? 30 : 40}
+                      color="#1488BB"
+                    />
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -253,7 +283,7 @@ export default ({ item, user }) => {
                   <Text>
                     <MaterialCommunityIcons
                       name="delete-circle-outline"
-                      size={28}
+                      size={deviceType === 1 ? 30 : 40}
                       color="#BB1427"
                     />
                   </Text>

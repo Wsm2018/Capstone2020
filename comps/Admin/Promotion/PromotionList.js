@@ -14,6 +14,7 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
 } from "react-native-responsive-dimensions";
 
 import db from "../../../db";
@@ -117,7 +118,7 @@ export default function PromotionList(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 18,
+                    fontSize: responsiveFontSize(2),
                     color: "white",
                   }}
                 >

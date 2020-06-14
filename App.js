@@ -335,7 +335,6 @@ export default function App(props) {
       FAQ: {
         screen: FAQStack,
         navigationOptions: {
-          drawerLabel: "Ask Us",
           drawerIcon: ({ tinColor }) => {
             return (
               <Image
@@ -453,8 +452,7 @@ export default function App(props) {
             {user.role === "admin" ||
             user.role === "manager" ||
             user.role === "user handler" ||
-            user.role === "asset handler" ||
-            user.role === "customer" ? (
+            user.role === "asset handler" ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -809,6 +807,17 @@ export default function App(props) {
               justifyContent: "center",
             }}
           >
+            <Image
+              width={Dimensions.get("window").width / 6}
+              source={require("./assets/images/mylogo.png")}
+              autoPlay
+              loop
+              style={{
+                position: "relative",
+                width: "50%",
+                height: "30%",
+              }}
+            />
             <LottieView
               width={Dimensions.get("window").width / 3}
               source={require("./assets/loadingAnimations/890-loading-animation.json")}
@@ -832,6 +841,17 @@ export default function App(props) {
           justifyContent: "center",
         }}
       >
+        <Image
+          width={Dimensions.get("window").width / 6}
+          source={require("./assets/images/mylogo.png")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "50%",
+            height: "30%",
+          }}
+        />
         <LottieView
           width={Dimensions.get("window").width / 3}
           source={require("./assets/loadingAnimations/890-loading-animation.json")}

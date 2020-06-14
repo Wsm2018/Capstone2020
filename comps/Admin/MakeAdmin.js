@@ -14,6 +14,12 @@ import firebase from "firebase";
 import "firebase/functions";
 import db from "../../db";
 import LottieView from "lottie-react-native";
+import {
+  responsiveFontSize,
+  responsiveHeight,
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+} from "react-native-responsive-dimensions";
 
 export default function MakeAdmin(props) {
   // -------------------------------------- STATE -----------------------------------
@@ -111,7 +117,7 @@ export default function MakeAdmin(props) {
           <Text
             style={{
               textAlign: "center",
-              fontSize: 15,
+              fontSize: responsiveFontSize(1.8),
               color: "#808080",
               // fontWeight: "bold",
             }}
@@ -120,12 +126,14 @@ export default function MakeAdmin(props) {
           </Text>
         </View>
         <TextInput
-          width={Dimensions.get("window").width / 1.2}
+          // width={Dimensions.get("window").width / 1.2}
           style={{
             backgroundColor: "white",
-            height: 50,
+            height: responsiveScreenHeight(5),
+            width: responsiveScreenWidth(90),
             // color: "red",
             // position: "absolute",
+            fontSize: responsiveFontSize(1.8),
             borderColor: "gray",
             borderWidth: 1,
             borderRadius: 10,
@@ -154,7 +162,7 @@ export default function MakeAdmin(props) {
           <TouchableOpacity
             style={{
               backgroundColor: "#2E9E9B",
-              height: 40,
+              height: responsiveScreenHeight(5),
               width: "30%",
               justifyContent: "center",
               alignItems: "center",
@@ -165,7 +173,7 @@ export default function MakeAdmin(props) {
             <Text
               style={{
                 textAlign: "center",
-                fontSize: 18,
+                fontSize: responsiveFontSize(2),
                 color: "white",
                 // fontWeight: "bold",
               }}

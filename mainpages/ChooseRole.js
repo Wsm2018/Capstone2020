@@ -14,6 +14,12 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/functions";
 import db from "../db";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 import { TextInput } from "react-native-paper";
 import { Picker } from "react-native";
 // import { Image, Avatar } from "react-native-elements";
@@ -132,7 +138,7 @@ export default function ChooseRole(props) {
           // backgroundColor: "red",
         }}
       >
-        <Text style={{ fontSize: Platform.isPad ? 28 : 25 }}>Login As:</Text>
+        <Text style={{ fontSize: responsiveFontSize(3) }}>Login As:</Text>
       </View>
       <View
         style={{
@@ -177,8 +183,8 @@ export default function ChooseRole(props) {
                     <Image
                       source={role.photoURL}
                       style={{
-                        width: 90,
-                        height: 90,
+                        width: responsiveScreenWidth(20),
+                        height: responsiveScreenWidth(20),
                         // aspectRatio: 1 / 1,
                         // borderWidth: 10,
                       }}
@@ -195,6 +201,7 @@ export default function ChooseRole(props) {
                     <Text
                       style={{
                         textAlign: "center",
+                        fontSize: responsiveFontSize(1.8),
                         textTransform: "capitalize",
                         // color: "#20365F",
                         fontWeight: "bold",
