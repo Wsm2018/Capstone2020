@@ -292,7 +292,7 @@ export default function ProfileScreen(props) {
           ]}
         >
           <View style={styles.headerContainer}>
-            {deviceType === 1 ? (
+            {deviceType === 1 || deviceType === 0 ? (
               <View style={styles.coverContainer}>
                 <ImageBackground
                   source={{
@@ -385,7 +385,7 @@ export default function ProfileScreen(props) {
               >
                 <Text
                   style={
-                    deviceType === 1
+                    deviceType === 1 || deviceType === 0
                       ? {
                           color: "black",
                           fontSize: responsiveScreenFontSize(2),
@@ -402,7 +402,7 @@ export default function ProfileScreen(props) {
                 </Text>
                 <Text
                   style={
-                    deviceType === 1
+                    deviceType === 1 || deviceType === 0
                       ? {
                           ...styles.tabLabelNumber,
                           fontSize: responsiveScreenFontSize(2),
@@ -426,7 +426,7 @@ export default function ProfileScreen(props) {
               >
                 <Text
                   style={
-                    deviceType === 1
+                    deviceType === 1 || deviceType === 0
                       ? {
                           color: "black",
                           fontSize: responsiveScreenFontSize(2),
@@ -443,7 +443,7 @@ export default function ProfileScreen(props) {
                 </Text>
                 <Text
                   style={
-                    deviceType === 1
+                    deviceType === 1 || deviceType === 0
                       ? {
                           ...styles.tabLabelNumber,
                           fontSize: responsiveScreenFontSize(2),
@@ -471,7 +471,7 @@ export default function ProfileScreen(props) {
           >
             <Text
               style={
-                deviceType === 1
+                deviceType === 1 || deviceType === 0
                   ? { fontSize: responsiveScreenFontSize(2.5), paddingRight: 5 }
                   : {
                       fontSize: responsiveScreenFontSize(1.8),
@@ -482,7 +482,7 @@ export default function ProfileScreen(props) {
               {displayName}
             </Text>
             <TouchableOpacity onPress={() => setEdit(true)}>
-              {deviceType === 1 ? (
+              {deviceType === 1 || deviceType === 0 ? (
                 <FontAwesome5
                   name="edit"
                   size={20}
@@ -867,7 +867,7 @@ export default function ProfileScreen(props) {
                   width: "100%",
                 }}
                 selectedTextStyle={
-                  deviceType === 1
+                  deviceType === 1 || deviceType === 0
                     ? {
                         color: "black",
                         fontWeight: "bold",
@@ -880,7 +880,7 @@ export default function ProfileScreen(props) {
                       }
                 }
                 textStyle={
-                  deviceType === 1
+                  deviceType === 1 || deviceType === 0
                     ? {
                         color: "#535150",
                         fontWeight: "bold",
