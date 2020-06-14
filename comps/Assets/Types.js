@@ -16,10 +16,8 @@ import {
   AsyncStorage,
 } from "react-native";
 import {
-  responsiveScreenHeight,
   responsiveScreenWidth,
-  responsiveScreenFontSize,
-  responsiveFontSize,
+  responsiveScreenHeight,
 } from "react-native-responsive-dimensions";
 import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
@@ -328,7 +326,7 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "QuickbooQ",
+  // title: "QuickbookinQ",
   headerStyle: { backgroundColor: "#185a9d" },
   // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
   headerTintColor: "white",

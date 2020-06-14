@@ -27,7 +27,7 @@ import { FlatList } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import Review from "../Profile/Review.js";
+import Review from "./Review.js";
 
 import {
   FontAwesome5,
