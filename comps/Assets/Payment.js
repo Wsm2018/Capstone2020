@@ -81,11 +81,16 @@ export default function Payment(props) {
   const [useBalance, setUseBalance] = useState(false);
   const [subscription, setSubscription] = useState(false);
   const [pointsChart, setPointsChart] = useState([]);
+  const [points, setPoints] = useState(0);
   const tName = props.navigation.getParam("tName", "failed");
 
   /////////////////////////////Front-End//////////////////////////////////
   const [promoView, setPromoView] = useState(false);
+  const [tokenView, setTokenView] = useState(false);
   const [clicked, setClicked] = useState(false);
+
+  const [discountType, setDiscountType] = useState(true);
+  const [useToken, setUseToken] = useState(false);
 
   //////////////////////////////////////////////////////////////////////
 
@@ -98,6 +103,8 @@ export default function Payment(props) {
     let t = total;
     if (promotionValid === true) {
       t = total - (total * promotion.percentage) / 100;
+    } else if (useToken === true) {
+      t = total - (total * 5) / 100;
     } else {
       t = total;
     }
@@ -139,14 +146,8 @@ export default function Payment(props) {
         setUser(data);
       });
   };
+
   useEffect(() => {
-    db.collection("pointsChart").onSnapshot((querySnapshot) => {
-      const pointsChart = [];
-      querySnapshot.forEach((doc) => {
-        pointsChart.push({ id: doc.id, ...doc.data() });
-      });
-      setPointsChart([...pointsChart]);
-    });
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("subscription")
@@ -158,7 +159,18 @@ export default function Payment(props) {
         // console.log(subscription);
         setSubscription([...subscription]);
       });
+
+    db.collection("pointsChart").onSnapshot((querySnapshot) => {
+      const pointsChart = [];
+      querySnapshot.forEach((doc) => {
+        pointsChart.push({ id: doc.id, ...doc.data() });
+      });
+      setPointsChart([...pointsChart]);
+      console.log("--------------pointsChart---------", pointsChart);
+    });
+
     getUser();
+
     db.collection("users")
       .doc(firebase.auth().currentUser.uid)
       .collection("cards")
@@ -171,6 +183,7 @@ export default function Payment(props) {
         setCards([...cards]);
         setChecked(cards[0] ? cards[0].id : 1);
         setOther(cards[0] ? false : true);
+        setCard(cards[0] ? cards[0] : {});
       });
 
     var years = [];
@@ -179,6 +192,28 @@ export default function Payment(props) {
     }
     setYearsList(years);
   }, []);
+
+  useEffect(() => {
+    setTimeout(cPoints, 2000);
+  }, [pointsChart]);
+
+  const cPoints = () => {
+    console.log("********pointsChart********", pointsChart);
+    const subscriptionType =
+      subscription && subscription[0] && subscription[0].type
+        ? subscription[0].type
+        : "normal";
+
+    const pointsChartE =
+      pointsChart.length > 0 &&
+      pointsChart.filter((p) => p.subscriptionType === subscriptionType)[0];
+
+    const points =
+      pointsChart.length > 0
+        ? (total / pointsChartE.spentValue) * pointsChartE.points
+        : 0;
+    setPoints(points);
+  };
 
   const pay = async () => {
     setClicked(true);
@@ -250,7 +285,7 @@ export default function Payment(props) {
         add();
       } else {
         alert("Sorry, Booking Can't be added!!");
-        props.navigation.navigate("Types");
+        props.navigation.navigate("BookingHistory");
       }
     }
   }, [checker]);
@@ -299,7 +334,12 @@ export default function Payment(props) {
     )[0];
 
     const points = (total / pointsChartE.spentValue) * pointsChartE.points;
-    u.points = u.points + points;
+    u.points = u.points + points + u.reputation;
+
+    if (useToken === true) {
+      u.tokens = u.tokens - 1;
+    }
+
     if (partial != "not found") {
       console.log("177");
       var toUpd = partial;
@@ -320,7 +360,7 @@ export default function Payment(props) {
         card: c,
         endDateTime: assetBooking.endDateTime,
         assetBooking: assetBooking,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount > 0 ? totalAmount : 0,
         status: true,
         serviceBooking: serviceBooking,
         user: u,
@@ -340,7 +380,7 @@ export default function Payment(props) {
         status: true,
         addCreditCard: addCreditCard && other,
         uid: firebase.auth().currentUser.uid,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount > 0 ? totalAmount : 0,
         // status: true,
         serviceBooking: serviceBooking,
       });
@@ -359,9 +399,11 @@ export default function Payment(props) {
         },
       };
       localNotification.title = "Payment complete";
-      localNotification.body = `Your payment of ${totalAmount} QAR for the ${tName} was completed successfully!`;
+      localNotification.body = `Your payment of ${
+        totalAmount > 0 ? totalAmount : 0
+      } QAR for the ${tName} was completed successfully!`;
       Notifications.presentLocalNotificationAsync(localNotification);
-      props.navigation.navigate("Types");
+      props.navigation.navigate("BookingHistory");
     }
     db.collection("users").doc(user.id).update(u);
     console.log("192");
@@ -381,6 +423,10 @@ export default function Payment(props) {
     setUseBalance(true);
   };
 
+  useEffect(() => {
+    calculation();
+  }, [useToken]);
+
   ///////////////////////////////Font-End////////////////////////////////
 
   useEffect(() => {
@@ -397,7 +443,7 @@ export default function Payment(props) {
   const _keyboardDidShow = () => {
     // console.log("keyyyyyyyyyyyyyyyShow");
 
-    setMargin(-250);
+    setMargin(250);
   };
 
   const _keyboardDidHide = () => {
@@ -412,7 +458,7 @@ export default function Payment(props) {
       <View
         style={{
           flex: 8,
-          marginTop: Platform.OS === "ios" ? marginVal : 0,
+          marginBottom: Platform.OS === "ios" ? marginVal : 0,
         }}
       >
         <ScrollView>
@@ -438,43 +484,184 @@ export default function Payment(props) {
           </Text> */}
           <View
             style={{
-              backgroundColor: "white",
-              // margin: "4%",
-              padding: "3%",
-              // borderRadius: 10,
-              borderWidth: 1,
-              borderColor: "lightgray",
-              alignItems: "center",
+              width: "100%",
+              flexDirection: "row",
               // flex: 1.5,
               // justifyContent: "space-between",
             }}
           >
-            <Text style={{ fontSize: 27, fontWeight: "bold" }}>
-              {user.balance}
-              <Text style={{ fontSize: 18 }}> QAR</Text>
-            </Text>
-            <Text
+            <View
               style={{
-                fontSize: 12,
-                color: "#185a9d",
-                fontWeight: "bold",
-                paddingTop: 4,
+                backgroundColor: "white",
+                // margin: "4%",
+                padding: "3%",
+                // borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "lightgray",
+                alignItems: "center",
+                width: "50%",
+                // flex: 1.5,
+                // justifyContent: "space-between",
               }}
             >
-              CURRENT BALANCE
-            </Text>
+              <Text style={{ fontSize: 27, fontWeight: "bold" }}>
+                {user.balance}
+                <Text style={{ fontSize: 18 }}> QAR</Text>
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#185a9d",
+                  fontWeight: "bold",
+                  paddingTop: 4,
+                }}
+              >
+                CURRENT BALANCE
+              </Text>
 
-            {/* <Button
+              {/* <Button
               title="Deduct From Balance"
               onPress={() => setModalVisible(true)}
             /> */}
-            {/* {useBalance && (
+              {/* {useBalance && (
               <View>
                 <Text>Used balance: {usedBalance} QAR</Text>
                 <Text>Amount to pay: {totalAmount} QAR</Text>
               </View>
             )} */}
+            </View>
+            <View
+              style={{
+                backgroundColor: "white",
+                // margin: "4%",
+                padding: "3%",
+                // borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "lightgray",
+                alignItems: "center",
+                width: "50%",
+                // flex: 1.5,
+                // justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: 27, fontWeight: "bold" }}>
+                {user.tokens}
+                <Text style={{ fontSize: 18 }}> Tokens </Text>
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#185a9d",
+                  fontWeight: "bold",
+                  paddingTop: 4,
+                }}
+              >
+                AVAILABLE TOKENS
+              </Text>
+
+              {/* <Button
+              title="Deduct From Balance"
+              onPress={() => setModalVisible(true)}
+            /> */}
+              {/* {useBalance && (
+              <View>
+                <Text>Used balance: {usedBalance} QAR</Text>
+                <Text>Amount to pay: {totalAmount} QAR</Text>
+              </View>
+            )} */}
+            </View>
           </View>
+
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              // flex: 1.5,
+              // justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                // margin: "4%",
+                padding: "3%",
+                // borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "lightgray",
+                alignItems: "center",
+                width: "50%",
+                // flex: 1.5,
+                // justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: 27, fontWeight: "bold" }}>
+                {points}
+                <Text style={{ fontSize: 18 }}> Points</Text>
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#185a9d",
+                  fontWeight: "bold",
+                  paddingTop: 4,
+                }}
+              >
+                Points Earned From Booking
+              </Text>
+
+              {/* <Button
+              title="Deduct From Balance"
+              onPress={() => setModalVisible(true)}
+            /> */}
+              {/* {useBalance && (
+              <View>
+                <Text>Used balance: {usedBalance} QAR</Text>
+                <Text>Amount to pay: {totalAmount} QAR</Text>
+              </View>
+            )} */}
+            </View>
+            <View
+              style={{
+                backgroundColor: "white",
+                // margin: "4%",
+                padding: "3%",
+                // borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "lightgray",
+                alignItems: "center",
+                width: "50%",
+                // flex: 1.5,
+                // justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ fontSize: 27, fontWeight: "bold" }}>
+                {user.reputation}
+                <Text style={{ fontSize: 18 }}> Points </Text>
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#185a9d",
+                  fontWeight: "bold",
+                  paddingTop: 4,
+                }}
+              >
+                Reputation Points
+              </Text>
+
+              {/* <Button
+              title="Deduct From Balance"
+              onPress={() => setModalVisible(true)}
+            /> */}
+              {/* {useBalance && (
+              <View>
+                <Text>Used balance: {usedBalance} QAR</Text>
+                <Text>Amount to pay: {totalAmount} QAR</Text>
+              </View>
+            )} */}
+            </View>
+          </View>
+
           <View
             style={{
               // alignItems: "center",
@@ -831,85 +1018,232 @@ export default function Payment(props) {
                 </TouchableOpacity>
               </View>
             )}
-            <TouchableOpacity
-              onPress={() => setPromoView(!promoView)}
-              style={{
-                // backgroundColor: "red",
-                width: "100%",
-                height: 50,
-                // justifyContent: "center",
-                alignItems: "center",
-                paddingStart: "3%",
-                flexDirection: "row",
-                borderWidth: 1,
-                borderColor: "lightgray",
-              }}
-              disabled={promotionValid === true ? true : false}
-            >
-              {promotionValid ? (
-                <MaterialIcons name="done" size={25} color={"#3ea3a3"} />
-              ) : promoView ? (
-                <MaterialCommunityIcons
-                  name="minus"
-                  size={25}
-                  color={"#3ea3a3"}
-                />
-              ) : (
-                <MaterialCommunityIcons
-                  name="plus"
-                  size={25}
-                  color={"#3ea3a3"}
-                />
-              )}
-
-              <Text style={{ paddingLeft: 5 }}>
-                Promo Code{" "}
-                {promotionValid === true && (
-                  <Text style={{ color: "#3ea3a3" }}>(Code Used)</Text>
-                )}
-              </Text>
-            </TouchableOpacity>
-            {promoView && !promotionValid && (
+            {!promotionValid && !useToken && (
               <View
                 style={{
-                  width: "90%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingBottom: "5%",
-                  alignSelf: "center",
+                  textAlign: "left",
+                  // paddingStart: "2%",
+                  padding: "0%",
+                  // paddingTop: "2%",
+                  flexDirection: "row",
+                  backgroundColor: "#ababab",
+                  color: "white",
+                  fontWeight: "bold",
                 }}
               >
-                <TextInput
+                <TouchableOpacity
+                  onPress={() => setDiscountType(true)}
                   style={{
-                    height: 50,
-                    borderColor: "gray",
-                    borderWidth: 1.5,
-                    width: "90%",
-                    textAlign: "center",
-                    marginTop: "5%",
-                    backgroundColor: "white",
+                    // backgroundColor: "red",
+                    width: "50%",
+                    height: 30,
+                    // justifyContent: "center",
+                    alignItems: "center",
+                    paddingStart: "3%",
+                    flexDirection: "row",
+                    borderWidth: 1,
+                    borderColor: "lightgray",
                   }}
-                  onChangeText={setCode}
-                  onSubmitEditing={() => handlePromotion(code)}
-                  placeholder="Enter Promotion Code"
-                  // placeholderTextColor="gray"
-                  value={code}
-                />
+                >
+                  <Text
+                    style={{
+                      textAlign: "left",
+                      // paddingStart: "2%",
+                      padding: "2%",
+                      // paddingTop: "2%",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Use Promo Code
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setDiscountType(false)}
+                  style={{
+                    // backgroundColor: "red",
+                    width: "50%",
+                    height: 30,
+                    // justifyContent: "center",
+                    alignItems: "center",
+                    paddingStart: "3%",
+                    flexDirection: "row",
+                    borderWidth: 1,
+                    borderColor: "lightgray",
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "left",
+                      // paddingStart: "2%",
+                      padding: "2%",
+                      // paddingTop: "2%",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Use a Token
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {discountType && (
+              <View>
+                <TouchableOpacity
+                  onPress={() => setPromoView(!promoView)}
+                  style={{
+                    // backgroundColor: "red",
+                    width: "100%",
+                    height: 50,
+                    // justifyContent: "center",
+                    alignItems: "center",
+                    paddingStart: "3%",
+                    flexDirection: "row",
+                    borderWidth: 1,
+                    borderColor: "lightgray",
+                  }}
+                  disabled={promotionValid === true ? true : false}
+                >
+                  {promotionValid ? (
+                    <MaterialIcons name="done" size={25} color={"#3ea3a3"} />
+                  ) : promoView ? (
+                    <MaterialCommunityIcons
+                      name="minus"
+                      size={25}
+                      color={"#3ea3a3"}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name="plus"
+                      size={25}
+                      color={"#3ea3a3"}
+                    />
+                  )}
 
-                {promotionValid === true ? (
-                  <Text
-                    style={{ color: "#3ea3a3", marginTop: 5, marginBottom: 10 }}
-                  >
-                    Code Valid
+                  <Text style={{ paddingLeft: 5 }}>
+                    Promo Code{" "}
+                    {promotionValid === true && (
+                      <Text style={{ color: "#3ea3a3" }}>(Code Used)</Text>
+                    )}
                   </Text>
-                ) : promotionValid === false ? (
-                  <Text
-                    style={{ color: "red", marginTop: 5, marginBottom: 10 }}
+                </TouchableOpacity>
+                {promoView && !promotionValid && (
+                  <View
+                    style={{
+                      width: "90%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingBottom: "5%",
+                      alignSelf: "center",
+                    }}
                   >
-                    Code Invalid
-                  </Text>
-                ) : (
-                  <Text></Text>
+                    <TextInput
+                      style={{
+                        height: 50,
+                        borderColor: "gray",
+                        borderWidth: 1.5,
+                        width: "90%",
+                        textAlign: "center",
+                        marginTop: "5%",
+                        backgroundColor: "white",
+                      }}
+                      onChangeText={setCode}
+                      onSubmitEditing={() => handlePromotion(code)}
+                      placeholder="Enter Promotion Code"
+                      // placeholderTextColor="gray"
+                      value={code}
+                    />
+
+                    {promotionValid === true ? (
+                      <Text
+                        style={{
+                          color: "#3ea3a3",
+                          marginTop: 5,
+                          marginBottom: 10,
+                        }}
+                      >
+                        Code Valid
+                      </Text>
+                    ) : promotionValid === false ? (
+                      <Text
+                        style={{ color: "red", marginTop: 5, marginBottom: 10 }}
+                      >
+                        Code Invalid
+                      </Text>
+                    ) : (
+                      <Text></Text>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+            {!discountType && (
+              <View>
+                <TouchableOpacity
+                  onPress={() => setTokenView(!tokenView)}
+                  style={{
+                    // backgroundColor: "red",
+                    width: "100%",
+                    height: 50,
+                    // justifyContent: "center",
+                    alignItems: "center",
+                    paddingStart: "3%",
+                    flexDirection: "row",
+                    borderWidth: 1,
+                    borderColor: "lightgray",
+                  }}
+                  disabled={useToken === true ? true : false}
+                >
+                  {useToken ? (
+                    <MaterialIcons name="done" size={25} color={"#3ea3a3"} />
+                  ) : tokenView ? (
+                    <MaterialCommunityIcons
+                      name="minus"
+                      size={25}
+                      color={"#3ea3a3"}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name="plus"
+                      size={25}
+                      color={"#3ea3a3"}
+                    />
+                  )}
+
+                  <Text style={{ paddingLeft: 5 }}>Use a Token</Text>
+                </TouchableOpacity>
+                {tokenView && !useToken && (
+                  <View
+                    style={{
+                      width: "90%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingBottom: "5%",
+                      alignSelf: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 15, color: "#878787" }}>
+                      Using a token gives you 5% discount
+                    </Text>
+                    <TouchableOpacity
+                      disabled={user.tokens <= 0}
+                      onPress={() => setUseToken(true)}
+                      style={{
+                        backgroundColor:
+                          user.tokens <= 0 ? "lightgray" : "#3ea3a3",
+                        width: "90%",
+                        borderRadius: 8,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 10,
+                        marginTop: 10,
+                      }}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Use Token
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
               </View>
             )}
@@ -1006,10 +1340,26 @@ export default function Payment(props) {
                 >
                   {total}
                 </Text>{" "}
-                {totalAmount}
+                {totalAmount > 0 ? totalAmount : 0}
+              </Text>
+            ) : useToken ? (
+              <Text style={{ fontWeight: "bold", fontSize: 22 }}>
+                <Text
+                  style={{
+                    textDecorationLine: "line-through",
+                    textDecorationStyle: "solid",
+                    color: "gray",
+                  }}
+                >
+                  {total}
+                </Text>{" "}
+                {totalAmount > 0 ? totalAmount : 0}
               </Text>
             ) : (
-              totalAmount
+              <Text style={{ fontWeight: "bold", fontSize: 22 }}>
+                {" "}
+                {totalAmount > 0 ? totalAmount : 0}
+              </Text>
             )}{" "}
             QAR
           </Text>

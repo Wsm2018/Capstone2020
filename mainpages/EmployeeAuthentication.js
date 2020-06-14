@@ -13,10 +13,11 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/functions";
 import "firebase/storage";
-import db from "../db";
+import db, { config } from "../db";
 import { TextInput } from "react-native-paper";
 import { Input, Tooltip } from "react-native-elements";
-
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { Octicons } from "@expo/vector-icons";
 import * as Print from "expo-print";
 
 export default function EmployeeHandlerCreate(props) {
@@ -37,6 +38,23 @@ export default function EmployeeHandlerCreate(props) {
     text: "",
     error: false,
   });
+  const [flag, setFlag] = useState(false);
+  const recaptchaVerifier = React.useRef(null);
+  const [verificationId, setVerificationId] = React.useState();
+  const [verificationCode, setVerificationCode] = React.useState();
+  const [showCodeErr, setShowCodeErr] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+  const firebaseConfig = firebase.apps.length
+    ? firebase.app().options
+    : undefined;
+  const [message, showMessage] = React.useState(
+    !firebaseConfig || Platform.OS === "web"
+      ? {
+          text:
+            "To get started, provide a valid firebase config in App.js and open this snack on an iOS or Android device.",
+        }
+      : undefined
+  );
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -57,6 +75,15 @@ export default function EmployeeHandlerCreate(props) {
     setCompany(tempCompany);
   };
 
+  // -------------------------------Password Strength-----------------------------------
+  const passwordStrength = (password) => {
+    const strongRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+    );
+    console.log("pass", strongRegex.test(password));
+    return strongRegex.test(password);
+  };
+
   // -------------------------------VALIDATE INPUTS-----------------------------------
   const validated = async () => {
     let count = 0;
@@ -69,7 +96,10 @@ export default function EmployeeHandlerCreate(props) {
       count++;
     }
 
-    if (password.text !== confirmPassword.text) {
+    if (
+      password.text !== confirmPassword.text &&
+      passwordStrength(password.text)
+    ) {
       console.log("confirmPassword bad");
       setConfirmPassword({ text: confirmPassword.text, error: true });
     } else {
@@ -96,18 +126,70 @@ export default function EmployeeHandlerCreate(props) {
   // --------------------------------CREATE----------------------------------
   const handleCreate = async () => {
     if (await validated()) {
-      let temp = JSON.parse(JSON.stringify(props.user));
-      temp.role = temp.role.slice(0, temp.role.length - 13);
-      props.setUser(temp);
-      let set = firebase.functions().httpsCallable("setEmployeeAuthentication");
-      let response = await set({
-        user: currentUser,
-        password: password.text,
-        phone: phone.text,
-      });
+      try {
+        const phoneProvider = new firebase.auth.PhoneAuthProvider();
+        const verificationId = await phoneProvider.verifyPhoneNumber(
+          `+974${phone.text}`,
+          recaptchaVerifier.current
+        );
+        setVerificationId(verificationId);
+        alert("Verification code has been sent to your phone.");
+        setFlag(true);
+      } catch (err) {
+        console.log(err195966);
+        // setErrMsg(`Error: ${err.message}`);
+        // setShowCodeErr(true);
+      }
+    }
+  };
 
-      console.log(temp);
-      console.log("response", response.data);
+  const handleConfirmCode = async () => {
+    if (
+      verificationCode === null ||
+      verificationCode === "" ||
+      verificationCode === undefined
+    ) {
+      setErrMsg("* Enter the Code");
+      setShowCodeErr(true);
+    } else if (verificationCode.length < 6) {
+      setErrMsg("* Invalid Code");
+      setShowCodeErr(true);
+    } else {
+      try {
+        const credential = firebase.auth.PhoneAuthProvider.credential(
+          verificationId,
+          verificationCode
+        );
+        if (credential !== null) {
+          try {
+            let temp = JSON.parse(JSON.stringify(props.user));
+            let newRole = temp.role.slice(0, temp.role.length - 13);
+            temp.role = newRole;
+            temp.activeRole = newRole;
+            console.log("temp.activeRole", temp.activeRole);
+            props.setUser(temp);
+            props.setActiveRole(temp.activeRole);
+            console.log("new User", temp);
+            console.log("going to set");
+            let set = firebase
+              .functions()
+              .httpsCallable("setEmployeeAuthentication");
+            console.log(set);
+            let response = await set({
+              user: currentUser,
+              password: password.text,
+              phone: phone.text,
+            });
+            console.log("did we get here?");
+            console.log("new User", temp);
+            console.log("response", response);
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -117,8 +199,12 @@ export default function EmployeeHandlerCreate(props) {
     handleCompany();
   }, []);
 
-  return (
+  return !flag ? (
     <View style={styles.container}>
+      <FirebaseRecaptchaVerifierModal
+        ref={recaptchaVerifier}
+        firebaseConfig={config}
+      />
       <Text
         style={{
           fontSize: 20,
@@ -211,46 +297,49 @@ export default function EmployeeHandlerCreate(props) {
       <TouchableOpacity style={styles.loginButton} onPress={handleCreate}>
         <Text style={{ color: "white", fontWeight: "bold" }}>Confirm</Text>
       </TouchableOpacity>
-      {/* 
-      <TextInput
-        onChangeText={(text) => setPassword({ text, error: false })}
-        value={password.text}
-        secureTextEntry={true}
-      /> */}
-
-      {/* ----------------------------------CONFIRM PASSWORD-------------------------------- */}
-      {/* <Text>Confirm Password</Text>
-      <TextInput
-        onChangeText={(text) => setConfirmPassword({ text, error: false })}
-        value={confirmPassword.text}
-        secureTextEntry={true}
-      />
+    </View>
+  ) : (
+    <View style={styles.container}>
       <Text
-        style={
-          confirmPassword.error ? { color: "red" } : { color: "transparent" }
-        }
+        style={{
+          fontSize: 20,
+          color: "#185a9d",
+          justifyContent: "center",
+          alignSelf: "center",
+          marginTop: "5%",
+          fontWeight: "bold",
+        }}
       >
-        * Passwords do not match
-      </Text> */}
+        Verify Phone Number
+      </Text>
+      <Input
+        inputStyle={{
+          color: "#185a9d",
+          fontSize: 16,
+        }}
+        editable={!!verificationId}
+        // inputContainerStyle={{ borderBottomWidth: 10 }}
+        leftIcon={<Octicons name="verified" size={20} color="#185a9d" />}
+        containerStyle={styles.Inputs}
+        placeholderTextColor="#185a9d"
+        onChangeText={(code) => {
+          setVerificationCode(code);
+          setErrMsg("");
+          setShowCodeErr(false);
+        }}
+        placeholder="Verification Code"
+      />
+      {showCodeErr ? <Text style={{ color: "red" }}>{errMsg}</Text> : null}
 
-      {/* ----------------------------------PHONE-------------------------------- */}
-      {/* <Text>Phone</Text> */}
-      {/* <View style={{ flexDirection: "row", justifyContent: "space-between" }}> */}
-      {/* <TextInput value={"+974"} style={{ width: "20%" }} disabled /> */}
-      {/* <TextInput
-          onChangeText={(text) => setPhone({ text, error: false })}
-          value={phone.text}
-          style={{ width: "75%" }}
-          keyboardType={"phone-pad"}
-          maxLength={8} */}
-      {/* /> */}
-      {/* </View> */}
-      {/* <Text style={phone.error ? { color: "red" } : { color: "transparent" }}>
-        * Invalid Phone Number
-      </Text> */}
-
-      {/* ---------------------------------SUBMIT--------------------------------- */}
-      <Text></Text>
+      <TouchableOpacity
+        onPress={handleConfirmCode}
+        disabled={!verificationId}
+        style={styles.loginButton}
+      >
+        <Text style={{ color: "white", fontWeight: "bold" }}>
+          Confirm Verification Code
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

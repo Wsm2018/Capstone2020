@@ -104,8 +104,23 @@ export default function FriendsList(props) {
   }, []);
 
   return !friends ? (
-    <View>
-      <Text>LOADING...</Text>
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
     </View>
   ) : (
     <View style={styles.container}>

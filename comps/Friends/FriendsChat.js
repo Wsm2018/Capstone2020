@@ -11,6 +11,8 @@ import {
   Keyboard,
   KeyboardEvent,
   Dimensions,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import firebase from "firebase/app";
@@ -42,6 +44,7 @@ export default function FriendsList(props) {
   const [popUp, setPopUp] = useState(false);
   const [popUpIndex, setPopUpIndex] = useState(false);
   const [modal, setModal] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   const chatView = useRef();
 
@@ -147,6 +150,11 @@ export default function FriendsList(props) {
         // console.log("scrnlistener running");
       }
     }, 1000);
+  };
+
+  // -------------------------------REMOVE-----------------------------------
+  const removeChat = async (chat) => {
+    db.collection("chats").doc(chat.id).delete();
   };
 
   useEffect(() => {
@@ -324,6 +332,7 @@ export default function FriendsList(props) {
             }
           }}
           scrollEventThrottle
+          onScrollBeginDrag={() => console.log("yoooo")}
         >
           {/* <Text style={{ transform: [{ scaleY: -1 }] }}>hey buddy</Text> */}
           {chats &&
@@ -394,6 +403,7 @@ export default function FriendsList(props) {
                         // setChats(tempChat);
                         setPopUp(!popUp);
                         // setPopUpIndex(i);
+                        setSelectedChat(chat);
                       }
                     }}
                     style={
@@ -568,6 +578,129 @@ export default function FriendsList(props) {
           />
         </TouchableOpacity>
       </View>
+      {/* ---------------------------------MODAL--------------------------------- */}
+      <Modal
+        transparent={true}
+        visible={modal}
+        animationType="slide"
+        onRequestClose={() => setModal(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            // alignItems: "center",
+            alignSelf: "center",
+            marginTop: 22,
+            // ---This is for Width---
+            width: "80%",
+            color: "grey",
+          }}
+        >
+          <View
+            style={{
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              alignItems: "center",
+              alignSelf: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              justifyContent: "center",
+              // ---This is for Height---
+              height: "30%",
+              width: "100%",
+            }}
+          >
+            <Text style={{ fontSize: 16, fontWeight: "500" }}>
+              Are you sure you want to{" "}
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  color: "#901616",
+                  textDecorationLine: "underline",
+                }}
+              >
+                DELETE
+                {/* {selectedFriend && selectedFriend.displayName} */}
+              </Text>{" "}
+              this message?
+            </Text>
+            <Text>{"\n"}</Text>
+            <View
+              style={{
+                //   borderWidth: 1,
+                width: "100%",
+                height: "20%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {/* ---------------------------------CONFIRM--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 2,
+                  borderColor: "#901616",
+                  width: "35%",
+                  height: "110%",
+                  backgroundColor: "#901616",
+                  borderRadius: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  // if (selectedChat === "ALL") {
+                  //   removeAllFriends();
+                  //   setModal(false);
+                  // } else {
+                  removeChat(selectedChat);
+                  setModal(false);
+                  setPopUp(false);
+                  // }
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                >
+                  Confirm
+                </Text>
+              </TouchableOpacity>
+              {/* ---------------------------------CANCEL--------------------------------- */}
+              <TouchableOpacity
+                style={{
+                  borderWidth: 2,
+                  borderColor: "#3ea3a3",
+                  width: "35%",
+                  height: "110%",
+                  backgroundColor: "#3ea3a3",
+                  borderRadius: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  setModal(false);
+                  setPopUp(false);
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 16, fontWeight: "500" }}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

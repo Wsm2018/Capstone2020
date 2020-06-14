@@ -83,17 +83,18 @@ export default function ProfileScreen(props) {
   console.log("------------------------------------------", Device.DeviceType);
   // ------------------------------------------- FUNCTIONS --------------------------------------
   const getUser = async () => {
-    db.collection("users")
+    const userRef = await db
+      .collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((doc) => {
-        const user = doc.data();
-        setPhotoURL(user.photoURL);
-        setDisplayName(user.displayName);
-        setProfileBackground(user.profileBackground);
-        setEditDisplayName(user.displayName);
-        setEditPic(user.photoURL);
-        setUser(user);
-      });
+      .get();
+
+    const user = userRef.data();
+    setPhotoURL(user.photoURL);
+    setDisplayName(user.displayName);
+    setProfileBackground(user.profileBackground);
+    setEditDisplayName(user.displayName);
+    setEditPic(user.photoURL);
+    setUser(user);
   };
 
   const askPermission = async () => {
@@ -105,6 +106,7 @@ export default function ProfileScreen(props) {
     const response = await fetch(uri);
     const blob = await response.blob();
     if (type === "profile") {
+      console.log("hey ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
       const putResult = await firebase
         .storage()
         .ref()
@@ -118,7 +120,8 @@ export default function ProfileScreen(props) {
       console.log("url ", url);
       await handleSaveEdit(url, editDisplayName);
       setPhotoURL(url);
-      setFlag(false);
+      getUser();
+      // setFlag(false);
     } else {
       setBackgroundEdit(false);
       const putResult = await firebase
@@ -216,18 +219,18 @@ export default function ProfileScreen(props) {
     getDeviceType();
   }, []);
 
-  useEffect(() => {
-    console.log("flag", flag);
-  }, [flag]);
+  // useEffect(() => {
+  //   console.log("flag", flag);
+  // }, [flag]);
 
   useEffect(() => {
     getUser();
     askPermission();
   }, []);
 
-  useEffect(() => {
-    console.log("user got changed ");
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("user got changed ");
+  // }, [user]);
 
   ///////////////////////////////Font-End////////////////////////////////
 
@@ -346,7 +349,11 @@ export default function ProfileScreen(props) {
                         height: 120 * 2,
                         overflow: "hidden",
                       }
-                    : null
+                    : {
+                        ...styles.profileImage,
+                        width: 140,
+                        height: 140,
+                      }
                 }
               />
 
@@ -615,63 +622,47 @@ export default function ProfileScreen(props) {
                       // backgroundColor: "red",
                     }}
                   >
-                    {!flag ? (
-                      <Avatar
-                        accessory={
-                          deviceType === 1
-                            ? {
-                                size: 45,
-                              }
-                            : deviceType === 2
-                            ? {
-                                size: 70,
-                              }
-                            : null
-                        }
-                        rounded
-                        source={{ uri: editPic }}
-                        showAccessory
-                        onAccessoryPress={handlePickImage}
-                        size="xlarge"
-                        style={
-                          deviceType === 1
-                            ? {
-                                ...styles.profileImageEdit,
-                                width: 140,
-                                height: 140,
-                              }
-                            : deviceType === 2
-                            ? {
-                                ...styles.profileImageTab,
-                                width: 250,
-                                height: 250,
-                                // overflow: "hidden",
-                              }
-                            : null
-                        }
-                      />
-                    ) : (
-                      // <Avatar
-                      //   accessory={{
-                      //     size: 45,
-                      //   }}
-                      //   rounded
-                      //   source={{ uri: editPic }}
-                      //   showAccessory
-                      //   onAccessoryPress={handlePickImage}
-                      //   size="xlarge"
-                      // />
-                      <LottieView
-                        width={Dimensions.get("window").width / 3}
-                        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
-                        autoPlay
-                        loop
-                        style={{
-                          position: "relative",
-                          width: "100%",
-                        }}
-                      />
-                    )}
+                    <Avatar
+                      accessory={
+                        deviceType === 1
+                          ? {
+                              size: 45,
+                            }
+                          : deviceType === 2
+                          ? {
+                              size: 70,
+                            }
+                          : {
+                              size: 70,
+                            }
+                      }
+                      rounded
+                      source={{ uri: editPic }}
+                      showAccessory
+                      onAccessoryPress={handlePickImage}
+                      size="xlarge"
+                      style={
+                        deviceType === 1
+                          ? {
+                              ...styles.profileImageEdit,
+                              width: 140,
+                              height: 140,
+                            }
+                          : deviceType === 2
+                          ? {
+                              ...styles.profileImageTab,
+                              width: 250,
+                              height: 250,
+                              // overflow: "hidden",
+                            }
+                          : {
+                              ...styles.profileImageEdit,
+                              width: 140,
+                              height: 140,
+                            }
+                      }
+                    />
+
                     <Input
                       inputContainerStyle={{
                         // width: "100%",
@@ -780,7 +771,7 @@ export default function ProfileScreen(props) {
                       >
                         <TouchableOpacity
                           onPress={() => {
-                            setPhotoURL(firebase.auth().currentUser.photoURL);
+                            setPhotoURL(photoURL);
                             setEditPic(photoURL);
                             setEdit(false);
                             setEditDisplayName(displayName);

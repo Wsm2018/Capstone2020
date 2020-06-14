@@ -6,15 +6,17 @@ import { createAppContainer } from "react-navigation";
 
 import ManagersRequest from "./ManagersRequest";
 import ManagersRequestDetail from "./ManagersRequestDetail";
+import Loading from "./Loading";
 
 import ManagersHome from "./ManagersHome";
 
 const ManagersStack = createAppContainer(
   createStackNavigator(
     {
-    //  ManagersHome: ManagersHome,
+      //  ManagersHome: ManagersHome,
       ManagersRequest: ManagersRequest,
       ManagersRequestDetail: ManagersRequestDetail,
+      Loading: Loading,
     },
     {
       // initialRouteName: "FriendsList",

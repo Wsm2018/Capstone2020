@@ -361,6 +361,22 @@ export default function Sections(props) {
       // console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       handleDeleteFavorite(item.id);
     }
+    // alert("item", item);
+
+    // console.log(response);
+    // if (response.data !== "Exists") {
+    //   // alert("Asset Added");
+    //   // getUserFavoriteAssets();
+    //   showMessage({
+    //     message: `Favourite Added!`,
+    //     description: `Item added to your favourites successfully!`,
+    //     // type: "success",
+    //     backgroundColor: "#3ea3a3",
+    //     // duration: 2300,
+    //   });
+    // } else {
+
+    // }
   };
   // const handleAddFavorite = async (item) => {
   //   console.log("fav preseddddddddddddddddddd ");

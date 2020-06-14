@@ -38,6 +38,8 @@ import FriendsRequest from "./FriendsRequest";
 import FriendsMap from "./FriendsMap";
 import FriendsSerach from "./FriendsSearch";
 
+import { RadioButton } from "react-native-paper";
+
 import Swipeout from "react-native-swipeout";
 
 export default function FriendsList(props) {
@@ -60,6 +62,8 @@ export default function FriendsList(props) {
   const [editMode, setEditMode] = useState(false);
   const [modal, setModal] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+
+  const [deleteIds, setDeleteIds] = useState([]);
 
   const numOfChars = 30;
 
@@ -95,6 +99,7 @@ export default function FriendsList(props) {
                 status: "offline",
                 lastMessage: "",
                 location: null,
+                locationP: false,
               });
             }
             if (doc.data().status === "requested") {
@@ -197,6 +202,8 @@ export default function FriendsList(props) {
         if (user.location !== null) {
           friend.location = user.location;
         }
+
+        friend.locationP = user.privacy.locationP;
         // console.log(friend);
 
         return friend;
@@ -380,31 +387,57 @@ export default function FriendsList(props) {
   ];
   /////////////////////////////////////////////////////////////////////////
 
+  // -------------------------------DELETE TOGGLE-----------------------------------
+  const deleteToggle = async (id) => {
+    if (deleteIds.includes(id)) {
+      let tempArr = [...deleteIds];
+      let index = tempArr.indexOf(id);
+      tempArr.splice(index, 1);
+      setDeleteIds(tempArr);
+    } else {
+      let tempArr = [...deleteIds];
+      tempArr.push(id);
+      setDeleteIds(tempArr);
+    }
+  };
+
+  // -------------------------------REMOVE SELECTED-----------------------------------
+  const removeSelectedFriends = async () => {
+    if (deleteIds.length > 0) {
+      deleteIds.forEach((id) => {
+        db.collection("users")
+          .doc(id)
+          .collection("friends")
+          .doc(firebase.auth().currentUser.uid)
+          .delete();
+
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .collection("friends")
+          .doc(id)
+          .delete();
+      });
+    }
+  };
+
   return !friends ? (
     <View
-      style={{
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        flex: 0.7,
-        paddingTop: "7%",
-        paddingLeft: "3%",
-      }}
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
     >
-      {/* <LottieView
-        source={require("../../assets/loading.json")}
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
         autoPlay
         loop
         style={{
           position: "relative",
-          width: "100%",
-          paddingTop: "13%",
-          paddingLeft: "5%",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
         }}
-      /> */}
-      <Text style={{ fontSize: 28, color: "#185a9d", position: "relative" }}>
-        LOADING
-      </Text>
+      />
     </View>
   ) : (
     <View style={styles.container}>
@@ -523,6 +556,54 @@ export default function FriendsList(props) {
         </View>
       </View>
       <View style={{ flex: 9 }}>
+        {view === "friends" && (
+          <View
+            style={{
+              height: 60,
+              // backgroundColor: "yellow"
+            }}
+          >
+            <SearchBar
+              placeholderTextColor="#e3e3e3"
+              placeholder="Search Here"
+              onChangeText={setSearch}
+              lightTheme
+              //showLoading={true}
+              searchIcon={true}
+              value={search}
+              containerStyle={{
+                backgroundColor: "transparent",
+                // borderBottomColor: "#185a9d",
+                // borderTopColor: "#185a9d",
+                width: "100%",
+                height: "100%",
+                borderWidth: 0,
+                // marginTop: 0,
+              }}
+              inputContainerStyle={{
+                borderRadius: 20,
+                borderWidth: 0,
+                borderColor: "#fafafa",
+                backgroundColor: "#fafafa",
+                height: "100%",
+              }}
+              // style={{
+              //   //backgroundColor: "white",
+              //   fontSize: 18,
+              //   paddingLeft: "2%",
+              //   // borderColor: "#185a9d",
+              //   // borderWidth: 2,
+              //   width: "85%",
+              //   // height: 50,
+              //   marginLeft: 10,
+              //   marginRight: 10,
+              //   elevation: 20,
+              // }}
+            />
+
+            {/* <Button title="edit" onPress={() => {}} /> */}
+          </View>
+        )}
         <ScrollView
           contentContainerStyle={{
             // backgroundColor: "red"
@@ -558,51 +639,6 @@ export default function FriendsList(props) {
                 onChangeText={setSearch}
                 value={search}
               /> */}
-              <View
-                style={{
-                  height: 60,
-                  // backgroundColor: "yellow"
-                }}
-              >
-                <SearchBar
-                  placeholderTextColor="#e3e3e3"
-                  placeholder="Search Here"
-                  onChangeText={setSearch}
-                  lightTheme
-                  //showLoading={true}
-                  searchIcon={true}
-                  value={search}
-                  containerStyle={{
-                    backgroundColor: "transparent",
-                    // borderBottomColor: "#185a9d",
-                    // borderTopColor: "#185a9d",
-                    width: "100%",
-                    height: "100%",
-                    borderWidth: 0,
-                    // marginTop: 0,
-                  }}
-                  inputContainerStyle={{
-                    borderRadius: 20,
-                    borderWidth: 0,
-                    borderColor: "#fafafa",
-                    backgroundColor: "#fafafa",
-                    height: "100%",
-                  }}
-                  // style={{
-                  //   //backgroundColor: "white",
-                  //   fontSize: 18,
-                  //   paddingLeft: "2%",
-                  //   // borderColor: "#185a9d",
-                  //   // borderWidth: 2,
-                  //   width: "85%",
-                  //   // height: 50,
-                  //   marginLeft: 10,
-                  //   marginRight: 10,
-                  //   elevation: 20,
-                  // }}
-                />
-                {/* <Button title="edit" onPress={() => {}} /> */}
-              </View>
               <View>
                 {friends.map((item, index) => (
                   <View
@@ -641,103 +677,188 @@ export default function FriendsList(props) {
                         }}
                         onPress={
                           editMode
-                            ? null
+                            ? () => {
+                                deleteToggle(item.id);
+                              }
                             : () =>
                                 props.navigation.navigate("FriendsChat", {
                                   friend: item,
                                 })
                         }
+                        onLongPress={() => setEditMode(true)}
                       >
-                        <View
-                          style={{
-                            width: "20%",
-                            maxWidth: 100,
-                            padding: 5,
-                            // backgroundColor: "yellow"
-                          }}
-                        >
-                          {/* <Text>1</Text> */}
-                          <Image
-                            source={{ uri: item.photoURL }}
+                        {editMode && (
+                          <View
                             style={{
-                              resizeMode: "contain",
+                              backgroundColor: "#f0f0f0",
                               height: "100%",
-                              // aspectRatio: 1 / 1,
-                              borderRadius: 1000,
+                              width: "10%",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              paddingLeft: "1%",
+                              // borderWidth: Platform.OS === "ios" ? 1 : 0,
                             }}
-                          />
-                          <Badge
-                            value={item.notifications}
-                            containerStyle={{
-                              position: "absolute",
-                              top: 5,
-                              right: 10,
-                            }}
-                            badgeStyle={{
-                              backgroundColor: "#3ea3a3",
-                              display:
-                                item.notifications === 0 ? "none" : "flex",
-                              // width: 25,
-                              // height: 25,
-                              borderColor: "#185a9d",
-                              borderWidth: 0,
-                            }}
-                          />
-                        </View>
+                          >
+                            {/* <RadioButton
+                              value="first"
+                              status={
+                                deleteIds.includes(item.id)
+                                  ? "checked"
+                                  : "unchecked"
+                              }
+                              // disabled
+                              // color={deleteIds.includes(item.id) ? "red" : "blue"}
+                              onPress={() => {
+                                deleteToggle(item.id);
+                              }}
+                            /> */}
+                            <TouchableOpacity
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                              onPress={() => {
+                                deleteToggle(item.id);
+                              }}
+                            >
+                              <FontAwesome
+                                name={
+                                  deleteIds.includes(item.id)
+                                    ? "check-circle-o"
+                                    : "circle-o"
+                                }
+                                // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                                size={25}
+                                color={
+                                  deleteIds.includes(item.id)
+                                    ? "#3ea3a3"
+                                    : "gray"
+                                }
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        )}
                         <View
                           style={{
-                            width: "70%",
-                            // backgroundColor: "blue"
-                            justifyContent: "center",
+                            backgroundColor: "#f0f0f0",
+                            height: "100%",
+                            width: editMode ? "90%" : "100%",
+                            flexDirection: "row",
+                            alignItems: "center",
                           }}
                         >
-                          {item.lastMessage ? (
-                            <Text style={{ color: "#185a9d" }}>
-                              {item.lastMessage &&
-                                moment(item.dateTime).format("LLL")}
+                          <View
+                            style={{
+                              width: "20%",
+                              maxWidth: 100,
+                              padding: 5,
+                              // backgroundColor: "yellow"
+                            }}
+                          >
+                            {/* <Text>1</Text> */}
+                            <Image
+                              source={{ uri: item.photoURL }}
+                              style={{
+                                resizeMode: "contain",
+                                height: "100%",
+                                // width: "100%",
+                                // aspectRatio: 1 / 1,
+                                borderRadius: 1000,
+                              }}
+                            />
+                            <Badge
+                              value={item.notifications}
+                              containerStyle={{
+                                position: "absolute",
+                                top: 5,
+                                right: 10,
+                              }}
+                              badgeStyle={{
+                                backgroundColor: "#3ea3a3",
+                                display:
+                                  item.notifications === 0 ? "none" : "flex",
+                                // width: 25,
+                                // height: 25,
+                                borderColor: "#185a9d",
+                                borderWidth: 0,
+                              }}
+                            />
+                          </View>
+                          <View
+                            style={{
+                              width: "70%",
+                              // backgroundColor: "blue"
+                              justifyContent: "center",
+                            }}
+                          >
+                            {item.lastMessage ? (
+                              <Text style={{ color: "#185a9d" }}>
+                                {item.lastMessage &&
+                                  moment(item.dateTime).format("LLL")}
+                              </Text>
+                            ) : null}
+                            <Text style={{ fontSize: 22 }}>
+                              {item.displayName}
                             </Text>
-                          ) : null}
-                          <Text style={{ fontSize: 22 }}>
-                            {item.displayName}
-                          </Text>
-                          <Text>
-                            {item.lastMessage
-                              ? item.lastMessage.split("\n").length > 0
-                                ? // if first line more than 32 chars
-                                  item.lastMessage.split("\n")[0].length >
-                                  numOfChars
+                            <Text>
+                              {item.lastMessage
+                                ? item.lastMessage.split("\n").length > 0
+                                  ? // if first line more than 32 chars
+                                    item.lastMessage.split("\n")[0].length >
+                                    numOfChars
+                                    ? // message limited to 32 chars with .....
+                                      item.lastMessage
+                                        .split("\n")[0]
+                                        .substring(0, numOfChars) + "......"
+                                    : // first line showed
+                                      item.lastMessage.split("\n")[0]
+                                  : // else
+                                  // if message more than 32 chars
+                                  item.lastMessage.length > numOfChars
                                   ? // message limited to 32 chars with .....
                                     item.lastMessage
-                                      .split("\n")[0]
+                                      .trim()
                                       .substring(0, numOfChars) + "......"
-                                  : // first line showed
-                                    item.lastMessage.split("\n")[0]
-                                : // else
-                                // if message more than 32 chars
-                                item.lastMessage.length > numOfChars
-                                ? // message limited to 32 chars with .....
-                                  item.lastMessage
-                                    .trim()
-                                    .substring(0, numOfChars) + "......"
-                                : // message showed
-                                  item.lastMessage.trim()
-                              : "New Contact"}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            width: "10%",
-                            // backgroundColor: "green"
-                          }}
-                        >
-                          <Octicons
-                            name="primitive-dot"
-                            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-                            size={30}
-                            color={
-                              item.status === "offline" ? "gray" : "#3ea3a3"
-                            }
-                          />
+                                  : // message showed
+                                    item.lastMessage.trim()
+                                : "New Contact"}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              width: "10%",
+                              // backgroundColor: "green"
+                            }}
+                          >
+                            <Octicons
+                              name="primitive-dot"
+                              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                              size={30}
+                              color={
+                                item.status === "offline" ? "gray" : "#3ea3a3"
+                              }
+                            />
+                            {/* {!editMode ? (
+                              <Octicons
+                                name="primitive-dot"
+                                // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+                                size={30}
+                                color={
+                                  item.status === "offline" ? "gray" : "#3ea3a3"
+                                }
+                              />
+                            ) : (
+                              <RadioButton
+                                value="first"
+                                status={"unchecked"}
+                                onPress={() => {
+                                  this.setState({ checked: "first" });
+                                }}
+                              />
+                            )} */}
+                          </View>
                         </View>
                       </TouchableOpacity>
                     </Swipeout>
@@ -756,28 +877,58 @@ export default function FriendsList(props) {
             // </View>
           )}
         </ScrollView>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#3ea3a3",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "absolute",
-            bottom: "3%",
-            right: "3%",
-            borderRadius: 100,
-            // height: "10%",
-            width: "15%",
-            aspectRatio: 1 / 1,
-          }}
-          onPress={() => props.navigation.navigate("FriendsSearch")}
-        >
-          <FontAwesome5
-            name="user-plus"
-            // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
-            size={22}
-            color={"white"}
-          />
-          {/* <Text
+
+        {/* ---------------------------------FRIENDS SEARCH--------------------------------- */}
+        {!editMode ? (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#3ea3a3",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "absolute",
+              bottom: "3%",
+              right: "3%",
+              borderRadius: 100,
+              // height: "10%",
+              width: "15%",
+              aspectRatio: 1 / 1,
+            }}
+            onPress={() => props.navigation.navigate("FriendsSearch")}
+          >
+            <FontAwesome5
+              name="user-plus"
+              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+              size={22}
+              color={"white"}
+            />
+          </TouchableOpacity>
+        ) : (
+          // ---------------------------------DELETE SELECTED---------------------------------
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#901616",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "absolute",
+              bottom: "3%",
+              right: "3%",
+              borderRadius: 100,
+              // height: "10%",
+              width: "15%",
+              aspectRatio: 1 / 1,
+            }}
+            onPress={() => {
+              removeSelectedFriends();
+              setEditMode(false);
+            }}
+          >
+            {/* <FontAwesome5
+              name="user-plus"
+              // name={favoriteAssets.includes(l.id) ? "heart" : "plus"}
+              size={22}
+              color={"white"}
+            /> */}
+            {/* <Text
               style={{
                 color: view === "requests" ? "#185a9d" : "gray",
                 fontSize: 12,
@@ -785,7 +936,33 @@ export default function FriendsList(props) {
             >
               Requests
             </Text> */}
-        </TouchableOpacity>
+            <Text style={{ color: "white" }}>Delete</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* ---------------------------------CANCEL EDITMODE--------------------------------- */}
+        {editMode && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#3ea3a3",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "absolute",
+              bottom: "3%",
+              left: "3%",
+              borderRadius: 100,
+              // height: "10%",
+              width: "15%",
+              aspectRatio: 1 / 1,
+            }}
+            onPress={() => {
+              setEditMode(false);
+              setDeleteIds([]);
+            }}
+          >
+            <Text style={{ color: "white" }}>Cancel</Text>
+          </TouchableOpacity>
+        )}
       </View>
       {/* ---------------------------------MODAL--------------------------------- */}
       <Modal

@@ -17,6 +17,7 @@ import "firebase/functions";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 export default function FriendsMap(props) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -115,8 +116,7 @@ export default function FriendsMap(props) {
     console.log(friends.length);
   }, []);
 
-  return (
-    location &&
+  return location ? (
     friends && (
       <View style={styles.container}>
         <MapView
@@ -131,7 +131,8 @@ export default function FriendsMap(props) {
         >
           {friends.map(
             (friend) =>
-              friend.location && (
+              friend.location &&
+              friend.locationP === true && (
                 <Marker
                   key={friend.id}
                   coordinate={friend.location && friend.location}
@@ -212,6 +213,25 @@ export default function FriendsMap(props) {
         </View>
       </View>
     )
+  ) : (
+    <View
+      style={{ flex: 1, justifyContent: "center", backgroundColor: "white" }}
+    >
+      <LottieView
+        source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+        autoPlay
+        loop
+        style={{
+          position: "relative",
+          width: "50%",
+          backgroundColor: "white",
+          alignItems: "center",
+          justifyContent: "center",
+          alignContent: "center",
+          alignSelf: "center",
+        }}
+      />
+    </View>
   );
 }
 

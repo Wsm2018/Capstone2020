@@ -49,7 +49,7 @@ import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
 import FAQStack from "./comps/FAQ/FAQScreen";
 import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
-
+import AssetHandlerStack from "./comps/AssetHandler/AssetHandlerScreen";
 import * as Location from "expo-location";
 import {
   Ionicons,
@@ -85,7 +85,8 @@ export default function App(props) {
       );
       firebase.auth().signOut();
     } else {
-      db.collection("users")
+      await db
+        .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ status: "offline" });
       firebase.auth().signOut();
@@ -129,6 +130,7 @@ export default function App(props) {
                 color="white"
                 // type="MaterialCommunityIcons"
                 size={28}
+                style={{ marginLeft: 20 }}
               />
             ),
           };
@@ -147,7 +149,20 @@ export default function App(props) {
           },
         },
       },
-
+      BookingHistory: {
+        screen: BookingHistory,
+        navigationOptions: {
+          tabBarIcon: ({ tintColor }) => {
+            return (
+              <MaterialCommunityIcons
+                name="history"
+                size={20}
+                color={tintColor}
+              />
+            );
+          },
+        },
+      },
       Profile: {
         screen: ProfileStack,
         navigationOptions: {
@@ -253,7 +268,7 @@ export default function App(props) {
           headerLeft: (
             <Icon
               style={{ paddingRight: 10 }}
-              onPress={() => navigation.FriendsList}
+              onPress={() => navigation.openDrawer()}
               name="md-menu"
               type="ionicon"
               color="white"
@@ -534,19 +549,44 @@ export default function App(props) {
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
-    const getAdmin = firebase.functions().httpsCallable("getAdmin");
-    const response = await getAdmin({
-      email: firebase.auth().currentUser.email,
-    });
 
-    const admin = response.data.result !== undefined ? true : false;
+    while (!userRef.exists) {
+      userRef = await db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get();
+    }
+    // const getAdmin = firebase.functions().httpsCallable("getAdmin");
+    // const response = await getAdmin({
+    //   email: firebase.auth().currentUser.email,
+    // });
+
+    const admin = null; //response.data.result !== undefined ? true : false;
 
     const user = { ...userRef.data(), admin };
 
-    await db
-      .collection("users")
+    console.log("userRef.exists", userRef.exists);
+    if (userRef.exists) {
+      await db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({ activeRole: user.role });
+    }
+
+    db.collection("users")
       .doc(firebase.auth().currentUser.uid)
-      .update({ activeRole: user.role });
+      .onSnapshot((userRef) => {
+        setPhotoURL(userRef.data().photoURL);
+      });
+
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((userRef) => {
+        console.log("userRef", userRef.data().activeRole);
+        if (userRef.data().role.slice(-12) !== "(incomplete)") {
+          setActiveRole(userRef.data().activeRole);
+        }
+      });
 
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);
@@ -675,24 +715,24 @@ export default function App(props) {
     return firebase.auth().onAuthStateChanged(setLoggedIn);
   }, []);
 
-  const adminTabNav = createBottomTabNavigator(
-    {
-      Home: AdminHomeStack,
-      Profile: ProfileStack,
-      BookingHistory: BookingHistory,
-    },
-    {
-      tabBarOptions: {
-        activeTintColor: "white",
-        inactiveTintColor: "gray",
-        style: { backgroundColor: "#005c9d" },
-      },
-    }
-  );
+  // --------------------- CHANGE THE CONFIG ---------------------
+  // const adminTabNav = (
+  //   {
+  //     Home: AdminHomeStack,
+  //   },
+  //   {
+  //     tabBarOptions: {
+  //       activeTintColor: "white",
+  //       inactiveTintColor: "gray",
+  //       style: { backgroundColor: "#005c9d" },
+  //     },
+  //   }
+  // );
 
-  const AdminAppContainer = createAppContainer(adminTabNav);
+  const AdminAppContainer = createAppContainer(AdminHomeStack);
 
-  const serviceEmployeeTabNav = createBottomTabNavigator({
+  // --------------------- CHANGE THE CONFIG ---------------------
+  const serviceEmployeeTabNav = createMaterialBottomTabNavigator({
     Schedule: ScheduleStack,
     Home: HomeStack,
 
@@ -741,7 +781,13 @@ export default function App(props) {
         // --------------------------------EMPLOYEE AUTHENTICATION----------------------------------
         // If employee account is incomplete go to employeeAuthenticate
         else if (user.role.slice(-12) === "(incomplete)") {
-          return <EmployeeAuthentication user={user} setUser={setUser} />;
+          return (
+            <EmployeeAuthentication
+              user={user}
+              setUser={setUser}
+              setActiveRole={setActiveRole}
+            />
+          );
         }
         // If employee is any OTHER role
         else {
@@ -756,8 +802,6 @@ export default function App(props) {
             switch (activeRole) {
               case "admin":
                 return <AdminAppContainer />;
-              // return <FriendsStack />;
-              // return <AppContainer />;
 
               case "manager":
                 return <ManagersStack />;
@@ -766,7 +810,7 @@ export default function App(props) {
                 return <UserHandlerStack />;
 
               case "asset handler":
-                return <AppContainer />;
+                return <AssetHandlerStack />;
 
               case "customer support":
                 return <AppContainer />;

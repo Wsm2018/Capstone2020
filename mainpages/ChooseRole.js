@@ -152,6 +152,7 @@ export default function ChooseRole(props) {
           {roles.map((role, index) => (
             // index < 7 &&
             <View
+              key={index}
               style={{
                 width: "29%",
                 // height: "29%",
@@ -201,7 +202,7 @@ export default function ChooseRole(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: responsiveFontSize(1.8),
+                        fontSize: responsiveFontSize(1.5),
                         textTransform: "capitalize",
                         // color: "#20365F",
                         fontWeight: "bold",

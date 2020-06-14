@@ -12,6 +12,9 @@ import {
   Dimensions,
   Platform,
   ClippingRectangle,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -36,7 +39,8 @@ import DatePicker from "react-native-datepicker";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-import { Avatar, ListItem } from "react-native-elements";
+
+import { Avatar, ListItem, Icon } from "react-native-elements";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
@@ -67,6 +71,10 @@ export default function Users() {
   const [valueText, setValueText] = useState();
   const subscriptionLevel = ["gold", "silver", "bronze"];
   const [selectedSub, setSelectedSub] = useState("");
+  const [search, setSearch] = useState("");
+
+  const [marginVal, setMargin] = useState(0);
+  const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     db.collection("users").onSnapshot((snap) => {
@@ -235,6 +243,26 @@ export default function Users() {
     }
   }, [users]);
 
+  // const handleSearch = (query) => {
+  //   let tempUsers = JSON.parse(JSON.stringify(users));
+  //   if (query.length > 0) {
+  //     setSearch(query);
+  //     // let tempUsers = [...users];
+  //     let result = tempUsers.filter((user) =>
+  //       user.displayName.toLowerCase().match(query.toLowerCase())
+  //     );
+
+  //     setUsers([...result]);
+  //   } else {
+  //     setUsers(tempUsers);
+  //     setSearch(query);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   handleSearch(search);
+  // }, [search]);
+
   const subscribe = (type) => {
     if (type === "new") {
       let sub = {
@@ -292,6 +320,23 @@ export default function Users() {
       .collection("subscription")
       .doc(subscription.id)
       .update({ endDate: new Date() });
+  };
+
+  useEffect(() => {
+    handleSearch(search);
+  }, [search]);
+
+  const handleSearch = (query) => {
+    if (query.length > 0) {
+      let tempUsers = [...users];
+      let result = tempUsers.filter((user) =>
+        user.displayName.toLowerCase().match(search.toLowerCase())
+      );
+
+      setSearchResult(result);
+    } else {
+      setSearchResult([]);
+    }
   };
 
   return user ? (
@@ -1706,23 +1751,49 @@ export default function Users() {
     </View>
   ) : users ? (
     <ScrollView>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: "#185a9d",
+          borderTopColor: "#185a9d",
+          //paddingTop:'2%',
+        }}
+      >
+        <MaterialCommunityIcons
+          name="account-search"
+          size={40}
+          color="black"
+          style={{ paddingTop: "2%", marginBottom: 10 }}
+        />
+
+        <TextInput
+          style={{
+            backgroundColor: "white",
+            fontSize: 18,
+            paddingLeft: "2%",
+            borderColor: "#185a9d",
+            borderWidth: 2,
+            width: "80%",
+            height: "80%",
+            marginLeft: 10,
+            marginRight: 10,
+          }}
+          placeholderTextColor="#20365F"
+          placeholder="Search Here"
+          onChangeText={setSearch}
+          value={search}
+        />
+      </View>
       {users.map((user) => (
         <TouchableOpacity key={user.id} onPress={() => setUser(user)}>
           <ListItem
-            leftAvatar={{
-              source: { uri: user.photoURL },
-              size: responsiveScreenWidth(12),
-            }}
+            leftAvatar={{ source: { uri: user.photoURL } }}
             rightAvatar={
-              <Ionicons
-                name="ios-arrow-forward"
-                size={responsiveScreenWidth(5)}
-                color="black"
-              />
+              <Ionicons name="ios-arrow-forward" size={24} color="black" />
             }
-            // fontSize={responsiveScreenFontSize(5)}
-            titleStyle={{ fontSize: responsiveScreenFontSize(2) }}
-            subtitleStyle={{ fontSize: responsiveScreenFontSize(1.8) }}
             title={user.displayName}
             subtitle={user.email}
             bottomDivider
