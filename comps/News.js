@@ -27,7 +27,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
-export default ({ item }) => {
+export default ({ item, user }) => {
   const [editFlag, setEditFlag] = useState(true);
   const [viewNews, setViewNews] = useState(false);
   const [titleEdit, setTitleEdit] = useState(item.title);
@@ -131,15 +131,29 @@ export default ({ item }) => {
           }}
         >
           {/* <Badge status="primary" containerStyle={{ paddingTop: "1%" }} /> */}
-          <Ionicons
-            name="ios-time"
-            size={20}
-            color="#185a9d"
-            style={{ paddingTop: "0.3%" }}
-          />
-          <Text style={{ paddingLeft: "3%", fontSize: 18, color: "#185a9d" }}>
-            {moment(item.datePublished.toDate()).format("LL")}
-          </Text>
+          {item.datePublished === item.endDate ? (
+            <Text style={{ fontSize: 16.5, color: "#20365F" }}>Until</Text>
+          ) : (
+            <Ionicons
+              name="ios-time"
+              size={20}
+              color="#20365F"
+              style={{ paddingTop: "0.3%" }}
+            />
+          )}
+          {item.datePublished === item.endDate ? (
+            <Text
+              style={{ paddingLeft: "1%", fontSize: 16.5, color: "#20365F" }}
+            >
+              {moment(item.datePublished.toDate()).format("LL")}
+            </Text>
+          ) : (
+            <Text
+              style={{ paddingLeft: "3%", fontSize: 16.5, color: "#20365F" }}
+            >
+              {moment(item.datePublished.toDate()).format("LL")}
+            </Text>
+          )}
           {viewNews === true ? (
             <Animatable.View animation="flipInX" style={{ width: "100%" }}>
               <TouchableOpacity
@@ -211,38 +225,41 @@ export default ({ item }) => {
               {/* Description:  */}
               {item.description}
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingTop: "3%",
-              }}
-            >
-              <TouchableOpacity
+            {item.endDate === item.datePublished ? null : user.role ===
+                "admin" || user.role === "manager" ? (
+              <View
                 style={{
-                  alignSelf: "flex-end",
-                  paddingRight: "2%",
-                  position: "relative",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingTop: "3%",
                 }}
-                onPress={() => setEditFlag(!editFlag)}
               >
-                <Text>
-                  <FontAwesome name="edit" size={28} color="#1488BB" />
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ alignSelf: "flex-end", position: "relative" }}
-                onPress={() => handleDelete(item)}
-              >
-                <Text>
-                  <MaterialCommunityIcons
-                    name="delete-circle-outline"
-                    size={28}
-                    color="#BB1427"
-                  />
-                </Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "flex-end",
+                    paddingRight: "2%",
+                    position: "relative",
+                  }}
+                  onPress={() => setEditFlag(!editFlag)}
+                >
+                  <Text>
+                    <FontAwesome name="edit" size={28} color="#1488BB" />
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ alignSelf: "flex-end", position: "relative" }}
+                  onPress={() => handleDelete(item)}
+                >
+                  <Text>
+                    <MaterialCommunityIcons
+                      name="delete-circle-outline"
+                      size={28}
+                      color="#BB1427"
+                    />
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </Animatable.View>
         )}
       </Card>

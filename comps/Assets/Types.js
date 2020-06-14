@@ -322,10 +322,16 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "QuickbookinQ",
+  // title: "QuickbookinQ",
   headerStyle: { backgroundColor: "#185a9d" },
   // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
   headerTintColor: "white",
+  headerTitle: (
+    <Image
+      style={{ width: 200, height: 200 }}
+      source={require("../../assets/loadingAnimations/headerlogo.png")}
+    />
+  ),
 });
 
 const styles = StyleSheet.create({

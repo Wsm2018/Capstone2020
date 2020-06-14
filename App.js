@@ -19,6 +19,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/functions";
 import { encode, decode } from "base-64";
+import TicketScreen from "./comps/Ticket/TicketScreen";
 
 if (!global.btoa) {
   global.btoa = encode;
@@ -26,7 +27,7 @@ if (!global.btoa) {
 if (!global.atob) {
   global.atob = decode;
 }
-
+import { responsiveFontSize } from "react-native-responsive-dimensions";
 import { createAppContainer } from "react-navigation";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createDrawerNavigator, DrawerItems } from "react-navigation-drawer";
@@ -34,7 +35,7 @@ import HomeStack from "./navigation/HomeStack";
 import ProfileStack from "./navigation/ProfileStack";
 import FriendsStack from "./comps/Friends/FriendsScreen";
 import Guide from "./mainpages/Guide";
-import { Icon } from "react-native-elements";
+import { Icon, Divider } from "react-native-elements";
 import { createStackNavigator } from "react-navigation-stack";
 import NewsStack from "./navigation/NewsStack";
 import ScheduleStack from "./navigation/ScheduleStack";
@@ -46,8 +47,18 @@ import ManagersStack from "./comps/Managers/ManagersScreen";
 import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
 import ChooseRole from "./mainpages/ChooseRole";
+import FAQStack from "./comps/FAQ/FAQScreen";
+import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
 
 import * as Location from "expo-location";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  FontAwesome5,
+  FontAwesome,
+  Entypo,
+  Fontisto,
+} from "@expo/vector-icons";
 
 // import AsyncStorage from "@react-native-community/async-storage";
 import FlashMessage, { showMessage } from "react-native-flash-message";
@@ -59,6 +70,7 @@ export default function App(props) {
   const [guideView, setGuideView] = useState(true);
   const [admin, setAdmin] = useState(null);
   const [activeRole, setActiveRole] = useState(null);
+  const [photoURL, setPhotoURL] = useState(null);
 
   const handleLogout = async () => {
     const userInfo = await db
@@ -103,38 +115,108 @@ export default function App(props) {
 
   ///////////////////////////////////////////////////////////////////
 
-  const Test = () => {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Test</Text>
-      </View>
-    );
-  };
+  const BookingStack = createAppContainer(
+    createStackNavigator(
+      { BookingHistory: BookingHistory },
+      {
+        defaultNavigationOptions: ({ navigation }) => {
+          return {
+            headerLeft: () => (
+              <MaterialCommunityIcons
+                // style={{ marginLeft: 20 }}
+                onPress={() => navigation.openDrawer()}
+                name="menu"
+                color="white"
+                // type="MaterialCommunityIcons"
+                size={28}
+              />
+            ),
+          };
+        },
+      }
+    )
+  );
 
-  const DashboardTabNavigator = createBottomTabNavigator(
+  const DashboardTabNavigator = createMaterialBottomTabNavigator(
     {
-      Home: HomeStack,
+      Home: {
+        screen: HomeStack,
+        navigationOptions: {
+          tabBarIcon: ({ tintColor }) => {
+            return <Ionicons name="ios-home" size={20} color={tintColor} />;
+          },
+        },
+      },
 
-      News: NewsStack,
-      BookingHistory: BookingHistory,
-      Advertisments: AdvertismentsStack,
+      Profile: {
+        screen: ProfileStack,
+        navigationOptions: {
+          tabBarIcon: ({ tintColor }) => {
+            return (
+              user && (
+                <Image
+                  // hereboi
+                  source={{ uri: photoURL }}
+                  style={{ height: 20, width: 20, borderRadius: 50 }}
+                />
+              )
+            );
+          },
+        },
+      },
+      BookingHistory: {
+        screen: BookingStack,
 
-      Profile: ProfileStack,
+        navigationOptions: {
+          tabBarIcon: ({ tintColor }) => {
+            return (
+              <MaterialCommunityIcons
+                name="history"
+                size={20}
+                color={tintColor}
+              />
+            );
+          },
+        },
+      },
     },
-    //   navigationOptions: ({ navigation }) => {
-    //     const { routeName } = navigation.state.routes[navigation.state.index];
-    //     return {
-    //       headerShown: true,
-    //       headerTitle: routeName,
-    //     };
-    //   },
-    // },
     {
+      //swipeEnabled - Whether to allow swiping between tabs.
+      swipeEnabled: true,
+      //animationEnabled - Whether to animate when changing tabs.
+      animationEnabled: true,
+      //activeColor - Custom color for icon and label in the active tab.
+      activeColor: "white",
+      //inactiveColor - Custom color for icon and label in the inactive tab.
+      inactiveColor: "gray",
+      // barStyle - Style for the bottom navigation bar.
+      barStyle: { backgroundColor: "#276b9c" },
+
+      // tabBarOptions - Configure the tab bar
       tabBarOptions: {
+        //activeTintColor - Label and icon color of the active tab
         activeTintColor: "white",
+        //inactiveTintColor - Label and icon color of the inactive tab.
         inactiveTintColor: "gray",
-        // style: { backgroundColor: theme === "light" ? "#185a9d" : "black" },
-        style: { backgroundColor: "#185a9d" },
+        // to display the labels
+
+        //style - Style object for the tab bar.
+        style: {
+          backgroundColor: "#276b9c",
+          paddingTop: 4,
+        },
+        //labelStyle - Style object for the tab label.
+        lableStyle: {
+          textAlign: "center",
+          fontSize: 19,
+          fontWeight: "bold",
+          color: "transparent",
+        },
+        //indicatorStyle - Style object for the tab indicator (line at the bottom of the tab).
+        indicatorStyle: {
+          borderBottomColor: "white",
+          borderBottomWidth: 70,
+        },
       },
     }
   );
@@ -192,62 +274,243 @@ export default function App(props) {
     {
       Home: {
         screen: DashboardStackNavigator,
+        navigationOptions: {
+          drawerIcon: ({ tintColor }) => {
+            return <Ionicons name="ios-home" size={20} color={tintColor} />;
+          },
+        },
       },
       Friends: {
         screen: FriendsStk,
+        navigationOptions: {
+          drawerIcon: ({ tintColor }) => {
+            return (
+              <FontAwesome5 name="user-friends" size={20} color={tintColor} />
+            );
+          },
+        },
+      },
+      News: {
+        screen: NewsStack,
+        navigationOptions: {
+          drawerIcon: ({ tintColor }) => {
+            return <Entypo name="news" size={20} color={tintColor} />;
+          },
+          headerLeft: () => (
+            <Icon
+              style={{ paddingLeft: 10 }}
+              onPress={() => navigation.openDrawer()}
+              name="md-menu"
+              color="white"
+              type="ionicon"
+              size={30}
+            />
+          ),
+        },
+      },
+      Ticket: {
+        screen: TicketScreen,
+        navigationOptions: {
+          drawerIcon: ({ tintColor }) => {
+            return (
+              <Image
+                source={require("./assets/images/customerSupport.png")}
+                style={{ height: 20, width: 20 }}
+              />
+            );
+          },
+          drawerLabel: "Contact Us",
+          headerLeft: () => (
+            <Icon
+              style={{ paddingLeft: 10 }}
+              onPress={() => navigation.openDrawer()}
+              name="md-menu"
+              color="white"
+              type="ionicon"
+              size={30}
+            />
+          ),
+        },
+      },
+      FAQ: {
+        screen: FAQStack,
+        navigationOptions: {
+          drawerLabel: "Ask Us",
+          drawerIcon: ({ tinColor }) => {
+            return (
+              <Image
+                source={require("./assets/images/faq.png")}
+                style={{ height: 20, width: 20 }}
+              />
+            );
+          },
+          headerLeft: () => (
+            <Icon
+              style={{ paddingLeft: 10 }}
+              onPress={() => navigation.openDrawer()}
+              name="md-menu"
+              color="white"
+              type="ionicon"
+              size={30}
+            />
+          ),
+        },
+      },
+      Advertisment: {
+        screen: AdvertismentsStack,
+        navigationOptions: {
+          headerLeft: () => (
+            <Icon
+              style={{ paddingLeft: 10 }}
+              onPress={() => navigation.openDrawer()}
+              name="md-menu"
+              color="white"
+              type="ionicon"
+              size={30}
+            />
+          ),
+          drawerLabel: "Advertise with us",
+          drawerIcon: ({ tinColor }) => {
+            return <FontAwesome5 name="adversal" size={20} color={tinColor} />;
+          },
+        },
       },
     },
     {
-      drawerBackgroundColor: "#F0F8FF",
+      // drawerBackgroundColor: "#F0F8FF",
       contentOptions: {
         activeTintColor: "black",
-        inactiveTintColor: "black",
+        inactiveTintColor: "gray",
       },
       contentComponent: (props) => (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, marginTop: "5%" }}>
           <View
             style={{
-              height: 200,
-              alignItems: "center",
-              justifyContent: "center",
+              flex: 1,
+              justifyContent: "space-around",
             }}
           >
-            <SafeAreaView style={{ marginTop: "19%" }}>
-              <View style={{ flexDirection: "row" }}>
-                {user && (
-                  <Image
-                    source={{ uri: user.qrCode }}
-                    style={{ width: 150, height: 150 }}
-                  />
-                )}
-                <Text style={{ fontSize: 20 }}>{user && user.displayName}</Text>
+            <View
+              style={{
+                // height: 200,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {user && (
+                <Image
+                  source={{ uri: user.qrCode }}
+                  style={{ width: 150, height: 150 }}
+                />
+              )}
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                source={{ uri: photoURL }}
+                style={{
+                  height: 35,
+                  width: 35,
+                  borderRadius: 50,
+                  marginLeft: "2%",
+                  justifyContent: "center",
+                }}
+              />
+              <View style={{ marginLeft: "5.5%", justifyContent: "center" }}>
+                <Text
+                  style={{
+                    fontSize: responsiveFontSize(2),
+                    fontWeight: "bold",
+                  }}
+                >
+                  {user && user.displayName}
+                </Text>
               </View>
-            </SafeAreaView>
-          </View>
-          <View>
-            <Text>{user && user.email}</Text>
-            <Text>{user && user.phone}</Text>
-          </View>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Fontisto
+                name="email"
+                size={25}
+                color="black"
+                style={{ marginLeft: "3%", justifyContent: "center" }}
+              />
+              <View style={{ marginLeft: "5.5%", justifyContent: "center" }}>
+                <Text>{user && user.email}</Text>
+              </View>
+            </View>
+            <View>
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome
+                  name="mobile-phone"
+                  size={30}
+                  color="black"
+                  style={{ marginLeft: "5%", justifyContent: "center" }}
+                />
+                <View style={{ marginLeft: "7%", justifyContent: "center" }}>
+                  <Text>{user && user.phone.substring(4)}</Text>
+                </View>
+              </View>
+            </View>
+            {user.role === "admin" ||
+            user.role === "manager" ||
+            user.role === "user handler" ||
+            user.role === "asset handler" ||
+            user.role === "customer" ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                }}
+              >
+                <View>
+                  <Image
+                    source={require("./assets/images/roles.png")}
+                    style={{ height: 40, width: 40 }}
+                  />
+                </View>
 
-          <ScrollView>
+                <TouchableOpacity
+                  onPress={handleChangeRole}
+                  style={{ justifyContent: "center", marginLeft: "2%" }}
+                >
+                  <View style={{ marginLeft: "2%" }}>
+                    <Text>Swap Your Role</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </View>
+          <Divider style={{ backgroundColor: "black", height: "0.1%" }} />
+          <ScrollView
+            contentContainerStyle={{
+              flex: 1,
+              justifyContent: "space-evenly",
+            }}
+          >
             <DrawerItems {...props} />
           </ScrollView>
-          <View>
-            <TouchableOpacity onPress={handleLogout}>
-              <Text>Logout {user && user.displayName}</Text>
+          {/* <Divider style={{ backgroundColor: "black", height: "0.1%" }} /> */}
+
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <MaterialCommunityIcons
+                name="logout"
+                size={25}
+                style={{ justifyContent: "center" }}
+                // style={styles.actionButtonIcon}
+              />
+              <View style={{ justifyContent: "center" }}>
+                <Text style={{ fontWeight: "bold" }}>
+                  Logout {user && user.displayName}
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
-          {user.role === "admin" ||
-          user.role === "manager" ||
-          user.role === "user handler" ||
-          user.role === "asset handler" ||
-          user.role === "customer" ? (
-            <View>
-              <TouchableOpacity onPress={handleChangeRole}>
-                <Text>Change Role {user && user.displayName}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
         </SafeAreaView>
       ),
     }
@@ -261,6 +524,12 @@ export default function App(props) {
       .onSnapshot((userRef) => {
         console.log("userRef", userRef.data().activeRole);
         setActiveRole(userRef.data().activeRole);
+      });
+
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((userRef) => {
+        setPhotoURL(userRef.data().photoURL);
       });
 
     const userRef = await db
@@ -402,7 +671,7 @@ export default function App(props) {
     }
   }, [loggedIn]);
 
-  useEffect(() => {}, [user]);
+  // useEffect(() => {}, [user]);
 
   useEffect(() => {
     return firebase.auth().onAuthStateChanged(setLoggedIn);

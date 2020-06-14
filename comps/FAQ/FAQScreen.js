@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
-
+import { Icon } from "react-native-elements";
 import ViewScreen from "./FAQViewScreen";
 import CreateScreen from "./FAQCreate";
 import UpdateScreen from "./FAQScreen";

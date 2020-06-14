@@ -557,7 +557,7 @@ export default function ProfileScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: responsiveScreenFontSize(2),
+                        fontSize: responsiveScreenFontSize(1.5),
                         color: "#28456B",
                         fontWeight: "bold",
                       }}
@@ -587,7 +587,7 @@ export default function ProfileScreen(props) {
                     <Text
                       style={{
                         textAlign: "center",
-                        fontSize: responsiveScreenFontSize(2),
+                        fontSize: responsiveScreenFontSize(1.5),
                         color: "#28456B",
                         fontWeight: "bold",
                       }}
