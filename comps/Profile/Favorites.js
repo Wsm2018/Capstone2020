@@ -115,15 +115,22 @@ export default function Favorites({
       { cancelable: false }
     );
   };
-
   const handleDeleteFavorite = async (id) => {
+    console.log("deleteddddddddddd ", id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
       assetId: id,
     });
     if (response.data !== null) {
-      alert("Asset Deleteted");
+      // alert("Asset Deleteted");
+      showMessage({
+        message: `Favourite Deleted!`,
+        description: `Item deleted from your favourites successfully!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
+      });
     }
   };
 
