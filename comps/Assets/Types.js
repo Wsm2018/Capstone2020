@@ -15,6 +15,10 @@ import {
   Dimensions,
   AsyncStorage,
 } from "react-native";
+import {
+  responsiveScreenWidth,
+  responsiveScreenHeight,
+} from "react-native-responsive-dimensions";
 import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -322,28 +326,19 @@ export default function Types(props) {
 }
 
 Types.navigationOptions = (props) => ({
-  title: "QuickbooQ",
+  // title: "QuickbookinQ",
   headerStyle: { backgroundColor: "#185a9d" },
   // headerStyle: { backgroundColor: theme2 === "light" ? "#185a9d" : "black" },
   headerTintColor: "white",
-  // headerTitle: (
-  //   <Image
-  //     style={{ width: 200, height: 200 }}
-  //     source={require("../../assets/loadingAnimations/headerlogo.png")}
-  //   />
-  // ),
-  // header: (
-  //   <View style={{ height: 100, justifyContent: "center", marginTop: 25 }}>
-  //     <Text
-  //       onPress={() => {
-  //         console.log("helllllllllllllo");
-  //         props.navigation.openDrawer();
-  //       }}
-  //     >
-  //       Helllo
-  //     </Text>
-  //   </View>
-  // ),
+  headerTitle: (
+    <Image
+      style={{
+        width: responsiveScreenWidth(28),
+        height: responsiveScreenHeight(8),
+      }}
+      source={require("../../assets/loadingAnimations/headerlogo.png")}
+    />
+  ),
 });
 
 const styles = StyleSheet.create({
