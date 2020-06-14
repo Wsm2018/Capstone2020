@@ -11,8 +11,8 @@ import DetailsScreen from "../comps/Profile/DetailsScreen";
 import AddCars from "../comps/Profile/Cars/AddCars";
 import CarsScreen from "../comps/Profile/Cars/CarsScreen";
 import CarDetail from "../comps/Profile/Cars/CarDetail";
-import BookingHistory from "../comps/Profile/BookingHistory";
-import Payment from "../comps/Profile/ExtensionPayment";
+// import BookingHistory from "../comps/BookingHistory/BookingHistory";
+import Payment from "../comps/BookingHistory/ExtensionPayment";
 import Subscription from "../comps/SubscriptionsScreen";
 
 import { Icon } from "react-native-elements";
@@ -28,7 +28,7 @@ const ProfileStack = createStackNavigator(
     Car: CarDetail,
     AddCars: AddCars,
     AllCars: CarsScreen,
-    BookingHistory: BookingHistory,
+    // BookingHistory: BookingHistory,
     Payment: Payment,
     Subscription: Subscription,
   },

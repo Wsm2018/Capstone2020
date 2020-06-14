@@ -42,7 +42,7 @@ import ScheduleStack from "./navigation/ScheduleStack";
 import AdvertismentsStack from "./navigation/AdvertismentsStack";
 import db from "./db";
 import AdminHomeStack from "./navigation/AdminHomeStack";
-import BookingHistory from "./comps/Profile/BookingHistory";
+import BookingStack from "./navigation/BookingHistoryStack";
 import ManagersStack from "./comps/Managers/ManagersScreen";
 import UserHandlerStack from "./comps/UserHandler/UserHandlerScreen";
 import EmployeeAuthentication from "./mainpages/EmployeeAuthentication";
@@ -116,29 +116,6 @@ export default function App(props) {
 
   ///////////////////////////////////////////////////////////////////
 
-  const BookingStack = createAppContainer(
-    createStackNavigator(
-      { BookingHistory: BookingHistory },
-      {
-        defaultNavigationOptions: ({ navigation }) => {
-          return {
-            headerLeft: () => (
-              <MaterialCommunityIcons
-                // style={{ marginLeft: 20 }}
-                onPress={() => navigation.openDrawer()}
-                name="menu"
-                color="white"
-                // type="MaterialCommunityIcons"
-                size={28}
-                style={{ marginLeft: 15 }}
-              />
-            ),
-          };
-        },
-      }
-    )
-  );
-
   const DashboardTabNavigator = createMaterialBottomTabNavigator(
     {
       Home: {
@@ -169,7 +146,8 @@ export default function App(props) {
         navigationOptions: {
           tabBarIcon: ({ tintColor }) => {
             return (
-              user && (
+              user &&
+              photoURL && (
                 <Image
                   // hereboi
                   source={{ uri: photoURL }}
@@ -444,7 +422,7 @@ export default function App(props) {
                 justifyContent: "center",
               }}
             >
-              {user && (
+              {user && photoURL && (
                 <Image
                   source={{ uri: user.qrCode }}
                   style={{ width: 150, height: 150 }}
@@ -452,16 +430,18 @@ export default function App(props) {
               )}
             </View>
             <View style={{ flexDirection: "row" }}>
-              <Image
-                source={{ uri: photoURL }}
-                style={{
-                  height: 35,
-                  width: 35,
-                  borderRadius: 50,
-                  marginLeft: "2%",
-                  justifyContent: "center",
-                }}
-              />
+              {photoURL && (
+                <Image
+                  source={{ uri: photoURL }}
+                  style={{
+                    height: 35,
+                    width: 35,
+                    borderRadius: 50,
+                    marginLeft: "2%",
+                    justifyContent: "center",
+                  }}
+                />
+              )}
               <View style={{ marginLeft: "5.5%", justifyContent: "center" }}>
                 <Text
                   style={{
@@ -591,22 +571,22 @@ export default function App(props) {
         .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ activeRole: user.role });
+
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          setPhotoURL(userRef.data().photoURL);
+        });
+
+      db.collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          console.log("userRef", userRef.data().activeRole);
+          if (userRef.data().role.slice(-12) !== "(incomplete)") {
+            setActiveRole(userRef.data().activeRole);
+          }
+        });
     }
-
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((userRef) => {
-        setPhotoURL(userRef.data().photoURL);
-      });
-
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((userRef) => {
-        console.log("userRef", userRef.data().activeRole);
-        if (userRef.data().role.slice(-12) !== "(incomplete)") {
-          setActiveRole(userRef.data().activeRole);
-        }
-      });
 
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);
