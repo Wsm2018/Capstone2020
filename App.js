@@ -431,7 +431,7 @@ export default function App(props) {
   const AppContainer = createAppContainer(AppDrawerNavigator);
 
   async function getUser() {
-    const userRef = await db
+    let userRef = await db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get();
@@ -465,15 +465,14 @@ export default function App(props) {
         setPhotoURL(userRef.data().photoURL);
       });
 
-    // db.collection("users")
-    //   .doc(firebase.auth().currentUser.uid)
-    //   .onSnapshot((userRef) => {
-    //     console.log("userRef", userRef.data().activeRole);
-    //     if (userRef.data().role.slice(-12) !== "(incomplete)") {
-    //       setActiveRole(userRef.data().activeRole);
-    //     }
-    //   });
-    setActiveRole("customer");
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((userRef) => {
+        console.log("userRef", userRef.data().activeRole);
+        if (userRef.data().role.slice(-12) !== "(incomplete)") {
+          setActiveRole(userRef.data().activeRole);
+        }
+      });
 
     console.log("userRole", user.role);
     console.log("userActiveRole", user.activeRole);

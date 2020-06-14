@@ -146,6 +146,7 @@ export default function ChooseRole(props) {
           {roles.map((role, index) => (
             // index < 7 &&
             <View
+              key={index}
               style={{
                 width: "29%",
                 // height: "29%",
