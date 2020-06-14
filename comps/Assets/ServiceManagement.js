@@ -90,8 +90,7 @@ export default function ServiceManagement(props) {
     const handleSelectService = (s) => {
         if (serviceWorkHoursDays) {
             var addWD = serviceWorkHoursDays.filter(w => w.service.id == s.id)[0]
-            //console.log("add wd" , addWD , s)
-            //setSelectedService()
+            
             var temp = { service: addWD.service, workingDays: addWD.workingDays }
             setSelectedService(temp)
             setShowEdit(false)
@@ -153,7 +152,7 @@ export default function ServiceManagement(props) {
                     })
                     manageDays(services[i], weekDays)
                 });
-                // console.log("here", i)
+              
             }
 
         }
@@ -166,7 +165,7 @@ export default function ServiceManagement(props) {
         var workingAt = []
         for (let i = 0; i < week.length; i++) {
             var findDay = weekDays.filter(w => w.day === week[i])[0]
-            // console.log(" found", findDay)
+           
             workingAt.push({ day: week[i], hours: findDay ? findDay.hours : [] })
         }
         temp.push({ service, workingDays: workingAt })
