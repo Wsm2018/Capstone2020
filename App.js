@@ -721,11 +721,11 @@ export default function App(props) {
   const serviceEmployeeTabNav = createMaterialBottomTabNavigator(
     {
       Schedule: ScheduleStack,
-      Home: HomeStack,
+      // Home: HomeStack,
 
-      News: NewsStack,
+      // News: NewsStack,
 
-      Profile: ProfileStack,
+      // Profile: ProfileStack,
     },
     {
       //swipeEnabled - Whether to allow swiping between tabs.s
@@ -768,7 +768,7 @@ export default function App(props) {
     }
   );
 
-  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+  const ServiceEmployeeAppContainer = createAppContainer(ScheduleStack);
 
   const guideSkip = async () => {
     // console.log("Skipppped");
