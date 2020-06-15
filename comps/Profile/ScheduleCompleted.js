@@ -372,6 +372,11 @@ export default function ScheduleCompleted(props) {
     </View>
   );
 }
+ScheduleCompleted.navigationOptions = (props) => ({
+  // title: "Schedule",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+});
 const styles = StyleSheet.create({
   container: {
     flex: 1,

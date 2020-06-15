@@ -51,7 +51,7 @@ export default function Schedule(props) {
   );
   const [deviceType, setDeviceType] = useState(0);
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
-
+  // .add(2, "days")
   useEffect(() => {
     db.collection("services").onSnapshot((snapshot) => {
       const temp = [];
@@ -390,7 +390,7 @@ export default function Schedule(props) {
             >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#949494",
+                  backgroundColor: "#3ea3a3",
                   height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
@@ -427,7 +427,7 @@ export default function Schedule(props) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#949494",
+                  backgroundColor: "#3ea3a3",
                   height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
@@ -447,7 +447,7 @@ export default function Schedule(props) {
                   }}
                 >
                   {" "}
-                  Completed?
+                  Complete
                 </Text>
               </TouchableOpacity>
             </View>

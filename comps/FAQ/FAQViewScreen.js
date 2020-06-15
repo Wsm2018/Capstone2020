@@ -109,7 +109,9 @@ export default function FAQViewScreen(props) {
           alignItems: "center",
         }}
       >
-        <Text style={{ fontSize: 34 }}>Ask us a Question? </Text>
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+          Frequently Asked Questions
+        </Text>
       </View>
       <ScrollView style={{ width: "100%" }}>
         {user ? (
