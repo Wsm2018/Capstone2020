@@ -39,6 +39,7 @@ import Review from "./Review";
 import { set } from "react-native-reanimated";
 import { Avatar, Card, Title, Paragraph } from "react-native-paper";
 import * as Animatable from "react-native-animatable";
+import FlashMessage, { showMessage } from "react-native-flash-message";
 
 export default function Sections(props) {
   // const [fromFav, setFromFav] = useState(false);
@@ -103,6 +104,8 @@ export default function Sections(props) {
   const [totalAmount, setTotalAmount] = useState(0);
   const [assetTotal, setAssetTotal] = useState(0);
   const [serviceTotal, setServiceTotal] = useState(0);
+
+  const bookView = useRef();
 
   const fav = props.navigation.getParam("flag", false);
   console.log(fav);
@@ -339,34 +342,76 @@ export default function Sections(props) {
   //   });
   //   return ids.includes(id);
   // };
-
   const handleAddFavorite = async (item) => {
     console.log("fav preseddddddddddddddddddd ");
-    // if (!(await checkFavorites(item.id))) {
-    //   db.collection("users")
-    //     .doc(firebase.auth().currentUser.uid)
-    //     .collection("favorites")
-    //     .doc(item.id)
-    //     .set({ asset: item });
-    // } else {
-    //   alert("Already exists");
-    // }
-    // alert("item", item);
-
-    const addFavorite = firebase.functions().httpsCallable("addFavorite");
-    const response = await addFavorite({
-      uid: firebase.auth().currentUser.uid,
-      asset: item.id,
-    });
-    console.log(response);
-    if (response.data !== "Exists") {
-      alert("Asset Added");
-      // getUserFavoriteAssets();
+    if (!favoriteIds.includes(item.id)) {
+      const addFavorite = firebase.functions().httpsCallable("addFavorite");
+      const response = await addFavorite({
+        uid: firebase.auth().currentUser.uid,
+        asset: item.id,
+      });
+      showMessage({
+        message: `Favourite Added!`,
+        description: `Item added to your favourites successfully!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
+      });
     } else {
-      console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      // console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       handleDeleteFavorite(item.id);
     }
+    // alert("item", item);
+
+    // console.log(response);
+    // if (response.data !== "Exists") {
+    //   // alert("Asset Added");
+    //   // getUserFavoriteAssets();
+    //   showMessage({
+    //     message: `Favourite Added!`,
+    //     description: `Item added to your favourites successfully!`,
+    //     // type: "success",
+    //     backgroundColor: "#3ea3a3",
+    //     // duration: 2300,
+    //   });
+    // } else {
+
+    // }
   };
+  // const handleAddFavorite = async (item) => {
+  //   console.log("fav preseddddddddddddddddddd ");
+  //   // if (!(await checkFavorites(item.id))) {
+  //   //   db.collection("users")
+  //   //     .doc(firebase.auth().currentUser.uid)
+  //   //     .collection("favorites")
+  //   //     .doc(item.id)
+  //   //     .set({ asset: item });
+  //   // } else {
+  //   //   alert("Already exists");
+  //   // }
+  //   // alert("item", item);
+
+  //   const addFavorite = firebase.functions().httpsCallable("addFavorite");
+  //   const response = await addFavorite({
+  //     uid: firebase.auth().currentUser.uid,
+  //     asset: item.id,
+  //   });
+  //   console.log(response);
+  //   if (response.data !== "Exists") {
+  //     // alert("Asset Added");
+  //     // getUserFavoriteAssets();
+  //     showMessage({
+  //       message: `Favourite Added!`,
+  //       description: `Item added to your favourites successfully!`,
+  //       // type: "success",
+  //       backgroundColor: "#3ea3a3",
+  //       // duration: 2300,
+  //     });
+  //   } else {
+  //     console.log("deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+  //     handleDeleteFavorite(item.id);
+  //   }
+  // };
 
   const handleDeleteFavorite = async (id) => {
     console.log("deleteddddddddddd ", id);
@@ -376,7 +421,14 @@ export default function Sections(props) {
       assetId: id,
     });
     if (response.data !== null) {
-      alert("Asset Deleteted");
+      // alert("Asset Deleteted");
+      showMessage({
+        message: `Favourite Deleted!`,
+        description: `Item deleted from your favourites successfully!`,
+        // type: "success",
+        backgroundColor: "#901616",
+        // duration: 2300,
+      });
     }
   };
 
@@ -485,16 +537,6 @@ export default function Sections(props) {
     // console.log("222222222222222222");
   });
 
-  // useEffect(() => {
-  //   setTotalAmount(assetTotal + serviceTotal);
-  // }, [assetTotal]);
-
-  // useEffect(() => {
-  //   if (selectedList) {
-  //     setTotalAmount(assetTotal + serviceTotal);
-  //   }
-  // }, [serviceTotal]);
-
   const countAssetTotal = () => {
     if (startDate && endDate) {
       var start = "";
@@ -575,11 +617,15 @@ export default function Sections(props) {
     setServiceTotal(serviceTotal);
   };
 
+  useEffect(() => {
+    setEndDate();
+  }, [startDate]);
+
   /////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView ref={(ref) => (bookView.current = ref)}>
         <View style={styles.header}>
           {/* <Image
             style={{
@@ -593,6 +639,7 @@ export default function Sections(props) {
           <Card.Cover
             // source={{ uri: "https://picsum.photos/700" }}
             source={require("../../assets/images/bookingcover1.jpg")}
+            // source={require("../../assets/assetTypes/cover1.png")}
             style={{ width: "100%" }}
           />
         </View>
@@ -621,7 +668,7 @@ export default function Sections(props) {
                   date={startDate}
                   mode="datetime"
                   placeholder="Choose A Start Date"
-                  format="YYYY-MM-DD T h:mm:ss"
+                  format="YYYY-MM-DD T h:00 A"
                   minDate={new Date()}
                   maxDate="2022-01-01"
                   confirmBtnText="Confirm"
@@ -708,7 +755,7 @@ export default function Sections(props) {
                   date={endDate}
                   mode="datetime"
                   placeholder="Choose An End Date"
-                  format="YYYY-MM-DD T h:mm:ss"
+                  format="YYYY-MM-DD T h:00 A"
                   minDate={startDate}
                   maxDate="2022-01-01"
                   confirmBtnText="Confirm"
@@ -1023,7 +1070,15 @@ export default function Sections(props) {
                       //     type,
                       //   })
                       // }
-                      onPress={() => setSelectedList(l) || setDetailsView(true)}
+                      onPress={() => {
+                        setSelectedList(l);
+                        setDetailsView(true);
+                        // bookView.current.scrollTo({
+                        //   x: 0,
+                        //   y: 400,
+                        //   animation: true,
+                        // });
+                      }}
                       key={i}
                       style={{
                         backgroundColor:

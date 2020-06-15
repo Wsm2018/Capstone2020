@@ -15,6 +15,10 @@ import {
   Dimensions,
   AsyncStorage,
 } from "react-native";
+import {
+  responsiveScreenWidth,
+  responsiveScreenHeight,
+} from "react-native-responsive-dimensions";
 import { Card, Divider } from "react-native-elements";
 import firebase from "firebase/app";
 import "firebase/auth";
@@ -24,17 +28,17 @@ import LottieView from "lottie-react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import TimedSlideshow from "react-native-timed-slideshow";
 import { Surface } from "react-native-paper";
-
+import * as Linking from "expo-linking";
 require("firebase/firestore");
 
-let theme2 = "";
-function tryTheme(props) {
-  const changeTheme = async (x) => {
-    theme2 = await AsyncStorage.getItem("theme");
-  };
-  changeTheme();
-}
-tryTheme();
+// let theme2 = "";
+// function tryTheme(props) {
+//   const changeTheme = async (x) => {
+//     theme2 = await AsyncStorage.getItem("theme");
+//   };
+//   changeTheme();
+// }
+// tryTheme();
 
 export default function Types(props) {
   const [assetTypes, setAssetTypes] = useState([]);
@@ -49,10 +53,11 @@ export default function Types(props) {
   };
 
   useEffect(() => {
-    getTheme();
+    // getTheme();
   }, []);
 
   const [ads, setAds] = useState([]);
+  const [adIndex, setAdIndex] = useState(0);
 
   useEffect(() => {
     db.collection("advertisements")
@@ -64,6 +69,7 @@ export default function Types(props) {
             title: doc.data().title,
             uri: doc.data().image,
             text: doc.data().description,
+            link: doc.data().link,
           });
         });
         console.log("adssss", adsBox);
@@ -82,7 +88,7 @@ export default function Types(props) {
 
   ///////////////////////////////////////////////////////////////////
 
-  //////////////////////  design ////////////////////////////////
+  /////////////////////////  design ////////////////////////////////
   const [assetTypes2, setAssetTypes2] = useState([
     { id: "1", name: "Parking" },
     { id: "2", name: "Parking" },
@@ -96,11 +102,10 @@ export default function Types(props) {
     // "Book a Classroom",
   ]);
   const [bookImage] = useState([
-    "https://image.flaticon.com/icons/png/512/1845/1845213.png",
-    "https://image.flaticon.com/icons/png/512/1845/1845213.png",
-    "https://cdn4.iconfinder.com/data/icons/office-workplace-2/50/82-512.png",
-    "https://image.flaticon.com/icons/png/512/1845/1845213.png",
-    "https://cdn4.iconfinder.com/data/icons/office-workplace-2/50/82-512.png",
+    require("../../assets/assetTypes/parking5.png"),
+    require("../../assets/assetTypes/studyroom.jpg"),
+    require("../../assets/assetTypes/classroom5.jpg"),
+    require("../../assets/assetTypes/tutor.jpg"),
   ]);
   const [items] = useState([
     {
@@ -123,7 +128,7 @@ export default function Types(props) {
       fullWidth: true,
     },
   ]);
-  ////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
 
   const [images] = useState(["../../assets/images/parking.png"]);
   useEffect(() => {
@@ -141,16 +146,14 @@ export default function Types(props) {
   };
 
   return (
-    <View style={theme === "light" ? styles.container : styles.container2}>
+    <View style={styles.container}>
       <ScrollView>
         {ads.length === 0 ? null : (
           <View style={{ height: Dimensions.get("window").height / 4 }}>
             <TouchableOpacity
               style={{ height: "100%" }}
               onPress={() => {
-                () => {
-                  Linking.openURL(ads[0].link);
-                };
+                Linking.openURL(ads[adIndex].link);
               }}
             >
               <TimedSlideshow
@@ -162,8 +165,22 @@ export default function Types(props) {
                 // renderCloseIcon={null}
                 renderCloseIcon={() => null}
                 // imageStyle={{ backgroundColor: "black", width: 20 }}
-                // renderIcon
+                renderIcon={() => null}
               />
+              <View style={{ position: "absolute", top: -500000000000 }}>
+                <TimedSlideshow
+                  items={ads}
+                  // progressBarDirection="middle"
+                  // progressBarColor="#3ea3a3"
+                  // renderCloseIcon=
+                  // onPress={() => console.log("Close Clickedddddd")}
+                  // renderCloseIcon={null}
+                  renderCloseIcon={() => null}
+                  // imageStyle={{ backgroundColor: "black", width: 20 }}
+                  // renderIcon
+                  renderItem={(item) => setAdIndex(item.focusedIndex)}
+                />
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -229,7 +246,7 @@ export default function Types(props) {
                     width: "95%",
                     // height: "50%",
                     // height: Dimensions.get("window").height / 4,
-                    justifyContent: "center",
+                    justifyContent: "flex-end",
                     alignItems: "center",
                     borderWidth: 4,
                     borderColor: "#185a9d",
@@ -238,7 +255,7 @@ export default function Types(props) {
                 >
                   <View
                     style={{
-                      height: "85%",
+                      height: "100%",
                       width: "100%",
                       justifyContent: "center",
                       alignItems: "center",
@@ -250,23 +267,33 @@ export default function Types(props) {
                       style={{
                         // width: Platform.isPad ? "70%" : "80%",
                         // height: Platform.isPad ? "100%" : "80%",
-                        aspectRatio: 1 / 1,
-                        width: "80%",
+                        // aspectRatio: 1 / 1,
+                        width: "100%",
+                        // height: 150,
+                        // resizeMode: "contain",
+                        height: "100%",
                       }}
-                      source={{
-                        uri: bookImage[i],
-                        // uri: t.image,
-                      }}
+                      source={
+                        // i % 2 !== 0
+                        //   ? require("../../assets/assetTypes/classroom5.jpg")
+                        //   : require("../../assets/assetTypes/parking5.png")
+                        // { uri: t.image }
+                        bookImage[i]
+                      }
                     />
                   </View>
 
                   <View
                     style={{
-                      height: "16%",
+                      // height: "102%",
+                      height: "20%",
                       width: "100%",
                       backgroundColor: "#185a9d",
                       justifyContent: "center",
                       alignItems: "center",
+                      position: "absolute",
+                      opacity: 0.9,
+                      // aspectRatio: 1 / 1,
                     }}
                   >
                     <Text
@@ -280,16 +307,9 @@ export default function Types(props) {
                         fontWeight: "bold",
                         // height: "20%",
                         textTransform: "capitalize",
+                        // opacity: 100,
                       }}
                     >
-                      {/* Book a
-                      {t.name.charAt(0).toLowerCase() === "a" ||
-                      "e" ||
-                      "i" ||
-                      "o" ||
-                      "u"
-                        ? " "
-                        : "n "} */}
                       {t.name}
                     </Text>
                   </View>
@@ -312,7 +332,10 @@ Types.navigationOptions = (props) => ({
   headerTintColor: "white",
   headerTitle: (
     <Image
-      style={{ width: 200, height: 200 }}
+      style={{
+        width: responsiveScreenWidth(28),
+        height: responsiveScreenHeight(8),
+      }}
       source={require("../../assets/loadingAnimations/headerlogo.png")}
     />
   ),

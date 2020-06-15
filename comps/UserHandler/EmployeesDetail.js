@@ -20,8 +20,12 @@ import { Card } from "react-native-shadow-cards";
 import firebase from "firebase/app";
 import "firebase/auth";
 import db from "../../db";
-import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
-
+import {
+  Feather,
+  Ionicons,
+  SimpleLineIcons,
+  EvilIcons,
+} from "@expo/vector-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ActionButton from "react-native-action-button";
 import * as Linking from "expo-linking";
@@ -300,8 +304,8 @@ export default function EmployeesRequest(props) {
                   style={{
                     borderRadius: 8,
                     borderWidth: 1,
-                    borderColor: "#185a9d",
-                    height: 40,
+                    // borderColor: "#185a9d",
+                    //  height: 30,
                     marginTop: "1%",
                     width: "50%",
                     marginBottom: "2%",
@@ -329,13 +333,13 @@ export default function EmployeesRequest(props) {
                   style={{
                     borderRadius: 8,
                     borderWidth: 1,
-                    borderColor: "#185a9d",
-                    height: 50,
-                    width: "87%",
+                    //  borderColor: "#185a9d",
+                    height: 40,
+                    width: "50%",
                     alignSelf: "center",
                     // opacity: 0.8,
                     paddingLeft: 12,
-                    marginTop: 20,
+                    //   marginTop: 20,
                     backgroundColor: "white",
                     // flexDirection: "row-reverse",
                     justifyContent: "center",
@@ -360,7 +364,7 @@ export default function EmployeesRequest(props) {
                     </Text>
                     <Ionicons
                       name="md-arrow-dropdown"
-                      size={responsiveScreenHeight(10)}
+                      size={responsiveScreenHeight(2)}
                       color="#333333"
                       style={{
                         marginRight: "5%",
@@ -383,7 +387,7 @@ export default function EmployeesRequest(props) {
             <Text
               style={{
                 alignSelf: "center",
-                fontSize: responsiveFontSize(1.5),
+                fontSize: responsiveFontSize(1.6),
                 marginBottom: "2%",
               }}
             >
@@ -535,7 +539,7 @@ export default function EmployeesRequest(props) {
               <Text></Text>
               <Text
                 style={{
-                  fontSize: responsiveFontSize(1.2),
+                  fontSize: responsiveFontSize(1.6),
                   textAlign: "center",
                 }}
               >
@@ -602,31 +606,54 @@ export default function EmployeesRequest(props) {
           </TouchableOpacity>
         </View>
       ) : (
-        <ActionButton buttonColor={"#3ea3a3"} size={80}>
+        // <ActionButton
+        //   buttonColor={"#3ea3a3"}
+        //   size={responsiveScreenFontSize(8)}
+        //   buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+        // >
+        //   <ActionButton.Item
+        //     buttonColor="#185a9d"
+        //     title="Reset Password"
+        //     onPress={() => setModal(true)}
+        //   >
+        //     <EvilIcons name="lock" size={20} style={styles.actionButtonIcon2} />
+        //   </ActionButton.Item>
+        //   <ActionButton.Item
+        //     buttonColor="#901616"
+        //     title="Edit"
+        //     onPress={() => {
+        //       setEditMode(true);
+        //       setHeightVal("75%");
+        //     }}
+        //   >
+        //     <Feather name="edit" size={20} style={styles.actionButtonIcon} />
+        //   </ActionButton.Item>
+        // </ActionButton>
+        <ActionButton
+          buttonColor={"#3ea3a3"}
+          size={responsiveScreenFontSize(8)}
+          //  style={styles.actionButtonIcon2}
+          // icon={responsiveScreenFontSize(10)}
+          buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+          // position="left"
+          //verticalOrientation="down"
+        >
           <ActionButton.Item
-            buttonColor="#9b59b6"
+            buttonColor="#185a9d"
             title="Reset Password"
             onPress={() => setModal(true)}
           >
-            <SimpleLineIcons
-              name="people"
-              size={20}
-              style={styles.actionButtonIcon}
-            />
+            <EvilIcons name="lock" size={20} style={styles.actionButtonIcon2} />
           </ActionButton.Item>
           <ActionButton.Item
-            buttonColor="#3498db"
+            buttonColor="#901616"
             title="Edit"
             onPress={() => {
               setEditMode(true);
               setHeightVal("75%");
             }}
           >
-            <MaterialCommunityIcons
-              name="logout"
-              size={20}
-              style={styles.actionButtonIcon}
-            />
+            <Feather name="edit" size={20} style={styles.actionButtonIcon} />
           </ActionButton.Item>
         </ActionButton>
       )}
@@ -655,13 +682,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#e3e3e3",
   },
   actionButtonIcon: {
-    fontSize: 20,
-    height: 22,
+    fontSize: responsiveFontSize(2),
+    // height: 40,
     color: "white",
   },
   actionButtonIcon2: {
-    height: 22,
-    width: 22,
+    fontSize: responsiveFontSize(4),
+    // height: 40,
+    color: "white",
   },
   footer: {
     flex: 0,
@@ -674,11 +702,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-    // marginStart: "2%",
-    // marginEnd: "2%",
     borderRadius: 10,
     marginBottom: 10,
-
     flexDirection: "row",
   },
   text: {

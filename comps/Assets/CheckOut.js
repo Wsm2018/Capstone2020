@@ -29,6 +29,7 @@ export default function CheckOut(props) {
   const [disable, setDisable] = useState(false);
   const tName = props.navigation.getParam("tName", "failed");
   const sName = props.navigation.getParam("sName", "failed");
+  const [checker, setChecker] = useState("");
   const assetBooking = props.navigation.getParam(
     "assetBooking",
     "some default value"
@@ -219,6 +220,80 @@ export default function CheckOut(props) {
   //   });
 
   const payLater = async () => {
+    var bookingTemp = [];
+    var bookings = await db
+      .collection("assets")
+      .doc(assetBooking.asset.id)
+      .collection("assetBookings")
+      .get();
+    // console.log(" ehh", bookings)
+    if (bookings) {
+      bookings.forEach((b) => {
+        bookingTemp.push(b.data());
+      });
+    }
+    //const temp = [];
+    //setEmpty(true)
+    setChecker(bookingTemp);
+  };
+
+  useEffect(() => {
+    if (checker && checker.length >= 0) {
+      console.log(" got it !!! 3");
+      var conflict = false;
+      var result = checker.filter((AB) => {
+        if (
+          AB.startDateTime >= assetBooking.startDateTime &&
+          AB.startDateTime <= assetBooking.endDateTime
+        ) {
+          console.log(
+            " 1 ",
+            AB.startDateTime,
+            assetBooking.startDateTime,
+            AB.endDateTime,
+            assetBooking.startDateTime
+          );
+          conflict = true;
+          //break
+        } else if (
+          AB.endDateTime >= assetBooking.endDateTime &&
+          AB.endDateTime <= assetBooking.endDateTime
+        ) {
+          console.log(
+            " 2 ",
+            AB.startDateTime,
+            assetBooking.endDateTime,
+            AB.endDateTime,
+            assetBooking.endDateTime
+          );
+          conflict = true;
+          // break
+        } else if (
+          AB.startDateTime == assetBooking.startDateTime ||
+          AB.endDateTime == assetBooking.endDateTime
+        ) {
+          console.log(
+            " 3 ",
+            AB.startDateTime,
+            assetBooking.startDateTime,
+            AB.endDateTime,
+            assetBooking.endDateTime
+          );
+          conflict = true;
+          // break
+        }
+      });
+
+      if (!conflict) {
+        add();
+      } else {
+        alert("Sorry, Booking Can't be added!!");
+        props.navigation.navigate("Types");
+      }
+    }
+  }, [checker]);
+
+  const add = async () => {
     const handleBooking = firebase.functions().httpsCallable("handleBooking");
     var user = await db
       .collection("users")
@@ -263,9 +338,13 @@ export default function CheckOut(props) {
         vibrate: true,
       },
     };
-    localNotification.title = "Booking Complete (Unpaid)";
-    localNotification.body = `Total of ${totalAmount} QAR is still pending and the ${tName} was booked successfully!`;
-    Notifications.presentLocalNotificationAsync(localNotification);
+    if (!response.data) {
+      alert("Sorry, whatever !!");
+    } else {
+      localNotification.title = "Booking Complete (Unpaid)";
+      localNotification.body = `Total of ${totalAmount} QAR is still pending and the ${tName} was booked successfully!`;
+      Notifications.presentLocalNotificationAsync(localNotification);
+    }
 
     props.navigation.navigate("Types");
   };

@@ -77,7 +77,7 @@ export default function indexUH(props) {
       code: "#185a9d",
       nav: () => props.navigation.navigate("EmployeesAllowed"),
       // change this image when needed
-      image: require("../../assets/images/form.png"),
+      image: require("../../assets/images/employeesAllowed.png"),
       // image: require("../../assets/images/emp.png"),
       height: 120,
       width: 200,
@@ -442,7 +442,7 @@ export default function indexUH(props) {
         //verticalOrientation="down"
       >
         <ActionButton.Item
-          buttonColor="#3498db"
+          buttonColor="#185a9d"
           title="Change Role"
           onPress={handleChangeRole}
         >

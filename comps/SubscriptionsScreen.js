@@ -29,6 +29,9 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
+  useResponsiveFontSize,
+  responsiveHeight,
 } from "react-native-responsive-dimensions";
 
 import { Card } from "react-native-shadow-cards";
@@ -218,7 +221,7 @@ export default function SubscriptionsScreen(props) {
               >
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: responsiveFontSize(2),
                     color: "#005c9d",
                     fontWeight: "bold",
                     textAlign: "center",
@@ -237,7 +240,7 @@ export default function SubscriptionsScreen(props) {
               >
                 <Text
                   style={{
-                    fontSize: 18,
+                    fontSize: responsiveFontSize(2),
                     // fontWeight: "bold",
                     textAlign: "center",
                   }}
@@ -257,7 +260,7 @@ export default function SubscriptionsScreen(props) {
                 <View
                   style={{
                     backgroundColor: "#2E9E9B",
-                    height: 40,
+                    height: responsiveHeight(5),
                     width: "60%",
                     justifyContent: "center",
                     alignItems: "center",
@@ -273,7 +276,7 @@ export default function SubscriptionsScreen(props) {
                       <Text
                         style={{
                           textAlign: "center",
-                          fontSize: 16,
+                          fontSize: responsiveFontSize(2),
                           color: "white",
                           fontWeight: "bold",
                         }}
@@ -290,7 +293,7 @@ export default function SubscriptionsScreen(props) {
                         <Text
                           style={{
                             textAlign: "center",
-                            fontSize: 16,
+                            fontSize: responsiveFontSize(2),
                             color: "white",
                             fontWeight: "bold",
                           }}
@@ -1011,7 +1014,7 @@ const styles = StyleSheet.create({
   },
   card2: {
     backgroundColor: "white",
-    width: "100%",
+    width: responsiveScreenWidth(80),
     // marginTop: "3%",
     // paddingBottom: "10%",
     borderWidth: 2,

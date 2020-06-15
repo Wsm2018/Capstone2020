@@ -11,11 +11,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from "react-native";
+
 import Image from "react-native-scalable-image";
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
+  useResponsiveScreenHeight,
 } from "react-native-responsive-dimensions";
 import { Divider, Card as Cards } from "react-native-elements";
 import { Octicons } from "@expo/vector-icons";
@@ -62,19 +65,21 @@ export default function Code(props) {
           >
             <View
               style={{
-                marginEnd: 30,
+                marginEnd: "20%",
                 // marginTop: -10,
               }}
             >
-              <Text style={{ marginTop: -10 }}>You Get</Text>
+              <Text style={{ fontSize: responsiveScreenFontSize(1.5) }}>
+                You Get
+              </Text>
             </View>
 
             <View
               style={{
                 backgroundColor: "#185a9d",
-                height: 45,
-                width: 45,
-                borderRadius: 30,
+                height: responsiveScreenHeight(6),
+                width: responsiveScreenHeight(6),
+                borderRadius: 90,
                 justifyContent: "center",
                 position: "absolute",
                 top: -25,
@@ -82,7 +87,12 @@ export default function Code(props) {
               }}
             >
               <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 20, color: "white" }}>
+                <Text
+                  style={{
+                    fontSize: responsiveScreenFontSize(2),
+                    color: "white",
+                  }}
+                >
                   {promotion.percentage}%
                 </Text>
               </View>
@@ -103,7 +113,7 @@ export default function Code(props) {
                 <View style={{ flex: 0.1, alignItems: "center" }}>
                   <Text
                     style={{
-                      fontSize: 30,
+                      fontSize: responsiveFontSize(3),
                       color: "#185a9d",
                       fontWeight: "bold",
                     }}
@@ -118,10 +128,10 @@ export default function Code(props) {
                     alignItems: "center",
                   }}
                 >
-                  <View style={{ flex: 0.2 }}>
+                  <View style={{ flex: 0.5 }}>
                     <Text
                       style={{
-                        fontSize: 14,
+                        fontSize: responsiveFontSize(1.5),
                         fontWeight: "bold",
                         color: "gray",
                       }}
@@ -131,9 +141,9 @@ export default function Code(props) {
                   </View>
                   <Text
                     style={{
-                      fontSize: 15,
+                      // fontSize: 15,
                       color: "#5c5c5c",
-                      fontSize: 18,
+                      fontSize: responsiveFontSize(2),
                       fontWeight: "bold",
                     }}
                   >

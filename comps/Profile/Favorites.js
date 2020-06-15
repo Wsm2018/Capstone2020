@@ -17,6 +17,7 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveHeight,
 } from "react-native-responsive-dimensions";
 import { AntDesign, FontAwesome } from "react-native-vector-icons";
 
@@ -115,15 +116,22 @@ export default function Favorites({
       { cancelable: false }
     );
   };
-
   const handleDeleteFavorite = async (id) => {
+    console.log("deleteddddddddddd ", id);
     const deleteFavorite = firebase.functions().httpsCallable("deleteFavorite");
     const response = await deleteFavorite({
       uid: firebase.auth().currentUser.uid,
       assetId: id,
     });
     if (response.data !== null) {
-      alert("Asset Deleteted");
+      // alert("Asset Deleteted");
+      showMessage({
+        message: `Favourite Deleted!`,
+        description: `Item deleted from your favourites successfully!`,
+        // type: "success",
+        backgroundColor: "#3ea3a3",
+        // duration: 2300,
+      });
     }
   };
 
@@ -627,7 +635,7 @@ const styles = StyleSheet.create({
   modalView2: {
     // flex: 1,
     // margin: 20,
-    height: height / 1.6,
+    height: responsiveHeight(90),
     width: width / 1.2,
     backgroundColor: "#fff",
     shadowOpacity: 1,

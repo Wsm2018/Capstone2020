@@ -8,6 +8,12 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Icon, Avatar, Button, Image, Input } from "react-native-elements";
@@ -40,14 +46,6 @@ export default function NewsPage() {
     getUser();
   }, []);
 
-  const getUser = () => {
-    db.collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .onSnapshot((querySnap) => {
-        setUser(querySnap.data());
-      });
-  };
-
   useEffect(() => {
     callNews();
   }, [promotions]);
@@ -69,6 +67,12 @@ export default function NewsPage() {
       setPromotions(codes);
     });
   }, []);
+
+  const getUser = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .onSnapshot((doc) => setUser({ id: doc.id, ...doc.data() }));
+  };
 
   const callNews = () => {
     db.collection("news").onSnapshot((onSnapshot) => {
@@ -150,7 +154,7 @@ export default function NewsPage() {
 
       <ScrollView style={{ flex: 1, width: "125%" }} horizontal={false}>
         {news.map((item, i) =>
-          user.role === "admin" ? (
+          user.activeRole === "admin" ? (
             !item.isPromo ? (
               <News key={i} item={item} user={user} />
             ) : null
@@ -159,12 +163,12 @@ export default function NewsPage() {
           )
         )}
       </ScrollView>
-      {user && (user.role === "admin" || user.role === "manager") ? (
+      {user && user.activeRole === "admin" ? (
         <TouchableOpacity
           style={{
             backgroundColor: "#3ea3a3",
-            height: 50,
-            width: "60%",
+            height: responsiveScreenHeight(5),
+            width: "50%",
             alignItems: "center",
             alignContent: "center",
 
@@ -185,7 +189,7 @@ export default function NewsPage() {
           <Text
             style={{
               color: "#fff",
-              fontSize: 22,
+              fontSize: responsiveFontSize(2),
               paddingLeft: "5%",
               paddingBottom: "2%",
             }}
@@ -218,7 +222,7 @@ export default function NewsPage() {
           flexDirection: "column",
         }}
       >
-        <View
+        {/* <View
           style={{
             // paddingTop: "15%",
             borderBottomWidth: 1,
@@ -245,10 +249,16 @@ export default function NewsPage() {
               <MaterialIcons name="cancel" size={30} color="#fff" />
             </Text>
           </TouchableOpacity>
-          <Text style={{ fontSize: 28, color: "#fff", paddingBottom: "5%" }}>
+          <Text
+            style={{
+              fontSize: responsiveFontSize(3),
+              color: "#fff",
+              paddingBottom: "5%",
+            }}
+          >
             Create News
           </Text>
-        </View>
+        </View> */}
         <View
           style={{
             borderWidth: 2,

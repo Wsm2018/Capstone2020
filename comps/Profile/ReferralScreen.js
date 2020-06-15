@@ -205,7 +205,7 @@ export default function ReferralScreen(props) {
                             // textAlign: "right",
                             // marginStart: 10,
                             // flex: 4,
-                            fontSize: responsiveScreenFontSize(3.3),
+                            fontSize: responsiveScreenFontSize(3),
                             fontWeight: "bold",
                             color: "black",
                           }}
@@ -270,19 +270,8 @@ export default function ReferralScreen(props) {
                           alignItems: "center",
                           justifyContent: "flex-end",
                           margin: 10,
-                          // marginBottom: -30,
-                          // backgroundColor: "blue",
-                          // position: "absolute",
-                          // right: -10,
-                          // top: -10,
-                          // borderBottomWidth: 1,
-                          // borderBottomColor: "gray",
                         }}
                       >
-                        {/* <Text style={{ fontSize: 16, color: "black" }}>
-                        What is this{" "}
-                      </Text> */}
-
                         {deviceType === 1 ? (
                           <AntDesign
                             name="questioncircle"
@@ -292,7 +281,7 @@ export default function ReferralScreen(props) {
                         ) : (
                           <AntDesign
                             name="questioncircle"
-                            size={32}
+                            size={23}
                             color="#901616"
                           />
                         )}
@@ -300,9 +289,6 @@ export default function ReferralScreen(props) {
                     </Tooltip>
                   </View>
                 </View>
-                {/* <View> */}
-
-                {/* </View> */}
               </Card>
               <View
                 style={{
@@ -318,39 +304,7 @@ export default function ReferralScreen(props) {
                     // backgroundColor: "red",
                     flex: 0.5,
                   }}
-                >
-                  {/* <Text
-                    style={{
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: "bold",
-                      color: "black",
-
-                      // color: "#20365F",
-                    }}
-                  >
-                    Tokens: {user.tokens}
-                  </Text> */}
-                </View>
-
-                {/* <View
-                style={{
-                  justifyContent: "flex-start",
-                  // backgroundColor: "red",
-                  flex: 0.5,
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    color: "black",
-                  }}
-                >
-                  Discount: 0
-                </Text>
-              </View> */}
+                ></View>
               </View>
             </View>
           </View>

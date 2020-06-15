@@ -267,9 +267,11 @@ export default function EmployeesRequest(props) {
             ) : (
               <View
                 style={{
+                  flex: 0.6,
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   flexDirection: "column",
+                  alignSelf: "center",
                 }}
               >
                 <LottieView
@@ -279,9 +281,9 @@ export default function EmployeesRequest(props) {
                   style={{
                     position: "relative",
                     width: "100%",
-                    justifyContent: "center",
-                    alignSelf: "center",
-                    paddingTop: "30%",
+                    // justifyContent: "center",
+                    // alignSelf: "center",
+                    paddingTop: "5%",
                   }}
                 />
                 <Text
@@ -358,11 +360,11 @@ const styles = StyleSheet.create({
     marginTop: "-10%",
   },
   containerLogin2: {
-    flex: 0.7,
+    flex: 0.8,
     justifyContent: "flex-start",
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
-    marginTop: "-8%",
+    // marginTop: "-8%",
   },
   header: {
     padding: 15,

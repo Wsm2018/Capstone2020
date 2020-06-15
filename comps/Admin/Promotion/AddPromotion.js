@@ -11,6 +11,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+  useResponsiveScreenHeight,
+} from "react-native-responsive-dimensions";
 import DatePicker from "react-native-datepicker";
 import moment from "moment";
 import db from "../../../db";
@@ -104,7 +111,7 @@ export default function AddPromotion(props) {
               >
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: responsiveFontSize(2),
                     color: "#005c9d",
                     justifyContent: "center",
                     alignSelf: "center",
@@ -130,7 +137,7 @@ export default function AddPromotion(props) {
                   }}
                 >
                   <TextInput
-                    style={{ height: 50, width: "80%" }}
+                    style={{ height: responsiveScreenHeight(5), width: "80%" }}
                     value={code}
                     onChangeText={(c) => {
                       setCode(c);
@@ -169,7 +176,7 @@ export default function AddPromotion(props) {
                   }}
                 >
                   <TextInput
-                    style={{ height: 50, width: "80%" }}
+                    style={{ height: responsiveScreenHeight(5), width: "80%" }}
                     value={percentage}
                     onChangeText={(percent) => {
                       setPercentage(percent);
@@ -255,7 +262,7 @@ export default function AddPromotion(props) {
                 style={{
                   flex: 0.3,
                   backgroundColor: "#2E9E9B",
-                  height: 40,
+                  height: responsiveScreenHeight(5),
                   justifyContent: "center",
                   alignItems: "center",
                   marginEnd: "3%",
@@ -266,7 +273,7 @@ export default function AddPromotion(props) {
                 <Text
                   style={{
                     textAlign: "center",
-                    fontSize: 16,
+                    fontSize: responsiveFontSize(2),
                     color: "white",
                   }}
                 >
