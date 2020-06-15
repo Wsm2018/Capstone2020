@@ -81,7 +81,7 @@ export default function SupportChat(props) {
   return (
     <KeyboardAvoidingView
       enabled={false}
-      behavior="height"
+      behavior="padding"
       // style={{ marginTop: marginVal }}
       style={{ flex: 1 }}
     >
@@ -93,6 +93,25 @@ export default function SupportChat(props) {
           height: "90%",
         }}
       >
+        <View
+          style={{
+            height: 40,
+            backgroundColor: "white",
+            borderBottomWidth: 1,
+            borderColor: "lightgray",
+            justifyContent: "center",
+            paddingLeft: 5,
+          }}
+        >
+          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={35}
+              color="#185a9d"
+              // style={{ paddingTop: "2%", marginBottom: 10 }}
+            />
+          </TouchableOpacity>
+        </View>
         <ScrollView>
           {messages ? (
             <View style={styles.container}>
@@ -118,12 +137,13 @@ export default function SupportChat(props) {
                   <View
                     key={index}
                     style={{
-                      backgroundColor: "#84e09e",
+                      backgroundColor: "#3ea3a3",
                       textAlign: "right",
                       alignSelf: "flex-end",
-                      borderRadius: 5,
+                      borderRadius: 8,
                       borderWidth: 0.1,
                       marginTop: 5,
+                      borderTopRightRadius: 0,
                     }}
                   >
                     <View style={{ padding: 5 }}>
@@ -141,11 +161,12 @@ export default function SupportChat(props) {
                   <View
                     key={index}
                     style={{
-                      backgroundColor: "lightgray",
-                      borderRadius: 5,
+                      backgroundColor: "white",
+                      borderRadius: 8,
                       alignSelf: "flex-start",
                       borderWidth: 0.1,
                       marginTop: 5,
+                      borderTopLeftRadius: 0,
                     }}
                   >
                     <View style={{ padding: 5 }}>
@@ -168,7 +189,8 @@ export default function SupportChat(props) {
         style={{
           flexDirection: "row",
           backgroundColor: "white",
-          marginBottom: marginVal === 0 ? 0 : keyboardHeight,
+          marginBottom:
+            Platform.OS === "ios" ? (marginVal === 0 ? 0 : keyboardHeight) : 0,
           flex: 1,
           // height: "10%",
           minHeight: marginVal === 0 ? 0 : 15,
@@ -176,7 +198,7 @@ export default function SupportChat(props) {
       >
         <TextInput
           placeholder="Type here..."
-          style={{ paddingLeft: 15 }}
+          style={{ paddingLeft: 15, height: "100%" }}
           value={text}
           multiline
           width={Dimensions.get("window").width - 70}
@@ -212,11 +234,12 @@ const styles = StyleSheet.create({
     padding: 3,
     fontSize: 14,
     color: "#383838",
+    fontWeight: "bold",
   },
   fontBold: {
     padding: 3,
     fontSize: 14,
-    color: "#383838",
+    color: "white",
     fontWeight: "bold",
   },
 });
