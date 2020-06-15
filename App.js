@@ -22,6 +22,10 @@ import { encode, decode } from "base-64";
 import TicketScreen from "./comps/Ticket/TicketScreen";
 import TicketScreenAgent from "./comps/Ticket/TicketScreenAgent";
 
+import {
+  responsiveScreenWidth,
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
 if (!global.btoa) {
   global.btoa = encode;
 }
@@ -880,14 +884,14 @@ export default function App(props) {
             }}
           >
             <Image
-              width={Dimensions.get("window").width / 6}
-              source={require("./assets/images/mylogo.png")}
+              width={Dimensions.get("window").width / 3}
+              source={require("./assets/images/mylogo2.png")}
               autoPlay
               loop
               style={{
                 position: "relative",
-                width: "50%",
-                height: "30%",
+                width: responsiveScreenWidth(60),
+                height: responsiveHeight(35),
               }}
             />
             <LottieView
@@ -914,14 +918,14 @@ export default function App(props) {
         }}
       >
         <Image
-          width={Dimensions.get("window").width / 6}
-          source={require("./assets/images/mylogo.png")}
+          width={Dimensions.get("window").width / 3}
+          source={require("./assets/images/mylogo2.png")}
           autoPlay
           loop
           style={{
             position: "relative",
-            width: "50%",
-            height: "30%",
+            width: responsiveScreenWidth(60),
+            height: responsiveHeight(35),
           }}
         />
         <LottieView
