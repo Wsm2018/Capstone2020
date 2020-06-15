@@ -195,7 +195,7 @@ export default function Details(props) {
                             fontSize: 18,
                           }}
                         >
-                          {asset.code}
+                          {asset.code} tt
                         </Text>
                       </View>
                     </TouchableOpacity>

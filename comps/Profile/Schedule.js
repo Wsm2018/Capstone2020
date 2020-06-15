@@ -23,19 +23,21 @@ import moment from "moment";
 import { ListItem, getIconType } from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import ActionButton from "react-native-action-button";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Collapse,
   CollapseHeader,
   CollapseBody,
 } from "accordion-collapse-react-native";
+import * as Device from "expo-device";
+import { Feather,  SimpleLineIcons } from "@expo/vector-icons";
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
   responsiveFontSize,
 } from "react-native-responsive-dimensions";
+import ActionButton from "react-native-action-button";
 export default function Schedule(props) {
   const [user, setUser] = useState({});
   const [services, setServices] = useState({});
@@ -51,6 +53,11 @@ export default function Schedule(props) {
   );
   const [deviceType, setDeviceType] = useState(0);
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
 
   useEffect(() => {
     db.collection("services").onSnapshot((snapshot) => {
@@ -849,7 +856,9 @@ export default function Schedule(props) {
           </View>
         </Modal>
       </ScrollView>
-      <ActionButton
+      {
+        user.role != "services employee" ?
+<ActionButton
         // buttonColor={"#3ea3a3"}
         // size={80}
         // //  style={styles.actionButtonIcon2}
@@ -863,6 +872,17 @@ export default function Schedule(props) {
         // icon={responsiveScreenFontSize(10)}
         buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
       >
+        <ActionButton.Item
+          buttonColor="#185a9d"
+          title="Change Role"
+          onPress={handleChangeRole}
+        >
+          <SimpleLineIcons
+            name="people"
+            size={deviceType === 1 ? 60 : 80}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
         <ActionButton.Item
           buttonColor="#3498db"
           title="Logout"
@@ -878,6 +898,11 @@ export default function Schedule(props) {
           />
         </ActionButton.Item>
       </ActionButton>
+        :
+
+        null
+      }
+      
     </View>
   );
 }

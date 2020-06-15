@@ -18,8 +18,7 @@ import ServiceManagement from "../comps/Assets/ServiceManagement"
 
 const HomeStack = createStackNavigator(
   {
-    AssetManager: AssetManager,
-    ServiceManagement:ServiceManagement,
+    
     Types: Types,
     Assets: Assets,
     Home: HomePage,
@@ -28,6 +27,8 @@ const HomeStack = createStackNavigator(
     Details: Details,
     Payment: Payment,
     CheckOut: CheckOut,
+    AssetManager: AssetManager,
+    ServiceManagement:ServiceManagement,
   },
   {
     defaultNavigationOptions: ({ navigation }) => {

@@ -80,6 +80,9 @@ export default function ProfileScreen(props) {
   const [deviceType, setDeviceType] = useState(0);
   const size = PixelRatio.getPixelSizeForLayoutSize(140);
 
+  useEffect(()=>{
+    
+  },[])
   console.log("------------------------------------------", Device.DeviceType);
   // ------------------------------------------- FUNCTIONS --------------------------------------
   const getUser = async () => {

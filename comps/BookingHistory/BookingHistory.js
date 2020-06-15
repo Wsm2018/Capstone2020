@@ -28,7 +28,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Review from "./Review.js";
-
+import LottieView from "lottie-react-native";
 import {
   FontAwesome5,
   Fontisto,
@@ -45,7 +45,7 @@ export default function BookingHistory(props) {
   const serviceTotal = useRef();
   const total = useRef();
   const assetTotal = useRef();
-  const [payments, setPayments] = useState([]);
+  const [payments, setPayments] = useState("");
   const [viewDetails, setViewDetails] = useState();
   const [services, setServices] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -668,23 +668,18 @@ export default function BookingHistory(props) {
   return (
     <View
       style={{
-        backgroundColor: "#e3e3e3",
+        backgroundColor: payments == ""? "white":"#e3e3e3",
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
         flex: 1,
       }}
     >
-      {/* <Header
-        containerStyle={{ backgroundColor: "#185a9d" }}
-        //leftComponent={{ icon: 'menu', color: '#fff' }}
-        centerComponent={{
-          text: "My Bookings History",
-          style: { color: "#fff", fontSize: 22 },
-        }}
-        // rightComponent={{ icon: 'home', color: '#fff' }}
-      /> */}
-      <ScrollView style={{ backgroundColor: "#e3e3e3", width: "100%" }}>
+
+      {
+    
+        payments && payments.length > 0 ?
+        <ScrollView style={{ backgroundColor: "#e3e3e3", width: "100%" }}>
         {payments && !viewDetails ? (
           <FlatList
             data={payments}
@@ -1466,6 +1461,36 @@ export default function BookingHistory(props) {
           </View>
         )}
       </ScrollView>
+
+        : payments == "" ?
+        
+        <LottieView
+          source={require("../../assets/loadingAnimations/890-loading-animation.json")}
+          autoPlay
+          loop
+          style={{
+            position: "relative",
+            width: "50%",
+            backgroundColor: "white",
+            alignItems: "center",
+            justifyContent: "center",
+            alignContent: "center",
+            alignSelf: "center",
+          }}
+        />
+      :
+      null
+      }
+      {/* <Header
+        containerStyle={{ backgroundColor: "#185a9d" }}
+        //leftComponent={{ icon: 'menu', color: '#fff' }}
+        centerComponent={{
+          text: "My Bookings History",
+          style: { color: "#fff", fontSize: 22 },
+        }}
+        // rightComponent={{ icon: 'home', color: '#fff' }}
+      /> */}
+     
     </View>
   );
 }
