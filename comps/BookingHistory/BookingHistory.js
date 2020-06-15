@@ -156,7 +156,8 @@ export default function BookingHistory(props) {
 
   const getBookings = () => {
     //payment has booking and user id
-    db.collection("payments").onSnapshot((querySnapshot) => {
+    db.collection("payments")
+    .orderBy("dateTime", "asc").onSnapshot((querySnapshot) => {
       const p = [];
       querySnapshot.forEach((doc) => {
         if (
@@ -645,7 +646,7 @@ export default function BookingHistory(props) {
 
   const ext = (end) => {
     if (
-      viewDetails.assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")
+      end.assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")
         .length == 1
     ) {
       var t = end.split(" ")[0] + "T0" + end.split(" ")[2];
@@ -653,6 +654,21 @@ export default function BookingHistory(props) {
       return new Date().getTime() < new Date(t.split(" ").join("")).getTime();
     } else {
       return new Date().getTime() < new Date(end.split(" ").join("")).getTime();
+    }
+  };
+
+  const ext2 = (end) => {
+    //var hour = converte(end)
+    //console.log("end" , end)
+    if (
+      end.split(" ")[2].split(":")[0].split("")
+        .length == 1
+    ) {
+      var t = end.split(" ")[0] + "T0" + end.split(" ")[2];
+      //console.log("here", t);
+      return new Date().getTime() > new Date(t.split(" ").join("")).getTime();
+    } else {
+      return new Date().getTime() > new Date(end.split(" ").join("")).getTime();
     }
   };
   const converte = (hour) => {
@@ -690,11 +706,12 @@ export default function BookingHistory(props) {
                   width: "90%",
                   marginLeft: "5%",
                   borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: "#185a9d",
+                  borderWidth: 3,
+                  borderColor:"#185a9d",
+                  //backgroundColor:"red"
                 }}
                 title={
-                  <View style={{ paddingTop: "3%", padding: "2%" }}>
+                  <View style={{ paddingTop: "3%", padding: "2%"  }}>
                     <View
                       style={{
                         flexDirection: "row",
@@ -792,7 +809,7 @@ export default function BookingHistory(props) {
                         {item.dateTime.split(" ")[0]} {converte(item.dateTime)}
                       </Text>
                     </View>
-                    <Text></Text>
+                    <Text style={{ color:ext2(item.assetBooking.endDateTime) ? "green" : "#800000" , fontSize:15 , paddingLeft: "1%"}}>{ext2(item.assetBooking.endDateTime) ? "* Completed" : "* Incomplete"}</Text>
                    { assetSections.length > 0 &&
                     <Image
                       style={{
