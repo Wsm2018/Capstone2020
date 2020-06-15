@@ -243,25 +243,25 @@ export default function Users() {
     }
   }, [users]);
 
-  // const handleSearch = (query) => {
-  //   let tempUsers = JSON.parse(JSON.stringify(users));
-  //   if (query.length > 0) {
-  //     setSearch(query);
-  //     // let tempUsers = [...users];
-  //     let result = tempUsers.filter((user) =>
-  //       user.displayName.toLowerCase().match(query.toLowerCase())
-  //     );
+  const handleSearch = (query) => {
+    let tempUsers = JSON.parse(JSON.stringify(users));
+    if (query.length > 0) {
+      setSearch(query);
+      // let tempUsers = [...users];
+      let result = tempUsers.filter((user) =>
+        user.displayName.toLowerCase().match(query.toLowerCase())
+      );
 
-  //     setUsers([...result]);
-  //   } else {
-  //     setUsers(tempUsers);
-  //     setSearch(query);
-  //   }
-  // };
+      setUsers([...result]);
+    } else {
+      setUsers(tempUsers);
+      setSearch(query);
+    }
+  };
 
-  // useEffect(() => {
-  //   handleSearch(search);
-  // }, [search]);
+  useEffect(() => {
+    handleSearch(search);
+  }, [search]);
 
   const subscribe = (type) => {
     if (type === "new") {
@@ -322,22 +322,22 @@ export default function Users() {
       .update({ endDate: new Date() });
   };
 
-  useEffect(() => {
-    handleSearch(search);
-  }, [search]);
+  // useEffect(() => {
+  //   handleSearch(search);
+  // }, [search]);
 
-  const handleSearch = (query) => {
-    if (query.length > 0) {
-      let tempUsers = [...users];
-      let result = tempUsers.filter((user) =>
-        user.displayName.toLowerCase().match(search.toLowerCase())
-      );
+  // const handleSearch = (query) => {
+  //   if (query.length > 0) {
+  //     let tempUsers = [...users];
+  //     let result = tempUsers.filter((user) =>
+  //       user.displayName.toLowerCase().match(search.toLowerCase())
+  //     );
 
-      setSearchResult(result);
-    } else {
-      setSearchResult([]);
-    }
-  };
+  //     setSearchResult(result);
+  //   } else {
+  //     setSearchResult([]);
+  //   }
+  // };
 
   return user ? (
     <View style={styles.container}>
