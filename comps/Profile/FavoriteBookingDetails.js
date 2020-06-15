@@ -201,6 +201,7 @@ export default function Details(props) {
     const done = () => {
         //props.setBook(false)
         props.setFavoritesModal(false)
+        props.closeAll()
         props.navigation.navigate("CheckOut", {
             tName: tName,
             sName: sName,
@@ -600,23 +601,24 @@ export default function Details(props) {
         props.countServiceTotal(serviceBooking);
     }, [serviceBooking]);
     return (
+        <ScrollView>
         <View style={styles.container}>
-            
-            <Text style={{   color: "#a6a6a6", fontSize: 20 , marginLeft:"auto", marginRight:"auto" , marginBottom:"5%" }}>Booking Details</Text>
-            
-            
-            <View style={{ backgroundColor:"#eff5f5" , marginBottom:"3%"}}>
-                <View style={{ flexDirection: "row", padding: 5, marginLeft:"auto", marginRight:"auto"  }}>
+
+            <Text style={{ color: "#a6a6a6", fontSize: 20, marginLeft: "auto", marginRight: "auto", marginBottom: "5%" }}>Booking Details</Text>
+
+
+            <View style={{ backgroundColor: "#eff5f5", marginBottom: "3%" }}>
+                <View style={{ flexDirection: "row", padding: 5, marginLeft: "auto", marginRight: "auto" }}>
                     <Text style={{ width: "20%", fontWeight: "bold", color: "#185a9d", fontSize: 15 }}>From</Text>
                     <Text>{startDateTime}</Text>
                 </View>
 
-                <View style={{ flexDirection: "row", padding: 5, marginLeft:"auto", marginRight:"auto"  }}>
+                <View style={{ flexDirection: "row", padding: 5, marginLeft: "auto", marginRight: "auto" }}>
                     <Text style={{ width: "20%", fontWeight: "bold", color: "#185a9d", fontSize: 15 }}>To</Text>
                     <Text>{endDateTime}</Text>
                 </View>
             </View>
-            <View style={{ flexDirection: "row", padding: 5 , backgroundColor:"#eff5f5"}}>
+            <View style={{ flexDirection: "row", padding: 5, backgroundColor: "#eff5f5" }}>
                 <View style={{ width: "23%", alignItems: "center", }}>
 
                     <View
@@ -671,15 +673,35 @@ export default function Details(props) {
 
                 </View>
             </View>
-            <View style={{ marginTop: 15 }}>
+            <View style={{ marginTop: 15, flexDirection: "row" }}>
                 <Text
-                   style={{   color: "#a6a6a6", fontSize: 18 , marginLeft:"auto", marginRight:"auto" , marginBottom:"2%" }}
+                    style={{ color: "#a6a6a6", fontSize: 18,  marginBottom: "2%", width:"85%" , marginLeft:"3%" }}
                 >
                     Services
         </Text>
+
+              
+                    <TouchableOpacity
+                        style={{
+                            //width: "10%",
+                            backgroundColor: "#3ea3a3",
+                            //justifyContent: "center",
+                            //alignItems: "center",
+                            padding: 5,
+                            marginBottom: 5,
+                            borderRadius: 8,
+                            //position:"absolute",
+                           // left:"100%"
+                        }}
+                        onPress={() => setModalAddService(true)}
+                    >
+                        <MaterialCommunityIcons name="plus" size={22} color={"white"} />
+                    </TouchableOpacity>
+
+                
             </View>
 
-            <View> 
+            <View>
                 {/* {selectedService ? (
           <View>
             <Text>Service: {selectedService.name}</Text>
@@ -716,14 +738,14 @@ export default function Details(props) {
 
                                     <TouchableOpacity
                                         style={{
-                                            backgroundColor: "#185a9d",
+                                            backgroundColor: "#2E9E9B",
                                             width: 70,
                                             height: 70,
                                             margin: 5,
                                             alignItems: "center",
                                             flexDirection: "row",
                                             borderWidth: 2,
-                                            borderColor: "#185a9d",
+                                            borderColor: "#2E9E9B",
                                         }}
                                         disabled
                                     >
@@ -812,50 +834,14 @@ export default function Details(props) {
                         </View>
                     ))
                 ) : (
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <View style={{ width: "90%", paddingTop: 5 }}>
-                                <Text>Click on '+' to add services</Text>
-                            </View>
-                            {/* <View
-              style={{
-                
-                width: "10%",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#20365F",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: 5,
-                  marginBottom: 5,
-                }}
-                onPress={() => setModalAddService(true)}
-              >
-               
-                <MaterialCommunityIcons name="plus" size={22} color={"white"} />
-              </TouchableOpacity>
-            </View> */}
-                        </View>
+                     
+                            <View style={{ paddingTop: 5 , marginLeft:"auto", marginRight:"auto" }}>
+                                <Text style={{  paddingTop: 5 , color:"red" }}>Click on '+' to add services</Text>
+                                </View>
+                           
+                        
                     )}
-                <View style={{ marginTop: 5, alignItems: "flex-end" }}>
-                    <View style={{ width: "10%" }}>
-                        <TouchableOpacity
-                            style={{
-                                // width: "10%",
-                                backgroundColor: "#3ea3a3",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: 5,
-                                marginBottom: 5,
-                                borderRadius: 8,
-                            }}
-                            onPress={() => setModalAddService(true)}
-                        >
-                            <MaterialCommunityIcons name="plus" size={22} color={"white"} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+
             </View>
 
             <Modal
@@ -1224,19 +1210,24 @@ export default function Details(props) {
                     </View>
                 </View>
             </Modal>
-            <View style={{ marginTop: 50 }}>
+            <View style={{ flexDirection:"row",backgroundColor: "#eff5f5", justifyContent:"space-evenly", marginBottom:"3%" , marginTop:"3%"}}>
+                <Text style={{  fontWeight: "bold", color: "#185a9d", fontSize: 15 , height:30 }}>Total Amount</Text>
+            <Text style={{  fontWeight: "bold" , height:30}}>{props.totalAssetService} QR</Text>
+            </View>
+            <View>
                 <TouchableOpacity
                     onPress={() => done()}
                     style={{
                         backgroundColor: "#3ea3a3",
                         height: 45,
-                        width: "100%",
+                        //width: "100%",
                         alignSelf: "center",
                         justifyContent: "center",
                         alignItems: "center",
                         // marginStart: "2%",
                         // marginEnd: "2%",
                         borderRadius: 8,
+                        padding:5
                         // marginBottom: 10,
                     }}
                 >
@@ -1247,6 +1238,7 @@ export default function Details(props) {
 
             </View>
         </View>
+        </ScrollView>
     );
 }
 

@@ -288,7 +288,7 @@ export default function CheckOut(props) {
         add();
       } else {
         alert("Sorry, Booking Can't be added!!");
-        props.navigation.navigate("Types");
+        props.navigation.navigate("Profile");
       }
     }
   }, [checker]);

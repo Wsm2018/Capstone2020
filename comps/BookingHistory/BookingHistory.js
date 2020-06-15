@@ -793,6 +793,7 @@ export default function BookingHistory(props) {
                       </Text>
                     </View>
                     <Text></Text>
+                   { assetSections.length > 0 &&
                     <Image
                       style={{
                         // width: Platform.isPad ? "70%" : "80%",
@@ -804,12 +805,13 @@ export default function BookingHistory(props) {
                       }}
                       source={{
                         uri:
-                          assetSections.length > 0
+                          assetSections.length > 0 
                             ? getImage(item.assetBooking.asset.assetSection)
                             : null,
                         // uri: t.image,
                       }}
                     />
+                }
                   </View>
                 }
 
