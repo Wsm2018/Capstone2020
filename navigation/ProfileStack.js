@@ -14,6 +14,7 @@ import CarDetail from "../comps/Profile/Cars/CarDetail";
 // import BookingHistory from "../comps/BookingHistory/BookingHistory";
 import Payment from "../comps/BookingHistory/ExtensionPayment";
 import Subscription from "../comps/SubscriptionsScreen";
+import PointsExchange from "../comps/Profile/PointsExchange";
 
 import { Icon } from "react-native-elements";
 const ProfileStack = createStackNavigator(
@@ -31,6 +32,7 @@ const ProfileStack = createStackNavigator(
     // BookingHistory: BookingHistory,
     Payment: Payment,
     Subscription: Subscription,
+    PointsExchange: PointsExchange,
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
