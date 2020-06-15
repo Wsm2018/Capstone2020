@@ -195,7 +195,7 @@ export default function FriendsList(props) {
     if (users.length > 0) {
       tempFriends = tempFriends.map((friend, index) => {
         let user = users.filter((user) => user.id === friend.id)[0];
-        console.log(user);
+        // console.log(user);
         if (user.status !== undefined) {
           friend.status = user.status;
         }

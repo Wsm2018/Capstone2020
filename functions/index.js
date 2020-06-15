@@ -225,6 +225,7 @@ exports.initUser = functions.https.onRequest(async (request, response) => {
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
       activeRole: null,
+      status: "offline",
     });
 
   if (request.query.referralStatus === "true") {
