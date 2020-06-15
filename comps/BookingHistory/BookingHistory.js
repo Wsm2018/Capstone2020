@@ -646,7 +646,7 @@ export default function BookingHistory(props) {
 
   const ext = (end) => {
     if (
-      end.assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")
+      viewDetails.assetBooking.endDateTime.split(" ")[2].split(":")[0].split("")
         .length == 1
     ) {
       var t = end.split(" ")[0] + "T0" + end.split(" ")[2];
