@@ -14,7 +14,7 @@ const AdvertismentsStack = createStackNavigator(
     MyAdvertisements: MyAdvertisements,
     AdvertisementsForm: AdvertisementsForm,
     AdvertisementsRequest: AdvertisementsRequest,
-    Payment: Payment,
+    AdvertisementsPayment: Payment,
   },
   {
     defaultNavigationOptions: ({ navigation }) => {

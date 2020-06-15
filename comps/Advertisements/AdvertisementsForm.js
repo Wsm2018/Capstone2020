@@ -8,6 +8,7 @@ import {
   TextInput,
   //   Input,
   Modal,
+  ScrollView,
 } from "react-native";
 import { Input, Tooltip } from "react-native-elements";
 import * as Device from "expo-device";
@@ -29,7 +30,6 @@ import {
 // import SubscriptionsScreen from "../SubscriptionsScreen";
 import { set } from "react-native-reanimated";
 import * as Linking from "expo-linking";
-import { ScrollView } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
 export default function AdvertisementsForm(props) {
   const [hasCameraRollPermission, setHasCameraRollPermission] = useState(false);
@@ -80,7 +80,7 @@ export default function AdvertisementsForm(props) {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [1, 1],
         quality: 1,
       });
       if (!result.cancelled) {
@@ -113,9 +113,11 @@ export default function AdvertisementsForm(props) {
   useEffect(() => {
     getUserObject();
   }, []);
+
   useEffect(() => {
     calculation();
   }, [date, endDate]);
+
   const getUserObject = async () => {
     let useracc = await db
       .collection("users")
@@ -123,6 +125,7 @@ export default function AdvertisementsForm(props) {
       .get();
     setUser(useracc.data());
   };
+
   const calculation = () => {
     let a = moment(date.value);
     let b = moment(endDate.value);
@@ -133,6 +136,7 @@ export default function AdvertisementsForm(props) {
       setAmount(result);
     }
   };
+
   const validated = async () => {
     let count = 0;
 
@@ -140,24 +144,41 @@ export default function AdvertisementsForm(props) {
       console.log("title is bad");
       setTitle({ text: title.text, error: true });
     } else {
-      console.log("title good");
-      count++;
+      if (title.text.charAt(0) === " ") {
+        console.log("title is bad");
+        setTitle({ text: title.text, error: true });
+      } else {
+        console.log("title good");
+        count++;
+      }
     }
 
     if (link.text === "") {
       console.log("link bad");
       setLink({ text: link.text, error: true });
     } else {
-      console.log("link good");
-      count++;
+      if (link.text.charAt(0) === " ") {
+        console.log("link bad");
+        setLink({ text: link.text, error: true });
+      } else if (!link.text.includes("https://")) {
+        setLink({ text: link.text, error: true });
+      } else {
+        console.log("link good");
+        count++;
+      }
     }
 
     if (description.text === "") {
       console.log("desc bad");
       setDescription({ text: description.text, error: true });
     } else {
-      console.log("desc good");
-      count++;
+      if (description.text.charAt(0) === " ") {
+        console.log("desc bad");
+        setDescription({ text: description.text, error: true });
+      } else {
+        console.log("desc good");
+        count++;
+      }
     }
 
     if (!endDate.value) {
@@ -209,10 +230,11 @@ export default function AdvertisementsForm(props) {
           paid: false,
           // dunno: "WHYYY",
         })
-        .then((doc) => {
+        .then(async (doc) => {
           console.log("we make it here?");
-          uploadImage(doc.id);
-          setModal(true);
+          await uploadImage(doc.id);
+          props.navigation.goBack();
+          // setModal(true);
         });
 
       //   setTitle(null);
@@ -301,6 +323,7 @@ export default function AdvertisementsForm(props) {
                 fontSize: 16,
                 textTransform: "capitalize",
               }}
+              maxLength={20}
               textstyle
             />
             <Text
@@ -345,6 +368,7 @@ export default function AdvertisementsForm(props) {
               inputContainerStyle={{
                 borderBottomWidth: 0,
               }}
+              maxLength={40}
               containerStyle={styles.Inputs}
               onChangeText={(text) => setDescription({ text, error: false })}
               placeholder="Enter Description"
