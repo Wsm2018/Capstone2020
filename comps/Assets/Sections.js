@@ -1334,7 +1334,7 @@ export default function Sections(props) {
   );
 }
 Sections.navigationOptions = (props) => ({
-  title: "Sections",
+  title: props.navigation.getParam("type", null).name,
   headerStyle: { backgroundColor: "#185a9d" },
   headerTintColor: "white",
 });
