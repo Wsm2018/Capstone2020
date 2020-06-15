@@ -729,6 +729,7 @@ export default function BookingHistory(props) {
                         >
                           <Text
                             style={{
+                              textAlign: "right",
                               fontSize: 18,
                               fontWeight: "bold",
                               color: "#901616",
@@ -753,6 +754,7 @@ export default function BookingHistory(props) {
                       ) : (
                         <Text
                           style={{
+                            textAlign: "right",
                             fontSize: 18,
                             fontWeight: "bold",
                             color: "#3ea3a3",
@@ -804,8 +806,11 @@ export default function BookingHistory(props) {
                         // height: Platform.isPad ? "100%" : "80%",
                         aspectRatio: 1 / 1,
                         width: "80%",
+                        // height: "100%",
                         marginLeft: "auto",
                         marginRight: "auto",
+                        // borderWidth: 1,
+                        // padding: 50,
                       }}
                       source={{
                         uri:
@@ -824,7 +829,13 @@ export default function BookingHistory(props) {
                 //     : "Loading ..."
                 // }
               >
-                <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderTopWidth: 0,
+                    borderColor: "#185a9d",
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 18,
@@ -965,7 +976,7 @@ export default function BookingHistory(props) {
                     marginRight: "auto",
                     width: "30%",
                     backgroundColor: "#2E9E9B",
-                    borderRaduis: 5,
+                    borderRadius: 8,
                     padding: 10,
                   }}
                   onPress={() => setViewDetails(item)}

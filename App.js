@@ -20,6 +20,7 @@ import "firebase/auth";
 import "firebase/functions";
 import { encode, decode } from "base-64";
 import TicketScreen from "./comps/Ticket/TicketScreen";
+import TicketScreenAgent from "./comps/Ticket/TicketScreenAgent";
 
 if (!global.btoa) {
   global.btoa = encode;
@@ -268,33 +269,7 @@ export default function App(props) {
     }
   );
 
-  // const TicketAppContainer = createAppContainer(
-  //   { Ticket: TicketScreen },
-  //   {}
-  // {
-  //   defaultNavigationOptions: ({ navigation }) => {
-  //     return {
-  //       headerLeft: (
-  //         <Icon
-  //           onPress={() => navigation.openDrawer()}
-  //           name="md-menu"
-  //           type="ionicon"
-  //           color="white"
-  //           size={30}
-  //           containerStyle={{
-  //             marginLeft: 20,
-  //           }}
-  //         />
-  //       ),
-  //       headerStyle: {
-  //         backgroundColor: "#185a9d",
-  //       },
-  //       // headerTitle: "FRIENDS",
-  //       headerTintColor: "white",
-  //     };
-  //   },
-  // }
-  // );
+  const TicketAppContainer = createAppContainer(TicketScreenAgent);
 
   const AppDrawerNavigator = createDrawerNavigator(
     {
@@ -571,21 +546,6 @@ export default function App(props) {
         .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ activeRole: user.role });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          setPhotoURL(userRef.data().photoURL);
-        });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          console.log("userRef", userRef.data().activeRole);
-          if (userRef.data().role.slice(-12) !== "(incomplete)") {
-            setActiveRole(userRef.data().activeRole);
-          }
-        });
     }
 
     console.log("userRole", user.role);
@@ -709,6 +669,32 @@ export default function App(props) {
     }
   }, [loggedIn]);
 
+  useEffect(() => {
+    if (user) {
+      const unsubPhoto = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          setPhotoURL(userRef.data().photoURL);
+        });
+
+      const unsubActiveRole = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          console.log("userRef", userRef.data().activeRole);
+          if (userRef.data().role.slice(-12) !== "(incomplete)") {
+            setActiveRole(userRef.data().activeRole);
+          }
+        });
+
+      return () => {
+        unsubPhoto();
+        unsubActiveRole();
+      };
+    }
+  }, [user]);
+
   // useEffect(() => {}, [user]);
 
   useEffect(() => {
@@ -742,7 +728,7 @@ export default function App(props) {
       Profile: ProfileStack,
     },
     {
-      //swipeEnabled - Whether to allow swiping between tabs.
+      //swipeEnabled - Whether to allow swiping between tabs.s
       swipeEnabled: true,
       //animationEnabled - Whether to animate when changing tabs.
       animationEnabled: true,
@@ -855,7 +841,7 @@ export default function App(props) {
                 return <AssetHandlerStack />;
 
               case "customer support":
-                return <AppContainer />;
+                return <TicketAppContainer />;
 
               case "services employee":
                 return <ServiceEmployeeAppContainer />;

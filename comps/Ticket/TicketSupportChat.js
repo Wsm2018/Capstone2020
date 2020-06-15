@@ -13,6 +13,7 @@ import {
   Dimensions,
   Keyboard,
   scrollToEnd,
+  Platform,
 } from "react-native";
 import db from "../../db";
 
@@ -51,6 +52,8 @@ export default function SupportChat(props) {
     }
   };
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [marginVal, setMargin] = useState(0);
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
     Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
@@ -62,10 +65,10 @@ export default function SupportChat(props) {
     };
   }, []);
 
-  const _keyboardDidShow = () => {
+  const _keyboardDidShow = (e) => {
     // console.log("keyyyyyyyyyyyyyyyShow");
-
-    setMargin(-280);
+    setKeyboardHeight(e.endCoordinates.height);
+    setMargin(200);
   };
 
   const _keyboardDidHide = () => {
@@ -73,12 +76,23 @@ export default function SupportChat(props) {
     setMargin(0);
   };
 
-  const [marginVal, setMargin] = useState(0);
   /////////////////////////////////////////////////////////////////////////////////////
 
   return (
-    <KeyboardAvoidingView behavior="height" style={{ marginTop: marginVal }}>
-      <View style={{ height: Dimensions.get("window").height / 1.19 }}>
+    <KeyboardAvoidingView
+      enabled={false}
+      behavior="height"
+      // style={{ marginTop: marginVal }}
+      style={{ flex: 1 }}
+    >
+      <View
+        style={{
+          // height: Dimensions.get("window").height / 1.19,
+          backgroundColor: "#f0f0f0",
+          flex: 10,
+          height: "90%",
+        }}
+      >
         <ScrollView>
           {messages ? (
             <View style={styles.container}>
@@ -149,8 +163,17 @@ export default function SupportChat(props) {
           ) : null}
         </ScrollView>
       </View>
-      <Divider style={{ backgroundColor: "blue" }} />
-      <View style={{ flexDirection: "row", backgroundColor: "white" }}>
+      {/* <Divider style={{ backgroundColor: "blue" }} /> */}
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: "white",
+          marginBottom: marginVal === 0 ? 0 : keyboardHeight,
+          flex: 1,
+          // height: "10%",
+          minHeight: marginVal === 0 ? 0 : 15,
+        }}
+      >
         <TextInput
           placeholder="Type here..."
           style={{ paddingLeft: 15 }}
@@ -159,16 +182,19 @@ export default function SupportChat(props) {
           width={Dimensions.get("window").width - 70}
           onChangeText={setText}
         />
-        <TouchableOpacity onPress={() => sendSupportMessage()}>
+        <TouchableOpacity
+          onPress={() => sendSupportMessage()}
+          style={{ justifyContent: "center", alignItems: "center" }}
+        >
           <MaterialCommunityIcons
             name="send"
             size={35}
             color={"black"}
-            style={{
-              textAlign: "center",
-              justifyContent: "center",
-              margin: 5,
-            }}
+            // style={{
+            //   textAlign: "center",
+            //   justifyContent: "center",
+            //   margin: 5,
+            // }}
           />
         </TouchableOpacity>
       </View>
@@ -179,7 +205,7 @@ export default function SupportChat(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f0f0f0",
     padding: 10,
   },
   font: {

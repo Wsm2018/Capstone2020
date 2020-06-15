@@ -56,7 +56,8 @@ export default function TicketScreen(props) {
   }, []);
 
   useEffect(() => {
-    db.collection("customerSupport")
+    const unsub = db
+      .collection("customerSupport")
       .where("userId", "==", firebase.auth().currentUser.uid)
       .onSnapshot((Snap) => {
         let temp = [];
@@ -66,6 +67,10 @@ export default function TicketScreen(props) {
           setTicketList(temp);
         setTicketListSearch(temp);
       });
+
+    return () => {
+      unsub();
+    };
   }, []);
 
   const changeView = () => {
