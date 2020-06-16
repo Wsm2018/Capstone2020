@@ -20,7 +20,10 @@ import "firebase/auth";
 import "firebase/functions";
 import { encode, decode } from "base-64";
 import TicketScreen from "./comps/Ticket/TicketScreen";
-
+import {
+  responsiveScreenWidth,
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
 if (!global.btoa) {
   global.btoa = encode;
 }
@@ -571,21 +574,6 @@ export default function App(props) {
         .collection("users")
         .doc(firebase.auth().currentUser.uid)
         .update({ activeRole: user.role });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          setPhotoURL(userRef.data().photoURL);
-        });
-
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          console.log("userRef", userRef.data().activeRole);
-          if (userRef.data().role.slice(-12) !== "(incomplete)") {
-            setActiveRole(userRef.data().activeRole);
-          }
-        });
     }
 
     console.log("userRole", user.role);
@@ -708,6 +696,32 @@ export default function App(props) {
       };
     }
   }, [loggedIn]);
+
+  useEffect(() => {
+    if (user) {
+      const unsubPhoto = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          setPhotoURL(userRef.data().photoURL);
+        });
+
+      const unsubActiveRole = db
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .onSnapshot((userRef) => {
+          console.log("userRef", userRef.data().activeRole);
+          if (userRef.data().role.slice(-12) !== "(incomplete)") {
+            setActiveRole(userRef.data().activeRole);
+          }
+        });
+
+      return () => {
+        unsubPhoto();
+        unsubActiveRole();
+      };
+    }
+  }, [user]);
 
   // useEffect(() => {}, [user]);
 
@@ -894,14 +908,14 @@ export default function App(props) {
             }}
           >
             <Image
-              width={Dimensions.get("window").width / 6}
-              source={require("./assets/images/mylogo.png")}
+              width={Dimensions.get("window").width / 3}
+              source={require("./assets/images/mylogo2.png")}
               autoPlay
               loop
               style={{
                 position: "relative",
-                width: "50%",
-                height: "30%",
+                width: responsiveScreenWidth(60),
+                height: responsiveHeight(35),
               }}
             />
             <LottieView
@@ -928,14 +942,14 @@ export default function App(props) {
         }}
       >
         <Image
-          width={Dimensions.get("window").width / 6}
-          source={require("./assets/images/mylogo.png")}
+          width={Dimensions.get("window").width / 3}
+          source={require("./assets/images/mylogo2.png")}
           autoPlay
           loop
           style={{
             position: "relative",
-            width: "50%",
-            height: "30%",
+            width: responsiveScreenWidth(60),
+            height: responsiveHeight(35),
           }}
         />
         <LottieView
