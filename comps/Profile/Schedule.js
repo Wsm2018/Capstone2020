@@ -309,6 +309,7 @@ export default function Schedule(props) {
                         color: "#185a9d",
                         marginBottom: "2%",
                         // fontWeight: "bold",
+                        textAlign: "center",
                       }}
                     >
                       {services.filter((s) => s.id === service)[0].name}
@@ -897,7 +898,32 @@ export default function Schedule(props) {
             />
           </ActionButton.Item>
         </ActionButton>
-      ) : null}
+      ) : (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#901616",
+            width: "20%",
+            borderRadius: 1000,
+            position: "absolute",
+            aspectRatio: 1 / 1,
+            justifyContent: "center",
+            alignItems: "center",
+            bottom: "3%",
+            right: "5%",
+          }}
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={25}
+            style={styles.actionButtonIcon}
+          />
+          <Text style={{ color: "white", fontSize: 8 }}>Logout</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -969,7 +995,7 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   actionButtonIcon: {
-    fontSize: 20,
+    // fontSize: 20,
     // height: 40,
     color: "white",
   },
