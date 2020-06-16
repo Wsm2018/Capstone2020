@@ -277,8 +277,8 @@ export default function Types(props) {
                         // i % 2 !== 0
                         //   ? require("../../assets/assetTypes/classroom5.jpg")
                         //   : require("../../assets/assetTypes/parking5.png")
-                        // { uri: t.image }
-                        bookImage[i]
+                        { uri: t.image }
+                        // bookImage[i]
                       }
                     />
                   </View>

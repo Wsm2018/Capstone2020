@@ -16,18 +16,18 @@ const AppContainer = createAppContainer(
       defaultNavigationOptions: ({ navigation }) => {
         if (navigation.state.routeName === "AssetManagement") {
           return {
-            headerLeft: (
-              <Icon
-                onPress={() => navigation.openDrawer()}
-                name="md-menu"
-                type="ionicon"
-                color="white"
-                size={30}
-                containerStyle={{
-                  marginLeft: 15,
-                }}
-              />
-            ),
+            // headerLeft: (
+            //   <Icon
+            //     onPress={() => navigation.openDrawer()}
+            //     name="md-menu"
+            //     type="ionicon"
+            //     color="white"
+            //     size={30}
+            //     containerStyle={{
+            //       marginLeft: 15,
+            //     }}
+            //   />
+            // ),
             headerStyle: {
               backgroundColor: "#185a9d",
             },

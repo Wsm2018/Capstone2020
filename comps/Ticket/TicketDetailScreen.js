@@ -347,7 +347,7 @@ export default function TicketDetailScreen(props) {
             flexDirection: "row",
           }}
         >
-          {!ticket.status === "pending" && (
+          {ticket.status === "pending" && (
             <TouchableOpacity
               style={{
                 backgroundColor: "#3ea3a3",
