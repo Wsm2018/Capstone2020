@@ -60,7 +60,7 @@ export default function NewsPage() {
           title: `Promotion Code ${doc.data().code}`,
           description: `${doc.data().percentage}% OFF!`,
           image:
-            "https://firebasestorage.googleapis.com/v0/b/capstone2020-b64fd.appspot.com/o/advertisements%2Fpromotion.jpg?alt=media&token=c8dbaa7b-311f-4030-a374-1aa772bdfdaf",
+            "https://lh3.googleusercontent.com/proxy/1bOceRJSkOoQ_awFjFqHXIrwLC8j-0JF4CuCp0ZyEYvL0VBkty2bmFv5Srb4y6QUWCJq3365uUb_2RaD9SZUJXZ9HxUPpqkuGlQnlwQmBnu3xA-ZOv87Zq5-yOz0ecJLx1qcjJlCiNxEFGx6KQoFbX96pE2mXVR8bjccnY9s9mHzPcClEMtSR7JasWQS5Wuphpg9af8o8uYCf_Iqt5H99V5WTkj9SRUcie18RuzV6nON",
           isPromo: true,
         });
       });

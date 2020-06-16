@@ -188,7 +188,7 @@ export default ({ item, user }) => {
                   borderRadius: 5,
                   borderColor: "white",
                   borderWidth: 1,
-                  marginLeft: "50%",
+                  marginLeft: "45%",
                   width: "9%",
                   backgroundColor: "#185a9d",
                 }}
@@ -219,7 +219,7 @@ export default ({ item, user }) => {
                   borderRadius: 5,
                   borderColor: "white",
                   borderWidth: 1,
-                  marginLeft: "50%",
+                  marginLeft: "45%",
                   width: "9%",
                   backgroundColor: "#185a9d",
                 }}

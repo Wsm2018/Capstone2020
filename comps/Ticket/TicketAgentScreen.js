@@ -22,7 +22,15 @@ import { set } from "react-native-reanimated";
 import { Card } from "react-native-shadow-cards";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
+import * as Device from "expo-device";
+import { Feather, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
+import ActionButton from "react-native-action-button";
 // Main Method
 export default function TicketAgentScreen(props) {
   //UseState
@@ -30,7 +38,22 @@ export default function TicketAgentScreen(props) {
   const [agentList, setAgentList] = useState([]);
   const [ticketList, setTicketList] = useState(null);
   const [ticketListSearch, setTicketListSearch] = useState(null);
-
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
+  const [deviceType, setDeviceType] = useState(0);
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   //UseEffect
   useEffect(() => {
     fetchData();
@@ -540,6 +563,43 @@ export default function TicketAgentScreen(props) {
       ) : (
         <Text>Something Went wrong??</Text>
       )}
+      <ActionButton
+        // buttonColor={"#3ea3a3"}
+        // size={deviceType === 1 ? 60 : 80}
+        buttonColor={"#3ea3a3"}
+        size={responsiveScreenFontSize(8)}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+
+        // position="left"
+        //verticalOrientation="down"
+      >
+        <ActionButton.Item
+          buttonColor="#185a9d"
+          title="Change Role"
+          onPress={handleChangeRole}
+        >
+          <SimpleLineIcons
+            name="people"
+            size={deviceType === 1 ? 60 : 80}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+        <ActionButton.Item
+          buttonColor="#901616"
+          title="Logout"
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+      </ActionButton>
     </View>
   ) : (
     <Text>Loading...</Text>
@@ -552,5 +612,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  itemContainer: {
+    justifyContent: "flex-end",
+    borderRadius: 5,
+    // flex: 2,
+    height: responsiveScreenWidth(40),
+  },
+  itemName: {
+    fontSize: responsiveScreenFontSize(1.9),
+    fontWeight: "bold",
+    color: "#fff",
+    // fontWeight: "600",
+  },
+  itemCode: {
+    fontWeight: "600",
+    fontSize: 12,
+    color: "#fff",
+  },
+  actionButtonIcon: {
+    fontSize: responsiveFontSize(2.5),
+    // height: 40,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    //height: 22,
+    // width: 22,
+    fontSize: responsiveFontSize(2.5),
   },
 });

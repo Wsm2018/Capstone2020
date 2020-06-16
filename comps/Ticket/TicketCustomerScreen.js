@@ -346,6 +346,7 @@ export default function TicketScreen(props) {
           >
             <Text style={{ fontWeight: "bold", fontSize: 18 }}>Image:</Text>
             <TouchableOpacity
+              onPress={_pickImage}
               style={{
                 backgroundColor: "gray",
                 borderRadius: 8,
