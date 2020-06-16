@@ -27,7 +27,9 @@ export default function FAQCreate(props) {
   return (
     <View style={styles.container}>
       <View style={{ width: "100%", flex: 1 }}>
-        <Text style={{ color:"#901616" , fontSize:20 , fontWeight:"bold"}}>Question:</Text>
+        <Text style={{ color: "#901616", fontSize: 20, fontWeight: "bold" }}>
+          Question:
+        </Text>
         <TextInput
           multiline
           numberOfLines={4}
@@ -37,8 +39,8 @@ export default function FAQCreate(props) {
             paddingRight: 10,
             flex: 1,
             marginBottom: 10,
-            borderColor:"#901616",
-            borderRadius:2
+            borderColor: "#901616",
+            borderRadius: 2,
           }}
           placeholder="Question?"
           onChangeText={setQuestion}
@@ -56,7 +58,7 @@ export default function FAQCreate(props) {
           onPress={() => Submit()}
           disabled={!question}
         >
-          <Text style={{ color: question ?"white" : "#708090" }}>Submit</Text>
+          <Text style={{ color: question ? "white" : "#708090" }}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

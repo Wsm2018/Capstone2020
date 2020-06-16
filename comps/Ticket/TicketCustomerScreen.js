@@ -11,6 +11,7 @@ import {
   ScrollView,
   ImageBackground,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 import { Image, Badge } from "react-native-elements";
@@ -18,7 +19,7 @@ import ReactNativePickerModule from "react-native-picker-module";
 
 import LottieView from "lottie-react-native";
 import { ButtonGroup, Input, SearchBar } from "react-native-elements";
-
+import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { Card } from "react-native-shadow-cards";
@@ -55,6 +56,8 @@ export default function TicketScreen(props) {
   const [loading, setLoading] = useState(false);
 
   const descriptionBox = useRef();
+
+  let pickerRef = null;
 
   //UseEffect
   useEffect(() => {
@@ -115,7 +118,7 @@ export default function TicketScreen(props) {
     let tempServ = [];
     const info3 = await db.collection("services").get();
     info3.forEach((doc) => {
-      tempServ.push({ id: doc.id, ...doc.data() });
+      tempServ.push(doc.data().name);
     });
     setServicesList(tempServ);
   };
@@ -308,35 +311,86 @@ export default function TicketScreen(props) {
           >
             * Description is required
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              // paddingTop: 10,
-              // paddingBottom: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold", fontSize: 18 }}>Subject:</Text>
-            <Picker
-              selectedValue={selectedValue.value}
-              style={{
-                height: 30,
-                // width: Dimensions.get("window").width / 1.3,
-                width: "50%",
-                borderWidth: 1,
-                borderColor: "gray",
-              }}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedValue({ value: itemValue, error: false })
-              }
-            >
-              <Picker.Item label="Select Subject" value="-1" />
-              {servicesList.map((item, index) => (
-                <Picker.Item key={index} label={item.name} value={item.name} />
-              ))}
 
-              <Picker.Item label="Car" value="user" />
-            </Picker>
-          </View>
+          {Platform.OS !== "ios" ? (
+            <View
+              style={{
+                flexDirection: "row",
+                // paddingTop: 10,
+                // paddingBottom: 10,
+              }}
+            >
+              <Text style={{ fontWeight: "bold", fontSize: 18 }}>Subject:</Text>
+              <Picker
+                selectedValue={selectedValue.value}
+                style={{
+                  height: 30,
+                  // width: Dimensions.get("window").width / 1.3,
+                  width: "50%",
+                  borderWidth: 1,
+                  borderColor: "gray",
+                }}
+                onValueChange={(itemValue, itemIndex) =>
+                  setSelectedValue({ value: itemValue, error: false })
+                }
+              >
+                <Picker.Item label="Select Subject" value="-1" />
+                {servicesList.map((item, index) => (
+                  <Picker.Item key={index} label={item} value={item} />
+                ))}
+
+                <Picker.Item label="Car" value="user" />
+              </Picker>
+            </View>
+          ) : (
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ fontWeight: "bold", fontSize: 18 }}>Subject:</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  pickerRef.show();
+                }}
+                style={{
+                  height: 30,
+
+                  width: "50%",
+
+                  borderColor: "gray",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingLeft: "2%",
+                }}
+              >
+                <Text style={{ fontSize: 17 }}>
+                  {selectedValue.value === "-1"
+                    ? "Select a role"
+                    : selectedValue.value}
+                </Text>
+                <Ionicons
+                  name="md-arrow-dropdown"
+                  size={23}
+                  color="#333333"
+                  style={{
+                    marginRight: "5%",
+                  }}
+                />
+              </TouchableOpacity>
+              {servicesList && (
+                <ReactNativePickerModule
+                  pickerRef={(e) => (pickerRef = e)}
+                  selectedValue={selectedValue.value}
+                  title={"Select role"}
+                  items={servicesList}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setSelectedValue({ value: itemValue, error: false })
+                  }
+                />
+              )}
+            </View>
+          )}
           <View
             style={{
               flexDirection: "row",
