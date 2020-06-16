@@ -32,8 +32,12 @@ export default function FAQCreate(props) {
   return question ? (
     <View style={styles.container}>
       <View style={{ width: "100%", flex: 1 }}>
-        <Text>Q. {question.question}</Text>
-        <Text>Answer:</Text>
+        <Text style={{ color: "#901616", fontSize: 15, fontWeight: "bold" }}>
+          Q. {question.question}
+        </Text>
+        <Text style={{ color: "#2E9E9B", fontSize: 20, fontWeight: "bold" }}>
+          Answer:
+        </Text>
         <TextInput
           multiline
           numberOfLines={4}
@@ -43,6 +47,8 @@ export default function FAQCreate(props) {
             paddingRight: 10,
             flex: 1,
             marginBottom: 10,
+            borderColor: "#2E9E9B",
+            borderRadius: 5,
           }}
           placeholder="Answer?"
           onChangeText={setAnswer}
@@ -55,11 +61,12 @@ export default function FAQCreate(props) {
             justifyContent: "center",
             alignItems: "center",
             alignSelf: "flex-end",
-            backgroundColor: "#3ea3a3",
+            backgroundColor: answer ? "#3ea3a3" : "#DCDCDC",
           }}
           onPress={() => Submit()}
+          disabled={!answer}
         >
-          <Text style={{ color: "white" }}>Submit</Text>
+          <Text style={{ color: answer ? "white" : "#708090" }}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>

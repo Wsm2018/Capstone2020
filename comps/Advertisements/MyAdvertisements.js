@@ -38,7 +38,7 @@ import {
 } from "react-native-responsive-dimensions";
 
 import LottieView from "lottie-react-native";
-import { add } from "react-native-reanimated";
+import * as Linking from "expo-linking";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -47,6 +47,9 @@ export default function MyAdvertisements(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [ads, setAds] = useState(null);
   const [buttonIndex, setButtonIndex] = useState(0);
+  const [approvedAds, setApprovedAds] = useState(null);
+  const [pendingAds, setPendingAds] = useState(null);
+  const [deniedAds, setDeniedAds] = useState(null);
 
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
@@ -65,14 +68,39 @@ export default function MyAdvertisements(props) {
       //   .where("status", "==", "pending")
       .onSnapshot((queryBySnapshot) => {
         let tempAds = [];
+        let approved = [];
+        let denied = [];
+        let pending = [];
         queryBySnapshot.forEach((doc) => {
           tempAds.push({ id: doc.id, ...doc.data() });
+          if (doc.data().status === "approved") {
+            approved.push({ id: doc.id, ...doc.data() });
+          } else if (doc.data().status === "pending") {
+            pending.push({ id: doc.id, ...doc.data() });
+          } else {
+            denied.push({ id: doc.id, ...doc.data() });
+          }
         });
+        setApprovedAds(approved);
+        setPendingAds(pending);
+        setDeniedAds(denied);
         // console.log(tempAds);
         setAds(tempAds);
       });
     return unsub;
   };
+
+  const openLink = async (item) => {
+    await db
+      .collection("advertisements")
+      .doc(item.id)
+      .update({
+        clickers: item.clickers + 1,
+      });
+    Linking.openURL(item.link);
+  };
+
+  // ------------------------------------------------ USE EFFECTS -----------------------------
 
   useEffect(() => {
     handleCurrentuser();
@@ -88,237 +116,210 @@ export default function MyAdvertisements(props) {
     }
   }, [currentUser]);
 
+  // useEffect(() => {
+  //   if (ads) {
+  //     ads.map((item) => {
+  //       item.status === "approved"
+  //         ? approved.push(item)
+  //         : item.status === "pending"
+  //         ? pending.push(item)
+  //         : denied.push(item);
+  //     });
+  //   }
+  // }, [ads]);
+
+  // ------------------------------------------------ RETURN  ----------------------------------
+
   return (
     ads && (
       <View style={styles.container}>
-        <View
+        <TouchableOpacity
           style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "center",
+            backgroundColor: "#3ea3a3",
             alignItems: "center",
-            height: "10%",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "3%",
+            right: "3%",
+            borderRadius: 100,
+            // height: "10%",
+            width: "15%",
+            aspectRatio: 1 / 1,
+            zIndex: 10,
           }}
+          onPress={() => props.navigation.navigate("AdvertisementsForm")}
         >
-          <TouchableOpacity
-            style={{
-              width: "15%",
-              //   borderWidth: 1,
-              height: "70%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onPress={() => props.navigation.navigate("AdvertisementsForm")}
-          >
-            <MaterialCommunityIcons
-              name={"plus-box"}
-              size={45}
-              color={"#a6a6a6"}
-            />
-          </TouchableOpacity>
-          <ButtonGroup
-            onPress={(index) => {
-              setButtonIndex(index);
-            }}
-            selectedIndex={buttonIndex}
-            buttons={["Approved", "Pending", "Denied"]}
-            containerStyle={{ width: "85%" }}
-          />
-        </View>
-        {ads.length > 0 && (
-          <ScrollView style={{ borderWidth: 1, height: "90%" }}>
-            {ads.map((ad, index) =>
-              buttonIndex === 0
-                ? // ---------------------------------APPROVED---------------------------------
-                ad.status === "approved" && (
+          <Ionicons name={"md-add"} size={45} color={"white"} />
+        </TouchableOpacity>
+        <ButtonGroup
+          onPress={(index) => {
+            setButtonIndex(index);
+          }}
+          selectedIndex={buttonIndex}
+          buttons={["Approved", "Pending", "Denied"]}
+          containerStyle={{ width: "95%" }}
+        />
+
+        {buttonIndex === 0 ? (
+          <ScrollView>
+            {approvedAds.length !== 0 ? (
+              approvedAds.map((ad, index) => (
+                <View
+                  style={{
+                    flex: 1,
+                    height: 250,
+                    margin: 15,
+                    backgroundColor: "white",
+                    borderWidth: 3,
+                    borderColor: "#185a9d",
+                    padding: 5,
+                  }}
+                >
                   <View
                     style={{
-                      flex: 1,
-                      height: 250,
-                      margin: 15,
-                      backgroundColor: "white",
-                      borderWidth: 3,
-                      borderColor: "#185a9d",
-                      padding: 5,
+                      flex: 2,
+                      flexDirection: "row",
+                    }}
+                    key={index}
+                  >
+                    <View style={{ flex: 1 }}>
+                      {ad.image != null ? (
+                        <Image
+                          source={{ uri: ad.image }}
+                          style={{
+                            width: 150,
+                            height: 175,
+                            borderWidth: 1,
+                            borderColor: "transparent",
+                          }}
+                        />
+                      ) : null}
+                    </View>
+
+                    {/* -------------------------------- */}
+
+                    <View
+                      style={{
+                        flex: 1.5,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {/* ---------------------------------TITLE--------------------------------- */}
+                      <View
+                        style={{
+                          flex: 0.3,
+                          width: "80%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#185a9d",
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            textTransform: "none",
+                          }}
+                        >
+                          {ad.title}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 0.5,
+                          width: "90%",
+                          flexDirection: "row",
+                          justifyContent: "flex-start",
+                          alignItems: "flex-start",
+                          // backgroundColor: "#185a9d",
+                          borderColor: "#185a9d",
+                          borderWidth: 1,
+                          padding: 5,
+                        }}
+                      >
+                        <Text style={{ fontSize: 16 }}>{ad.description}</Text>
+                      </View>
+
+                      {/* ---------------------------------LINK--------------------------------- */}
+                      <TouchableOpacity
+                        style={{
+                          flex: 0.2,
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        onPress={() => openLink(ad)}
+                      >
+                        <Feather name="link" size={20} color="gray" />
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 16,
+                            color: "blue",
+                            textDecorationLine: "underline",
+                          }}
+                        >
+                          {" "}
+                          Link
+                        </Text>
+                      </TouchableOpacity>
+
+                      {/* ---------------------------------DATE--------------------------------- */}
+                      <View
+                        style={{
+                          flex: 0.2,
+                          width: "95%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderBottomWidth: 1,
+                        }}
+                      >
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(1.5),
+                            }}
+                          >
+                            {moment(ad.startDate.toDate()).format("L")}{" "}
+                            <Text
+                              style={{
+                                fontWeight: "bold",
+                                color: "#185a9d",
+                              }}
+                            >
+                              {" "}
+                              To{" "}
+                            </Text>{" "}
+                            {moment(ad.endDate.toDate()).format("L")}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 0.5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row",
                     }}
                   >
                     <View
                       style={{
-                        flex: 2,
-                        // backgroundColor: "pink",
-                        // borderRadius: 20,
-                        flexDirection: "row",
-                      }}
-                      key={index}
-                    >
-                      <View style={{ flex: 1 }}>
-                        {ad.image != null ? (
-                          <Image
-                            source={{ uri: ad.image }}
-                            style={{
-                              width: 150,
-                              height: 175,
-                              borderWidth: 1,
-                              borderColor: "transparent",
-                              // resizeMode: "contain",
-                              // borderTopRightRadiusRadius: 10,
-                              // borderRadius: 5,
-                            }}
-                          />
-                        ) : null}
-                      </View>
+                        flex: 0.3,
+                        backgroundColor: "#3ea3a3",
+                        height: 30,
 
-                      {/* -------------------------------- */}
-
-                      <View
-                        style={{
-                          flex: 1.5,
-
-                          alignItems: "center",
-                          justifyContent: "center",
-                          // backgroundColor: "lightblue",
-                        }}
-                      >
-                        {/* ---------------------------------TITLE--------------------------------- */}
-                        <View
-                          // elevation={3}
-                          style={{
-                            flex: 0.3,
-                            width: "80%",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // borderColor: "gray",
-                            // borderRadius: 5,
-                            // borderWidth: 1,
-                            // backgroundColor: "lightgray",
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "#185a9d",
-                              fontSize: 20,
-                              fontWeight: "bold",
-                              textTransform: "none",
-                            }}
-                          >
-                            {ad.title}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            flex: 0.5,
-                            width: "90%",
-                            flexDirection: "row",
-                            justifyContent: "flex-start",
-                            alignItems: "flex-start",
-                            // backgroundColor: "#185a9d",
-                            borderColor: "#185a9d",
-                            borderWidth: 1,
-                            padding: 5,
-                          }}
-                        >
-                          {/* <Ionicons
-                              name="md-paper"
-                              size={22}
-                              color="darkred"
-                            /> */}
-                          <Text style={{ fontSize: 16 }}>
-                            {ad.description}
-                          </Text>
-                        </View>
-
-                        {/* ---------------------------------LINK--------------------------------- */}
-                        <TouchableOpacity
-                          style={{
-                            flex: 0.2,
-                            flexDirection: "row",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            // backgroundColor: "pink",
-                          }}
-                        >
-                          <Feather name="link" size={20} color="gray" />
-                          <Text
-                            style={{
-                              fontWeight: "bold",
-                              fontSize: 16,
-                              color: "blue",
-                              textDecorationLine: "underline",
-                            }}
-                          >
-                            {" "}
-                              Link
-                            </Text>
-                        </TouchableOpacity>
-
-                        {/* ---------------------------------DATE--------------------------------- */}
-                        <View
-                          style={{
-                            flex: 0.2,
-                            width: "95%",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: "white",
-                            borderBottomWidth: 1,
-                            // flexDirection: "row",
-                          }}
-                        >
-                          {/* <View>
-                              <MaterialCommunityIcons
-                                name="timer-sand"
-                                size={22}
-                                color="darkred"
-                              />
-                            </View> */}
-                          <View>
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(1.5),
-                              }}
-                            >
-                              {moment(ad.startDate.toDate()).format("L")}{" "}
-                              <Text
-                                style={{
-                                  fontWeight: "bold",
-                                  color: "#185a9d",
-                                }}
-                              >
-                                {" "}
-                                  To{" "}
-                              </Text>{" "}
-                              {moment(ad.endDate.toDate()).format("L")}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 0.5,
-                        // backgroundColor: "red",
                         justifyContent: "center",
                         alignItems: "center",
-                        flexDirection: "row",
+
+                        borderRadius: 10,
                       }}
                     >
-                      <View
-                        style={{
-                          flex: 0.3,
-                          backgroundColor: "#e3e3e3",
-                          // borderWidth: 4,
-                          height: 30,
-                          // width: "30%",
-                          // alignSelf: "center",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          //marginStart: "2%",
-                          // marginEnd: "3%",
-                          borderRadius: 10,
-                          //marginBottom: 10,
-                        }}
-                      >
-                        {/* ---------------------------------PAY--------------------------------- */}
-                        {ad.paid ? <Text
+                      {/* ---------------------------------PAY--------------------------------- */}
+                      {ad.paid ? (
+                        <Text
                           style={{
                             textAlign: "center",
                             fontSize: 16,
@@ -327,626 +328,537 @@ export default function MyAdvertisements(props) {
                           }}
                         >
                           Paid
-                            </Text> : <TouchableOpacity
-                            onPress={() =>
-                              props.navigation.navigate(
-                                "AdvertisementsPayment",
-                                {
-                                  totalAmount: ad.amount,
-                                  ad,
-                                }
-                              )
-                            }
-                          >
-                            <Text
-                              style={{
-                                textAlign: "center",
-                                fontSize: 16,
-                                color: "white",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Pay
-                            </Text>
-                          </TouchableOpacity>}
-                      </View>
-                      {/* <View
-                          style={{
-                            flex: 0.3,
-                            backgroundColor: "#901919",
-                            // borderWidth: 4,
-                            height: 30,
-                            // width: "30%",
-                            // alignSelf: "center",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            //marginStart: "2%",
-                            marginStart: "3%",
-                            borderRadius: 10,
-                            //marginBottom: 10,
-                          }}
+                        </Text>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() =>
+                            props.navigation.navigate("AdvertisementsPayment", {
+                              totalAmount: ad.amount,
+                              ad,
+                            })
+                          }
                         >
-                          <TouchableOpacity
-                            onPress={() => approve(ad.id, "denied")}
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              fontSize: 16,
+                              color: "white",
+                              fontWeight: "bold",
+                            }}
                           >
-                            <Text
-                              style={{
-                                textAlign: "center",
-                                fontSize: 16,
-                                color: "white",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Reject
-                            </Text>
-                          </TouchableOpacity>
-                        </View> */}
+                            Pay
+                          </Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   </View>
-                )
-                : buttonIndex === 1
-                  ? // ---------------------------------PENDING---------------------------------
-                  ad.status === "pending" && (
+                </View>
+              ))
+            ) : (
+              <View style={{ flex: 10, alignItems: "center" }}>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // flex: 0.7,
+                    paddingTop: "15%",
+                  }}
+                >
+                  <LottieView
+                    source={require("../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(3),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    You have no Ads
+                  </Text>
+                  <View
+                    style={{
+                      flex: 4,
+                      // backgroundColor: "red",
+                      // justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                      flexDirection: "row-reverse",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#2E9E9B",
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(40),
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                      onPress={() =>
+                        props.navigation.navigate("AdvertisementsForm")
+                      }
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "white",
+                          // fontWeight: "bold",
+                        }}
+                      >
+                        + Request
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        ) : buttonIndex === 1 ? (
+          <ScrollView>
+            {pendingAds.length !== 0 ? (
+              pendingAds.map((ad, index) => (
+                <View
+                  style={{
+                    flex: 1,
+                    height: 250,
+                    margin: 15,
+                    backgroundColor: "white",
+                    borderWidth: 3,
+                    borderColor: "#185a9d",
+                    padding: 5,
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 2,
+                      flexDirection: "row",
+                    }}
+                    key={index}
+                  >
+                    <View style={{ flex: 1 }}>
+                      {ad.image != null ? (
+                        <Image
+                          source={{ uri: ad.image }}
+                          style={{
+                            width: 150,
+                            height: 175,
+                            borderWidth: 1,
+                            borderColor: "transparent",
+                          }}
+                        />
+                      ) : null}
+                    </View>
+
+                    {/* -------------------------------- */}
+
                     <View
                       style={{
-                        flex: 1,
-                        height: 250,
-                        margin: 15,
-                        backgroundColor: "white",
-                        borderWidth: 3,
-                        borderColor: "#185a9d",
-                        padding: 5,
+                        flex: 1.5,
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
+                      {/* ---------------------------------TITLE--------------------------------- */}
                       <View
                         style={{
-                          flex: 2,
-                          // backgroundColor: "pink",
-                          // borderRadius: 20,
-                          flexDirection: "row",
+                          flex: 0.3,
+                          width: "80%",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
-                        key={index}
                       >
-                        <View style={{ flex: 1 }}>
-                          {ad.image != null ? (
-                            <Image
-                              source={{ uri: ad.image }}
-                              style={{
-                                width: 150,
-                                height: 175,
-                                borderWidth: 1,
-                                borderColor: "transparent",
-                                // resizeMode: "contain",
-                                // borderTopRightRadiusRadius: 10,
-                                // borderRadius: 5,
-                              }}
-                            />
-                          ) : null}
-                        </View>
-
-                        {/* -------------------------------- */}
-
-                        <View
+                        <Text
                           style={{
-                            flex: 1.5,
-
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: "lightblue",
+                            color: "#185a9d",
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            textTransform: "none",
                           }}
                         >
-                          {/* ---------------------------------TITLE--------------------------------- */}
-                          <View
-                            // elevation={3}
-                            style={{
-                              flex: 0.3,
-                              width: "80%",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              // borderColor: "gray",
-                              // borderRadius: 5,
-                              // borderWidth: 1,
-                              // backgroundColor: "lightgray",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "#185a9d",
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textTransform: "none",
-                              }}
-                            >
-                              {ad.title}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flex: 0.5,
-                              width: "90%",
-                              flexDirection: "row",
-                              justifyContent: "flex-start",
-                              alignItems: "flex-start",
-                              // backgroundColor: "#185a9d",
-                              borderColor: "#185a9d",
-                              borderWidth: 1,
-                              padding: 5,
-                            }}
-                          >
-                            {/* <Ionicons
-                              name="md-paper"
-                              size={22}
-                              color="darkred"
-                            /> */}
-                            <Text style={{ fontSize: 16 }}>
-                              {ad.description}
-                            </Text>
-                          </View>
-
-                          {/* ---------------------------------LINK--------------------------------- */}
-                          <TouchableOpacity
-                            style={{
-                              flex: 0.2,
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              // backgroundColor: "pink",
-                            }}
-                          >
-                            <Feather name="link" size={20} color="gray" />
-                            <Text
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: 16,
-                                color: "blue",
-                                textDecorationLine: "underline",
-                              }}
-                            >
-                              {" "}
-                              Link
-                            </Text>
-                          </TouchableOpacity>
-
-                          {/* ---------------------------------DATE--------------------------------- */}
-                          <View
-                            style={{
-                              flex: 0.2,
-                              width: "95%",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              // backgroundColor: "white",
-                              borderBottomWidth: 1,
-                              // flexDirection: "row",
-                            }}
-                          >
-                            {/* <View>
-                              <MaterialCommunityIcons
-                                name="timer-sand"
-                                size={22}
-                                color="darkred"
-                              />
-                            </View> */}
-                            <View>
-                              <Text style={{ fontSize: 12 }}>
-                                {moment(ad.startDate.toDate()).format("L")}{" "}
-                                <Text
-                                  style={{
-                                    fontWeight: "bold",
-                                    color: "#185a9d",
-                                  }}
-                                >
-                                  {" "}
-                                  To{" "}
-                                </Text>{" "}
-                                {moment(ad.endDate.toDate()).format("L")}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
+                          {ad.title}
+                        </Text>
                       </View>
                       <View
                         style={{
                           flex: 0.5,
-                          // backgroundColor: "red",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          width: "90%",
                           flexDirection: "row",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flex: 0.3,
-                            backgroundColor: "#2E9E9B",
-                            // borderWidth: 4,
-                            height: 30,
-                            // width: "30%",
-                            // alignSelf: "center",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            //marginStart: "2%",
-                            // marginEnd: "3%",
-                            borderRadius: 10,
-                            //marginBottom: 10,
-                          }}
-                        >
-                          {/* ---------------------------------PAY--------------------------------- */}
-                          <TouchableOpacity
-                            onPress={() =>
-                              props.navigation.navigate(
-                                "AdvertisementsPayment",
-                                {
-                                  totalAmount: ad.amount,
-                                }
-                              )
-                            }
-                          >
-                            <Text
-                              style={{
-                                textAlign: "center",
-                                fontSize: 16,
-                                color: "white",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Pay
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                        {/* <View
-                          style={{
-                            flex: 0.3,
-                            backgroundColor: "#901919",
-                            // borderWidth: 4,
-                            height: 30,
-                            // width: "30%",
-                            // alignSelf: "center",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            //marginStart: "2%",
-                            marginStart: "3%",
-                            borderRadius: 10,
-                            //marginBottom: 10,
-                          }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => approve(ad.id, "denied")}
-                          >
-                            <Text
-                              style={{
-                                textAlign: "center",
-                                fontSize: 16,
-                                color: "white",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Reject
-                            </Text>
-                          </TouchableOpacity>
-                        </View> */}
-                      </View>
-                    </View>
-                  )
-                  : buttonIndex === 2
-                    ? // ---------------------------------DENIED---------------------------------
-                    ad.status === "denied" && (
-                      <View
-                        style={{
-                          flex: 1,
-                          height: 250,
-                          margin: 15,
-                          backgroundColor: "white",
-                          borderWidth: 3,
+                          justifyContent: "flex-start",
+                          alignItems: "flex-start",
+                          // backgroundColor: "#185a9d",
                           borderColor: "#185a9d",
+                          borderWidth: 1,
                           padding: 5,
                         }}
                       >
-                        <View
+                        <Text style={{ fontSize: 16 }}>{ad.description}</Text>
+                      </View>
+
+                      {/* ---------------------------------LINK--------------------------------- */}
+                      <TouchableOpacity
+                        style={{
+                          flex: 0.2,
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        onPress={() => openLink(ad)}
+                      >
+                        <Feather name="link" size={20} color="gray" />
+                        <Text
                           style={{
-                            flex: 2,
-                            // backgroundColor: "pink",
-                            // borderRadius: 20,
-                            flexDirection: "row",
+                            fontWeight: "bold",
+                            fontSize: 16,
+                            color: "blue",
+                            textDecorationLine: "underline",
                           }}
-                          key={index}
                         >
-                          <View style={{ flex: 1 }}>
-                            {ad.image != null ? (
-                              <Image
-                                source={{ uri: ad.image }}
-                                style={{
-                                  width: 150,
-                                  height: 175,
-                                  borderWidth: 1,
-                                  borderColor: "transparent",
-                                  // resizeMode: "contain",
-                                  // borderTopRightRadiusRadius: 10,
-                                  // borderRadius: 5,
-                                }}
-                              />
-                            ) : null}
-                          </View>
+                          {" "}
+                          Link
+                        </Text>
+                      </TouchableOpacity>
 
-                          {/* -------------------------------- */}
-
-                          <View
+                      {/* ---------------------------------DATE--------------------------------- */}
+                      <View
+                        style={{
+                          flex: 0.2,
+                          width: "95%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderBottomWidth: 1,
+                        }}
+                      >
+                        <View>
+                          <Text
                             style={{
-                              flex: 1.5,
-
-                              alignItems: "center",
-                              justifyContent: "center",
-                              // backgroundColor: "lightblue",
+                              fontSize: responsiveScreenFontSize(1.5),
                             }}
                           >
-                            {/* ---------------------------------TITLE--------------------------------- */}
-                            <View
-                              // elevation={3}
-                              style={{
-                                flex: 0.3,
-                                width: "80%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                // borderColor: "gray",
-                                // borderRadius: 5,
-                                // borderWidth: 1,
-                                // backgroundColor: "lightgray",
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  color: "#185a9d",
-                                  fontSize: 20,
-                                  fontWeight: "bold",
-                                  textTransform: "none",
-                                }}
-                              >
-                                {ad.title}
-                              </Text>
-                            </View>
-                            <View
-                              style={{
-                                flex: 0.5,
-                                width: "90%",
-                                flexDirection: "row",
-                                justifyContent: "flex-start",
-                                alignItems: "flex-start",
-                                // backgroundColor: "#185a9d",
-                                borderColor: "#185a9d",
-                                borderWidth: 1,
-                                padding: 5,
-                              }}
-                            >
-                              {/* <Ionicons
-                              name="md-paper"
-                              size={22}
-                              color="darkred"
-                            /> */}
-                              <Text style={{ fontSize: 16 }}>
-                                {ad.description}
-                              </Text>
-                            </View>
-
-                            {/* ---------------------------------LINK--------------------------------- */}
-                            <TouchableOpacity
-                              style={{
-                                flex: 0.2,
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                // backgroundColor: "pink",
-                              }}
-                            >
-                              <Feather name="link" size={20} color="gray" />
-                              <Text
-                                style={{
-                                  fontWeight: "bold",
-                                  fontSize: 16,
-                                  color: "blue",
-                                  textDecorationLine: "underline",
-                                }}
-                              >
-                                {" "}
-                              Link
-                            </Text>
-                            </TouchableOpacity>
-
-                            {/* ---------------------------------DATE--------------------------------- */}
-                            <View
-                              style={{
-                                flex: 0.2,
-                                width: "95%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                // backgroundColor: "white",
-                                borderBottomWidth: 1,
-                                // flexDirection: "row",
-                              }}
-                            >
-                              {/* <View>
-                              <MaterialCommunityIcons
-                                name="timer-sand"
-                                size={22}
-                                color="darkred"
-                              />
-                            </View> */}
-                              <View>
-                                <Text style={{ fontSize: 12 }}>
-                                  {moment(ad.startDate.toDate()).format("L")}{" "}
-                                  <Text
-                                    style={{
-                                      fontWeight: "bold",
-                                      color: "#185a9d",
-                                    }}
-                                  >
-                                    {" "}
-                                  To{" "}
-                                  </Text>{" "}
-                                  {moment(ad.endDate.toDate()).format("L")}
-                                </Text>
-                              </View>
-                            </View>
-                          </View>
-                        </View>
-                        <View
-                          style={{
-                            flex: 0.5,
-                            // backgroundColor: "red",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            flexDirection: "row",
-                          }}
-                        >
-                          {
-                            <View
-                              style={{
-                                flex: 0.3,
-                                backgroundColor: "#2E9E9B",
-                                // borderWidth: 4,
-                                height: 30,
-                                // width: "30%",
-                                // alignSelf: "center",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                //marginStart: "2%",
-                                // marginEnd: "3%",
-                                borderRadius: 10,
-                                //marginBottom: 10,
-                              }}
-                            >
-                              {/* ---------------------------------PAY--------------------------------- */}
-                              <TouchableOpacity
-                                onPress={() =>
-                                  props.navigation.navigate(
-                                    "AdvertisementsPayment",
-                                    {
-                                      totalAmount: ad.amount,
-                                    }
-                                  )
-                                }
-                              >
-                                <Text
-                                  style={{
-                                    textAlign: "center",
-                                    fontSize: 16,
-                                    color: "white",
-                                    fontWeight: "bold",
-                                  }}
-                                >
-                                  Pay
-                              </Text>
-                              </TouchableOpacity>
-                            </View>
-                          }
-                          {/* <View
-                          style={{
-                            flex: 0.3,
-                            backgroundColor: "#901919",
-                            // borderWidth: 4,
-                            height: 30,
-                            // width: "30%",
-                            // alignSelf: "center",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            //marginStart: "2%",
-                            marginStart: "3%",
-                            borderRadius: 10,
-                            //marginBottom: 10,
-                          }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => approve(ad.id, "denied")}
-                          >
+                            {moment(ad.startDate.toDate()).format("L")}{" "}
                             <Text
                               style={{
-                                textAlign: "center",
-                                fontSize: 16,
-                                color: "white",
                                 fontWeight: "bold",
+                                color: "#185a9d",
                               }}
                             >
-                              Reject
-                            </Text>
-                          </TouchableOpacity>
-                        </View> */}
+                              {" "}
+                              To{" "}
+                            </Text>{" "}
+                            {moment(ad.endDate.toDate()).format("L")}
+                          </Text>
                         </View>
                       </View>
-                    )
-                    : null
-            )}
-          </ScrollView>
-        )}
-        {ads.length === 0 && (
-          <View style={{ flex: 10, alignItems: "center" }}>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                // flex: 0.7,
-                paddingTop: "15%",
-              }}
-            >
-              <LottieView
-                source={require("../../assets/17723-waitting.json")}
-                autoPlay
-                loop
-                style={{
-                  position: "relative",
-                  width: "80%",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  // paddingTop: "30%",
-                }}
-              />
-              <Text
-                style={{
-                  // paddingTop: "15%",
-                  fontSize: responsiveScreenFontSize(3),
-                  color: "darkgray",
-                  fontWeight: "bold",
-                }}
-              >
-                You have no Ads
-              </Text>
-              <View
-                style={{
-                  flex: 4,
-                  // backgroundColor: "red",
-                  // justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                  flexDirection: "row-reverse",
-                }}
-              >
-                <TouchableOpacity
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 0.5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row",
+                    }}
+                  ></View>
+                </View>
+              ))
+            ) : (
+              <View style={{ flex: 10, alignItems: "center" }}>
+                <View
                   style={{
-                    backgroundColor: "#2E9E9B",
-                    height: responsiveScreenHeight(5),
-                    width: responsiveScreenWidth(40),
                     justifyContent: "center",
                     alignItems: "center",
-                    borderRadius: 10,
+                    // flex: 0.7,
+                    paddingTop: "15%",
                   }}
-                  onPress={() =>
-                    props.navigation.navigate("AdvertisementsForm")
-                  }
                 >
+                  <LottieView
+                    source={require("../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
+                    }}
+                  />
                   <Text
                     style={{
-                      textAlign: "center",
-                      fontSize: responsiveScreenFontSize(2),
-                      color: "white",
-                      // fontWeight: "bold",
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(3),
+                      color: "darkgray",
+                      fontWeight: "bold",
                     }}
                   >
-                    + Request
+                    You have no Ads
                   </Text>
-                </TouchableOpacity>
+                  <View
+                    style={{
+                      flex: 4,
+                      // backgroundColor: "red",
+                      // justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                      flexDirection: "row-reverse",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#2E9E9B",
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(40),
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                      onPress={() =>
+                        props.navigation.navigate("AdvertisementsForm")
+                      }
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "white",
+                          // fontWeight: "bold",
+                        }}
+                      >
+                        + Request
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-            </View>
-          </View>
-        )}
-        <Button
-          title="Requests"
-          onPress={() => props.navigation.navigate("AdvertisementsRequest")}
-        />
+            )}
+          </ScrollView>
+        ) : buttonIndex === 2 ? (
+          <ScrollView>
+            {deniedAds.length !== 0 ? (
+              deniedAds.map((ad, index) => (
+                <View
+                  style={{
+                    flex: 1,
+                    height: 250,
+                    margin: 15,
+                    backgroundColor: "white",
+                    borderWidth: 3,
+                    borderColor: "#185a9d",
+                    padding: 5,
+                  }}
+                >
+                  {console.log(":ded", deniedAds)}
+                  <View
+                    style={{
+                      flex: 2,
+                      flexDirection: "row",
+                    }}
+                    key={index}
+                  >
+                    <View style={{ flex: 1 }}>
+                      {ad.image != null ? (
+                        <Image
+                          source={{ uri: ad.image }}
+                          style={{
+                            width: 150,
+                            height: 175,
+                            borderWidth: 1,
+                            borderColor: "transparent",
+                          }}
+                        />
+                      ) : null}
+                    </View>
+
+                    {/* -------------------------------- */}
+
+                    <View
+                      style={{
+                        flex: 1.5,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {/* ---------------------------------TITLE--------------------------------- */}
+                      <View
+                        style={{
+                          flex: 0.3,
+                          width: "80%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#185a9d",
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            textTransform: "none",
+                          }}
+                        >
+                          {ad.title}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 0.5,
+                          width: "90%",
+                          flexDirection: "row",
+                          justifyContent: "flex-start",
+                          alignItems: "flex-start",
+                          // backgroundColor: "#185a9d",
+                          borderColor: "#185a9d",
+                          borderWidth: 1,
+                          padding: 5,
+                        }}
+                      >
+                        <Text style={{ fontSize: 16 }}>{ad.description}</Text>
+                      </View>
+
+                      {/* ---------------------------------LINK--------------------------------- */}
+                      <TouchableOpacity
+                        style={{
+                          flex: 0.2,
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                        onPress={() => openLink(ad)}
+                      >
+                        <Feather name="link" size={20} color="gray" />
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 16,
+                            color: "blue",
+                            textDecorationLine: "underline",
+                          }}
+                        >
+                          {" "}
+                          Link
+                        </Text>
+                      </TouchableOpacity>
+
+                      {/* ---------------------------------DATE--------------------------------- */}
+                      <View
+                        style={{
+                          flex: 0.2,
+                          width: "95%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderBottomWidth: 1,
+                        }}
+                      >
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(1.5),
+                            }}
+                          >
+                            {moment(ad.startDate.toDate()).format("L")}{" "}
+                            <Text
+                              style={{
+                                fontWeight: "bold",
+                                color: "#185a9d",
+                              }}
+                            >
+                              {" "}
+                              To{" "}
+                            </Text>{" "}
+                            {moment(ad.endDate.toDate()).format("L")}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View
+                style={{
+                  flex: 10,
+                  alignItems: "center",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // flex: 0.7,
+                    paddingTop: "15%",
+                    marginBottom: "10%",
+                  }}
+                >
+                  <LottieView
+                    source={require("../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(3),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    You have no Ads
+                  </Text>
+                  <View
+                    style={{
+                      flex: 4,
+                      // backgroundColor: "red",
+                      // justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                      flexDirection: "row-reverse",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#2E9E9B",
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(40),
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 10,
+                      }}
+                      onPress={() =>
+                        props.navigation.navigate("AdvertisementsForm")
+                      }
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "white",
+                          // fontWeight: "bold",
+                        }}
+                      >
+                        + Request
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        ) : null}
       </View>
     )
   );
