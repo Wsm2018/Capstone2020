@@ -126,7 +126,7 @@ export default function FAQViewScreen(props) {
                   alignSelf: "center",
                   width: "100%",
                 }}
-                selectedButtonStyle={{ backgroundColor: "#3ea3a3" }}
+                selectedButtonStyle={{ backgroundColor: "#185a9d" }}
               />
               {selectedValue == 0 ? (
                 <ScrollView>
