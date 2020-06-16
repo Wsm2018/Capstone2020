@@ -49,7 +49,7 @@ export default function Schedule(props) {
   const [today, setToday] = useState(true);
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [currentDate, setCurrentDate] = useState(
-    moment().format("YYYY-MM-DDTHH:MM:SS")
+    moment().add(1, "days").format("YYYY-MM-DDTHH:MM:SS")
   );
   const [deviceType, setDeviceType] = useState(0);
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
