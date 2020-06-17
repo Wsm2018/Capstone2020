@@ -33,6 +33,17 @@ export default function AddCars(props) {
   const [brand, setBrand] = useState("");
   const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(0);
+  // const [plate, setPlate] = useState("");
+  const [showPlateErr, setShowPlateErr] = useState(false);
+  const [plateErr, setPlateErr] = useState("");
+
+  // const [model, setModel] = useState("");
+  const [showModelErr, setShowModelErr] = useState(false);
+  const [modelErr, setModelErr] = useState("");
+
+  // const [brand, setBrand] = useState("");
+  const [showBrandErr, setShowBrandErr] = useState(false);
+  const [brandErr, setBrandErr] = useState("");
 
   const getCars = () => {
     db.collection("users")
@@ -65,21 +76,33 @@ export default function AddCars(props) {
 
   const validateForm = () => {
     if (brand === "") {
-      alert("Enter Car Brand");
-      return false;
-    }
-    if (model === "") {
-      alert("Enter Car Model");
-      return false;
-    }
-    if (plate === "") {
-      alert("Enter Plate Number");
-      return false;
+      setBrandErr("* Enter brand");
+      setShowBrandErr(true);
+    } else if (brand.charAt(0) === " ") {
+      setBrandErr("* Invalid Brand");
+      setShowBrandErr(true);
     }
 
-    if (plate.length < 3) {
-      alert("Invalid Plate Number");
-      return;
+    if (model === "") {
+      setModelErr("* Enter Model");
+      setShowModelErr(true);
+    } else if (model.charAt(0) === " ") {
+      setModelErr("* Enter Model");
+      setShowModelErr(true);
+    }
+
+    if (plate === "") {
+      setPlateErr("* Enter Plate Number");
+      setShowPlateErr(true);
+    } else {
+      if (plate.length < 3) {
+        setPlateErr("* Invalid Plate Number");
+        setShowPlateErr(true);
+      }
+      if (plate.charAt(0) === " ") {
+        setPlateErr("* Invalid Plate Number");
+        setShowPlateErr(true);
+      }
     }
 
     cars.map((item) => {
@@ -88,12 +111,20 @@ export default function AddCars(props) {
         item.brand === brand &&
         item.model === model
       ) {
-        alert("Car already exists");
-        return false;
+        setPlateErr("* Car already exists");
+        setShowPlateErr(true);
+        setModelErr("* Car already exists");
+        setShowModelErr(true);
+        setBrandErr("* Car already exists");
+        setShowBrandErr(true);
       }
     });
 
-    return true;
+    if (!showBrandErr && !showModelErr && !showPlateErr) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const handleSubmit = async () => {
@@ -148,84 +179,99 @@ export default function AddCars(props) {
               </Text>
             </View>
 
-            <View
-              style={{
-                backgroundColor: "white",
-                alignItems: "center",
-
-                flexDirection: "column",
-
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 5,
-                marginBottom: "5%",
-              }}
-            >
-              <TextInput
-                width={Dimensions.get("window").width / 1.5}
+            <View style={{ marginBottom: "5%" }}>
+              <View
                 style={{
-                  height: responsiveScreenHeight(5),
-                  paddingLeft: 6,
-                  fontSize: responsiveScreenFontSize(2),
+                  backgroundColor: "white",
+                  alignItems: "center",
+
+                  flexDirection: "column",
+
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginBottom: "5%",
                 }}
-                placeholder="Enter Car Brand"
-                onChangeText={setBrand}
-                value={brand}
-              />
+              >
+                <TextInput
+                  width={Dimensions.get("window").width / 1.5}
+                  style={{
+                    height: responsiveScreenHeight(5),
+                    paddingLeft: 6,
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                  placeholder="Enter Car Brand"
+                  onChangeText={setBrand}
+                  value={brand}
+                />
+              </View>
+              {showBrandErr ? (
+                <Text style={{ color: "red" }}>{brandErr}</Text>
+              ) : null}
             </View>
-            <View
-              style={{
-                backgroundColor: "white",
-                alignItems: "center",
-
-                flexDirection: "column",
-
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 5,
-                marginBottom: "5%",
-              }}
-            >
-              <TextInput
-                width={Dimensions.get("window").width / 1.5}
+            <View style={{ marginBottom: "5%" }}>
+              <View
                 style={{
-                  height: responsiveScreenHeight(5),
-                  paddingLeft: 6,
-                  fontSize: responsiveScreenFontSize(2),
+                  backgroundColor: "white",
+                  alignItems: "center",
+
+                  flexDirection: "column",
+
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginBottom: "5%",
                 }}
-                placeholder="Enter Car Model"
-                onChangeText={setModel}
-                value={model}
-              />
+              >
+                <TextInput
+                  width={Dimensions.get("window").width / 1.5}
+                  style={{
+                    height: responsiveScreenHeight(5),
+                    paddingLeft: 6,
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                  placeholder="Enter Car Model"
+                  onChangeText={setModel}
+                  value={model}
+                />
+              </View>
+              {showModelErr ? (
+                <Text style={{ color: "red" }}>{modelErr}</Text>
+              ) : null}
             </View>
-            <View
-              style={{
-                backgroundColor: "white",
-                alignItems: "center",
-
-                flexDirection: "column",
-
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 5,
-                marginBottom: "5%",
-              }}
-            >
-              <TextInput
-                width={Dimensions.get("window").width / 1.5}
+            <View style={{ marginBottom: "5%" }}>
+              <View
                 style={{
-                  height: responsiveScreenHeight(5),
-                  paddingLeft: 6,
-                  fontSize: responsiveScreenFontSize(2),
+                  backgroundColor: "white",
+                  alignItems: "center",
+
+                  flexDirection: "column",
+
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginBottom: "5%",
                 }}
-                placeholder="Enter Plate Number"
-                onChangeText={setPlate}
-                // label="Plate Number"
-                value={plate}
-                maxLength={6}
-                keyboardType="number-pad"
-              />
+              >
+                <TextInput
+                  width={Dimensions.get("window").width / 1.5}
+                  style={{
+                    height: responsiveScreenHeight(5),
+                    paddingLeft: 6,
+                    fontSize: responsiveScreenFontSize(2),
+                  }}
+                  placeholder="Enter Plate Number"
+                  onChangeText={setPlate}
+                  // label="Plate Number"
+                  value={plate}
+                  maxLength={6}
+                  keyboardType="number-pad"
+                />
+              </View>
             </View>
+            {showPlateErr ? (
+              <Text style={{ color: "red" }}>{plateErr}</Text>
+            ) : null}
           </View>
 
           <View

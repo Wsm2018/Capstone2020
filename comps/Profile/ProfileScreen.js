@@ -56,7 +56,7 @@ import GiftScreen from "./GiftScreen";
 import DetailsScreen from "./DetailsScreen";
 import CarsScreen from "./Cars/CarsScreen";
 import Favorites from "./Favorites";
-
+import PointsExchage from "./PointsExchange";
 const { width, height } = Dimensions.get("screen");
 
 export default function ProfileScreen(props) {
@@ -78,6 +78,7 @@ export default function ProfileScreen(props) {
   const [showDisplayErr, setShowDisplayErr] = useState(false);
   const [backgroundEdit, setBackgroundEdit] = useState(false);
   const [deviceType, setDeviceType] = useState(0);
+  const [pointsModal, setPointsModal] = useState(false);
   const size = PixelRatio.getPixelSizeForLayoutSize(140);
 
   console.log("------------------------------------------", Device.DeviceType);
@@ -424,23 +425,25 @@ export default function ProfileScreen(props) {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  style={
-                    deviceType === 1 || deviceType === 0
-                      ? {
-                          color: "black",
-                          fontSize: responsiveScreenFontSize(2),
-                          fontWeight: "bold",
-                        }
-                      : {
-                          color: "black",
-                          fontSize: responsiveScreenFontSize(1.5),
-                          fontWeight: "bold",
-                        }
-                  }
-                >
-                  Points
-                </Text>
+                <TouchableOpacity onPress={() => setPointsModal(true)}>
+                  <Text
+                    style={
+                      deviceType === 1 || deviceType === 0
+                        ? {
+                            color: "black",
+                            fontSize: responsiveScreenFontSize(2),
+                            fontWeight: "bold",
+                          }
+                        : {
+                            color: "black",
+                            fontSize: responsiveScreenFontSize(1.5),
+                            fontWeight: "bold",
+                          }
+                    }
+                  >
+                    Points
+                  </Text>
+                </TouchableOpacity>
                 <Text
                   style={
                     deviceType === 1 || deviceType === 0
@@ -810,7 +813,17 @@ export default function ProfileScreen(props) {
                           //marginBottom: 10,
                         }}
                       >
-                        <TouchableOpacity onPress={() => removeProfile()}>
+                        <TouchableOpacity
+                          disabled={
+                            editPic ===
+                              "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png" ||
+                            photoURL ===
+                              "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png"
+                              ? true
+                              : false
+                          }
+                          onPress={() => removeProfile()}
+                        >
                           <Text
                             style={{
                               textAlign: "center",
@@ -1091,6 +1104,10 @@ export default function ProfileScreen(props) {
               setFavoritesModal={setFavoritesModal}
               navigation={props.navigation}
               user={user}
+            />
+            <PointsExchage
+              pointsModal={pointsModal}
+              setPointsModal={setPointsModal}
             />
           </View>
         </View>

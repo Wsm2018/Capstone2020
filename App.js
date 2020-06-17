@@ -20,6 +20,8 @@ import "firebase/auth";
 import "firebase/functions";
 import { encode, decode } from "base-64";
 import TicketScreen from "./comps/Ticket/TicketScreen";
+import TicketScreenAgent from "./comps/Ticket/TicketScreenAgent";
+
 import {
   responsiveScreenWidth,
   responsiveHeight,
@@ -271,33 +273,7 @@ export default function App(props) {
     }
   );
 
-  // const TicketAppContainer = createAppContainer(
-  //   { Ticket: TicketScreen },
-  //   {}
-  // {
-  //   defaultNavigationOptions: ({ navigation }) => {
-  //     return {
-  //       headerLeft: (
-  //         <Icon
-  //           onPress={() => navigation.openDrawer()}
-  //           name="md-menu"
-  //           type="ionicon"
-  //           color="white"
-  //           size={30}
-  //           containerStyle={{
-  //             marginLeft: 20,
-  //           }}
-  //         />
-  //       ),
-  //       headerStyle: {
-  //         backgroundColor: "#185a9d",
-  //       },
-  //       // headerTitle: "FRIENDS",
-  //       headerTintColor: "white",
-  //     };
-  //   },
-  // }
-  // );
+  const TicketAppContainer = createAppContainer(TicketScreenAgent);
 
   const AppDrawerNavigator = createDrawerNavigator(
     {
@@ -749,14 +725,14 @@ export default function App(props) {
   const serviceEmployeeTabNav = createMaterialBottomTabNavigator(
     {
       Schedule: ScheduleStack,
-      Home: HomeStack,
+      // Home: HomeStack,
 
-      News: NewsStack,
+      // News: NewsStack,
 
-      Profile: ProfileStack,
+      // Profile: ProfileStack,
     },
     {
-      //swipeEnabled - Whether to allow swiping between tabs.
+      //swipeEnabled - Whether to allow swiping between tabs.s
       swipeEnabled: true,
       //animationEnabled - Whether to animate when changing tabs.
       animationEnabled: true,
@@ -796,7 +772,7 @@ export default function App(props) {
     }
   );
 
-  const ServiceEmployeeAppContainer = createAppContainer(serviceEmployeeTabNav);
+  const ServiceEmployeeAppContainer = createAppContainer(ScheduleStack);
 
   const guideSkip = async () => {
     // console.log("Skipppped");
@@ -869,7 +845,7 @@ export default function App(props) {
                 return <AssetHandlerStack />;
 
               case "customer support":
-                return <AppContainer />;
+                return <TicketAppContainer />;
 
               case "services employee":
                 return <ServiceEmployeeAppContainer />;

@@ -17,19 +17,43 @@ import db from "../../db";
 
 import * as Linking from "expo-linking";
 import * as Print from "expo-print";
-import { FontAwesome5, MaterialCommunityIcons, AntDesign, Ionicons } from "@expo/vector-icons";
-
+import {
+  FontAwesome5,
+  MaterialCommunityIcons,
+  AntDesign,
+  Ionicons,
+} from "@expo/vector-icons";
+import * as Device from "expo-device";
+import { Feather, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+  responsiveFontSize,
+} from "react-native-responsive-dimensions";
+import ActionButton from "react-native-action-button";
 export default function EmployeesAllowed(props) {
   const [currentUser, setCurrentUser] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
   const [users, setUsers] = useState(null);
   const [search, setSearch] = useState("");
+
   const roles = [
     "asset handler (request)",
     "manager (request)",
     "user handler (request)",
   ];
-
+  const [deviceType, setDeviceType] = useState(0);
+  const handleLogout = () => {
+    firebase.auth().signOut();
+  };
+  const getDeviceType = async () => {
+    const type = await Device.getDeviceTypeAsync();
+    setDeviceType(type);
+  };
+  useEffect(() => {
+    getDeviceType();
+  }, []);
   // ------------------------------CURRENT USER------------------------------------
   const handleCurrentuser = async () => {
     const doc = await db
@@ -147,10 +171,10 @@ export default function EmployeesAllowed(props) {
       >
         {/* <Text>Employees Index</Text> */}
         {/* <AntDesign name="leftcircleo" size={30} color="#fff" /> */}
-        <TouchableOpacity onPress={handleChangeRole}> 
+        {/* <TouchableOpacity onPress={handleChangeRole}> 
         <Ionicons name="ios-arrow-back" size={40} color="#fff" style={{paddingRight:'2%'}} />
-        </TouchableOpacity>
-        
+        </TouchableOpacity> */}
+
         <TextInput
           style={{
             backgroundColor: "white",
@@ -158,7 +182,7 @@ export default function EmployeesAllowed(props) {
             paddingLeft: "2%",
             borderColor: "#185a9d",
             borderWidth: 2,
-            borderRadius:4,
+            borderRadius: 4,
             width: "75%",
             height: "50%",
             marginLeft: 10,
@@ -171,7 +195,7 @@ export default function EmployeesAllowed(props) {
         <FontAwesome5 name="search" size={25} color="#fff" />
       </View>
 
-      <ScrollView style={{paddingTop:'2%'}}>
+      <ScrollView style={{ paddingTop: "2%" }}>
         {users.map((user, i) => (
           <ListItem
             key={i}
@@ -199,6 +223,43 @@ export default function EmployeesAllowed(props) {
           />
         ))}
       </ScrollView>
+      <ActionButton
+        // buttonColor={"#3ea3a3"}
+        // size={deviceType === 1 ? 60 : 80}
+        buttonColor={"#3ea3a3"}
+        size={responsiveScreenFontSize(8)}
+        //  style={styles.actionButtonIcon2}
+        // icon={responsiveScreenFontSize(10)}
+        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+
+        // position="left"
+        //verticalOrientation="down"
+      >
+        <ActionButton.Item
+          buttonColor="#185a9d"
+          title="Change Role"
+          onPress={handleChangeRole}
+        >
+          <SimpleLineIcons
+            name="people"
+            size={deviceType === 1 ? 60 : 80}
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+        <ActionButton.Item
+          buttonColor="#901616"
+          title="Logout"
+          onPress={() => {
+            firebase.auth().signOut();
+            console.log(firebase.auth().currentUser.uid);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            style={styles.actionButtonIcon}
+          />
+        </ActionButton.Item>
+      </ActionButton>
     </View>
   ) : (
     <View>
@@ -211,5 +272,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //   margin: 20,
+  },
+  gridView: {
+    // marginTop: 20,
+    flex: 1,
+    // marginBottom: 100,
+  },
+  itemContainer: {
+    justifyContent: "flex-end",
+    borderRadius: 5,
+    // flex: 2,
+    height: responsiveScreenWidth(40),
+  },
+  itemName: {
+    fontSize: responsiveScreenFontSize(1.9),
+    fontWeight: "bold",
+    color: "#fff",
+    // fontWeight: "600",
+  },
+  itemCode: {
+    fontWeight: "600",
+    fontSize: 12,
+    color: "#fff",
+  },
+  actionButtonIcon: {
+    fontSize: responsiveFontSize(2.5),
+    // height: 40,
+    color: "white",
+  },
+  actionButtonIcon2: {
+    //height: 22,
+    // width: 22,
+    fontSize: responsiveFontSize(2.5),
   },
 });

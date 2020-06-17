@@ -28,29 +28,28 @@ import {
 } from "@expo/vector-icons";
 const TicketStack = createStackNavigator(
   {
-    Customer: TicketCustomerScreen,
-
+    Agent: TicketAgentScreen,
     Chat: SupportChat,
     Details: TicketDetailScreen,
-    Agent: TicketAgentScreen,
+    Customer: TicketCustomerScreen,
   },
   {
     // initialRouteName: "Customer Support",
 
     defaultNavigationOptions: ({ navigation }) => {
       return {
-        headerLeft: (
-          <Icon
-            onPress={() => navigation.openDrawer()}
-            name="md-menu"
-            type="ionicon"
-            color="white"
-            size={30}
-            containerStyle={{
-              marginLeft: 15,
-            }}
-          />
-        ),
+        // headerLeft: (
+        //   <Icon
+        //     onPress={() => navigation.openDrawer()}
+        //     name="md-menu"
+        //     type="ionicon"
+        //     color="white"
+        //     size={30}
+        //     containerStyle={{
+        //       marginLeft: 15,
+        //     }}
+        //   />
+        // ),
         headerStyle: {
           backgroundColor: "#185a9d",
         },

@@ -23,19 +23,21 @@ import moment from "moment";
 import { ListItem, getIconType } from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import ActionButton from "react-native-action-button";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Collapse,
   CollapseHeader,
   CollapseBody,
 } from "accordion-collapse-react-native";
+import * as Device from "expo-device";
+import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
   responsiveFontSize,
 } from "react-native-responsive-dimensions";
+import ActionButton from "react-native-action-button";
 export default function Schedule(props) {
   const [user, setUser] = useState({});
   const [services, setServices] = useState({});
@@ -47,10 +49,15 @@ export default function Schedule(props) {
   const [today, setToday] = useState(true);
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [currentDate, setCurrentDate] = useState(
-    moment().format("YYYY-MM-DDTHH:MM:SS")
+    moment().add(1, "days").format("YYYY-MM-DDTHH:MM:SS")
   );
   const [deviceType, setDeviceType] = useState(0);
   //const [currentDate, setCurrentDate] = useState("2020-05-30T00:00:00")
+  const handleChangeRole = () => {
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({ activeRole: null });
+  };
 
   useEffect(() => {
     db.collection("services").onSnapshot((snapshot) => {
@@ -302,6 +309,7 @@ export default function Schedule(props) {
                         color: "#185a9d",
                         marginBottom: "2%",
                         // fontWeight: "bold",
+                        textAlign: "center",
                       }}
                     >
                       {services.filter((s) => s.id === service)[0].name}
@@ -390,7 +398,7 @@ export default function Schedule(props) {
             >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#949494",
+                  backgroundColor: "#3ea3a3",
                   height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
@@ -427,7 +435,7 @@ export default function Schedule(props) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#949494",
+                  backgroundColor: "#3ea3a3",
                   height: responsiveScreenHeight(4.5),
                   width: "38%",
                   alignSelf: "center",
@@ -447,7 +455,7 @@ export default function Schedule(props) {
                   }}
                 >
                   {" "}
-                  Completed?
+                  Complete
                 </Text>
               </TouchableOpacity>
             </View>
@@ -849,23 +857,60 @@ export default function Schedule(props) {
           </View>
         </Modal>
       </ScrollView>
-      <ActionButton
-        // buttonColor={"#3ea3a3"}
-        // size={80}
-        // //  style={styles.actionButtonIcon2}
-        // // icon={responsiveScreenFontSize(10)}
-        // buttonTextStyle={{ fontSize: 20 }}
-        // position="left"
-        //verticalOrientation="down"
-        buttonColor={"#3ea3a3"}
-        size={responsiveScreenFontSize(8)}
-        //  style={styles.actionButtonIcon2}
-        // icon={responsiveScreenFontSize(10)}
-        buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
-      >
-        <ActionButton.Item
-          buttonColor="#3498db"
-          title="Logout"
+      {user.role != "services employee" ? (
+        <ActionButton
+          // buttonColor={"#3ea3a3"}
+          // size={80}
+          // //  style={styles.actionButtonIcon2}
+          // // icon={responsiveScreenFontSize(10)}
+          // buttonTextStyle={{ fontSize: 20 }}
+          // position="left"
+          //verticalOrientation="down"
+          buttonColor={"#3ea3a3"}
+          size={responsiveScreenFontSize(8)}
+          //  style={styles.actionButtonIcon2}
+          // icon={responsiveScreenFontSize(10)}
+          buttonTextStyle={{ fontSize: responsiveScreenFontSize(3) }}
+        >
+          <ActionButton.Item
+            buttonColor="#185a9d"
+            title="Change Role"
+            onPress={handleChangeRole}
+          >
+            <SimpleLineIcons
+              name="people"
+              size={deviceType === 1 ? 60 : 80}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+          <ActionButton.Item
+            buttonColor="#901616"
+            title="Logout"
+            onPress={() => {
+              firebase.auth().signOut();
+              console.log(firebase.auth().currentUser.uid);
+            }}
+          >
+            <MaterialCommunityIcons
+              name="logout"
+              size={20}
+              style={styles.actionButtonIcon}
+            />
+          </ActionButton.Item>
+        </ActionButton>
+      ) : (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#901616",
+            width: "20%",
+            borderRadius: 1000,
+            position: "absolute",
+            aspectRatio: 1 / 1,
+            justifyContent: "center",
+            alignItems: "center",
+            bottom: "3%",
+            right: "5%",
+          }}
           onPress={() => {
             firebase.auth().signOut();
             console.log(firebase.auth().currentUser.uid);
@@ -873,11 +918,12 @@ export default function Schedule(props) {
         >
           <MaterialCommunityIcons
             name="logout"
-            size={20}
+            size={25}
             style={styles.actionButtonIcon}
           />
-        </ActionButton.Item>
-      </ActionButton>
+          <Text style={{ color: "white", fontSize: 8 }}>Logout</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -949,7 +995,7 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   actionButtonIcon: {
-    fontSize: 20,
+    // fontSize: 20,
     // height: 40,
     color: "white",
   },

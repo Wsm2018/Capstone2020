@@ -16,6 +16,8 @@ import {
 import { ButtonGroup, Input, SearchBar } from "react-native-elements";
 import { Card } from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import moment from "moment";
 import db from "../../db";
 
@@ -166,206 +168,203 @@ export default function TicketDetailScreen(props) {
           <Text>transfare Ticket</Text>
         </TouchableOpacity>
       </Overlay>
-
-      <Card
-        height={130}
+      <View
         style={{
-          justifyContent: "space-evenly",
           flex: 1,
-          margin: 10,
-          width: Dimensions.get("window").width,
+          backgroundColor: "white",
+          margin: "4%",
+          borderWidth: 2,
+          borderColor: "lightgray",
+          padding: "2%",
         }}
       >
-        {/* <ImageBackground
-          style={{ width: "100%", height: "100%", position: "absolute" }}
-          source={{
-            uri:
-              "https://images.all-free-download.com/images/graphicthumb/red_bar_abstract_background_6821811.jpg",
-          }}
-        ></ImageBackground> */}
         <View
           style={{
-            flexDirection: "row",
+            flex: 1.3,
+            // backgroundColor: "red"
           }}
         >
           <Text
             style={{
-              margin: 2,
-              fontSize: 20,
-              width: 60,
+              fontSize: 22,
+              width: "85%",
+              textTransform: "capitalize",
               fontWeight: "bold",
             }}
+            numberOfLines={3}
           >
-            Title:
-          </Text>
-          <Text numberOfLines={2} style={{ fontSize: 20, width: "85%" }}>
             {ticket.title}
           </Text>
-        </View>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          <View
+
+          <Text
             style={{
-              flexDirection: "row",
-              width: "45%",
+              color:
+                ticket.status === "pending"
+                  ? "#919129"
+                  : ticket.status === "closed"
+                  ? "green"
+                  : "orange",
+              fontSize: 20,
+              fontWeight: "bold",
+              textTransform: "capitalize",
             }}
           >
-            <Text style={{ width: 60, fontWeight: "bold", margin: 2 }}>
-              Status:
+            {ticket.status}
+          </Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "bold",
+              }}
+            >
+              Priority:
             </Text>
-            <Text>{ticket.status}</Text>
+            <Text
+              style={{
+                color:
+                  ticket.priority === "very high"
+                    ? "red"
+                    : ticket.priority === "high"
+                    ? "red"
+                    : ticket.priority === "medium"
+                    ? "orange"
+                    : "green",
+                fontSize: 15,
+                fontWeight: "bold",
+                textTransform: "capitalize",
+              }}
+            >
+              {" "}
+              {ticket.priority}
+            </Text>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "45%",
-            }}
-          >
-            <Text style={{ width: 60, fontWeight: "bold", margin: 2 }}>
-              Opened:
-            </Text>
-            <Text>{moment(ticket.dateOpen.toDate()).format("LLL")}</Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "45%",
-            }}
-          >
-            <Text style={{ width: 60, fontWeight: "bold", margin: 2 }}>
-              Target:
-            </Text>
-            <Text>{ticket.target}</Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "45%",
-            }}
-          >
-            <Text style={{ width: 60, fontWeight: "bold", margin: 2 }}>
-              Closed :
-            </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Subject: </Text>
+            {ticket.target}
+          </Text>
+
+          <Text>
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Opened: </Text>
+            {moment(ticket.dateOpen.toDate()).format("LLL")}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Closed: </Text>
             {ticket.dateClose != "" ? (
               <Text>{moment(ticket.dateClose.toDate()).format("LLL")}</Text>
-            ) : null}
-          </View>
-        </View>
-      </Card>
-
-      <View style={{ flex: 2, padding: 15 }}>
-        <Text style={{ width: "100%", fontWeight: "bold", margin: 2 }}>
-          Description:
-        </Text>
-        <ScrollView>
-          <Text
-            width={Dimensions.get("window").width}
-            style={{
-              fontSize: 18,
-              backgroundColor: "lightgray",
-              borderWidth: 1,
-              padding: 10,
-            }}
-          >
-            {ticket.description}
+            ) : (
+              <Text>-</Text>
+            )}
           </Text>
-        </ScrollView>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          padding: 10,
-        }}
-      >
-        {user.activeRole == "customer support" &&
-        ticket.status != "Closed" &&
-        ticket.supportAgentUid == user.id ? (
-          <>
-            <View style={{ width: "18%", textAlign: "center" }}>
+        </View>
+        <Text></Text>
+        <Text></Text>
+        <View
+          style={{
+            borderWidth: 2,
+            // margin: "1%",
+            marginTop: "5%",
+            borderColor: "#e3e3e3",
+            flex: 2,
+            padding: "1%",
+            paddingBottom: 0,
+          }}
+        >
+          <View style={{ height: "90%" }}>
+            <Text
+              style={{
+                width: "100%",
+                // minHeight: 25,
+                backgroundColor: "#e3e3e3",
+                textAlign: "center",
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
+              Details
+            </Text>
+            {ticket.extraInfo !== "" && (
+              <Text style={{ fontWeight: "bold" }}>
+                Plate No: {ticket.extraInfo}
+              </Text>
+            )}
+            <Text numberOfLines={10} style={{ fontSize: 16 }}>
+              {ticket.description}
+            </Text>
+          </View>
+          {url && (
+            <View
+              style={{
+                height: "10%",
+                // backgroundColor: "red",
+                alignItems: "flex-start",
+                // paddingRight: "2%",
+                // justifyContent: "center",
+                // marginBottom: "2.5%",
+              }}
+            >
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#3ea3a3",
-                  padding: 3.5,
-                  borderRadius: 25,
+                  backgroundColor: "lightgray",
+                  // padding: 3.5,
+                  // borderRadius: 25,
                   justifyContent: "center",
+                  flexDirection: "row",
+                  borderWidth: 0,
+                  // borderColor: "gray",
+                  padding: 5,
+                  // paddingTop: 5,
+                  marginTop: -5,
                 }}
-                onPress={() => setVisibleTransfare(!visibleTransfare)}
+                onPress={() => setVisible(!visible)}
               >
-                <MaterialCommunityIcons
-                  name="clipboard-arrow-down-outline"
-                  size={35}
-                  color={"white"}
-                  style={{
-                    textAlign: "center",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
+                <MaterialIcons
+                  name="attach-file"
+                  size={25}
+                  color={"#185a9d"}
+                  style={
+                    {
+                      // textAlign: "center",
+                      // justifyContent: "center",
+                      // margin: 5,
+                    }
+                  }
                 />
+                {/* <Text style={{ color: "#185a9d" }}>Attachment</Text> */}
               </TouchableOpacity>
-              <Text style={{ textAlign: "center" }}>Transfare</Text>
             </View>
-            <View style={{ width: "18%", textAlign: "center" }}>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#3ea3a3",
-                  padding: 3.5,
-                  borderRadius: 25,
-                  justifyContent: "center",
-                }}
-                onPress={() => CloseTicket()}
-              >
-                <MaterialCommunityIcons
-                  name="close-box"
-                  size={35}
-                  color={"white"}
-                  style={{
-                    textAlign: "center",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                />
-              </TouchableOpacity>
-              <Text style={{ textAlign: "center" }}>Close</Text>
-            </View>
-            <View style={{ width: "18%", textAlign: "center" }}>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#3ea3a3",
-                  padding: 3.5,
-                  borderRadius: 25,
-                  justifyContent: "center",
-                }}
-                onPress={() => toggleOverlaySearch()}
-              >
-                <MaterialCommunityIcons
-                  name="book-remove"
-                  size={35}
-                  color={"white"}
-                  style={{
-                    textAlign: "center",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                />
-              </TouchableOpacity>
-              <Text style={{ textAlign: "center" }}>Search</Text>
-            </View>
-          </>
-        ) : null}
-        {ticket.status === "pending" ? (
-          <View style={{ width: "18%", textAlign: "center" }}>
+          )}
+        </View>
+        <View
+          style={{
+            borderWidth: 0,
+            // margin: "1%",
+            marginTop: "5%",
+            borderColor: "gray",
+            flex: 0.5,
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+          }}
+        >
+          {ticket.status === "pending" && (
             <TouchableOpacity
               style={{
                 backgroundColor: "#3ea3a3",
-                padding: 3.5,
-                borderRadius: 25,
+                // padding: 3.5,
+                borderRadius: 8,
                 justifyContent: "center",
+                alignItems: "center",
+                width: "18%",
+                aspectRatio: 1 / 1,
+                marginRight: "1%",
+                marginLeft: "1%",
               }}
               onPress={() => TakeTicket()}
             >
-              <MaterialCommunityIcons
-                name="plus-box"
-                size={35}
+              <MaterialIcons
+                name="note-add"
+                size={32}
                 color={"white"}
                 style={{
                   textAlign: "center",
@@ -373,23 +372,56 @@ export default function TicketDetailScreen(props) {
                   margin: 5,
                 }}
               />
+              <Text style={{ color: "white", fontSize: 10 }}>Take</Text>
             </TouchableOpacity>
-            <Text style={{ textAlign: "center" }}>Take</Text>
-          </View>
-        ) : null}
-        <View style={{ flexDirection: "column", width: "18%" }}>
+          )}
+          {user.activeRole == "customer support" &&
+            ticket.status != "Closed" &&
+            ticket.supportAgentUid == user.id && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#3ea3a3",
+                  // padding: 3.5,
+                  borderRadius: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "18%",
+                  aspectRatio: 1 / 1,
+                  marginRight: "1%",
+                  marginLeft: "1%",
+                }}
+                onPress={() => CloseTicket()}
+              >
+                <MaterialIcons
+                  name="done"
+                  size={32}
+                  color={"white"}
+                  style={{
+                    textAlign: "center",
+                    justifyContent: "center",
+                    margin: 5,
+                  }}
+                />
+                <Text style={{ color: "white", fontSize: 10 }}>Done</Text>
+              </TouchableOpacity>
+            )}
           <TouchableOpacity
             style={{
               backgroundColor: "#3ea3a3",
-              padding: 3.5,
-              borderRadius: 25,
+              // padding: 3.5,
+              borderRadius: 8,
               justifyContent: "center",
+              alignItems: "center",
+              width: "18%",
+              aspectRatio: 1 / 1,
+              marginRight: "1%",
+              marginLeft: "1%",
             }}
-            onPress={() => setVisible(!visible)}
+            onPress={() => props.navigation.navigate("Chat", { ticket, user })}
           >
             <MaterialCommunityIcons
-              name="attachment"
-              size={35}
+              name="wechat"
+              size={32}
               color={"white"}
               style={{
                 textAlign: "center",
@@ -397,31 +429,73 @@ export default function TicketDetailScreen(props) {
                 margin: 5,
               }}
             />
+            <Text style={{ color: "white", fontSize: 10 }}>Chat</Text>
           </TouchableOpacity>
-          <Text style={{ textAlign: "center" }}>Attachment</Text>
+          {user.activeRole == "customer support" &&
+            ticket.status != "Closed" &&
+            ticket.supportAgentUid == user.id && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#3ea3a3",
+                  // padding: 3.5,
+                  borderRadius: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "18%",
+                  aspectRatio: 1 / 1,
+                  marginRight: "1%",
+                  marginLeft: "1%",
+                }}
+                onPress={() => setVisibleTransfare(!visibleTransfare)}
+              >
+                <MaterialCommunityIcons
+                  name="file-send"
+                  size={32}
+                  color={"white"}
+                  style={{
+                    textAlign: "center",
+                    justifyContent: "center",
+                    margin: 5,
+                  }}
+                />
+                <Text style={{ color: "white", fontSize: 10 }}>Transfer</Text>
+              </TouchableOpacity>
+            )}
+
+          {user.activeRole == "customer support" &&
+            ticket.status != "Closed" &&
+            ticket.supportAgentUid == user.id &&
+            ticket.extraInfo !== "" && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#3ea3a3",
+                  // padding: 3.5,
+                  borderRadius: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "18%",
+                  aspectRatio: 1 / 1,
+                  marginRight: "1%",
+                  marginLeft: "1%",
+                }}
+                onPress={() => toggleOverlaySearch()}
+              >
+                <MaterialCommunityIcons
+                  name="account-search"
+                  size={32}
+                  color={"white"}
+                  style={{
+                    textAlign: "center",
+                    justifyContent: "center",
+                    margin: 5,
+                  }}
+                />
+                <Text style={{ color: "white", fontSize: 10 }}>Search</Text>
+              </TouchableOpacity>
+            )}
         </View>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#3ea3a3",
-            padding: 3.5,
-            borderRadius: 25,
-            justifyContent: "center",
-            width: "18%",
-          }}
-          onPress={() => props.navigation.navigate("Chat", { ticket, user })}
-        >
-          <MaterialCommunityIcons
-            name="wechat"
-            size={35}
-            color={"white"}
-            style={{
-              textAlign: "center",
-              justifyContent: "center",
-              margin: 5,
-            }}
-          />
-        </TouchableOpacity>
       </View>
+      {/* <View style={{ flex: 1, backgroundColor: "green" }}></View> */}
     </View>
   );
 }
@@ -429,7 +503,7 @@ export default function TicketDetailScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#e3e3e3",
   },
   text: {
     padding: 5,
