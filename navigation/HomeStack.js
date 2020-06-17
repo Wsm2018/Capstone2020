@@ -13,9 +13,13 @@ import Details from "../comps/Assets/Details";
 import Sections from "../comps/Assets/Sections";
 import List from "../comps/Assets/List";
 import Types from "../comps/Assets/Types";
+import AssetManager from "../comps/Assets/AssetManagement"
+import ServiceManagement from "../comps/Assets/ServiceManagement"
 
 const HomeStack = createStackNavigator(
   {
+    AssetManager: AssetManager,
+    ServiceManagement:ServiceManagement,
     Types: Types,
     Assets: Assets,
     Home: HomePage,
