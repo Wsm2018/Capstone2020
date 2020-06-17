@@ -1213,7 +1213,7 @@ export default function FriendsList(props) {
                     removeSelectedFriends();
                     setDeleteIds([]);
                     setModal(false);
-                    editMode(false);
+                    setEditMode(false);
                   } else {
                     removeFriend(selectedFriend);
                     setSelectedFriend(null);

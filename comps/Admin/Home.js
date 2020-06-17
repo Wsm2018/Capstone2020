@@ -99,6 +99,14 @@ export default function Home(props) {
       // height: 120,
       // width: 200,
     },
+    {
+      name: "FAQ",
+      code: "#005c9d",
+      nav: () => props.navigation.navigate("FAQ"),
+      image: require("../../assets/images/adminpic/faqAdmin.png"),
+      // height: 120,
+      // width: 200,
+    },
   ];
 
   const handleChangeRole = () => {

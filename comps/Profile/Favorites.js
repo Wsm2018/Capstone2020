@@ -13,7 +13,7 @@ import {
 import Image from "react-native-scalable-image";
 import { Card } from "react-native-shadow-cards";
 import * as Device from "expo-device";
-import Details from "./FavoriteBookingDetails"
+import Details from "./FavoriteBookingDetails";
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
@@ -30,13 +30,14 @@ import "firebase/functions";
 import LottieView from "lottie-react-native";
 import DatePicker from "react-native-datepicker";
 import { NavigationActions } from "react-navigation";
+import { ScrollView } from "react-native-gesture-handler";
 const { width, height } = Dimensions.get("window");
 export default function Favorites({
   favoritesModal,
   setFavoritesModal,
   navigation,
   user,
-  props
+  props,
 }) {
   // ------------------------------------- USE STATES ---------------------------------------------
   // ------------------------------------- USE STATES ---------------------------------------------
@@ -47,24 +48,24 @@ export default function Favorites({
   const [endDate, setEndDate] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [allBookings, setAllBookings] = useState([]);
-  const [type, setType] = useState()
-  const [sectionName, setSectionName] = useState()
-  const [serviceTotal , setServiceTotal] = useState(0)
+  const [type, setType] = useState();
+  const [sectionName, setSectionName] = useState();
+  const [serviceTotal, setServiceTotal] = useState(0);
   const [assetTypes, setAssetTypes] = useState([]);
   const [assetTypeIds, setAssetTypeIds] = useState([]);
   const [assetSections, setAssetSections] = useState([]);
   const [assetSectionIds, setAssetSectionIds] = useState([]);
-  const [assetTotal , setAssetTotal] = useState(0)
-  const [book, setBook] = useState(false)
+  const [assetTotal, setAssetTotal] = useState(0);
+  const [book, setBook] = useState(false);
   // ------------------------------------- FUNCTIONS ----------------------------------------------
 
   useEffect(() => {
-    setBook(false)
-    setStartDate()
-    setEndDate()
+    setBook(false);
+    setStartDate();
+    setEndDate();
     setAssetModal(false);
-    setSelectedAsset()
-  }, [])
+    setSelectedAsset();
+  }, []);
 
   const getUserFavoriteAssets = () => {
     db.collection("users")
@@ -90,7 +91,7 @@ export default function Favorites({
             assetSection: asset.data().assetSection,
             assetBookings: assetBookings,
             price: asset.data().price,
-            code: asset.data().code
+            code: asset.data().code,
           });
           if (assetArr.length === querySnap.size) {
             setFavoriteAssets([...assetArr]);
@@ -106,13 +107,11 @@ export default function Favorites({
     getDeviceType();
   }, []);
 
-
   useEffect(() => {
     if (startDate) {
-      setEndDate()
+      setEndDate();
     }
-  }, [startDate])
-
+  }, [startDate]);
 
   const formatDate = (date) => {
     const splitDateTime = date.split("T");
@@ -198,26 +197,33 @@ export default function Favorites({
 
     const assetType = typeId !== -1 ? assetTypes[typeId] : null;
 
-    var s = await db.collection("assetSections").doc(selectedAsset.assetSection).get()
-    var t = await db.collection("assetTypes").doc(s.data().assetType).get()
-    var a = await db.collection("assets").doc(selectedAsset.id).get()
-    setSelectedAsset({ id: selectedAsset.id, ...a.data() })
-    setSectionName(s.data().name)
-    setType({ ...t.data(), id: s.data().assetType })
-    console.log("----------------------------------------------", type, sectionName)
+    var s = await db
+      .collection("assetSections")
+      .doc(selectedAsset.assetSection)
+      .get();
+    var t = await db.collection("assetTypes").doc(s.data().assetType).get();
+    var a = await db.collection("assets").doc(selectedAsset.id).get();
+    setSelectedAsset({ id: selectedAsset.id, ...a.data() });
+    setSectionName(s.data().name);
+    setType({ ...t.data(), id: s.data().assetType });
+    console.log(
+      "----------------------------------------------",
+      type,
+      sectionName
+    );
     if (selectedAsset.assetBookings.length === 0) {
       setAssetModal(false);
-      countAssetTotal()
-      setBook(true)
+      countAssetTotal();
+      setBook(true);
     } else {
       const filteredArray = selectedAsset.assetBookings.filter(
         (item) =>
           formatDate(item.endDateTime.replace(/\s+/g, "")) -
-          formatDate(startDate.replace(/\s+/g, "")) >
-          0 &&
+            formatDate(startDate.replace(/\s+/g, "")) >
+            0 &&
           formatDate(item.startDateTime.replace(/\s+/g, "")) -
-          formatDate(endDate.replace(/\s+/g, "")) <
-          0
+            formatDate(endDate.replace(/\s+/g, "")) <
+            0
       );
       if (filteredArray.length > 0) {
         alert("Asset booked within these times");
@@ -239,8 +245,8 @@ export default function Favorites({
         //     },
         //   })
         // );
-        countAssetTotal()
-        setBook(true)
+        countAssetTotal();
+        setBook(true);
       }
     }
   };
@@ -274,7 +280,12 @@ export default function Favorites({
         tempEnd = endDate.split(" ")[0] + " T " + endDate.split(" ")[2] + ":00";
       }
       //now is 24 h
-      console.log("temp end ------------------", tempEnd, "start-----------------------", tempStart);
+      console.log(
+        "temp end ------------------",
+        tempEnd,
+        "start-----------------------",
+        tempStart
+      );
       //digits
       if (tempStart.split(" ")[2].split(":")[0].split("").length == 1) {
         startHour = "0" + tempStart.split(" ")[2].split(":")[0].split("")[0];
@@ -292,14 +303,13 @@ export default function Favorites({
       // count days and total
       var s = new Date(start);
       var e = new Date(end);
-      console.log(" ssssssssssssssss", s , "eeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
+      console.log(" ssssssssssssssss", s, "eeeeeeeeeeeeeeeeeeeeeeeeeeeee", e);
       var diff = (e.getTime() - s.getTime()) / 1000;
 
       diff /= 60 * 60;
-      console.log("difff",diff)
-      var at =
-        Math.round(diff * parseInt(selectedAsset.price) * 100) / 100;
-console.log("Total",at)
+      console.log("difff", diff);
+      var at = Math.round(diff * parseInt(selectedAsset.price) * 100) / 100;
+      console.log("Total", at);
       // var serviceTotal = 0;
       // if (serviceBooking.length > 0) {
       //   for (let i = 0; i < serviceBooking.length; i++) {
@@ -335,14 +345,14 @@ console.log("Total",at)
 
   // ----------------------------------------- RETURN ---------------------------------------------
 
-  const closeAll = () =>{
-    setFavoritesModal(false) 
-     setBook(false)
-     setStartDate()
-    setEndDate()
+  const closeAll = () => {
+    setFavoritesModal(false);
+    setBook(false);
+    setStartDate();
+    setEndDate();
     setAssetModal(false);
-    setSelectedAsset()
-  }
+    setSelectedAsset();
+  };
 
   return (
     <Modal visible={favoritesModal} transparent={true}>
@@ -355,7 +365,7 @@ console.log("Total",at)
               marginEnd: 15,
               marginTop: 15,
             }}
-            onPress={() => setFavoritesModal(false) || setBook(false)  }
+            onPress={() => setFavoritesModal(false) || setBook(false)}
           >
             <AntDesign
               name="close"
@@ -364,249 +374,253 @@ console.log("Total",at)
             />
           </TouchableOpacity>
 
-          {
-            !book ?
-              <View style={{ flex: 10, alignItems: "center" }}>
-                {favoriteAssets.length === 0 ? (
-                  <View style={styles.header}>
-                    <LottieView
-                      source={require("../../assets/17723-waitting.json")}
-                      autoPlay
-                      loop
+          {!book ? (
+            <View style={{ flex: 10, alignItems: "center", width: "100%" }}>
+              {favoriteAssets.length === 0 ? (
+                <View style={styles.header}>
+                  <LottieView
+                    source={require("../../assets/17723-waitting.json")}
+                    autoPlay
+                    loop
+                    style={{
+                      position: "relative",
+                      width: "80%",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      // paddingTop: "30%",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      // paddingTop: "15%",
+                      fontSize: responsiveScreenFontSize(2),
+                      color: "darkgray",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    No Favorites
+                  </Text>
+                  <View
+                    style={{
+                      flex: 4,
+                      // backgroundColor: "red",
+                      // justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                      flexDirection: "row-reverse",
+                    }}
+                  >
+                    <TouchableOpacity
                       style={{
-                        position: "relative",
-                        width: "80%",
+                        backgroundColor: "#2E9E9B",
+                        height: responsiveScreenHeight(5),
+                        width: responsiveScreenWidth(40),
                         justifyContent: "center",
-                        alignSelf: "center",
-                        // paddingTop: "30%",
+                        alignItems: "center",
+                        borderRadius: 10,
                       }}
-                    />
-                    <Text
-                      style={{
-                        // paddingTop: "15%",
-                        fontSize: responsiveScreenFontSize(2),
-                        color: "darkgray",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      No Favorites
-                </Text>
-                    <View
-                      style={{
-                        flex: 4,
-                        // backgroundColor: "red",
-                        // justifyContent: "flex-end",
-                        alignItems: "flex-end",
-                        flexDirection: "row-reverse",
+                      onPress={() => {
+                        setFavoritesModal(false);
+                        navigation.navigate(
+                          "Home",
+                          {},
+                          NavigationActions.navigate("Types")
+                        );
                       }}
                     >
-                      <TouchableOpacity
+                      <Text
                         style={{
-                          backgroundColor: "#2E9E9B",
-                          height: responsiveScreenHeight(5),
-                          width: responsiveScreenWidth(40),
-                          justifyContent: "center",
-                          alignItems: "center",
-                          borderRadius: 10,
-                        }}
-                        onPress={() => {
-                          setFavoritesModal(false);
-                          navigation.navigate(
-                            "Home",
-                            {},
-                            NavigationActions.navigate("Types")
-                          );
+                          textAlign: "center",
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "white",
+                          // fontWeight: "bold",
                         }}
                       >
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            fontSize: responsiveScreenFontSize(2),
-                            color: "white",
-                            // fontWeight: "bold",
-                          }}
-                        >
-                          Add Favorites
-                    </Text>
-                      </TouchableOpacity>
-                    </View>
+                        Add Favorites
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                ) : (
+                </View>
+              ) : (
+                <View
+                  style={{
+                    // flex: 0.5,
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    paddingBottom: 10,
+                  }}
+                >
+                  <ScrollView
+                    style={{}}
+                    contentContainerStyle={{
+                      width: width / 1.3,
+                      // backgroundColor: "red",
+                      // height: "100%",
+                      // flexGrow: 1,
+                    }}
+                  >
                     <View
                       style={{
                         // flex: 0.5,
-                        flex: 0.5,
+                        //flex: 0.2,
                         justifyContent: "center",
                         alignItems: "center",
                       }}
                     >
-
-
-                      <View
+                      <Text
                         style={{
-                          // flex: 0.5,
-                          //flex: 0.2,
-                          justifyContent: "center",
-                          alignItems: "center",
+                          fontSize: 20,
+                          color: "#185a9d",
+                          fontWeight: "bold",
+                          //marginBottom:"2%"
                         }}
                       >
-                        <Text
-                          style={{
-                            fontSize: 20,
-                            color: "#185a9d",
-                            fontWeight: "bold",
-                            //marginBottom:"2%"
-                          }}
-                        >
-                          My Favorites
-                  </Text>
-                      </View>
-                      {favoriteAssets.map((item, index) => (
-                        <View
-                          width={Dimensions.get("window").width / 1.2}
-                          style={{
-                            flex: 1,
-                            marginTop: "10%",
-                            // backgroundColor: "red",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            flexDirection: "row",
-                          }}
-                          key={index}
-                        >
-                          {/* <TouchableOpacity
+                        My Favorites
+                      </Text>
+                    </View>
+
+                    {favoriteAssets.map((item, index) => (
+                      <View
+                        // width={Dimensions.get("window").width / 1.2}
+                        style={{
+                          flex: 1,
+                          marginTop: "10%",
+                          // backgroundColor: "red",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          borderBottomWidth: 1.5,
+                          borderBottomColor: "#cfe2e2",
+                        }}
+                        key={index}
+                      >
+                        {/* <TouchableOpacity
                     onPress={() => handleDeleteAlert(item.asset.id)}
                   >
                     <Text>X</Text>
                   </TouchableOpacity> */}
 
-                          {/* ================== */}
+                        {/* ================== */}
 
+                        {/* ============================================== */}
 
-                          {/* ============================================== */}
-
-                          <View
-                            style={{
-                              flex: 1,
-                              flexDirection: "row",
-                              justifyContent: "space-evenly",
-                              borderBottomWidth: 1.5,
-                              borderBottomColor: "#cfe2e2",
-                              //width:"70%"
-                            }}
-                          >
-                            <View>
-                              <Text
-                                style={{
-                                  fontSize: 20,
-                                  // paddingStart: 10,
-                                  fontWeight: "bold",
-                                  color: "#185a9d",
-                                  // fontVariant: 4,
-                                  // backgroundColor: "green",
-                                  // backgroundColor: "blue",
-                                }}
-                              >
-                                {item.assetName}
-                              </Text>
-
-                              <Text>Price: {item.price} QR</Text>
-                              <Text>Code: {item.code}</Text>
-                            </View>
-
-                            <TouchableOpacity
-                              onPress={() => {
-                                setAssetModal(true);
-                                setSelectedAsset(item);
-                              }}
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            justifyContent: "space-evenly",
+                            // borderBottomWidth: 1.5,
+                            borderBottomColor: "#cfe2e2",
+                            //width:"70%"
+                            marginLeft: "15%",
+                            marginRight: "15%",
+                          }}
+                        >
+                          <View>
+                            <Text
                               style={{
-                                backgroundColor: "#2E9E9B",
-                                height: responsiveScreenHeight(4),
-                                width: responsiveScreenWidth(25),
-                                // alignSelf: "center",
-                                //justifyContent: "center",
-                                //alignItems: "center",
-                                //marginEnd: 15,
-                                borderRadius: 10,
-                                marginBottom: "auto",
-                                marginTop: "auto"
+                                fontSize: 20,
+                                // paddingStart: 10,
+                                fontWeight: "bold",
+                                color: "#185a9d",
+                                // fontVariant: 4,
+                                // backgroundColor: "green",
+                                // backgroundColor: "blue",
                               }}
                             >
-                              <Text
-                                style={{
-                                  textAlign: "center",
-                                  fontSize: responsiveScreenFontSize(2),
-                                  color: "white",
-                                }}
-                              >
-                                Book
+                              {item.assetName}
                             </Text>
-                            </TouchableOpacity>
 
-                            <MaterialCommunityIcons
-                              name="delete-forever-outline"
-                              size={28}
-                              color="#901616"
-                              style={{
-                                marginBottom: "auto",
-                                marginTop: "auto",
-                                // alignItems: "center",
-                                //marginEnd: 15,
-                                // backgroundColor: "yellow",
-
-                                // marginTop: 15,
-                              }}
-                              onPress={() => handleDeleteAlert(item.id)}
-                            />
-
+                            <Text>Price: {item.price} QR</Text>
+                            <Text>Code: {item.code}</Text>
                           </View>
 
+                          <TouchableOpacity
+                            onPress={() => {
+                              setAssetModal(true);
+                              setSelectedAsset(item);
+                            }}
+                            style={{
+                              backgroundColor: "#2E9E9B",
+                              height: responsiveScreenHeight(4),
+                              width: responsiveScreenWidth(25),
+                              // alignSelf: "center",
+                              //justifyContent: "center",
+                              //alignItems: "center",
+                              //marginEnd: 15,
+                              borderRadius: 10,
+                              marginBottom: "auto",
+                              marginTop: "auto",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                textAlign: "center",
+                                fontSize: responsiveScreenFontSize(2),
+                                color: "white",
+                              }}
+                            >
+                              Book
+                            </Text>
+                          </TouchableOpacity>
+
+                          <MaterialCommunityIcons
+                            name="delete-forever-outline"
+                            size={28}
+                            color="#901616"
+                            style={{
+                              marginBottom: "auto",
+                              marginTop: "auto",
+                              // alignItems: "center",
+                              //marginEnd: 15,
+                              // backgroundColor: "yellow",
+
+                              // marginTop: 15,
+                            }}
+                            onPress={() => handleDeleteAlert(item.id)}
+                          />
                         </View>
-
-
-                      ))}
-                    </View>
-                  )}
-              </View>
-              :
-              <View
-                style={{
-                  // flex: 0.5,
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-
-
-                <Details
-                  sName={sectionName}
-                  tName={type.name}
-                  asset={selectedAsset}
-                  startDateTime={startDate}
-                  endDateTime={endDate}
-                  type={type.id}
-                  navigation={navigation}
-                  assetIcon={type.assetIcon}
-                  //sectionIcon={sectionIcon}
-                  countServiceTotal={countServiceTotal}
-                  setFavoritesModal={setFavoritesModal}
-                  totalAssetService = {assetTotal + serviceTotal}
-                  closeAll={closeAll}
-                />
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          ) : (
+            <View
+              style={{
+                // flex: 0.5,
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Details
+                sName={sectionName}
+                tName={type.name}
+                asset={selectedAsset}
+                startDateTime={startDate}
+                endDateTime={endDate}
+                type={type.id}
+                navigation={navigation}
+                assetIcon={type.assetIcon}
+                //sectionIcon={sectionIcon}
+                countServiceTotal={countServiceTotal}
+                setFavoritesModal={setFavoritesModal}
+                totalAssetService={assetTotal + serviceTotal}
+                closeAll={closeAll}
+              />
 
               {/* <Text>{assetTotal + serviceTotal}</Text> */}
-                {/* <AntDesign
+              {/* <AntDesign
                   name="close"
                   size={deviceType === 1 ? 25 : 40}
                   style={{ color: "#224229" }}
                   onPress={() => setBook(false)}
                 /> */}
-              </View>
-
-          }
-
-
+            </View>
+          )}
         </View>
         <Modal transparent={true} visible={assetModal}>
           <View style={styles.centeredView1}>
@@ -673,7 +687,7 @@ console.log("Total",at)
                   // backgroundColor: "blue",
                   //width: "10%",
                   marginRight: "auto",
-                  marginLeft: "auto"
+                  marginLeft: "auto",
                 }}
               />
               <View
@@ -744,9 +758,6 @@ console.log("Total",at)
                   >
                     Book
                   </Text>
-
-
-
                 </TouchableOpacity>
               </View>
             </View>
