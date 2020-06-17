@@ -575,11 +575,11 @@ export default function App(props) {
         .doc(firebase.auth().currentUser.uid)
         .update({ activeRole: user.role });
 
-      db.collection("users")
+      const userReff = await db
+        .collection("users")
         .doc(firebase.auth().currentUser.uid)
-        .onSnapshot((userRef) => {
-          setPhotoURL(userRef.data().photoURL);
-        });
+        .get();
+      setPhotoURL(userReff.data().photoURL);
 
       db.collection("users")
         .doc(firebase.auth().currentUser.uid)

@@ -810,7 +810,17 @@ export default function ProfileScreen(props) {
                           //marginBottom: 10,
                         }}
                       >
-                        <TouchableOpacity onPress={() => removeProfile()}>
+                        <TouchableOpacity
+                          disabled={
+                            editPic ===
+                              "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png" ||
+                            photoURL ===
+                              "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png"
+                              ? true
+                              : false
+                          }
+                          onPress={() => removeProfile()}
+                        >
                           <Text
                             style={{
                               textAlign: "center",

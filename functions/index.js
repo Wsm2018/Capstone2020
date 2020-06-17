@@ -612,7 +612,7 @@ exports.createEmployee = functions.https.onCall(async (data, context) => {
       reputation: 0,
       points: 0,
       photoURL:
-        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+        "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
     });
@@ -824,22 +824,24 @@ exports.getAdmin = functions.https.onCall(async (data, context) => {
 exports.makeAdmin = functions.https.onCall(async (data, context) => {
   const email = data.email;
   console.log(email);
-  return grantAdminRole(email).then(async () => {
-    const user = await admin.auth().getUserByEmail(email);
-    console.log("user", user);
-    return {
-      result: user.customClaims,
-    };
-  });
+  const user = await admin.auth().getUserByEmail(email);
+  return await db
+    .collection("users")
+    .doc(user.uid)
+    .update({ role: "admin", activeRole: "admin" });
+  // return grantAdminRole(email).then(async () => {
+  //   console.log("user", user);
+  //   return {
+  //     result: user.customClaims,
+  //   };
+  // });
 });
 
-async function grantAdminRole(email) {
-  const user = await admin.auth().getUserByEmail(email);
+// async function grantAdminRole(email) {
+//   const user = await admin.auth().getUserByEmail(email);
 
-  return admin.auth().setCustomUserClaims(user.uid, {
-    moderator: true,
-  });
-}
+//   return user;
+// }
 exports.giftsExpCheck = functions.pubsub
   .schedule("0 0 * * *")
   .timeZone("Asia/Qatar")
@@ -869,7 +871,7 @@ exports.deleteGuestUser = functions.https.onRequest(
       email: "DELETED",
       phone: "DELETED",
       photoURL:
-        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+        "https://toppng.com/uploads/preview/user-account-management-logo-user-icon-11562867145a56rus2zwu.png",
       profileBackground:
         "https://c4.wallpaperflare.com/wallpaper/843/694/407/palm-trees-sky-sea-horizon-wallpaper-preview.jpg",
       location: null,

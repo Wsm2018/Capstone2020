@@ -245,7 +245,7 @@ export default function Sections(props) {
   let tName = props.navigation.getParam("type", "failed").name;
   let sectionIcon = props.navigation.getParam("type", "failed").sectionIcon;
   let assetIcon = props.navigation.getParam("type", "failed").assetIcon;
-
+  props.navigation.setParams("type", type);
   useEffect(() => {
     getSections();
   }, [type]);

@@ -18,6 +18,7 @@ import AddPromotion from "../comps/Admin/Promotion/AddPromotion";
 import AdvertisementsRequest from "../comps/Advertisements/AdvertisementsRequest";
 
 import NewsPage from "../comps/NewsPage";
+import FAQStack from "../comps/FAQ/FAQScreen";
 const AdminHomeStack = createStackNavigator({
   Home: AdminHome,
   Users: Users,
@@ -34,6 +35,7 @@ const AdminHomeStack = createStackNavigator({
   AddPromotion: AddPromotion,
   News: NewsPage,
   Ad: AdvertisementsRequest,
+  FAQ: FAQStack,
 });
 
 export default AdminHomeStack;
