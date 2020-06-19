@@ -201,7 +201,11 @@ export default function ScheduleMap(props) {
     </View>
   );
 }
-
+ScheduleMap.navigationOptions = (props) => ({
+  title: "Map",
+  headerStyle: { backgroundColor: "#185a9d" },
+  headerTintColor: "white",
+});
 const styles = StyleSheet.create({
   container: {
     flex: 1,

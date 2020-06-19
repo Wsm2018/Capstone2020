@@ -37,36 +37,43 @@ export default function ChooseRole(props) {
       name: "admin",
       photoURL: require("../assets/icons/admin.png"),
       selected: false,
+      displayName: "Admin",
     },
     {
       name: "manager",
       photoURL: require("../assets/icons/manager.png"),
       selected: false,
+      displayName: "Manager",
     },
     {
       name: "user handler",
       photoURL: require("../assets/icons/userHandler.png"),
       selected: false,
+      displayName: "User\nHandler",
     },
     {
       name: "asset handler",
       photoURL: require("../assets/icons/assetHandler.png"),
       selected: false,
+      displayName: "Asset\nhandler",
     },
     {
       name: "customer support",
       photoURL: require("../assets/icons/customerSupport.png"),
       selected: false,
+      displayName: "Customer\nSupport",
     },
     {
       name: "services employee",
       photoURL: require("../assets/icons/servicesEmployee.png"),
       selected: false,
+      displayName: "Services\nEmployee",
     },
     {
       name: "customer",
       photoURL: require("../assets/icons/customer2.png"),
       selected: false,
+      displayName: "Customer",
     },
   ];
 
@@ -194,7 +201,7 @@ export default function ChooseRole(props) {
                   <View
                     style={{
                       // backgroundColor: "green",
-                      height: 30,
+                      height: 40,
                       // width: "100%",
                       // justifyContent: "flex-end",
                     }}
@@ -208,7 +215,7 @@ export default function ChooseRole(props) {
                         fontWeight: "bold",
                       }}
                     >
-                      {role.name}
+                      {role.displayName}
                     </Text>
                   </View>
                 </View>

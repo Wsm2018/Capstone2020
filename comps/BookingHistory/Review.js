@@ -311,8 +311,10 @@ export default function Details(props) {
                 style={{
                   marginTop: "2%",
                   marginBottom: 10,
-                  marginLeft: "3%",
+                  // marginLeft: "3%",
+                  // marginRight: "3%",
                   backgroundColor: "#f5f5f5",
+                  padding: "3%",
                 }}
               >
                 <Text style={{ color: "#6b6b6b", fontWeight: "bold" }}>
@@ -366,31 +368,30 @@ export default function Details(props) {
                           <View
                             style={{
                               width: "10%",
-                              justifyContent: "flex-end",
+                              // justifyContent: "flex-end",
                               // alignItems: "center",
-                              // padding: 5,
+                              // marginRight: 15,
                               // marginTop: 10,
                             }}
                           >
-                            {/* <TouchableOpacity
+                            <TouchableOpacity
                               style={{
-                                // width: "70%",
-                                backgroundColor: "#20365F",
+                                backgroundColor: "#2E9E9B",
                                 justifyContent: "center",
                                 alignItems: "center",
                                 padding: 5,
                                 marginBottom: 5,
+                                // marginRight: "2%",
                               }}
-                              onPress={() => setModalAddReview(true)}
+                              onPress={() => setModalViewReview(true)}
                             >
-                              
                               <MaterialCommunityIcons
-                                name="plus"
+                                name="format-list-bulleted"
                                 size={22}
                                 color={"white"}
                               />
-                            </TouchableOpacity> */}
-                            <TouchableOpacity
+                            </TouchableOpacity>
+                            {/* <TouchableOpacity
                               style={{
                                 // width: "70%",
                                 backgroundColor: "#3ea3a3",
@@ -398,16 +399,32 @@ export default function Details(props) {
                                 alignItems: "center",
                                 padding: 5,
                                 borderRadius: 8,
-                                position: "absolute",
+                                // position: "absolute",
                                 bottom: "50%",
                               }}
                               onPress={() => setModalViewReview(true)}
                             >
-                              {/* <Text style={{ fontSize: 12, color: "gray" }}>
-                              >
-                            </Text> */}
+                              
                               <MaterialCommunityIcons
                                 name="format-list-bulleted"
+                                size={22}
+                                color={"white"}
+                              />
+                            </TouchableOpacity> */}
+                            <TouchableOpacity
+                              style={{
+                                // width: "10%",
+                                backgroundColor: "#2E9E9B",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: 5,
+                                marginBottom: 5,
+                                marginRight: "2%",
+                              }}
+                              onPress={() => setModalAddReview(true)}
+                            >
+                              <MaterialCommunityIcons
+                                name="plus"
                                 size={22}
                                 color={"white"}
                               />

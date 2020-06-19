@@ -43,6 +43,17 @@ export default function AddCars(props) {
 
   const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(0);
+  // const [plate, setPlate] = useState("");
+  const [showPlateErr, setShowPlateErr] = useState(false);
+  const [plateErr, setPlateErr] = useState("");
+
+  // const [model, setModel] = useState("");
+  const [showModelErr, setShowModelErr] = useState(false);
+  const [modelErr, setModelErr] = useState("");
+
+  // const [brand, setBrand] = useState("");
+  const [showBrandErr, setShowBrandErr] = useState(false);
+  const [brandErr, setBrandErr] = useState("");
 
   // ------------------------------- FUNCTIONS --------------------------------------------
   const getCars = () => {
@@ -190,7 +201,7 @@ export default function AddCars(props) {
                   borderColor: "black",
                   borderWidth: 1,
                   borderRadius: 5,
-                  // marginBottom: "5%",
+                  marginBottom: "5%",
                 }}
               >
                 <TextInput
@@ -213,7 +224,6 @@ export default function AddCars(props) {
                 <Text style={{ color: "red" }}>{brandErr}</Text>
               ) : null}
             </View>
-
             <View style={{ marginBottom: "5%" }}>
               <View
                 style={{
@@ -225,7 +235,6 @@ export default function AddCars(props) {
                   borderColor: "black",
                   borderWidth: 1,
                   borderRadius: 5,
-                  // marginBottom: "5%",
                 }}
               >
                 <TextInput
@@ -280,10 +289,10 @@ export default function AddCars(props) {
                   keyboardType="number-pad"
                 />
               </View>
-              {showPlateErr ? (
-                <Text style={{ color: "red" }}>{plateErr}</Text>
-              ) : null}
             </View>
+            {showPlateErr ? (
+              <Text style={{ color: "red" }}>{plateErr}</Text>
+            ) : null}
           </View>
 
           <View

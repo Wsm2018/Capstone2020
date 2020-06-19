@@ -29,6 +29,9 @@ import {
   responsiveScreenHeight,
   responsiveScreenWidth,
   responsiveScreenFontSize,
+  responsiveFontSize,
+  useResponsiveFontSize,
+  responsiveHeight,
 } from "react-native-responsive-dimensions";
 
 import { Card } from "react-native-shadow-cards";
@@ -172,6 +175,7 @@ export default function SubscriptionsScreen(props) {
           .collection("subscription")
           .add(sub.bronze);
       }
+      setModal(false);
     } else if (type === "update") {
       setUserSubscription(undefined);
       setFlag(!flag);
@@ -190,16 +194,12 @@ export default function SubscriptionsScreen(props) {
   //   setFlag(false)
   // }, [userSubscription]);
 
-
-
   return (
     <View style={styles.container}>
       <Modal visible={modal} transparent={true}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={[styles.centeredView2]}>
             <View elevation={5} style={styles.modalView2}>
-
-
               <TouchableOpacity
                 style={{
                   justifyContent: "flex-start",
@@ -221,7 +221,7 @@ export default function SubscriptionsScreen(props) {
               >
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: responsiveFontSize(2),
                     color: "#005c9d",
                     fontWeight: "bold",
                     textAlign: "center",
@@ -240,7 +240,7 @@ export default function SubscriptionsScreen(props) {
               >
                 <Text
                   style={{
-                    fontSize: 18,
+                    fontSize: responsiveFontSize(2),
                     // fontWeight: "bold",
                     textAlign: "center",
                   }}
@@ -260,7 +260,7 @@ export default function SubscriptionsScreen(props) {
                 <View
                   style={{
                     backgroundColor: "#2E9E9B",
-                    height: 40,
+                    height: responsiveHeight(5),
                     width: "60%",
                     justifyContent: "center",
                     alignItems: "center",
@@ -276,7 +276,7 @@ export default function SubscriptionsScreen(props) {
                       <Text
                         style={{
                           textAlign: "center",
-                          fontSize: 16,
+                          fontSize: responsiveFontSize(2),
                           color: "white",
                           fontWeight: "bold",
                         }}
@@ -293,7 +293,7 @@ export default function SubscriptionsScreen(props) {
                         <Text
                           style={{
                             textAlign: "center",
-                            fontSize: 16,
+                            fontSize: responsiveFontSize(2),
                             color: "white",
                             fontWeight: "bold",
                           }}
@@ -316,229 +316,277 @@ export default function SubscriptionsScreen(props) {
         }}
       >
         <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 5 }}>
-          <View style={{ backgroundColor: "#e3e3e3", flex: 1, margin: 5, width: "95%" }}>
-            {
-              !userSubscription ? (
-                <View>
+          <View
+            style={{
+              backgroundColor: "#e3e3e3",
+              flex: 1,
+              margin: 5,
+              width: "95%",
+            }}
+          >
+            {!userSubscription ? (
+              <View>
+                <View
+                  style={{
+                    // width: "100%",
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <View
                     style={{
                       // width: "100%",
                       flex: 1,
                       alignItems: "center",
                       justifyContent: "center",
+                    }}
+                  >
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(3),
+                          color: "#2E9E9B",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        VIP Subscriptions
+                      </Text>
+                    </View>
 
+                    <View style={styles.card}>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(1.4),
+                          color: "#185a9d",
+                          marginBottom: 15,
+                          fontWeight: "bold",
+                          // textAlign: "center",
+                        }}
+                      >
+                        Collect points based on the Subscription Level you are
+                        in.
+                      </Text>
+
+                      <View
+                        style={{
+                          ...styles.card2,
+                          // justifyContent: "center",
+                          // alignItems: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access VIP parking
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Free car wash
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Free liters of petrol
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access to the valet
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: responsiveScreenFontSize(2),
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access to projector rooms
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      width: "100%",
+                      flex: 1,
                     }}
                   >
                     <View
+                      width={Dimensions.get("window").width / 1}
                       style={{
                         // width: "100%",
                         flex: 1,
                         alignItems: "center",
                         justifyContent: "center",
-
+                        flexDirection: "row",
                       }}
                     >
-                      <View >
-                        <Text
-                          style={{ fontSize: responsiveScreenFontSize(3), color: "#2E9E9B", fontWeight: "bold" }}
-                        >
-                          VIP Subscriptions
-                    </Text>
-                      </View>
-
-                      <View style={styles.card}>
-                        <Text
-                          style={{
-                            fontSize: responsiveScreenFontSize(1.4),
-                            color: "#185a9d",
-                            marginBottom: 15,
-                            fontWeight: "bold"
-                            // textAlign: "center",
-                          }}
-                        >
-                          Collect points based on the Subscription Level you are in.
-                    </Text>
-
+                      {levels.map((l, i) => (
                         <View
                           style={{
-                            ...styles.card2,
-                            // justifyContent: "center",
-                            // alignItems: "center",
-
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access VIP parking
-                    </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Free car wash
-                      </Text>
-                          </View>
+                          <Image
+                            width={Dimensions.get("window").width / 3.5}
+                            source={levelPics[i]}
+                          />
 
                           <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Free liters of petrol
-                     </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access to the valet
-                      </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access to projector rooms
-                     </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        width: "100%",
-                        flex: 1,
-                      }}
-                    >
-
-                      <View
-                        width={Dimensions.get("window").width / 1}
-                        style={
-                          {
-                            // width: "100%",
-                            flex: 1,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexDirection: "row"
-                          }}
-                      >
-                        {levels.map((l, i) => (
-                          <View
-
                             style={{
                               flex: 1,
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
                               justifyContent: "center",
                               alignItems: "center",
-
+                              // marginTop: "10%",
                             }}
                           >
-                            <Image
-                              width={Dimensions.get("window").width / 3.5}
-                              source={levelPics[i]}
-                            />
-
                             <View
+                              width={Dimensions.get("window").width / 4}
                               style={{
                                 flex: 1,
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                justifyContent: "center",
                                 alignItems: "center",
-                                // marginTop: "10%",
+                                justifyContent: "center",
+                                paddingTop: "35%",
+                                // backgroundColor: "red",
+                                // justifyContent: "center",
+                                // alignItems: "flex-end",
+                                // marginTop: "-12%",
+                                // marginEnd: "-3%",
                               }}
                             >
-                              <View
-                                width={Dimensions.get("window").width / 4}
+                              <Text
+                                style={
+                                  deviceType === 1 || deviceType === 0
+                                    ? {
+                                      ...styles.levelDescription,
+                                      fontSize: responsiveScreenFontSize(2.8),
+                                    }
+                                    : {
+                                      ...styles.levelDescription,
+                                      fontSize: responsiveScreenFontSize(1.8),
+                                    }
+                                }
+                              >
+                                {l.price} QR
+                              </Text>
+                            </View>
+                            <View style={{ alignItems: "flex-start", flex: 1 }}>
+                              <Text
+                                style={
+                                  deviceType === 1 || deviceType === 0
+                                    ? {
+                                      ...styles.levelDescription,
+                                      fontSize: responsiveScreenFontSize(2),
+                                    }
+                                    : {
+                                      ...styles.levelDescription,
+                                      fontSize: responsiveScreenFontSize(1.8),
+                                    }
+                                }
+                              >
+                                Points: {l.points}
+                              </Text>
+                            </View>
+                            <View
+                              style={{ alignItems: "flex-start", flex: 0.6 }}
+                            >
+                              <TouchableOpacity
+                                onPress={() => process(l)}
                                 style={{
-                                  flex: 1,
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  paddingTop: "35%",
-                                  // backgroundColor: "red",
-                                  // justifyContent: "center",
-                                  // alignItems: "flex-end",
-                                  // marginTop: "-12%",
-                                  // marginEnd: "-3%",
+                                  width: "100%",
+                                  // height: "100%",
+                                  // backgroundColor: "#e3e3e3",
                                 }}
                               >
                                 <Text
@@ -546,351 +594,361 @@ export default function SubscriptionsScreen(props) {
                                     deviceType === 1 || deviceType === 0
                                       ? {
                                         ...styles.levelDescription,
-                                        fontSize: responsiveScreenFontSize(2.8),
-                                      }
-                                      : {
-                                        ...styles.levelDescription,
-                                        fontSize: responsiveScreenFontSize(1.8),
-                                      }
-                                  }
-                                >
-                                  {l.price} QR
-                            </Text>
-                              </View>
-                              <View style={{ alignItems: "flex-start", flex: 1 }}>
-                                <Text
-                                  style={
-                                    deviceType === 1 || deviceType === 0
-                                      ? {
-                                        ...styles.levelDescription,
                                         fontSize: responsiveScreenFontSize(2),
+                                        fontWeight: "bold",
+                                        // color: "gray",
                                       }
                                       : {
                                         ...styles.levelDescription,
-                                        fontSize: responsiveScreenFontSize(1.8),
+                                        fontSize: responsiveScreenFontSize(
+                                          1.8
+                                        ),
+                                        fontWeight: "bold",
                                       }
                                   }
                                 >
-                                  Points: {l.points}
+                                  Sign Up
                                 </Text>
-
-                              </View>
-                              <View style={{ alignItems: "flex-start", flex: 0.6 }}>
-                                <TouchableOpacity
-                                  onPress={() => process(l)}
-                                  style={{
-                                    width: "100%",
-                                    // height: "100%",
-                                    // backgroundColor: "#e3e3e3",
-                                  }}
-                                >
-                                  <Text
-                                    style={
-                                      deviceType === 1 || deviceType === 0
-                                        ? {
-                                          ...styles.levelDescription,
-                                          fontSize: responsiveScreenFontSize(2),
-                                          fontWeight: "bold",
-                                          // color: "gray",
-                                        }
-                                        : {
-                                          ...styles.levelDescription,
-                                          fontSize: responsiveScreenFontSize(1.8),
-                                          fontWeight: "bold",
-                                        }
-                                    }
-                                  >
-                                    Sign Up
-                                </Text>
-                                </TouchableOpacity>
-                              </View>
+                              </TouchableOpacity>
                             </View>
                           </View>
-                        ))}
-                      </View>
+                        </View>
+                      ))}
                     </View>
                   </View>
                 </View>
-              ) : (
-                  <>
-                    <View
-                      width={Dimensions.get("window").width / 1}
-                      style={
-                        {
-                          // width: "100%",
-                          flex: 1,
-                          alignItems: "center",
-                          justifyContent: "center",
-
-                        }}
-                    >
-                      <View >
-                        <Text
-                          style={{ fontSize: responsiveScreenFontSize(3), color: "#2E9E9B", fontWeight: "bold" }}
-                        >
-                          VIP Subscriptions
-                </Text>
-                      </View>
-
-                      <View style={styles.card}>
-                        <Text
-                          style={{
-
-                            fontSize: responsiveScreenFontSize(2),
-                            color: "#185a9d",
-                            marginBottom: 15, fontWeight: "bold"
-
-                            // textAlign: "center",
-                          }}
-                        >
-                          your subscription level is: {levels[levels.findIndex(l => l.level == userSubscription.type)].level}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: responsiveScreenFontSize(2),
-                            color: "#185a9d",
-                            marginBottom: 15,
-                            // textAlign: "center",
-                          }}
-                        >
-                          Subscription will end at:{" "}
-                          {moment(userSubscription.endDate.toDate()).format("L")}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: responsiveScreenFontSize(1.5),
-                            color: "#185a9d",
-                            marginBottom: 15, fontWeight: "bold"
-                            // textAlign: "center",
-                          }}
-                        >
-                          You can use your Points in the Following services
-                        </Text>
-
-                        <View
-                          style={{
-                            ...styles.card2,
-                            // justifyContent: "center",
-                            // alignItems: "center",
-
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access VIP parking
-                    </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Free car wash
-                    </Text>
-                          </View>
-
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Free liters of petrol
-                    </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access to the valet
-                    </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AntDesign
-                              name="check"
-                              size={20}
-                              style={{ color: "#2E9E9B" }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                color: "#185a9d",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Access to projector rooms
-                    </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={{
+              </View>
+            ) : (
+                <>
+                  <View
+                    width={Dimensions.get("window").width / 1}
+                    style={{
+                      // width: "100%",
                       flex: 1,
-                      justifyContent: "center",
                       alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(3),
+                          color: "#2E9E9B",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        VIP Subscriptions
+                    </Text>
+                    </View>
 
-                    }}>
+                    <View style={styles.card}>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "#185a9d",
+                          marginBottom: 15,
+                          fontWeight: "bold",
 
-                      <Image
-                        // width={Dimensions.get("window").width / 1}
-                        height={responsiveScreenHeight(44)}
-                        source={levelPics[levels.findIndex(l => l.level == userSubscription.type)]}
-                      />
+                          // textAlign: "center",
+                        }}
+                      >
+                        your subscription level is:{" "}
+                        {
+                          levels[
+                            levels.findIndex(
+                              (l) => l.level == userSubscription.type
+                            )
+                          ].level
+                        }
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(2),
+                          color: "#185a9d",
+                          marginBottom: 15,
+                          // textAlign: "center",
+                        }}
+                      >
+                        Subscription will end at:{" "}
+                        {moment(userSubscription.endDate.toDate()).format("L")}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: responsiveScreenFontSize(1.5),
+                          color: "#185a9d",
+                          marginBottom: 15,
+                          fontWeight: "bold",
+                          // textAlign: "center",
+                        }}
+                      >
+                        You can use your Points in the Following services
+                    </Text>
 
                       <View
                         style={{
-                          flex: 1,
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          justifyContent: "space-around",
-                          alignItems: "center",
-                          // backgroundColor: "pink"
-                          // marginTop: "10%",
+                          ...styles.card2,
+                          // justifyContent: "center",
+                          // alignItems: "center",
                         }}
                       >
                         <View
-                          width={Dimensions.get("window").width / 4}
-                          // width={
-                          //   deviceType === 1 || deviceType === 0
-                          //     ? responsiveScreenFontSize(3.5)
-                          //     :
-                          //     responsiveScreenFontSize(3.5)
-                          // }
                           style={{
-                            flex: 1,
-                            alignItems: "center",
+                            flexDirection: "row",
                             justifyContent: "center",
-                            paddingTop: "10%",
-                            //backgroundColor: "red",
-                            // justifyContent: "center",
-                            // alignItems: "flex-end",
-                            // marginTop: "-12%",
-                            // marginEnd: "-3%",
+                            alignItems: "center",
                           }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access VIP parking
+                        </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Free car wash
+                        </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Free liters of petrol
+                        </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access to the valet
+                        </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AntDesign
+                            name="check"
+                            size={20}
+                            style={{ color: "#2E9E9B" }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              color: "#185a9d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Access to projector rooms
+                        </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      // width={Dimensions.get("window").width / 1}
+                      height={responsiveScreenHeight(32)}
+                      source={
+                        levelPics[
+                        levels.findIndex(
+                          (l) => l.level == userSubscription.type
+                        )
+                        ]
+                      }
+                    />
+
+                    <View
+                      style={{
+                        flex: 1,
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        // backgroundColor: "pink"
+                        // marginTop: "10%",
+                      }}
+                    >
+                      <View
+                        width={Dimensions.get("window").width / 4}
+                        // width={
+                        //   deviceType === 1 || deviceType === 0
+                        //     ? responsiveScreenFontSize(3.5)
+                        //     :
+                        //     responsiveScreenFontSize(3.5)
+                        // }
+                        style={{
+                          flex: 1,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          paddingTop: "14%",
+                          //backgroundColor: "red",
+                          // justifyContent: "center",
+                          // alignItems: "flex-end",
+                          // marginTop: "-12%",
+                          // marginEnd: "-3%",
+                        }}
+                      >
+                        <Text
+                          style={
+                            deviceType === 1 || deviceType === 0
+                              ? {
+                                ...styles.levelDescription,
+                                fontSize: responsiveScreenFontSize(2.5),
+                              }
+                              : {
+                                ...styles.levelDescription,
+                                fontSize: responsiveScreenFontSize(2.5),
+                              }
+                          }
+                        >
+                          {
+                            levels[
+                              levels.findIndex(
+                                (l) => l.level == userSubscription.type
+                              )
+                            ].price
+                          }{" "}
+                        QAR
+                      </Text>
+                      </View>
+                      <View
+                        style={{
+                          alignItems: "flex-start",
+                          flex: 1,
+                          paddingTop: "10%",
+                        }}
+                      >
+                        <Text
+                          style={
+                            deviceType === 1 || deviceType === 0
+                              ? {
+                                ...styles.levelDescription,
+                                fontSize: responsiveScreenFontSize(2.3),
+                              }
+                              : {
+                                ...styles.levelDescription,
+                                fontSize: responsiveScreenFontSize(2.5),
+                              }
+                          }
+                        >
+                          Points:{" "}
+                          {
+                            levels[
+                              levels.findIndex(
+                                (l) => l.level == userSubscription.type
+                              )
+                            ].points
+                          }
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          alignItems: "center",
+                          flex: 1,
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
+                            subscribe("update");
+                          }}
+                          style={{ width: "100%", height: "50%" }}
                         >
                           <Text
                             style={
                               deviceType === 1 || deviceType === 0
-                                ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2.5) }
+                                ? {
+                                  ...styles.levelDescription,
+                                  fontSize: responsiveScreenFontSize(2),
+                                }
                                 : {
                                   ...styles.levelDescription,
-                                  fontSize: responsiveScreenFontSize(2.5),
+                                  fontSize: responsiveScreenFontSize(1.5),
                                 }
                             }
                           >
-                            {levels[levels.findIndex(l => l.level == userSubscription.type)].price} QAR
-                      </Text>
-                        </View>
-                        <View style={{ alignItems: "flex-start", flex: 1, paddingTop: "12%" }}>
-                          <Text
-                            style={
-                              deviceType === 1 || deviceType === 0
-                                ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2.8) }
-                                : {
-                                  ...styles.levelDescription,
-                                  fontSize: responsiveScreenFontSize(2.5),
-                                }
-                            }
-                          >
-                            Points: {levels[levels.findIndex(l => l.level == userSubscription.type)].points}
-                          </Text>
-
-                        </View>
-                        <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
-                          <TouchableOpacity onPress={() => { subscribe("update") }} style={{ width: "100%", height: "50%", }}>
-                            <Text
-                              style={
-                                deviceType === 1 || deviceType === 0
-                                  ? { ...styles.levelDescription, fontSize: responsiveScreenFontSize(2) }
-                                  : {
-                                    ...styles.levelDescription,
-                                    fontSize: responsiveScreenFontSize(1.5),
-                                  }
-                              }
-                            >
-                              renew
-                      </Text>
-
-                          </TouchableOpacity>
-
-                        </View>
+                            Renew
+                        </Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                  </>
-                )}
+                  </View>
+                </>
+              )}
           </View>
         </View>
       </View>
     </View>
-
   );
 }
 
@@ -937,7 +995,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   levelDescription: {
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   card: {
     backgroundColor: "#e3e3e3",
@@ -956,7 +1014,7 @@ const styles = StyleSheet.create({
   },
   card2: {
     backgroundColor: "white",
-    width: "100%",
+    width: responsiveScreenWidth(80),
     // marginTop: "3%",
     // paddingBottom: "10%",
     borderWidth: 2,

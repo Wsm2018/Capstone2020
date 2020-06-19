@@ -386,7 +386,7 @@ export default function MyAdvertisements(props) {
                   >
                     You have no Ads
                   </Text>
-                  <View
+                  {/* <View
                     style={{
                       flex: 4,
                       // backgroundColor: "red",
@@ -419,7 +419,7 @@ export default function MyAdvertisements(props) {
                         + Request
                       </Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                 </View>
               </View>
             )}
@@ -603,7 +603,7 @@ export default function MyAdvertisements(props) {
                   >
                     You have no Ads
                   </Text>
-                  <View
+                  {/* <View
                     style={{
                       flex: 4,
                       // backgroundColor: "red",
@@ -636,7 +636,7 @@ export default function MyAdvertisements(props) {
                         + Request
                       </Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                 </View>
               </View>
             )}
@@ -820,7 +820,7 @@ export default function MyAdvertisements(props) {
                   >
                     You have no Ads
                   </Text>
-                  <View
+                  {/* <View
                     style={{
                       flex: 4,
                       // backgroundColor: "red",
@@ -853,7 +853,7 @@ export default function MyAdvertisements(props) {
                         + Request
                       </Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                 </View>
               </View>
             )}
